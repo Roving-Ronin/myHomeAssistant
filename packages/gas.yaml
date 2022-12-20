@@ -1,0 +1,139 @@
+#
+#  Based upon sensor in ESP device being configured as type PULSE  (sensor ID = sensor.gas_meter_consumption )
+#
+
+template:
+  - sensor:
+      - name: "Gas Consumed m3"
+        unique_id: gas_consumed_m3
+        state: "{{ states('sensor.gas_meter_consumption') | float(0) * 1 }}"     # Float x 1 instead of 0.01 as sensor in ESP device already set to 0 
+        unit_of_measurement: "m³"
+        icon: mdi:fire
+        device_class: gas
+        state_class: total_increasing
+
+      - name: "Gas Consumed m3 (Corrected)"
+        unique_id: gas_consumed_m3_corrected
+        state: "{{ states('sensor.gas_consumed_m3') | float(0) * 0.9775 }}"   # Change 0.9775 to your retailers CORRECTION FACTOR
+        unit_of_measurement: "m³"
+        icon: mdi:fire
+        device_class: gas
+        state_class: total_increasing
+
+      - name: "Gas Consumed MJ"
+        unique_id: gas_consumed_mj
+        state: "{{ states('sensor.gas_consumed_m3_corrected') | float(0) * 38.29 }}"   #Update 38.29 to your retailers HEATING VALUE
+        unit_of_measurement: "MJ"
+        icon: mdi:fire
+        device_class: gas
+        state_class: total_increasing
+
+      - name: "Gas Cost Per MJ"
+        unique_id: gas_cost_per_mj
+        icon: mdi:cash-minus
+        unit_of_measurement: "$/MJ"
+        state: "0.034700"                          # update to reflect your retailers cost per MJ. This yaml assumes only one rate per MJ used
+
+#      - name: "Gas Import Rate MJ"
+#        unique_id: gas_import_rate_mj
+#        icon: mdi:cash-minus
+#        unit_of_measurement: $
+#        state: "{{ states('sensor.gas_cost_per_mj') | float(0) * states('sensor.gas_consumed_mj') }}"
+
+      - name: "Gas Daily Supply Charge"
+        unique_id: gas_daily_supply_charge
+        icon: mdi:cash-minus
+        unit_of_measurement: "AUD"
+        state: "0.58500"
+
+      - name: "Gas Total Cost Daily"
+        unique_id: gas_total_cost_daily
+        icon: mdi:currency-usd
+        unit_of_measurement: $
+        state_class: total
+        device_class: monetary
+        state: >
+          {% set supply = states('sensor.gas_daily_supply_charge') | float(0) %}
+          {% set usage = states('sensor.gas_consumed_daily_mj') | float(0) * states('sensor.gas_cost_per_mj') | float(0) %}
+          {{ (supply + usage) | round(2) }}
+
+      - name: "Gas Total Cost Monthly"
+        unique_id: gas_total_cost_monthly
+        icon: mdi:currency-usd
+        unit_of_measurement: $
+        state_class: total
+        device_class: monetary
+        state: >
+          {% set supply = states('sensor.gas_daily_supply_charge') | float(0) * now().day %}
+          {% set usage = states('sensor.gas_consumed_monthly_mj') | float(0) * states('sensor.gas_cost_per_mj') | float(0) %}
+          {{ (supply + usage) | round(2) }}
+
+      - name: "Gas Total Cost Yearly"
+        unique_id: gas_total_cost_yearly
+        icon: mdi:currency-usd
+        unit_of_measurement: $
+        state_class: total
+        device_class: monetary
+        state: >
+          {% set supply = states('sensor.gas_daily_supply_charge') | float(0) * ( states('sensor.days_passed_in_year') | int(0) + 1 ) %}
+          {% set usage = states('sensor.gas_consumed_yearly_mj') | float(0) * states('sensor.gas_cost_per_mj') | float(0) %}
+          {{ (supply + usage) | round(2) }}
+
+
+utility_meter:
+  gas_consumed_daily_m3:
+    unique_id: gas_consumed_daily_m3 
+    source: sensor.gas_consumed_m3
+    name: Gas Consumed Daily m³
+    cycle: daily
+
+  gas_consumed_daily_m3_corrected:
+    unique_id: gas_consumed_daily_m3_corrected 
+    source: sensor.gas_consumed_m3_corrected
+    name: Gas Consumed Daily m³ (Corrected)
+    cycle: daily
+
+  gas_consumed_monthly_m3:
+    unique_id: gas_consumed_monthly_m3
+    source: sensor.gas_consumed_m3
+    name: Gas Consumed Monthly m³
+    cycle: monthly
+
+  gas_consumed_monthly_m3_corrected:
+    unique_id: gas_consumed_monthly_m3_corrected
+    source: sensor.gas_consumed_m3_corrected
+    name: Gas Consumed Monthly m³ (Corrected)
+    cycle: monthly
+
+  gas_consumed_yearly_m3:
+    unique_id: gas_consumed_yearly_m3
+    source: sensor.gas_consumed_m3
+    name: Gas Consumed Yearly m³
+    cycle: yearly
+
+  gas_consumed_yearly_m3_corrected:
+    unique_id: gas_consumed_yearly_m3_corrected
+    source: sensor.gas_consumed_m3_corrected
+    name: Gas Consumed Yearly m³ (Corrected)
+    cycle: yearly
+
+
+# Note MJ is already corrected (above), so no need for reading verses corrected meters
+
+  gas_consumed_daily_mj:
+    unique_id: gas_consumed_daily_mj 
+    source: sensor.gas_consumed_mj
+    name: Gas Consumed Daily mj
+    cycle: daily
+
+  gas_consumed_monthly_mj:
+    unique_id: gas_consumed_monthly_mj
+    source: sensor.gas_consumed_mj
+    name: Gas Consumed Monthly mj
+    cycle: monthly
+
+  gas_consumed_yearly_mj:
+    unique_id: gas_consumed_yearly_mj
+    source: sensor.gas_consumed_mj
+    name: Gas Consumed Yearly mj
+    cycle: yearly
