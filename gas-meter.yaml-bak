@@ -15,21 +15,21 @@ preferences:
 # Enable Home Assistant API
 api:
   encryption:
-    key: "YamQPfQvLIPBEtRZTRA5u7+QajSe+oFWyQZwcOqp13A="
+    key: "ADD-YOUR-OWN-HA-DEVICE-KEY-HERE"
 
 ota:
-  password: "a9a3103541255b3c8f381d12941d11dc"
+  password: "ADD-YOUR-OWN-OTA-DEVICE-PWD-HERE"
 
 
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
-  domain: .iot.home.lan
+  domain: .iot.home.lan        # Update to your own home DNS domain
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Gas-Meter Fallback Hotspot"
-    password: "8tQiz8ufiWTk"
+    password: "ADD-YOUR-OWN-WiFi-FALLBACK-PWD-HERE"
 
 captive_portal:
 
