@@ -1,4 +1,5 @@
 ### This package assumes you have an import sensor from Solar Analytics "sensor.sa_todays_energy_imported_kwh" 
+### from: https://github.com/PeterH24x7/-Solar-Analytics-integration-for-Home-Assistant-Energy-monitoring
 ### which provides cumulative electricity imported in kWh and an export sensor "sensor.sa_todays_energy_exported_kwh"
 ### which provides cumulative electricity exported in kWh. 
 
