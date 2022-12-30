@@ -1,6 +1,9 @@
-### This package assumes you have an import sensor from Solar Analytics "sensor.sa_todays_energy_imported_kwh" which provides cumulative electricity imported in kWh
-### and an export sensor "sensor.sa_todays_energy_exported_kwh" which provides cumulative electricity exported in kWh. 
+### This package assumes you have an import sensor from Solar Analytics "sensor.sa_todays_energy_imported_kwh" 
+### which provides cumulative electricity imported in kWh and an export sensor "sensor.sa_todays_energy_exported_kwh"
+### which provides cumulative electricity exported in kWh. 
+
 ### If you use other sensor names, adjust everything below as required to match. 
+### Credits to SgtBatten for original code this was developed from.
 
 binary_sensor:
   - platform: workday
