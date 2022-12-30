@@ -96,8 +96,8 @@ template:
         unit_of_measurement: $/day
         state: 1.39370                                                            ### edit to your daily supply charge
 
-      - name: Tariff - Electricity
-        unique_id: tariff_electricity
+      - name: Tariff - Electricity                                                ### Select this in Energy Dashboard to show daily energy costs
+        unique_id: tariff_electricity                                             ### based upon used kWh and daily supply charge (preferred option)
         icon: mdi:currency-usd
         state_class: total_increasing
         device_class: monetary
@@ -109,9 +109,9 @@ template:
           {% set peak = states('sensor.electricity_imported_power_daily_peak') | float(0) * states('sensor.electricity_import_rate_peak') | float(0) %}
           {{ (supply + offpeak + shoulder + peak) | round(2) }}
 
-      - name: "Electricity Total Cost Daily"
-        unique_id: electricity_total_cost_daily
-        icon: mdi:currency-usd
+      - name: "Electricity Total Cost Daily"                                      ### Select this in Energy Dashboard to show daily energy costs
+        unique_id: electricity_total_cost_daily                                   ### based upon used kWh daily supply charge minus FIT not recommended
+        icon: mdi:currency-usd                                                    ### if you have Export tracking enabled and FIT applied there
         unit_of_measurement: $
         state_class: total
         device_class: monetary
