@@ -78,7 +78,7 @@ captive_portal:
 
 dashboard_import:
   # Imports this configuration template for Gas-Meter from GitHub
-  package_import_url: github://RovingRonin/Home-Assistant/esphome/gas-meter.yaml
+  package_import_url: github://Roving-Ronin/Home-Assistant/esphome/gas-meter.yaml
 
 globals:
   # Globals for use with pulse meter, to allow storing and setting a base reading
