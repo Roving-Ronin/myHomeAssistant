@@ -5,6 +5,7 @@ substitutions:
   device_description: "Measure the household gas consumption, on Elster 750 meter"
   project_name: "rovingronin.gas-meter-v1"
   project_version: "1.0"
+  dns_domain: "iot.home.lan"
 
 esphome:
   # Configures these settings to use the substituions defined below
@@ -30,7 +31,7 @@ preferences:
 
 wifi:
   # Set the DNS domain of the device #
-  domain: !secret dns_domain
+  domain: "${dns_domain}"
   # Directly connects to WiFi network without doing a full scan first
   fast_connect: true
   # This spawns an AP with the device name and mac address with no password
