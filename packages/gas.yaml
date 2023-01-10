@@ -1,6 +1,7 @@
 #
 #  Based upon sensor in ESP device being configured as type PULSE meter.
-#  Uses code from SgtBatten and also from https://community.home-assistant.io/t/using-home-assistant-to-calculate-my-energy-bill-using-data-from-my-solar-inverter/344913/1
+#  Uses code from SgtBatten and also from:
+# https://community.home-assistant.io/t/using-home-assistant-to-calculate-my-energy-bill-using-data-from-my-solar-inverter/344913/1
 #
 
 template:
@@ -110,7 +111,7 @@ utility_meter:
     unique_id: gas_consumed_quarterly_m3
     source: sensor.gas_meter_reading_m3
     name: Gas Consumed Quarterly m³
-#    cycle: quarterly                                  # Quarterly cycle will see this reset on 1 Jan, 1 Apr, 1 July and 1 Oct. Need to manually add automations to rest on your meter reading day.
+#    cycle: quarterly          # Quarterly cycle will see this reset on 1 Jan, 1 Apr, 1 July and 1 Oct. Need to manually add automations to rest on your meter reading day.
 
 
 # ---------------------------------------------------------------------------
@@ -132,7 +133,7 @@ utility_meter:
     unique_id: gas_consumed_quarterly_mj
     source: sensor.gas_meter_reading_mj
     name: Gas Consumed Quarterly mj
-#    cycle: quarterly                                  # Quarterly cycle will see this reset on 1 Jan, 1 Apr, 1 July and 1 Oct. Need to manually add automations to rest on your meter reading day.
+#    cycle: quarterly             # Quarterly cycle will see this reset on 1 Jan, 1 Apr, 1 July and 1 Oct. Need to manually add automations to rest on your meter reading day.
     tariffs:
       - rate_1
       - rate_2
@@ -145,7 +146,7 @@ utility_meter:
     unique_id: gas_consumed_quarterly_mj_total
     source: sensor.gas_meter_reading_mj
     name: Gas Consumed Quarterly mj Total
-#    cycle: quarterly                                  # Quarterly cycle will see this reset on 1 Jan, 1 Apr, 1 July and 1 Oct. Need to manually add automations to rest on your meter reading day.
+#    cycle: quarterly              # Quarterly cycle will see this reset on 1 Jan, 1 Apr, 1 July and 1 Oct. Need to manually add automations to rest on your meter reading day.
 
 
 # ---------------------------------------------------------------------------
