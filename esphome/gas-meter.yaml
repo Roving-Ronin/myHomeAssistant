@@ -22,11 +22,11 @@ esphome:
 esp8266:
   # Define the type of ESP8266 board being used
   board: 
-  # Enables the ESP to restore the 'pulse count' used to record the 'Reading Total' sensor. Not required for ESP32.
+  # Enables the ESP to restore the 'pulse count' used to record the 'Reading Total' sensor. Not required for ESP32
   restore_from_flash: true
 
 preferences:
-  # Enable to allow storing of 'Read Total' between reboots and flashing.
+  # Enable to allow storing of 'Read Total' between reboots and flashing
   flash_write_interval: 5min
 
 wifi:
