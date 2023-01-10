@@ -1,7 +1,7 @@
 #
-#  Based upon sensor in ESP device being configured as type PULSE meter.
+#  Based upon sensor in ESP device being configured as type PULSE meter, on GPIO PIN 5.
 #  Uses code from SgtBatten and also from:
-# https://community.home-assistant.io/t/using-home-assistant-to-calculate-my-energy-bill-using-data-from-my-solar-inverter/344913/1
+#  https://community.home-assistant.io/t/using-home-assistant-to-calculate-my-energy-bill-using-data-from-my-solar-inverter/344913/1
 #
 
 template:
@@ -92,8 +92,8 @@ template:
 
 # ---------------------------------------------------------------------------
 # 
-# Utility meter consumption totals in cubic meters (m3), as the gas meter provides, with retailer correction factor applied.
-# No tariffs are required here, as the retailers count the overall m3 for the quarter, but bill upon the MJ.
+#  Utility meter consumption totals in cubic meters (m3), as the gas meter provides, with retailer correction factor applied.
+#  No tariffs are required here, as the retailers count the overall m3 for the quarter, but bill upon the MJ.
 #
 
 utility_meter:
@@ -105,18 +105,21 @@ utility_meter:
     cycle: daily
 
 #
-# Quarterly m3 total only included to allow validation against the retailers m3 reading on their quarterly invoice.
+#  Quarterly m3 total only included to allow validation against the retailers m3 reading on their quarterly invoice.
 #
   gas_consumed_quarterly_m3:
     unique_id: gas_consumed_quarterly_m3
     source: sensor.gas_meter_reading_m3
     name: Gas Consumed Quarterly m³
-#    cycle: quarterly          # Quarterly cycle will see this reset on 1 Jan, 1 Apr, 1 July and 1 Oct. Need to manually add automations to rest on your meter reading day.
+# Quarterly cycle will see this reset on 1 Jan, 1 Apr, 1 July and 1 Oct. 
+# Need to manually add automations to rest on your meter reading day.
+#    cycle: quarterly
+
 
 
 # ---------------------------------------------------------------------------
 # 
-# Utility meter consumption totals in megajoules (mj), as converted from gas meter m3 reading, with retailer correction factor applied.
+#  Utility meter consumption totals in megajoules (mj), as converted from gas meter m3 reading, with retailer correction factor applied.
 #
 
   gas_consumed_daily_mj:
@@ -133,25 +136,30 @@ utility_meter:
     unique_id: gas_consumed_quarterly_mj
     source: sensor.gas_meter_reading_mj
     name: Gas Consumed Quarterly mj
-#    cycle: quarterly             # Quarterly cycle will see this reset on 1 Jan, 1 Apr, 1 July and 1 Oct. Need to manually add automations to rest on your meter reading day.
+# Quarterly cycle will see this reset on 1 Jan, 1 Apr, 1 July and 1 Oct. 
+# Need to manually add automations to rest on your meter reading day.
+#    cycle: quarterly
     tariffs:
       - rate_1
       - rate_2
       - rate_3
 
 #
-#  The Quarterly MJ Total reading is required to provide a reading against which the tariff rates are triggered, as 0-1905mj / 1905-252558mj etc are based on total for the quarter
+#  The Quarterly MJ Total reading is required to provide a reading against which the tariff rates are triggered,
+#  as 0-1905mj / 1905-252558mj etc are based on total for the quarter
 #
   gas_consumed_quarterly_mj_total:
     unique_id: gas_consumed_quarterly_mj_total
     source: sensor.gas_meter_reading_mj
     name: Gas Consumed Quarterly mj Total
-#    cycle: quarterly              # Quarterly cycle will see this reset on 1 Jan, 1 Apr, 1 July and 1 Oct. Need to manually add automations to rest on your meter reading day.
+# Quarterly cycle will see this reset on 1 Jan, 1 Apr, 1 July and 1 Oct. 
+# Need to manually add automations to rest on your meter reading day.
+#    cycle: quarterly
 
 
 # ---------------------------------------------------------------------------
 #
-# Automation to monitor (quarterly mj reading) and switch tarrifs as they hit mj consumed thresholds for the quarter.
+#  Automation to monitor (quarterly mj reading) and switch tarrifs as they hit mj consumed thresholds for the quarter.
 #
 
 automation:
