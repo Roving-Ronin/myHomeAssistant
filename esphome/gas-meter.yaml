@@ -1,0 +1,201 @@
+substitutions:
+  # Provides substitutions or variables that are then called elsewhere multiple times in the config
+  device_name: "gas-meter"
+  friendly_name: "Gas Meter"
+  device_description: "Measure the household gas consumption, on Elster 750 meter"
+  project_name: "rovingronin.gas-meter-v1"
+  project_version: "1.0"
+  dns_domain: "iot.home.lan"
+
+esphome:
+  # Configures these settings to use the substituions defined below
+  name: "${device_name}"
+  comment: "${device_description}"
+  name_add_mac_suffix: false
+  project:
+    name: "${project_name}"
+    version: "${project_version}"
+
+preferences:
+  # Enable to allow storing of 'Read Total' between reboots and flashing
+  flash_write_interval: 5min
+
+wifi:
+  # Set the DNS domain of the device #
+  domain: "${dns_domain}"
+  # Directly connects to WiFi network without doing a full scan first
+  fast_connect: true
+  # This spawns an AP with the device name and mac address with no password
+  ap: {}
+
+api:
+  # Define service that calls the 'button:' defined below to reset the (current) Reading'
+  services:
+    - service: reset_total_energy
+      then:
+        - button.press:
+            id: button_reset_reading
+
+ota:
+
+button:
+  # Restart the ESP Device
+  - platform: restart
+    name: '${friendly_name} - Restart'
+  # Reset the total energy entity (Gas Meter - Reading)
+  - platform: template
+    name: '${friendly_name} - Reset Reading'
+    id: button_reset_reading
+    on_press:
+      - pulse_meter.set_total_pulses:
+          id: sensor_gas_flow_rate
+          value: 0
+
+# Enable logging
+logger:
+  # Disables logging
+  baud_rate: 0
+
+mdns:
+  disabled: false
+
+web_server:
+  # Enables the local webserver on the ESP device, upon port 80
+  port: 80
+
+captive_portal:
+  # Enables the fall back WiFi hotspot and ability to connect and recover the device.
+  # See: https://esphome.io/components/captive_portal.html
+
+dashboard_import:
+  # Imports this configuration template for Gas-Meter from GitHub
+  package_import_url: github://Roving-Ronin/Home-Assistant/esphome/gas-meter.yaml
+
+globals:
+  # Globals for use with pulse meter, to allow storing and setting a base reading
+  # Go to HA Developer Tools --> Services and select the 'Utility Meter: Calibrate' and sensor 
+  # 'Gas Consumed Quarterly mj Total'and enter your physical meter reading after subtracting the
+  # last meter reading from your last bill. Remeber to use use the m3 with your retailers correction factor applied
+  - id: total_m3
+    type: float
+    restore_value: yes
+    
+binary_sensor:
+  # Creates the status sensor
+  - platform: status
+    name: '${friendly_name} - Status'
+
+
+text_sensor:
+  # Creates sensor for tracking the WiFi IP address
+  - platform: wifi_info
+    ip_address:
+      name: '${friendly_name} - WiFi IP Address'
+      icon: mdi:wifi
+      disabled_by_default: false
+    # Defines the WiFi SSID network to connect to
+    ssid:
+      name: '${friendly_name} - WiFi SSID'
+      icon: mdi:wifi-strength-2
+    # Creates sensor for tracking the WiFi IP MAC address
+    mac_address:
+      name: '${friendly_name} - WiFi MAC Address'
+  # Creates sensor for tracking the version of ESPHome installed
+  - platform: version
+    hide_timestamp: true
+    name: '${friendly_name} - Version of ESPHome'
+  # Creates a sensor of the name of installed project
+  - platform: template
+    name: '${friendly_name} - Project Name'
+    id: gas_meter_project
+    icon: "mdi:label-outline"
+    entity_category: diagnostic
+    lambda: |-
+      return {"${project_name}"};
+    update_interval: 6h
+  # Creates a sensor of the version of installed project
+  - platform: template
+    name: '${friendly_name} - Project Version'
+    id: gas_meter_version
+    icon: "mdi:label-outline"
+    entity_category: diagnostic
+    lambda: |-
+      return {"${project_version}"};
+    update_interval: 6h
+
+sensor:
+  # Send WiFi signal strength & uptime to HA
+  - platform: wifi_signal
+    name: "${friendly_name} - WiFi Strength"
+    update_interval: 120s
+  # Sensor uptime in seconds
+  - platform: uptime
+    name: "${friendly_name} - Uptime Sensor"
+    update_interval: 120s
+  # Gas pulse meter on GPIO 5 & 0.01m3 (10L) increments
+  - platform: pulse_meter
+    name: '${friendly_name} - Flow Rate'
+    id: "sensor_gas_flow_rate"
+    unit_of_measurement: "m³/h"
+    state_class: measurement
+    device_class: gas
+    icon: "mdi:pump"
+    accuracy_decimals: 2
+    pin:
+      number: 5
+      inverted: true
+      mode: INPUT_PULLUP
+    internal_filter_mode: PULSE
+    internal_filter: 2s
+    timeout: 5min
+    filters:
+      - multiply: 1.0
+    # Uses the above pulse_meter and adds sensor and calculations for tracking m3
+    total:    
+      name: '${friendly_name} - Reading'
+      id: sensor_gas_reading
+      unit_of_measurement: "m³"
+      icon: "mdi:gas"
+      state_class: "total_increasing"
+      device_class: gas
+      accuracy_decimals: 2
+      filters:
+        - multiply: 0.01
+    # Adds the calculation for 'Reading Total'
+      on_value: 
+        then:
+          - lambda: |-
+              static float previous_m3_value = 0.0;
+              float current_m3_value = id(sensor_gas_reading).state;
+              id(total_m3) += current_m3_value - previous_m3_value;
+              previous_m3_value = current_m3_value;
+  # Adds the 'Reading Total' that tracks the lifetime total of m3
+  - platform: template
+    name: "${friendly_name} - Reading Total"
+    id: sensor_gas_reading_total
+    unit_of_measurement: "m³"
+    device_class: gas
+    state_class: "total_increasing"
+    icon: "mdi:water"
+    accuracy_decimals: 2
+    lambda: |-
+      return id(total_m3);
+    # Set interval that updates are sent to HA instance
+    update_interval: 15s
+
+# Enable time component to reset energy at midnight
+time:
+    # Set sync to SNTP method
+    platform: sntp
+    id: sntp_time
+    # Define the timezone of the device
+    timezone: "Australia/Sydney"
+    # Change sync interval from default 5min
+    update_interval: 360min
+    # Set specific sntp servers to use
+    servers: 
+      - 2.au.pool.ntp.org
+      - 1.au.pool.ntp.org
+      - 0.au.pool.ntp.org
+  # Alternative sync option to sntp, using HA instances time
+#    platform: homeassistant
