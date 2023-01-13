@@ -49,7 +49,6 @@ api:
 
 ota:
 
-
 button:
   # Restart the ESP Device
   - platform: restart
@@ -69,8 +68,6 @@ button:
 
 # Enable logging
 logger:
-  # Disables logging
-  baud_rate: 0
 
 mdns:
   disabled: false
