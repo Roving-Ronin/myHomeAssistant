@@ -5,7 +5,7 @@ substitutions:
   device_description: "Measure the household gas consumption, on Elster 750 meter"
   project_name: "rovingronin.gas-meter-v1"
   project_version: "1.0"
-  dns_domain: "iot.home.lan"
+  dns_domain: ".iot.home.lan"
 
 esphome:
   # Configures these settings to use the substituions defined below
