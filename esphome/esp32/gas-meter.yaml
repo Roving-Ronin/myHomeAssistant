@@ -60,8 +60,6 @@ button:
 
 # Enable logging
 logger:
-  # Disables logging
-  baud_rate: 0
 
 mdns:
   disabled: false
