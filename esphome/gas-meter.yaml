@@ -21,7 +21,7 @@ esphome:
  # esp8266: https://esphome.io/components/esp8266.html
 esp8266:
   # Define the type of ESP8266 board being used
-  board: 
+#  board: 
   # Enables the ESP to restore the 'pulse count' used to record the 'Reading Total' sensor. Not required for ESP32
   restore_from_flash: true
 
