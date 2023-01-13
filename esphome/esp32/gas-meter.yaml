@@ -14,7 +14,7 @@ esphome:
   # Configures these settings to use the substituions defined below
   name: "${device_name}"
   comment: "${device_description}"
-  name_add_mac_suffix: false
+#  name_add_mac_suffix: false
   project:
     name: "${project_name}"
     version: "${project_version}"
