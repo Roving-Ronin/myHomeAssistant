@@ -1,0 +1,219 @@
+#
+#  Based upon sensor in ESP device being configured as type PULSE meter.
+#  Uses code from SgtBatten and also from https://community.home-assistant.io/t/using-home-assistant-to-calculate-my-energy-bill-using-data-from-my-solar-inverter/344913/1
+#  Version: 1.1
+#
+
+template:
+  - sensor:
+
+# ---------------------------------------------------------------------------
+#
+#  Takes sensor called 'gas_meter_reading' from the ESPHome device. Based upon the meter recording in 0.01m³ increments (10L)
+#  The correction factor is the factor the retailer applies to the meter reading, to allow for temperature affecting gas volume.
+#
+      - name: "Gas Meter Reading - m³"
+        unique_id: gas_meter_reading_m3
+        state: "{{ states('sensor.gas_meter_reading') | float(0) * 0.9775 }}"   # Change 0.9775 to your retailers CORRECTION FACTOR
+        unit_of_measurement: "m³"
+        icon: mdi:meter-gas-outline
+        device_class: gas
+        state_class: total_increasing
+
+#
+#  Takes the above sensor 'gas_meter_reading_m3' and applied the 'heating value' as determined by the retailer, to convert from m3 to MJ.
+#
+      - name: "Gas Meter Reading - MJ"
+        unique_id: gas_meter_reading_mj
+        state: "{{ states('sensor.gas_meter_reading_m3') | float(0) * 38.29 }}"   #Update 38.29 to your retailers HEATING VALUE
+        unit_of_measurement: "MJ"
+        icon: mdi:meter-gas-outline
+        device_class: energy
+        state_class: total_increasing
+
+# ---------------------------------------------------------------------------
+#
+#  Gas retailer consumption and daily connection fee charges.
+#
+      - name: "Gas Tariff Rate - 1"               # 0-1905mj per quarter
+        unique_id: gas_tariff_rate_1
+        icon: mdi:cash-minus
+        unit_of_measurement: "$/MJ"
+        state: "0.03470"                          # update to reflect your retailers cost per MJ
+
+      - name: "Gas Tariff Rate - 2"               # 1905-252558mj per quarter
+        unique_id: gas_tariff_rate_2
+        icon: mdi:cash-minus
+        unit_of_measurement: "$/MJ"
+        state: "0.02070"                          # update to reflect your retailers cost per MJ
+
+      - name: "Gas Tariff Rate - 3"               # above 252,558mj per quarter
+        unique_id: gas_tariff_rate_3
+        icon: mdi:cash-minus
+        unit_of_measurement: "$/MJ"
+        state: "0.01800"                          # update to reflect your retailers cost per MJ
+
+      - name: "Gas Supply Charge - Daily"
+        unique_id: gas_supply_charge_daily
+        icon: mdi:cash-minus
+        unit_of_measurement: "$"
+        state: "0.58500"
+
+# ---------------------------------------------------------------------------
+# 
+#  Calculate daily, quarterly and yearly costs (consumption plus daily connection fee).
+#
+      - name: "Tariff - Gas Cost Daily"
+        unique_id: tariff_gas_cost_daily
+        icon: mdi:currency-usd
+        state_class: total_increasing
+        device_class: monetary
+        unit_of_measurement: $
+        state: >
+          {% set supply = states('sensor.gas_supply_charge_daily') | float(0) %}
+          {% set usage1 = states('sensor.gas_consumed_daily_mj_rate_1') | float(0) * states('sensor.gas_tariff_rate_1') | float(0) %}
+          {% set usage2 = states('sensor.gas_consumed_daily_mj_rate_2') | float(0) * states('sensor.gas_tariff_rate_2') | float(0) %}
+          {% set usage3 = states('sensor.gas_consumed_daily_mj_rate_3') | float(0) * states('sensor.gas_tariff_rate_3') | float(0) %}
+          {{ (supply + usage1 + usage2 + usage3) | round(2) }}
+
+
+      - name: "Tariff - Gas - Quarterly"
+        unique_id: tariff_gas_cost_quarterly
+        icon: mdi:currency-usd
+        state_class: total_increasing
+        device_class: monetary
+        unit_of_measurement: $
+        state: >
+          {% set supply = states('sensor.gas_supply_charge_daily') | float(0) * now().day %}
+          {% set usage1 = states('sensor.gas_consumed_quarterly_mj_rate_1') | float(0) * states('sensor.gas_tariff_rate_1') | float(0) %}
+          {% set usage2 = states('sensor.gas_consumed_quarterly_mj_rate_2') | float(0) * states('sensor.gas_tariff_rate_2') | float(0) %}
+          {% set usage3 = states('sensor.gas_consumed_quarterly_mj_rate_3') | float(0) * states('sensor.gas_tariff_rate_3') | float(0) %}
+          {{ (supply + usage1 + usage2 + usage3) | round(2) }}
+
+
+# ---------------------------------------------------------------------------
+# 
+# Utility meter consumption totals in cubic meters (m3), as the gas meter provides, with retailer correction factor applied.
+# No tariffs are required here, as the retailers count the overall m3 for the quarter, but bill upon the MJ.
+#
+
+utility_meter:
+
+#  Note this reading is in 'corrected' m3, after correction factor applied.
+  gas_consumed_daily_m3:
+    unique_id: gas_consumed_daily_m3
+    source: sensor.gas_meter_reading_m3
+    name: Gas Consumed Daily m³
+    cycle: daily
+
+#
+#   Quarterly m3 total only included to allow validation against the retailers m3 reading on their quarterly invoice.
+#
+  gas_consumed_quarterly_m3:
+    unique_id: gas_consumed_quarterly_m3
+    source: sensor.gas_meter_reading_m3
+    name: Gas Consumed Quarterly m³
+
+#
+#  The meter reading on the physical gas meter display window. m3 are raw, and not 'corrected'.
+#
+#  gas_meter_reading_lifetime_m3:
+#    unique_id: gas_meter_reading_lifetime_m3
+#    source: sensor.gas_meter_reading_raw
+#    name: Gas Meter Reading Lifetime m³
+# To Do - SET baseline and then add gas_meter_reading_raw to it.
+
+
+# ---------------------------------------------------------------------------
+# 
+#   Utility meter consumption totals in megajoules (mj), as converted from gas meter m3 reading, with retailer correction factor applied.
+#
+
+  gas_consumed_daily_mj:
+    unique_id: gas_consumed_daily_mj 
+    source: sensor.gas_meter_reading_mj
+    name: Gas Consumed Daily mj
+    cycle: daily
+    tariffs:
+      - rate_1
+      - rate_2
+      - rate_3
+
+  gas_consumed_quarterly_mj:
+    unique_id: gas_consumed_quarterly_mj
+    source: sensor.gas_meter_reading_mj
+    name: Gas Consumed Quarterly mj
+# To Do - Add cron job that calls substitution of days to offset
+    tariffs:
+      - rate_1
+      - rate_2
+      - rate_3
+
+#
+#  The Quarterly MJ Total reading is required to provide a reading against which the tariff rates are triggered, as 0-1905mj / 1905-252558mj etc are based on total for the quarter
+#
+  gas_consumed_quarterly_mj_total:
+    unique_id: gas_consumed_quarterly_mj_total
+    source: sensor.gas_meter_reading_mj
+    name: Gas Consumed Quarterly mj Total
+# To Do - Add cron job that calls substitution of days to offset
+
+# ---------------------------------------------------------------------------
+#
+# Automation to monitor (quarterly mj reading) and switch tarrifs as they hit mj consumed thresholds for the quarter.
+#
+
+automation:
+
+  #  This continually checks the quarterly mj used and then changes the tariff being used based upon mj used for the quarter
+  - alias: Set Gas Tariff
+    description: 'Set Gas Rate Tariff based upon the mj consumed during the quarter'
+    trigger:
+      - platform: state
+        entity_id:
+          - sensor.gas_meter_reading_mj
+    condition: []
+    action:
+    - service: select.select_option
+      data:
+        option: >-
+          {% set mj = states('sensor.gas_consumed_quarterly_mj_total') | float(0) %}
+          {%- if mj >= 0 and mj < 1905  %}
+            rate_1
+          {%- elif mj >= 1905 and mj | float(0) < 252558 %}
+            rate_2
+          {%- else -%}
+            rate_3
+          {%- endif -%}
+      target:
+        entity_id:
+          - select.gas_consumed_daily_mj
+          - select.gas_consumed_quarterly_mj
+    mode: single
+
+  - alias: Gas Meter Quarterly Reset
+    description: 'Reset the gas quarterly meter totals, at the end of each quarter. Remember to update these dates each year.'
+    trigger:
+      - platform: time
+        at: input_datetime.gas_quarter_1
+      - platform: time
+        at: input_datetime.gas_quarter_2
+      - platform: time
+        at: input_datetime.gas_quarter_3
+      - platform: time
+        at: input_datetime.gas_quarter_4
+    condition: []
+    action:
+      - service: utility_meter.reset
+        data: {}
+        target:
+          entity_id:
+            - select.tariff_gas_quarterly
+            - select.gas_consumed_quarterly_m3
+            - select.gas_consumed_quarterly_mj
+            - select.gas_consumed_quarterly_mj_rate_1
+            - select.gas_consumed_quarterly_mj_rate_2
+            - select.gas_consumed_quarterly_mj_rate_3
+    mode: single
+
+# ---------------------------------------------------------------------------
