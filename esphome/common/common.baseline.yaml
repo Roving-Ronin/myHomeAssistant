@@ -1,0 +1,13 @@
+preferences:
+  # Enable to allow storing of 'Read Total' between reboots and flashing.
+  flash_write_interval: 5min
+
+  #  Enable logging
+logger:
+
+mdns:
+  disabled: false
+
+web_server:
+  #  Enables the local webserver on the ESP device, upon port 80
+  port: 80
