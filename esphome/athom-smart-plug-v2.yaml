@@ -27,7 +27,6 @@ dashboard_import:
   package_import_url: github://roving-ronin/home-assistant/esphome/athom-smart-plug-v2.yaml
 
 packages:
-  athom.smart-plug-v2: github://roving-ronin/home-assistant/esphome/athom-smart-plug-v2.yaml
   baseline: github://roving-ronin/home-assistant/esphome/common/common.baseline.yaml@main
   sensor: github://roving-ronin/home-assistant/esphome/common/common.sensor.yaml@main
   binary_sensor: github://roving-ronin/home-assistant/esphome/common/common/common.binary_sensor.yaml@main
