@@ -1,0 +1,10 @@
+wifi:
+  # Set the DNS domain of the device
+  domain: "${set_dns_domain}"
+  # Directly connects to WiFi network without doing a full scan first
+  fast_connect: true
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: '"${device_name}" Fallback Hotspot'
+    password: "TigerClawdia@72"
+
