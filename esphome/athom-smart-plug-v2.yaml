@@ -1,5 +1,4 @@
 substitutions:
-  project_name: "athom.smart-plug-v2"
   alias_name: "Athom Smart Plug V2"
   project_name: "athom.smart-plug-v2"
   project_version: "1.1"
