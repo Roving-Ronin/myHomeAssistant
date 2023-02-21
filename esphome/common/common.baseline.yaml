@@ -2,6 +2,9 @@ preferences:
   # Enable to allow storing of 'Read Total' between reboots and flashing.
   flash_write_interval: 5min
 
+logger:
+  #  Enable logging
+
 mdns:
   disabled: false
 
