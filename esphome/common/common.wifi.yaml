@@ -5,6 +5,6 @@ wifi:
   fast_connect: true
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: '"${device_name}" Fallback Hotspot'
+    ssid: '${device_name} Fallback Hotspot'
     password: "TigerClawdia@72"
 
