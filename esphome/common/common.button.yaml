@@ -1,0 +1,13 @@
+button:
+  #  Restart the ESP Device
+  - platform: restart
+    name: 'Restart Device'
+    entity_category: diagnostic
+
+#  - platform: template
+#    name: 'Reset - WiFi'
+#    on_press:
+#      then:
+#        - lambda: |-
+#            WiFi.disconnect();
+#            WiFi.begin();

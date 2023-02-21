@@ -1,0 +1,23 @@
+esphome:
+  name: ${node_name}
+  platform: ESP8266
+  board: ${board}
+  esp8266_restore_from_flash: ${restore_from_flash}
+  build_path: ./build/${node_name}
+
+captive_portal:
+
+logger:
+  level: ${log_level}
+
+api:
+  password: ${api_password}
+
+ota:
+  password: ${ota_password}
+  id: ${node_name}_ota
+
+<<: !include common.button.yaml
+<<: !include common.binary_sensor.yaml
+<<: !include common.sensor.yaml
+<<: !include common.text_sensor.yaml

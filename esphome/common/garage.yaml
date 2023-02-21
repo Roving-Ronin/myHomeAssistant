@@ -1,0 +1,239 @@
+substitutions:
+  node_name: raygarage
+  friendly_name: Ray's Garage
+  board: d1_mini
+  restore_from_flash: 'False'
+  log_level: NONE
+  library_priority: '0'
+  garage_priority: '1'
+  
+packages:
+  wifi: !include common/wifi.yaml
+  device_base: !include common/device_base_esp8266.yaml
+
+i2c:
+  scl: D2
+  sda: D4
+  scan: True
+
+ads1115:
+  - address: 0x48
+
+globals:
+  - id: performing_last_movement
+    type: boolean
+    restore_value: no
+    initial_value: 'false'
+
+sensor:
+  - platform: ultrasonic
+    update_interval: 5s
+    timeout: 4.0m
+    trigger_pin: D0
+    echo_pin: D7
+    name: Ray's Bay Distance
+    id: ray_s_bay_distance
+    filters:
+      - median:
+          window_size: 5
+          send_every: 5
+          send_first_at: 3
+  # Use D3 for DHT22 and I don't need an external pull-up
+  - platform: dht
+    update_interval: 5s
+    pin: D3
+    model: AM2302
+    temperature:
+      name: "Garage Temperature"
+      filters:
+        - lambda: return x * (9.0/5.0) + 32.0;
+        - median:
+            window_size: 31
+            send_every: 6
+            send_first_at: 2
+      unit_of_measurement: "°F"
+    humidity:
+      name: "Garage Humidity"
+      filters:
+        - median:
+            window_size: 31
+            send_every: 6
+            send_first_at: 2
+  - platform: ads1115
+    update_interval: 6s
+    multiplexer: 'A0_GND'
+    gain: 6.144
+    name: "Garage Illuminance"
+    icon: mdi:candle
+    # Added device_class to customize icon.
+    device_class: ""
+    accuracy_decimals: 0
+    filters:
+      - lambda: return (x / 10000.0) * 2000000.0;
+      - median:
+          window_size: 15
+          send_every: 10
+          send_first_at: 3
+    unit_of_measurement: 'lx'
+  - platform: ads1115
+    update_interval: 6s
+    multiplexer: 'A1_GND'
+    gain: 6.144
+    name: "Garage CO Content"
+    icon: mdi:molecule-co
+    # Added device_class to customize icon.
+    device_class: ""
+    accuracy_decimals: 2
+    unit_of_measurement: 'V'
+    filters:
+      - median:
+          window_size: 15
+          send_every: 10
+          send_first_at: 9
+
+switch:
+  - platform: gpio
+    id: ray_button
+    internal: true
+    pin:
+      number: D1
+      mode: OUTPUT
+    restore_mode: ALWAYS_OFF
+    on_turn_on:
+      - delay: 1500ms
+      - switch.turn_off: ray_button
+
+cover:
+  - platform: template
+    name: Ray's Garage Door
+    id: ray_s_garage_door
+    device_class: garage
+    lambda: |-
+      if (id(closed_endstop).state) //Door at closed endstop
+      {
+        if (id(ray_s_garage_door).current_operation ==  esphome::cover::COVER_OPERATION_OPENING) //We should be opening
+        {
+          if (!id(performing_last_movement)) //Make sure we don't trigger this logic twice otherwise it will do unwanted things
+          {
+            delay(1000); //Wait for door to stop in case reed is triggered too early
+            id(ray_button).turn_on(); //Press button again
+            id(performing_last_movement) = true; //Set flag to indicate we madeknow where the door is
+          }
+        }
+        else if (id(ray_s_garage_door).current_operation ==  esphome::cover::COVER_OPERATION_CLOSING)
+        {
+          //We should be closing, so all is good
+          id(performing_last_movement) = false;
+          id(ray_s_garage_door).current_operation =  esphome::cover::COVER_OPERATION_IDLE;
+          id(ray_s_garage_door).position = COVER_CLOSED;
+          id(ray_s_garage_door).publish_state();
+          return COVER_CLOSED;
+        }
+        else
+        {
+          //No operation in progress, just send state
+          id(performing_last_movement) = false;
+          if (!id(ray_s_garage_door).position == esphome::cover::COVER_CLOSED)
+          {
+            id(ray_s_garage_door).position = COVER_CLOSED;
+            id(ray_s_garage_door).publish_state();
+            return COVER_CLOSED;
+          }
+        }
+      }
+      else if (id(open_endstop).state) //Door at open endstop
+      {
+        if (id(ray_s_garage_door).current_operation ==  esphome::cover::COVER_OPERATION_CLOSING) //We should be closing
+        {
+          if (!id(performing_last_movement))  //Make sure we don't trigger this logic twice otherwise it will do unwanted things
+          {
+            delay(1000);  //Wait for door to stop in case reed is triggered too early
+            id(ray_button).turn_on(); //Press button again
+            id(performing_last_movement) = true; //Set flag to indicate we madeknow where the door is
+          }
+        }
+        else if (id(ray_s_garage_door).current_operation ==  esphome::cover::COVER_OPERATION_OPENING)
+        {
+          //We should be opening, so all is good
+          id(performing_last_movement) = false;
+          id(ray_s_garage_door).current_operation =  esphome::cover::COVER_OPERATION_IDLE;
+          id(ray_s_garage_door).position = COVER_OPEN;
+          id(ray_s_garage_door).publish_state();
+          return COVER_OPEN;
+        }
+        else //Door not at any endstop
+        {
+          //No operation in progress, just send state
+          id(performing_last_movement) = false;
+          if (id(ray_s_garage_door).position != esphome::cover::COVER_OPEN)
+          {
+            id(ray_s_garage_door).position = COVER_OPEN;
+            id(ray_s_garage_door).publish_state();
+            return COVER_OPEN;
+          }
+        }
+      }
+      else
+      {
+        //The door is halfway open, so set it to OPEN
+        if (id(ray_s_garage_door).position != esphome::cover::COVER_OPEN)
+          {
+            id(ray_s_garage_door).position = COVER_OPEN;
+            id(ray_s_garage_door).publish_state();
+            return COVER_OPEN;
+          }
+      }
+      return {};
+    open_action: 
+      - lambda: |-
+          id(ray_s_garage_door).current_operation =  esphome::cover::COVER_OPERATION_OPENING;
+          if (!id(open_endstop).state) {
+            id(ray_button).turn_on();
+            if (id(closed_endstop).state) {
+              id(performing_last_movement) = true; //Set flag to indicate we know where the door is
+            }
+          }
+    close_action:
+      - lambda: |-
+          id(ray_s_garage_door).current_operation =  esphome::cover::COVER_OPERATION_CLOSING;
+          if (!id(closed_endstop).state) {
+            id(ray_button).turn_on();
+            if (id(open_endstop).state) {
+              id(performing_last_movement) = true; //Set flag to indicate we know where the door is
+            }
+          }
+    stop_action:
+      - lambda: |-
+          if (id(ray_s_garage_door).current_operation ==  esphome::cover::COVER_OPERATION_CLOSING || id(ray_s_garage_door).current_operation ==  esphome::cover::COVER_OPERATION_OPENING )
+          {
+            id(ray_s_garage_door).current_operation =  esphome::cover::COVER_OPERATION_IDLE;
+            //Stop the door if it is moving
+            id(performing_last_movement) = false;
+            id(ray_button).turn_on();
+          }
+
+binary_sensor:
+  - platform: template
+    name: Ray's Car Presence
+    lambda: |-
+      if (id(ray_s_bay_distance).state < 1.3) {
+        return true;
+      } else {
+        return false;
+      }
+    # D5 will need an external pull down, and reed switch goes to 3.3V
+  - platform: gpio
+    pin: D5
+    device_class: opening
+    id: open_endstop
+    internal: True
+    filters:
+      - delayed_on_off: 500ms
+    # D6 will need an external pull down, and reed switch goes to 3.3V
+  - platform: gpio
+    pin: D6
+    device_class: opening
+    id: closed_endstop
+    internal: True
+    filters:
+      - delayed_on_off: 500ms
