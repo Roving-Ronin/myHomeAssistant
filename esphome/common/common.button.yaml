@@ -1,8 +1,12 @@
 button:
   #  Restart the ESP Device
   - platform: restart
-    name: 'Restart Device'
+    name: 'Reboot Device'
     entity_category: diagnostic
+
+  #  Reset the ESP Device
+  - platform: factory_reset
+    name: Reset with Default Settings
 
 #  - platform: template
 #    name: 'Reset - WiFi'
