@@ -5,5 +5,5 @@ wifi:
   fast_connect: true
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    password: "TigerClawdia@72"
+    password: "TigerClawdia@22"
 
