@@ -1,12 +1,14 @@
 substitutions:
-  device_name: "athom-smart-plug-v2"
-  friendly_name: "Athom Smart Plug V2"
   project_name: "athom.smart-plug-v2"
+  alias_name: "Athom Smart Plug V2"
   project_version: "1.1"
   relay_restore_mode: RESTORE_DEFAULT_ON
+  set_timezone: "Australia/Sydney"
+  set_dns_domain: ".iot.home.lan"
 
 esphome:
   name: "${device_name}"
+  friendly_name: "${alias_name}"
   name_add_mac_suffix: false
   project:
     name: "${project_name}"
@@ -16,6 +18,9 @@ esp8266:
   board: esp8285
   restore_from_flash: true
 
+preferences:
+  flash_write_interval: 5min
+  
 api:
 
 ota:
@@ -23,20 +28,21 @@ ota:
 logger:
   baud_rate: 0
 
+mdns:
+  disabled: false
+
+web_server:
+  port: 80
+
+wifi:
+  domain: "${set_dns_domain}"
+  fast_connect: true
+  ap: {} # This spawns an AP with the device name and mac address with no password.
+
 captive_portal:
 
 dashboard_import:
   package_import_url: github://roving-ronin/home-assistant/esphome/athom-smart-plug-v2.yaml
-
-packages:
-  baseline: github://roving-ronin/home-assistant/esphome/common/common.baseline.yaml@main
-  sensor: github://roving-ronin/home-assistant/esphome/common/common.sensor.yaml@main
-  binary_sensor: github://roving-ronin/home-assistant/esphome/common/common/common.binary_sensor.yaml@main
-  text_sensor: github://roving-ronin/home-assistant/esphome/common/common.text_sensor.yaml@main
-  button: github://roving-ronin/home-assistant/esphome/common/common.button.yaml@main
-  wifi: github://roving-ronin/home-assistant/esphome/common/common.wifi.yaml@main
-  time: github://roving-ronin/home-assistant/esphome/common/common.time.yaml@main
-
 
 uart:
   rx_pin: RX
@@ -49,6 +55,10 @@ globals:
     initial_value: '0.0' 
 
 binary_sensor:
+  - platform: status
+    name: "Device Status"
+    entity_category: diagnostic
+
   - platform: gpio
     pin:
       number: 5
@@ -68,6 +78,21 @@ binary_sensor:
           - button.press: Reset
 
 sensor:
+  #  WiFi signal strength
+  - platform: wifi_signal
+    name: "WiFi Strength"
+    update_interval: 120s
+    entity_category: diagnostic
+    internal: True
+
+  #  Sensor uptime in seconds
+  - platform: uptime
+    name: "Uptime Seconds"
+    id: uptime_seconds
+    update_interval: 120s
+    entity_category: diagnostic
+    internal: True
+
   - platform: cse7766
     update_interval: 10s
     current:
@@ -120,9 +145,14 @@ sensor:
     filters:
       - multiply: 0.001
 
+
 button:
+  - platform: restart
+    name: 'Restart Device'
+    entity_category: diagnostic
+
   - platform: factory_reset
-    name: Restart with Factory Default Settings
+    name: Reset with Default Settings
     id: Reset
 
 switch:
@@ -140,3 +170,105 @@ light:
     pin:
       inverted: true
       number: GPIO13
+
+text_sensor:
+  #  Creates a sensor showing when the device was last restarted
+  - platform: template
+    name: 'Device Last Restart'
+    id: device_last_restart
+    icon: mdi:clock
+    entity_category: diagnostic
+#    device_class: timestamp
+
+  #  Creates sensor for tracking the WiFi IP address
+  - platform: wifi_info
+    ip_address:
+      name: 'WiFi IP Address'
+      icon: mdi:wifi
+      entity_category: diagnostic
+
+  #  Defines the WiFi SSID network to connect to
+    ssid:
+      name: 'WiFi SSID'
+      icon: mdi:wifi-strength-2
+      entity_category: diagnostic
+
+  #  Creates sensor for tracking the WiFi IP MAC address
+    mac_address:
+      name: 'WiFi MAC Address'
+      entity_category: diagnostic
+
+  #  Creates sensor for tracking the version of ESPHome installed
+  - platform: version
+    hide_timestamp: true
+    name: 'Project ESPHome Version'
+    entity_category: diagnostic
+
+  #  Creates a sensor of the name of installed project
+  - platform: template
+    name: 'Project Name'
+    id: gas_meter_project
+    icon: "mdi:label-outline"
+    entity_category: diagnostic
+    lambda: |-
+      return {"${project_name}"};
+    update_interval: 6h
+
+  #  Creates a sensor of the version of installed project
+  - platform: template
+    name: 'Project Version'
+    id: gas_meter_version
+    icon: "mdi:label-outline"
+    entity_category: diagnostic
+    lambda: |-
+      return {"${project_version}"};
+    update_interval: 6h
+
+  #  Creates a sensor of the uptime of the device, in formatted days, hours, minutes and seconds
+  - platform: template
+    name: "Device Uptime"
+    entity_category: diagnostic
+    lambda: |-
+      int seconds = (id(uptime_seconds).state);
+      int days = seconds / (24 * 3600);
+      seconds = seconds % (24 * 3600);
+      int hours = seconds / 3600;
+      seconds = seconds % 3600;
+      int minutes = seconds /  60;
+      seconds = seconds % 60;
+      if ( days > 3650 ) {
+        return { "Starting up" };
+      } else if ( days ) {
+        return { (String(days) +"d " + String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
+      } else if ( hours ) {
+        return { (String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
+      } else if ( minutes ) {
+        return { (String(minutes) +"m "+ String(seconds) +"s").c_str() };
+      } else {
+        return { (String(seconds) +"s").c_str() };
+      }
+    icon: mdi:clock-start
+     
+time:
+  - platform: sntp
+    id: sntp_time
+  # Define the timezone of the device
+    timezone: "Australia/Sydney"
+  # Change sync interval from default 5min
+    update_interval: 360min
+  # Set specific sntp servers to use
+    servers: 
+      - 2.au.pool.ntp.org
+      - 1.au.pool.ntp.org
+      - 0.au.pool.ntp.org
+  # Publish the time the device was last restarted
+    on_time_sync:
+      then:
+        # Update last restart time, but only once.
+        - if:
+            condition:
+              lambda: 'return id(device_last_restart).state == "";'
+            then:
+              - text_sensor.template.publish:
+                  id: device_last_restart
+                  state: !lambda 'return id(sntp_time).now().strftime("%a %d %b %Y - %H:%M:%S");'
