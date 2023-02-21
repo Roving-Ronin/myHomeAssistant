@@ -1,7 +1,7 @@
 button:
   #  Restart the ESP Device
   - platform: restart
-    name: 'Reboot Device'
+    name: 'Restart Device'
     entity_category: diagnostic
 
   #  Reset the ESP Device
