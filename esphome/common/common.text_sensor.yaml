@@ -26,10 +26,10 @@ text_sensor:
       entity_category: diagnostic
 
   #  Creates sensor for tracking the version of ESPHome installed
-  - platform: version
-    hide_timestamp: true
-    name: 'Project ESPHome Version'
-    entity_category: diagnostic
+#  - platform: version
+#    hide_timestamp: true
+#    name: 'Project ESPHome Version'
+#    entity_category: diagnostic
 
   #  Creates a sensor of the name of installed project
   - platform: template
