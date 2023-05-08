@@ -1,0 +1,1071 @@
+  #
+  #  Kincony KC868-A16 ESP32 Board Configuration for ESPHome, and use with Home Assistant
+  #  https://www.kincony.com/kc868-a16-esp32-home-automation-relay-module.html
+  #
+
+substitutions:
+  # Provides substitutions or variables that are then called elsewhere multiple times in the config
+  device_name: "kc868-a16"
+  device_description: "Primary central ESP32 device with 16 I/O and RS485 support"
+  project_name: "kincony.kc868-a16"
+  project_version: "0.3"
+  set_timezone: "Australia/Sydney"
+  set_dns_domain: ".iot.home.lan"
+  disable_entities: "false"
+  relay_restore_mode: RESTORE_DEFAULT_OFF
+
+esphome:
+  #  Configures these settings to use the substituions defined below
+  name: "${device_name}"
+  friendly_name: "KC868-A16 Primary"
+  comment: "${device_description}"
+  name_add_mac_suffix: false
+  project:
+    name: "${project_name}"
+    version: "${project_version}"
+  
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+packages:
+  baseline: !include common/common.baseline.yaml
+  sensor: !include common/common.sensor.yaml
+  binary_sensor: !include common/common.binary_sensor.yaml
+  text_sensor: !include common/common.text_sensor.yaml
+  button: !include common/common.button.yaml
+  wifi: !include common/common.wifi.yaml
+  time: !include common/common.time.yaml
+
+  # Sun Azimuth and Elevation for Home Address
+sun:
+  latitude: -34.726460°
+  longitude: 149.724503°
+  id: sun_home
+
+  # Enable Home Assistant API
+api:
+  encryption:
+    key: !secret api_key  
+  # Define service that calls the 'button:' defined below to reset the Gas Meter - Current Reading'
+  services:
+    - service: reset_total_energy
+      then:
+        - button.press:
+            id: button_reset_gas_reading_current
+
+  # Define service that calls the 'button:' defined below to reset the Water Meter - Current Reading'
+    - service: reset_total_energy
+      then:
+        - button.press:
+            id: button_reset_water_reading_current
+
+
+  # Over the Air Firmware Updates
+ota:
+  password: !secret ota_password
+  safe_mode: true
+
+button:
+  #  Reset the total energy entity (Gas Meter - Current Reading)
+  - platform: template
+    name: 'Gas Meter - Reset Current Reading'
+    entity_category: diagnostic
+    id: button_reset_gas_reading_current
+    on_press:
+      - pulse_meter.set_total_pulses:
+          id: sensor_gas_meter_flow_rate
+          value: 0
+
+  #  Reset the total energy entity (Water Meter - Current Reading)
+  - platform: template
+    name: 'Water Meter - Reset Current Reading'
+    entity_category: diagnostic
+    id: button_reset_water_reading_current
+    on_press:
+      - pulse_meter.set_total_pulses:
+          id: sensor_water_meter_flow_rate
+          value: 0
+
+
+  # Ethernet configuration entry. If using WiFi then these lines needed to the commented out
+  # also Captive Portal must be commented out, as it is for WiFi use
+#ethernet:
+#  type: LAN8720
+#  mdc_pin: GPIO23
+#  mdio_pin: GPIO18
+#  clk_mode: GPIO17_OUT
+#  phy_addr: 0
+
+   # Optional manual IP
+# manual_ip:
+# static_ip: 10.0.5.15
+# gateway: 10.0.5.1
+# subnet: 255.255.255.0
+
+wifi:
+  # WiFi configuration entry. If using WiFi then these lines needed to the commented out
+  # WiFi credentials
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+captive_portal:
+  #  Enables the fall back WiFi hotspot and ability to connect and recover the device.
+  #  See: https://esphome.io/components/captive_portal.html
+
+
+#######################################################################################
+
+globals:
+  #  Globals for use with pulse meter, to allow storing and setting a base reading for gas meter
+  - id: lifetime_gas_m3
+    type: float
+    restore_value: yes
+   # Change initial value to 0 to reset, or enter your actual meter reading to start counting lifetime total from that number 
+#    initial_value: "0"
+  #  Globals for use with pulse meter, to allow storing and setting a base reading for water meter
+  - id: lifetime_water_litre
+    type: float
+    restore_value: yes
+   # Change initial value to 0 to reset, or enter your actual meter reading to start counting lifetime total from that number 
+#    initial_value: "0"
+
+# Example configuration entry for ESP32
+i2c:
+  sda: 4
+  scl: 5
+  scan: true
+  id: bus_a
+
+  # RF 433mhz receiver configuration
+# remote_receiver:
+#  pin:
+#    number: 2
+#    inverted: true
+#  dump: rc_switch
+#  # Settings to optimize recognition of RF devices
+#  tolerance: 50%
+#  filter: 250us
+#  idle: 4ms
+#  buffer_size: 2kb
+  
+  # RF 433mhz transmitter configuration
+# remote_transmitter:
+#  pin: 15
+#  carrier_duty_percent: 100%
+
+# PCF8574 I/O expander configuration
+# Address below are for v1.5 board - https://www.kincony.com/forum/showthread.php?tid=2128
+pcf8574:
+  - id: 'pcf8574_hub_out_1' # for output channel 1-8
+    address: 0x24
+
+  - id: 'pcf8574_hub_out_2' # for output channel 9-16
+    address: 0x25
+
+  - id: 'pcf8574_hub_in_1' # for input channel 1-8
+    address: 0x22
+
+  - id: 'pcf8574_hub_in_2' # for input channel 9-16
+    address: 0x21
+
+################################################################################
+#  Outputs - 1 to 16. DC12V/24V 500mA per channel
+################################################################################
+switch:
+
+  # Output 1 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 01'
+    id: sensor_relay_1
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_1
+      number: 0
+      mode: OUTPUT
+      inverted: true
+    internal: true
+
+  # Output 2 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 02'
+    id: sensor_relay_2
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_1
+      number: 1
+      mode: OUTPUT
+      inverted: true
+    internal: true
+
+  # Output 3 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 03'
+    id: sensor_relay_3
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_1
+      number: 2
+      mode: OUTPUT
+      inverted: true
+    internal: true
+
+  # Output 4 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 04'
+    id: sensor_relay_4
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_1
+      number: 3
+      mode: OUTPUT
+      inverted: true
+    internal: true
+
+  # Output 5 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 05'
+    id: sensor_relay_5
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_1
+      number: 4
+      mode: OUTPUT
+      inverted: true
+    internal: true
+
+  # Output 6 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 06'
+    id: sensor_relay_6
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_1
+      number: 5
+      mode: OUTPUT
+      inverted: true
+    internal: true
+
+  # Output 7 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 07'
+    id: sensor_relay_7
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_1
+      number: 6
+      mode: OUTPUT
+      inverted: true
+    internal: true
+
+    # Output 8 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 08'
+    id: sensor_relay_8
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_1
+      number: 7
+      mode: OUTPUT
+      inverted: true
+    internal: true
+
+  # Output 9 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 09'
+    id: sensor_relay_9
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_2
+      number: 0
+      mode: OUTPUT
+      inverted: true
+    internal: true
+
+  # Output 10 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 10'
+    id: sensor_relay_10
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_2
+      number: 1
+      mode: OUTPUT
+      inverted: true
+    internal: true
+
+# Output 11 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 11'
+    id: sensor_relay_11
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_2
+      number: 2
+      mode: OUTPUT
+      inverted: true
+    internal: true
+
+# Output 12 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 12'
+    id: sensor_relay_12
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_2
+      number: 3
+      mode: OUTPUT
+      inverted: true
+    internal: true
+
+# Output 13 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 13'
+    id: sensor_relay_13
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_2
+      number: 4
+      mode: OUTPUT
+      inverted: true
+    internal: true
+
+# Output 14 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 14'
+    id: sensor_relay_14
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_2
+      number: 5
+      mode: OUTPUT
+      inverted: true
+    internal: true
+
+# Output 15 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 15'
+    id: sensor_relay_15
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_2
+      number: 6
+      mode: OUTPUT
+      inverted: true
+    internal: true
+
+# Output 16 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 16'
+    id: sensor_relay_16
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_2
+      number: 7
+      mode: OUTPUT
+      inverted: true
+    internal: true
+
+
+binary_sensor:
+################################################################################
+#  Digital Inputs - 1 to 16
+#
+#  DC 0-12V. Logical define:
+#  - DC 0-1.8V logical "0"
+#  - DC 8-12V logical "1"
+#
+################################################################################
+
+    # Input 1 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 01'
+    id: input1
+    pin:
+      pcf8574: pcf8574_hub_in_1
+      number: 0
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 2 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 02'
+    id: input2
+    pin:
+      pcf8574: pcf8574_hub_in_1
+      number: 1
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 3 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 03'
+    id: input3
+    pin:
+      pcf8574: pcf8574_hub_in_1
+      number: 2
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 4 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 04'
+    id: input4
+    pin:
+      pcf8574: pcf8574_hub_in_1
+      number: 3
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 5 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 05'
+    id: input5
+    pin:
+      pcf8574: pcf8574_hub_in_1
+      number: 4
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 6 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 06'
+    id: input6
+    pin:
+      pcf8574: pcf8574_hub_in_1
+      number: 5
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 7 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 07'
+    id: input7
+    pin:
+      pcf8574: pcf8574_hub_in_1
+      number: 6
+      mode: INPUT
+      inverted: true
+    internal: true
+    
+    # Input 8 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 08'
+    id: input8
+    pin:
+      pcf8574: pcf8574_hub_in_1
+      number: 7
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 9 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 09'
+    id: input9
+    pin:
+      pcf8574: pcf8574_hub_in_2
+      number: 0
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 10 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 10'
+    id: input10
+    pin:
+      pcf8574: pcf8574_hub_in_2
+      number: 1
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 11 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 11'
+    id: input11
+    pin:
+      pcf8574: pcf8574_hub_in_2
+      number: 2
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 12 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 12'
+    id: input12
+    pin:
+      pcf8574: pcf8574_hub_in_2
+      number: 3
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 13 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 13'
+    id: input13
+    pin:
+      pcf8574: pcf8574_hub_in_2
+      number: 4
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 14 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 14'
+    id: input14
+    pin:
+      pcf8574: pcf8574_hub_in_2
+      number: 5
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 15 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 15'
+    id: input15
+    pin:
+      pcf8574: pcf8574_hub_in_2
+      number: 6
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 16 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 16'
+    id: input16
+    pin:
+      pcf8574: pcf8574_hub_in_2
+      number: 7
+      mode: INPUT
+      inverted: true
+    internal: true
+
+
+################################################################################
+#  Text Sensors
+################################################################################
+
+text_sensor:
+  - platform: sun
+    name: Sun Next Sunrise
+    type: sunrise
+    update_interval: 60min
+    
+  - platform: sun
+    name: Sun Next Sunset
+    type: sunset
+    update_interval: 60min
+
+################################################################################
+#  Sensors
+################################################################################
+
+sensor:
+
+  # BME280 Sensor in I2C Port - Temperature
+  - platform: bme280
+    address: 0x76
+    update_interval: 30s
+
+    # Temperature sensor - defaults to celcius
+    temperature:
+      name: "BME280 - Temperature"
+      id: bme280_temperature
+      accuracy_decimals: 1
+      filters:
+        offset: 0.4
+
+    # Pressure sensor - defaults to hPa
+    pressure:
+      name: "BME280 - Pressure"
+      id: bme280_pressure
+      accuracy_decimals: 1
+
+    # Relative Humidity sensor
+    humidity:
+      name: "BME280 - Humidity (Relative)"
+      id: bme280_humidity
+      accuracy_decimals: 1
+      filters:
+        offset: -8.5
+
+  # BME280 Sensor in I2C Port - Absolute Humidity
+  - platform: absolute_humidity
+    name: "BME280 - Humidity (Absolute)"
+    state_class: 'measurement'
+    accuracy_decimals: 1
+    temperature: bme280_temperature
+    humidity: bme280_humidity
+    equation: Wobus   # Wobus (Default), optional Tetens or Buck
+
+  # BME280 Sensor in I2C Port - Dew Point
+  - platform: template
+    name: "BME280 - Dew Point"
+    state_class: 'measurement'
+    accuracy_decimals: 1
+    lambda: |-
+      return (243.5*(log(id(bme280_humidity).state/100)+((17.67*id(bme280_temperature).state)/
+      (243.5+id(bme280_temperature).state)))/(17.67-log(id(bme280_humidity).state/100)-
+      ((17.67*id(bme280_temperature).state)/(243.5+id(bme280_temperature).state))));
+    unit_of_measurement: °C
+    icon: 'mdi:thermometer-alert'
+    filters:
+      - filter_out: nan
+
+  # BME280 Sensor in I2C Port - Pressure in kPa
+#  - platform: template
+#    name: "BME280 - Pressure (kPa)"
+#    state_class: 'measurement'
+#    accuracy_decimals: 2
+#    lambda: |-
+#      return id(bme280_pressure).state / 10.0 ;
+#    update_interval: 15s
+#    unit_of_measurement: 'kPa'
+
+  # BME280 Sensor in I2C Port - Equivalent Sea Level Pressure (based on 655m Goulburn North)
+  - platform: template
+    name: "BME280 - Pressure (Equivalent Sea Level)"
+    state_class: 'measurement'
+    accuracy_decimals: 1
+    lambda: |-
+      const float STANDARD_ALTITUDE = 656; // in meters, see note
+      return id(bme280_pressure).state / powf(1 - ((0.0065 * STANDARD_ALTITUDE) /
+        (id(bme280_temperature).state + (0.0065 * STANDARD_ALTITUDE) + 273.15)), 5.257); // in hPa
+    update_interval: 15s
+    unit_of_measurement: 'hPa'
+
+   # Only Altitude OR Equivalent Sea Level Pressure can be run at one time, not both
+#  - platform: template
+#    name: "BME280 - Altitude"
+#    lambda: |-
+#      const float STANDARD_SEA_LEVEL_PRESSURE = 1014.1; //in hPa, see note
+#      return ((id(bme280_temperature).state + 273.15) / 0.0065) *
+#        (powf((STANDARD_SEA_LEVEL_PRESSURE / id(bme280_pressure).state), 0.190234) - 1); // in meter
+#    update_interval: 15s
+#    icon: 'mdi:signal'
+#    unit_of_measurement: 'm'
+
+  # Provides the Sun elevation and Azimuth, based upon the Lat & Long set above
+  - platform: sun
+    name: Sun Elevation
+    type: elevation
+  - platform: sun
+    name: Sun Azimuth
+    type: azimuth
+
+
+########################
+
+# ADC Input Port 1 - 4-20mA
+# sensor:
+#  - platform: adc
+#    pin: 36
+#    name: 'Analog Digital Input 1'
+#    accuracy_decimals: 3
+#    device_class: "current"
+#    unit_of_measurement: "mA"
+#    state_class: "measurement"
+#    update_interval: 10s
+#    attenuation: 11db  #auto
+#    filters:
+#    - calibrate_polynomial:
+#       degree: 2
+#       datapoints:
+          # Map from SENSOR -> TRUE value
+#          - 3.90 -> 3.31
+#          - 3.65 -> 3.04
+#          - 3.09 -> 2.73
+#          - 2.51 -> 2.28
+#          - 2.13 -> 1.95
+#          - 1.61 -> 1.51
+#          - 1.34 -> 1.28
+#          - 1.10 -> 1.08
+#          - 0.60 -> 0.66
+#          - 0.14 -> 0.25
+#          - 0.00 -> 0.00
+#    internal: true
+
+# ADC Input Port 2 - 4-20mA
+#  - platform: adc
+#    pin: 34
+#    name: 'Analog Digital Input 2'
+#    accuracy_decimals: 3
+#    device_class: "current"
+#    unit_of_measurement: "mA"
+#    state_class: "measurement"
+#    update_interval: 10s
+#    attenuation: 11db  #auto
+#    filters:
+#    - calibrate_polynomial:
+#       degree: 2
+#       datapoints:
+          # Map from SENSOR -> TRUE value
+#          - 3.90 -> 3.31
+#          - 3.65 -> 3.04
+#          - 3.09 -> 2.73
+#          - 2.51 -> 2.28
+#          - 2.13 -> 1.95
+#          - 1.61 -> 1.51
+#          - 1.34 -> 1.28
+#          - 1.10 -> 1.08
+#          - 0.60 -> 0.66
+#          - 0.14 -> 0.25
+#          - 0.00 -> 0.00
+#    internal: true
+
+# ADC Input Port 3 - 0-5V
+  - platform: adc
+    pin: 35
+    name: 'Water Tank - Voltage'
+    id: water_tank_voltage
+    accuracy_decimals: 3
+    device_class: "voltage"
+    state_class: "measurement"
+    unit_of_measurement: "V"
+    update_interval: 5s
+    attenuation: 11db  #auto
+    filters:
+#     - multiply: 3.3
+    - median: 
+       window_size: 6
+       send_every: 6
+       send_first_at: 6
+#    - calibrate_polynomial:
+#       degree: 2
+#       datapoints:
+#          # Map from SENSOR -> TRUE value
+#         - 4.15867 -> 4.01667
+#         - 3.75700 -> 3.61500
+#         - 3.35533 -> 3.21333
+#         - 2.95367 -> 2.81167
+#         - 2.55200 -> 2.41000
+#         - 2.15033 -> 2.00833
+#         - 1.74867 -> 1.60667
+#         - 1.34700 -> 1.20500
+#         - 0.94533 -> 0.80333
+#         - 0.14200 -> 0.00000
+    internal: false
+
+#### Water Tank - Conversions and metrics from pressure sensor
+
+  - platform: template
+    name: "Water Tank - Level"
+    id: water_tank_level
+    icon: 'mdi:water-well'
+    unit_of_measurement: 'cm'
+    lambda: |-
+        return id(water_tank_voltage).state;
+    update_interval: 1s #the delta filter will ensure it only sends values when something changes. 
+    filters:
+      - calibrate_linear:
+          # Measured value of X volt maps to Y cm
+          - 4.01667 -> 241.0   # 100%
+          - 3.61500 -> 216.9   #  90%
+          - 3.21333 -> 192.8   #  80%
+          - 2.81167 -> 168.7   #  70%
+          - 2.41000 -> 144.6   #  60%
+          - 2.00833 -> 120.5   #  50%
+          - 1.60667 -> 96.4    #  40%
+          - 1.20500 -> 72.3    #  30%
+          - 0.80333 -> 48.2    #  20%
+          - 0.40167 -> 24.1    #  10%
+          - 0.00000 -> 0.00    #   0%
+
+#          - 4.15867 -> 241.0   # 100%
+#          - 3.75700 -> 216.9   #  90%
+#          - 3.35533 -> 192.8   #  80%
+#          - 2.95367 -> 168.7   #  70%
+#          - 2.55200 -> 144.6   #  60%
+#          - 2.15033 -> 120.5   #  50%
+#          - 1.74867 -> 96.4    #  40%
+#          - 1.34700 -> 72.3    #  30%
+#          - 0.94533 -> 48.2    #  20%
+#          - 0.54367 -> 24.1    #  10%
+#          - 0.14200 -> 0.00    #   0%
+
+
+        # From https://www.sensorsone.com/measurement-to-linear-0-5v-converter/?iunit=cm&irdg=0.8452500672&ilo=0.469&ihi=4.016666&ounit=V&olo=0&ohi=5
+      - delta : 0.001 #only send the result if the difference with the last sent result is higher than this
+      - offset: 0.01847   # Add 0.01847cm to total, to correct to 0L when voltage is 0.469V
+
+
+  - platform: template
+    name: "Water Tank - %"
+    id: water_tank_percent
+    icon: 'mdi:water-well'
+    unit_of_measurement: '%'
+    update_interval: 1s #the delta filter will ensure it only sends values when something changes.     
+    lambda: |-
+        return id(water_tank_level).state / 17.0 * 100;
+
+#        return id(water_tank_level).state / 241.0 * 100;
+
+    # divide by max water level height to get a percentage. Inlet height 2410mm / tank height 2485mm. Diamter 2380mm. 10,000L
+    # H 2410mm x D 2380mm = 10,721.6305 L (Full).   2410mm = 23.56kPa / .24bar / 3.42psi / 176.75 mmHg
+    # local gravity = 9.79697g ms2.  1,000L = 979.697kg
+#    update_interval: 1s #the delta filter will ensure it only sends values when something changes. 
+    filters:
+      - delta : 0.1 #only send the result if the difference with the last sent result is higher than this
+
+
+  - platform: template
+    name: "Water Tank - Litres"
+    id: water_tank_litres
+    icon: 'mdi:water-well'
+    unit_of_measurement: 'L'
+    lambda: |-
+      return id(water_tank_level).state / 100 * 3.14159265359 * 0.0475 * 0.0475 * 1000.0;
+#   
+#      if (id(water_tank_level).state <= 0) {
+#        return {"Empty"};
+#      } else {
+#        return id(water_tank_level).state / 100 * 3.14159265359 * 1.19 * 1.19 * 1000.0;
+#      }
+    # height (meters) times pi times radius (meters) squared times 1000 gives litres. 
+    # This works if your water tank is a cylinder shape. Otherwise you have to use different calculations.
+    # 10,000L with diamter of 2.38m = 224.7792431210859cm height
+    #
+    # return id(water_tank_level).state / 100 * 3.14159265359 * 1.19 * 1.19 * 1000.0;
+    update_interval: 1s #the delta filter will ensure it only sends values when something changes. 
+    filters:
+      - delta : 0.001 #only send the result if the difference with the last sent result is higher than this
+
+
+## 655.4 m or 2150.3 feet Location :-34.72653,149.72461
+
+####
+
+
+  # ADC Input Port 4 - 0-5V
+#  - platform: adc
+#    pin: 39
+#    name: 'Analog Digital Input 4'
+#    accuracy_decimals: 3
+#    device_class: "voltage"
+#    state_class: "measurement"
+#    unit_of_measurement: "V"
+#    update_interval: 10s
+#    attenuation: auto   # 11db
+#    filters:
+#    - calibrate_polynomial:
+#       degree: 2
+#       datapoints:
+#          # Map from SENSOR -> TRUE value
+#          - 3.90 -> 3.31
+#          - 3.65 -> 3.04
+#          - 3.09 -> 2.73
+#          - 2.51 -> 2.28
+#          - 2.13 -> 1.95
+#          - 1.61 -> 1.51
+#          - 1.34 -> 1.28
+#          - 1.10 -> 1.08
+#          - 0.60 -> 0.66
+#          - 0.14 -> 0.25
+#          - 0.00 -> 0.00
+#    internal: true
+
+########################################
+#  GPIO Inputs - 1 to 3
+########################################
+
+# sensor:
+  ##################################
+  # GPIO Input 1 - PIN 32
+  # Utility - Gas Meter
+  - platform: pulse_meter
+    name: 'Gas Meter - Flow Rate'
+    id: "sensor_gas_meter_flow_rate"
+    unit_of_measurement: "m³/h"
+    state_class: measurement
+    device_class: gas
+    icon: "mdi:pump"
+    accuracy_decimals: 2
+    pin:
+      number: 32
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    internal_filter_mode: PULSE
+    internal_filter: 2s
+    timeout: 5min
+    filters:
+      - multiply: 1.0
+    #  Uses the above pulse_meter and adds sensor and calculations for tracking m3
+    total:    
+      name: 'Gas Meter - Reading (Current)'
+      id: sensor_gas_meter_reading
+      unit_of_measurement: "m³"
+      icon: "mdi:counter"
+      state_class: "total_increasing"
+      device_class: gas
+      accuracy_decimals: 2
+      filters:
+        - multiply: 0.01
+    #  Adds the calculation for 'Gas Lifetime Total m3' 
+      on_value: 
+        then:
+          - lambda: |-
+              static float previous_gas_m3_value = 0.0;
+              float current_gas_m3_value = id(sensor_gas_meter_reading).state;
+              id(lifetime_gas_m3) += current_gas_m3_value - previous_gas_m3_value;
+              previous_gas_m3_value = current_gas_m3_value;
+
+  #  Adds the 'Lifetime Reading' that tracks the LIFETIME total of Gas m3
+  - platform: template
+    name: 'Gas Meter - Reading (Lifetime)'
+    id: sensor_gas_meter_reading_lifetime
+    unit_of_measurement: "m³"
+    device_class: gas
+    state_class: "total_increasing"
+    icon: "mdi:counter"
+    accuracy_decimals: 2
+    filters:
+      - delta : 0.001
+    # The number 0.00 should be replaced with your own gas meters physical reading
+    lambda: |-
+          return (id(lifetime_gas_m3) + 0.00);
+    # Set interval that updates are sent to HA instance
+    update_interval: 15s
+
+  ##################################
+  # GPIO Input 2 - PIN 33
+  # Utility - Water Meter
+  - platform: pulse_meter
+    name: "Water Meter - Flow Rate"
+    id: "sensor_water_meter_flow_rate"
+    unit_of_measurement: "L/min"
+    state_class: measurement
+    device_class: gas
+    icon: "mdi:pump"
+    accuracy_decimals: 2
+    pin:
+      number: 33
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    internal_filter_mode: PULSE
+    internal_filter: 100ms
+    timeout: 1min
+    #  Uses the above pulse_meter and adds sensor and calculations for tracking current litres
+    total:
+      name: 'Water Meter - Reading (Current)'
+      id: sensor_water_meter_reading
+      unit_of_measurement: "L"
+      icon: "mdi:water"
+      state_class: "total_increasing"
+      device_class: water
+      accuracy_decimals: 2
+      filters:
+#        - delta : 0.001
+        - multiply: 0.5
+    #  Adds the calculation for 'Water Reading Lifetime' total of water litres
+      on_value: 
+        then:
+          - lambda: |-
+              static float previous_water_litre_value = 0.0;
+              float current_water_litre_value = id(sensor_water_meter_reading).state;
+              id(lifetime_water_litre) += current_water_litre_value - previous_water_litre_value;
+              previous_water_litre_value = current_water_litre_value;
+
+  #  Adds the 'Lifetime Reading' that tracks the LIFETIME total of Gas m3
+  - platform: template
+    name: 'Water Meter - Reading (Lifetime)'
+    id: sensor_water_meter_reading_lifetime
+    unit_of_measurement: "L"
+    device_class: water
+    state_class: "total_increasing"
+    icon: "mdi:counter"
+    accuracy_decimals: 2
+    filters:
+#      - delta : 0.001
+    # The number 0.00 should be replaced with your own gas meters physical reading
+    lambda: |-
+          return (id(lifetime_water_litre) + 0.00);
+    # Set interval that updates are sent to HA instance
+    update_interval: 15s
+
+
+# sensor:
+  - platform: adc
+    pin: 35
+    name: 'Water Tank - Pressure (kPa)'
+    id: water_tank_pressure_bar
+    accuracy_decimals: 2
+    device_class: pressure
+    state_class: "measurement"
+    unit_of_measurement: kPa
+    icon: "mdi:gauge"
+    update_interval: 5s
+    attenuation: 11db  #auto
+    filters:
+#      - multiply: 3.3
+      - median: 
+          window_size: 6
+          send_every: 6
+          send_first_at: 6
+      - calibrate_linear:
+          # Measured value of X volt maps to y kPa
+          - 4.15867 -> 23.6061428   # 100%
+          - 3.75700 -> 21.2455285   #  90%
+          - 3.35533 -> 18.8849142   #  80%
+          - 2.95367 -> 16.5243      #  70%
+          - 2.55200 -> 14.1636857   #  60%
+          - 2.15033 -> 11.8030714   #  50%
+          - 1.74867 -> 9.44245712   #  40%
+          - 1.34700 -> 7.08184284   #  30%
+          - 0.94533 -> 4.72122856   #  20%
+          - 0.54367 -> 2.36061428   #  10%
+          - 0.14200 -> 0.0          #   0%
+        # From https://www.sensorsone.com/liquid-level-to-pressure-calculator/?lval=241&lunit=centimetres+%28cm%29&lfctr=cm&sg=1&grav=9.79508&punit=kilopascals+%28kPa%29&pfctr=kPa
+        # Gouburn 655m - Local Gravity 9.79508 ms-2
+
+
+  - platform: adc
+    pin: 35
+    name: 'Water Tank - Pressure (psi)'
+    id: water_tank_pressure_psi
+    accuracy_decimals: 2
+    device_class: pressure
+    state_class: "measurement"
+    unit_of_measurement: psi
+    icon: "mdi:gauge"
+    update_interval: 5s
+    attenuation: 11db  #auto
+    filters:
+#      - multiply: 3.3
+      - median: 
+          window_size: 6
+          send_every: 6
+          send_first_at: 6
+      - calibrate_linear:
+          # Measured value of X volt maps to y PSI
+
+          - 4.15867 -> 3.42378155   # 100%
+          - 3.75700 -> 3.08140339   #  90%
+          - 3.35533 -> 2.73902524   #  80%
+          - 2.95367 -> 2.39664708   #  70%
+          - 2.55200 -> 2.05426893   #  60%
+          - 2.15033 -> 1.71189077   #  50%
+          - 1.74867 -> 1.36951262   #  40%
+          - 1.34700 -> 1.02713446   #  30%
+          - 0.94533 -> 0.68475631   #  20%
+          - 0.54367 -> 0.342378155  #  10%
+          - 0.14200 -> 0.0          #   0%
+
+        # https://www.sensorsone.com/liquid-level-to-pressure-calculator/?lval=241&lunit=centimetres+%28cm%29&lfctr=cm&sg=1&grav=9.79508&punit=kilopascals+%28kPa%29&pfctr=kPa
