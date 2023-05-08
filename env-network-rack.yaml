@@ -1,0 +1,195 @@
+substitutions:
+  # Provides substitutions or variables that are then called elsewhere multiple times in the config
+  device_name: env-network-rack
+  device_description: "Phase C / GPO 1 - Environment data (temp / humidity / pressure) within the network rack"
+  project_name: "esphome.environmental"
+  project_version: "1.0"
+  set_timezone: "Australia/Sydney"
+  set_dns_domain: ".iot.home.lan"
+  disable_entities: "false"
+
+  # I2C PINS - Used for BME280 sensor
+  sda_pin: GPIO20   # Default on ESP32 is SDA = PIN 21. ES32 S3 use 20
+  scl_pin: GPIO21   # Default on ESP32 is SLC = PIN 22. ES32 S3 use 21
+
+
+esphome:
+  name: env-network-rack
+  friendly_name: "ENV - Network Rack"
+  comment: "${device_description}"
+  name_add_mac_suffix: false
+  project:
+    name: "${project_name}"
+    version: "${project_version}"
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: arduino
+
+preferences:
+  # Enable to allow storing of 'Read Total' between reboots and flashing.
+  flash_write_interval: 5min
+
+logger:
+  level: WARN
+  baud_rate: 0
+
+packages:
+  baseline: !include common/common.baseline.yaml
+  sensor: !include common/common.sensor.yaml
+  binary_sensor: !include common/common.binary_sensor.yaml
+  text_sensor: !include common/common.text_sensor.yaml
+  button: !include common/common.button.yaml
+  wifi: !include common/common.wifi.yaml
+  time: !include common/common.time.yaml
+
+  # Enable Home Assistant API
+api:
+#  encryption:
+#    key: !secret api_key
+
+  # Over the Air Firmware Updates
+ota:
+  password: !secret ota_password
+  safe_mode: true
+
+wifi:
+  # WiFi credentials
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+captive_portal:
+
+button:
+
+
+# ======================================================================================
+
+esp32_ble_tracker:
+  scan_parameters:
+# Adjust timing if the defaults do not work in your environment
+    interval: 1100ms
+    window: 1100ms
+    active: true
+
+bluetooth_proxy:
+  active: true
+
+# =========================================
+
+i2c:
+  sda: $sda_pin
+  scl: $scl_pin
+  scan: true
+  id: bus_a
+
+# =========================================
+
+binary_sensor:
+
+
+# =========================================
+
+sensor:
+
+  # BME280 Sensor in I2C Port - Temperature
+  - platform: bme280
+    address: 0x76
+    update_interval: 30s
+
+    # Temperature sensor - defaults to celcius
+    temperature:
+      name: "BME280 - Temperature"
+      id: bme280_temperature
+      accuracy_decimals: 1
+      filters:
+        offset: -4.5
+
+    # Pressure sensor - defaults to hPa
+    pressure:
+      name: "BME280 - Pressure"
+      id: bme280_pressure
+      accuracy_decimals: 1
+
+    # Relative Humidity sensor
+    humidity:
+      name: "BME280 - Humidity (Relative)"
+      id: bme280_humidity
+      accuracy_decimals: 1
+      filters:
+        offset: 4.7
+
+  # BME280 Sensor in I2C Port - Absolute Humidity
+  - platform: absolute_humidity
+    name: "BME280 - Humidity (Absolute)"
+    state_class: 'measurement'
+    accuracy_decimals: 1
+    temperature: bme280_temperature
+    humidity: bme280_humidity
+    equation: Wobus   # Wobus (Default), optional Tetens or Buck
+
+  # BME280 Sensor in I2C Port - Dew Point
+  - platform: template
+    name: "BME280 - Dew Point"
+    state_class: 'measurement'
+    accuracy_decimals: 1
+    lambda: |-
+      return (243.5*(log(id(bme280_humidity).state/100)+((17.67*id(bme280_temperature).state)/
+      (243.5+id(bme280_temperature).state)))/(17.67-log(id(bme280_humidity).state/100)-
+      ((17.67*id(bme280_temperature).state)/(243.5+id(bme280_temperature).state))));
+    unit_of_measurement: °C
+    icon: 'mdi:thermometer-alert'
+    filters:
+      - filter_out: nan
+
+  # BME280 Sensor in I2C Port - Equivalent Sea Level Pressure (based on 655m Goulburn North)
+  - platform: template
+    name: "BME280 - Pressure (Equivalent Sea Level)"
+    state_class: 'measurement'
+    accuracy_decimals: 1
+    lambda: |-
+      const float STANDARD_ALTITUDE = 656; // in meters, see note
+      return id(bme280_pressure).state / powf(1 - ((0.0065 * STANDARD_ALTITUDE) /
+        (id(bme280_temperature).state + (0.0065 * STANDARD_ALTITUDE) + 273.15)), 5.257); // in hPa
+    update_interval: 15s
+    unit_of_measurement: 'hPa'
+
+
+   # Only Altitude OR Equivalent Sea Level Pressure can be run at one time, not both
+#  - platform: template
+#    name: "BME280 - Altitude"
+#    lambda: |-
+#      const float STANDARD_SEA_LEVEL_PRESSURE = 1014.1; //in hPa, see note
+#      return ((id(bme280_temperature).state + 273.15) / 0.0065) *
+#        (powf((STANDARD_SEA_LEVEL_PRESSURE / id(bme280_pressure).state), 0.190234) - 1); // in meter
+#    update_interval: 15s
+#    icon: 'mdi:signal'
+#    unit_of_measurement: 'm'
+
+# =========================================
+
+text_sensor:
+
+# =========================================
+status_led:
+  pin:
+    number: GPIO48 #ESP8266 Onboard LED
+    inverted: false
+
+light:
+  - platform: neopixelbus
+    type: GRB
+    variant: WS2812x
+    pin: 48
+    num_leds: 1
+    name: "Onboard RGB LED"
+    id: onboard_led
+    effects:
+      - strobe:
+      - addressable_rainbow:
+      - addressable_scan:
+      - addressable_twinkle:
+      - addressable_random_twinkle:
+      - addressable_fireworks:
+      - addressable_flicker:
