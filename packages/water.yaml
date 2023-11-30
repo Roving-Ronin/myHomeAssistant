@@ -1,0 +1,118 @@
+template:
+  - sensor:
+      - name: "Water - Consumed"
+        unique_id: water_consumed
+        state: "{{ states('counter.water_flow_meter') | float(0) * 0.5 }}"
+        unit_of_measurement: "L"
+        icon: mdi:water-pump
+        device_class: water
+        state_class: total_increasing
+
+
+## Goulburn Mulware Council - 25mm connection, from 0 to 0.8KL per day is $2.99 per 1,000L
+
+      - name: "Water - Cost per Litre"
+        unique_id: water_cost_litre
+        icon: mdi:cash-minus
+        unit_of_measurement: "$"
+        state: "0.00299"                              # Equals $2.99 per kilo-litre for 0 - 800 Litres per day / 1000
+
+      - name: "Days Passed in Year"
+        unique_id: days_passed_in_year
+        state: >
+          {% set this = now().replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0) %}
+          {% set first = this.replace(month=1, day=1) %}
+          {{ (this.date() - first.date()).days }}
+
+
+# Goulburn Mulware Council - $802 p/a for sewerage connection, $2.197260273972603 per day. 
+# 25mm water connection fee is $182 p.a., $0.5055555555555556 per day. If wanting water only daily fee, change this to 0.505555
+
+      - name: "Sewerage - Daily Connection Charge"
+        unique_id: sewerage_daily_charge
+        icon: mdi:cash-minus
+        unit_of_measurement: "$"
+        state: "2.197260273972603"
+
+      - name: "Water - Daily Connection Charge"
+        unique_id: water_daily_charge
+        icon: mdi:cash-minus
+        unit_of_measurement: "$"
+        state: "0.5055555555555556"
+
+      - name: "Water - Total Cost Daily"
+        unique_id: water_total_cost_daily
+        icon: mdi:currency-usd
+        unit_of_measurement: $
+        state_class: total
+        device_class: monetary
+        state: >
+          {% set sewerage = states('sensor.sewerage_daily_charge') | float(0) %}
+          {% set supply = states('sensor.water_daily_charge') | float(0) %}
+          {% set usage = states('sensor.water_consumed_daily') | float(0) * states('sensor.water_cost_litre') | float(0) %}
+          {{ (sewerage + supply + usage) | round(2) }}
+
+      - name: "Water - Total Cost Monthly"
+        unique_id: water_total_cost_monthly
+        icon: mdi:currency-usd
+        unit_of_measurement: $
+        state_class: total
+        device_class: monetary
+        state: >
+          {% set sewerage = states('sensor.sewerage_daily_charge') | float(0) * now().day %}
+          {% set supply = states('sensor.water_daily_charge') | float(0) * now().day %}
+          {% set usage = states('sensor.water_consumed_monthly') | float(0) * states('sensor.water_cost_litre') | float(0) %}
+          {{ (sewerage + supply + usage) | round(2) }}
+
+      - name: "Water - Total Cost Yearly"
+        unique_id: water_total_cost_yearly
+        icon: mdi:currency-usd
+        unit_of_measurement: $
+        state_class: total
+        device_class: monetary
+        state: >
+          {% set sewerage = states('sensor.sewerage_daily_charge') | float(0) * ( states('sensor.days_passed_in_year') | int(0) + 1 ) %}
+          {% set supply = states('sensor.water_daily_charge') | float(0) * ( states('sensor.days_passed_in_year') | int(0) + 1 ) %}
+          {% set usage = states('sensor.water_consumed_yearly') | float(0) * states('sensor.water_cost_litre') | float(0) %}
+          {{ (sewerage + supply + usage) | round(2) }}
+
+
+####################################################
+# utility_meter:
+
+energy_meter:
+
+  water_consumed_daily:
+    name: Water - Consumed Daily
+    unique_id: water_consumed_daily
+    source: sensor.water_consumed
+    source_type: water
+    cycle: daily
+    price_entity: &entity-price sensor.water_cost_litre
+
+
+  water_consumed_monthly:
+    name: Water - Consumed Monthly
+    unique_id: water_consumed_monthly
+    source: sensor.water_consumed
+    source_type: water
+    cycle: monthly
+    price_entity: *entity-price
+
+
+  water_consumed_quarterly:
+    name: Water - Consumed Quarterly
+    unique_id: water_consumed_quarterly
+    source: sensor.water_consumed
+    source_type: water
+    cycle: quarterly
+    offset: 18
+    price_entity: *entity-price
+
+  water_consumed_yearly:
+    name: Water - Consumed Yearly
+    unique_id: water_consumed_yearly
+    source: sensor.water_consumed
+    source_type: water
+    cycle: yearly
+    price_entity: *entity-price
