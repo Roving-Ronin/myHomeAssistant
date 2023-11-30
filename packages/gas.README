@@ -1,7 +1,0 @@
-To be updated with instructions for adding Gas meter into Home Assistant.
-
-How to match ESP to your actual gas meter reading.
-
-How to calibrate your current quarterly MJ reading, take your last bill 'final reading' and deduct from current meter reading, then apply your retailer m3 correction factor (0.9775 for Origin Energy) and then convert from m3 to MJ ( x38.29 for Origin Energy) to get your current quarterly running mj total. Then go to Developer --> Services and use the Utility Calibration service to update the entity 'Gas Consumed Quarterly mj Total' to enter your calculated mj total (to 2 decimal places. i.e. 1234.56).
-
-.
