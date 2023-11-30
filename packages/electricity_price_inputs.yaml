@@ -1,0 +1,110 @@
+
+# Updated 1 July 2023 for new Red Energy Rates - https://www.energymadeeasy.gov.au/plan?id=RED552274MRE2&postcode=2580
+# Updated 1 October 2023 for new Red Energy Rates - 
+
+# Input numbers to allow setting the electricity costs from the HA interface
+#
+
+input_number:
+  electricity_daily_supply_charge:
+    name: Daily Supply Charge
+    initial: 1.53945
+    min: 0
+    max: 3
+    step: 0.00001
+    unit_of_measurement: $/day
+    mode: box
+    icon: mdi:cash-minus
+
+  electricity_import_rate_peak_demand:
+    name: Peak Demand Rate
+    initial: 0.16940
+    min: 0
+    max: 1
+    step: 0.00001
+    unit_of_measurement: $/kWh
+    mode: box
+    icon: mdi:cash-minus
+
+  electricity_import_rate_peak:
+    name: Peak Rate
+    initial: 0.42790
+    min: 0
+    max: 1
+    step: 0.00001
+    unit_of_measurement: $/kWh
+    mode: box
+    icon: mdi:cash-minus
+
+  electricity_import_rate_shoulder:
+    name: Shoulder Rate
+    initial: 0.36498
+    min: 0
+    max: 1
+    step: 0.00001
+    unit_of_measurement: $/kWh
+    mode: box
+    icon: mdi:cash-minus
+
+  electricity_import_rate_offpeak:
+    name: Off Peak Rate
+    initial: 0.27698
+    min: 0
+    max: 1
+    step: 0.00001
+    unit_of_measurement: $/kWh
+    mode: box
+    icon: mdi:cash-minus
+
+  electricity_export_rate:
+    name: Export Rate (FIT)
+    initial: 0.07000
+    min: 0
+    max: 1
+    step: 0.001
+    unit_of_measurement: $/kWh
+    mode: box
+    icon: mdi:cash-plus
+
+#######################
+#
+# Template sensor to use for 'price_entity' in Energy Meter
+#
+
+template:
+  -  sensor:
+      - name: "Electricity - Daily Supply Charge"
+        unique_id: electricity_daily_supply_charge
+        state: "{{ states('input_number.electricity_daily_supply_charge') }}"
+        unit_of_measurement: $/Day
+        device_class: monetary
+
+      - name: "Electricity - Import Rate Peak Demand"
+        unique_id: electricity_import_rate_peak_demand
+        state: "{{ states('input_number.electricity_import_rate_peak_demand') }}"
+        unit_of_measurement: $/kWh
+        device_class: monetary
+
+      - name: "Electricity - Import Rate Peak"
+        unique_id: electricity_import_rate_peak
+        state: "{{ states('input_number.electricity_import_rate_peak') }}"
+        unit_of_measurement: $/kWh
+        device_class: monetary
+
+      - name: "Electricity - Import Rate Shoulder"
+        unique_id: electricity_import_rate_shoulder
+        state: "{{ states('input_number.electricity_import_rate_shoulder') }}"
+        unit_of_measurement: $/kWh
+        device_class: monetary
+
+      - name: "Electricity - Import Rate Offpeak"
+        unique_id: electricity_import_rate_offpeak
+        state: "{{ states('input_number.electricity_import_rate_offpeak') }}"
+        unit_of_measurement: $/kWh
+        device_class: monetary
+
+      - name: "Electricity - Export Rate (FIT)"
+        unique_id: electricity_export_rate
+        state: "{{ states('input_number.electricity_export_rate') }}"
+        unit_of_measurement: $/kWh
+        device_class: monetary

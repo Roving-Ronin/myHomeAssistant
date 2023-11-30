@@ -1,0 +1,79 @@
+
+#packages/nbn.yaml
+
+## This package is intended to give sensors to let you track when a FTTP upgrade may be avaliable for your LOCID
+# To find your LOCID, go to https://launtel.net.au/ - put your address into the "check if your address is eligible", then scroll down past their plans to "your details".
+# Do not share your LOCID with anyone on the internet, as it contains your physical address!
+
+## Using this data
+# Create an automation to notify you when a value changes, e.g altReasonCode or targetEligibilityQuarter
+
+rest:
+  resource: "https://places.nbnco.net.au/places/v2/details/LOC000121434940"
+  headers:
+    Referer: https://www.nbnco.com.au/
+  scan_interval: 3600 # Update every 4 hours
+  sensor:
+    - name: "NBN Address"
+      value_template: "{{ value_json.addressDetail.formattedAddress }}"
+    - name: "NBN Tech Type"
+      value_template: "{{ value_json.addressDetail.techType }}"
+    - name: "NBN Tech Change Status"
+      value_template: "{{ value_json.addressDetail.techChangeStatus }}"
+    - name: "NBN Reason Code"
+      value_template: "{{ value_json.addressDetail.reasonCode }}"
+    - name: "NBN Alt Reason Code"
+      value_template: "{{ value_json.addressDetail.altReasonCode }}"
+    - name: "NBN Target Eligibility Quarter"
+      value_template: "{{ value_json.addressDetail.targetEligibilityQuarter }}"
+    - name: "NBN Program Type"
+      value_template: "{{ value_json.addressDetail.programType }}"
+
+sensor:
+  - platform: template
+    sensors:
+      nbn_staus:
+        friendly_name: "NBN Status"
+        unique_id: nbn_status
+        value_template: >
+          {% set tech_status = states('sensor.nbn_tech_change_status') %}
+          {% set status_map = {
+            'Not Planned': 'No FTTP upgrade',
+            'Planned': 'FTTP Planned',
+            'In Design': 'FTTP Upgrade in Design',
+            'Committed': 'FTTP Upgrade Committed',
+            'Build Finalised': 'FTTP Upgrade Build Finalized',
+            'Eligible To Order': 'FTTP Upgrade Eligible to Order',
+            'MDU Complex Eligible To Apply': 'MDU Complex Eligible to Apply',
+            'New Tech Connected': 'New Technology Connected',
+            'Previous Tech Disconnected': 'Previous Technology Disconnected'
+          } %}
+          {{ status_map[tech_status] if tech_status in status_map else tech_status }}
+
+
+automation:
+  - id: '1696953073865'
+    alias: Notify - NBN FTTP upgrade availability
+    description: ""
+    trigger:
+      - platform: state
+        entity_id:
+          - sensor.nbn_status
+    condition:
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: sensor.nbn_status
+            enabled: true
+            state: No FTTP upgrade
+          - condition: state
+            entity_id: sensor.nbn_status
+            state: API not available
+    action:
+      - service: notify.mobile_app_justins_iphone_14
+        data:
+          title: NBN status change
+          message: >-
+            NBN status just changed from "{{ trigger.from_state.state }}" to "{{trigger.to_state.state }}"
+          data:
+            priority: high

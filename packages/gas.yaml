@@ -1,0 +1,176 @@
+#
+#  Based upon sensor in ESP device being configured as type PULSE meter.
+#  Uses code from SgtBatten and also from https://community.home-assistant.io/t/using-home-assistant-to-calculate-my-energy-bill-using-data-from-my-solar-inverter/344913/1
+#
+#  Version: 1.0 - Added availability checks to gas_meter_reading_m3 and gas_meter_reading_mj, so when there is a delay reading gas_meter_reading
+#                 from ESP device, it does not see HA taking a double reading of the gas meter
+#
+#  Version: 1.1 - Updated to use the energy_meter integration, and converted to using a gas_price sensor that automatically updates to reflect the current MJ cost
+#                 as based upon total MJ consumed for the quarter.
+#
+#  Version: 1.2 - Updated to use the energy_meter integration's, source_type: gas
+#
+
+template: 
+  - sensor:
+    - name: "Gas - Price (MJ)"
+      unique_id: gas_price_mj
+      unit_of_measurement: "$/MJ"
+      device_class: monetary
+      state: >
+        {## Enter cost per MJ rates below ##}
+        {% set rate1 = 0.03608 %}
+        {% set rate2 = 0.03058 %}
+        {% set rate3 = 0.02810 %}
+        {% set rate4 = 0.02728 %}
+        {% set rate5 = 0.02420 %}
+        {% set gas_consumption = states('sensor.gas_consumed_quarterly_mj') | float %}
+        {% if gas_consumption <= 1890 %} {{rate1}}
+        {% elif gas_consumption <= 3750 %} {{rate2}}
+        {% elif gas_consumption <= 8250 %} {{rate3}}
+        {% elif gas_consumption <= 250500 %} {{rate4}}
+        {% else %} {{rate5}}
+        {% endif %}
+
+#
+#  Meter Reading x 0.9961 x 38.15 MJ = 38.001215 MJ per m³
+#  M3 price is MJ rate x 38.001215 MJ in 1m³. 
+#
+  - sensor:
+    - name: "Gas - Price (m³)"
+      unique_id: gas_price_m3
+      unit_of_measurement: "AUD/m³"
+      device_class: monetary
+      state: >
+        {## Enter cost per m3 rates below ##}
+        {% set rate1 = 1.3710838372 %}
+        {% set rate2 = 1.1620771547 %}
+        {% set rate3 = 1.0678341415 %}
+        {% set rate4 = 1.0366731452 %}
+        {% set rate5 = 0.9196294030 %}
+        {% set gas_consumption = states('sensor.gas_consumed_quarterly_mj') | float %}
+        {% if gas_consumption <= 1890 %} {{rate1}}
+        {% elif gas_consumption <= 3750 %} {{rate2}}
+        {% elif gas_consumption <= 8250 %} {{rate3}}
+        {% elif gas_consumption <= 250500 %} {{rate4}}
+        {% else %} {{rate5}}
+        {% endif %}
+
+# ---------------------------------------------------------------------------
+#
+# Derived sensor. Gas pulse counter uses an automation to increase 'counter.gas_meter' by 10(L) for each impulse.
+# This counter by setting the minimum value to the readout on the physical meter, is sync'ed
+# This reading however is taken as a full number, i.e. 05846314 is read as 5,846,314 instead of 05846.314 m³ 
+# So this template sensor is needed to divide the number by 1,000
+#
+  - sensor:
+    - name: "Gas Meter - Readout"
+      unique_id: gas_meter_readout
+      unit_of_measurement: "m³"
+      device_class: "gas"
+      state_class: total_increasing
+      state: "{{ (states('counter.gas_meter') | int / 1000 | round(1)) }}"
+
+# ---------------------------------------------------------------------------
+# 
+# Energy meter consumption totals in cubic meters (m3), as the gas meter provides, with retailer correction factor applied.
+# No tariffs are required here, as the retailers count the overall m3 for the quarter, but bill upon the MJ.
+#
+
+energy_meter:
+
+#  Note this reading is in 'corrected' m3, after correction factor applied.
+#  This is to get an m3 amount, to then use to apply a price too, to get provide a cost on Energy Dashboard
+#  gas_consumed_daily_m3:
+#    unique_id: gas_consumed_daily_m3
+#    source: sensor.kc868_1_gas_meter_reading_m3
+#    name: Gas Consumed Daily m³
+#    cycle: daily
+
+#   Quarterly m3 total only included to allow validation against the retailers m3 reading on their quarterly invoice.
+#  gas_consumed_quarterly_m3:
+#    unique_id: gas_consumed_quarterly_m3
+#    source: sensor.kc868_1_gas_meter_reading_m3
+#    name: Gas Consumed Quarterly m³
+#    cycle: quarterly
+#    offset:
+#      days: 11
+
+#   Quarterly m3 total only included to allow validation against the retailers m3 reading on their quarterly invoice.
+#  gas_consumed_yearly_m3:
+#    unique_id: gas_consumed_yearly_m3
+#    source: sensor.kc868_1_gas_meter_reading_m3
+#    name: Gas Consumed Yearly m³
+#    cycle: yearly
+
+# ---------------------------------------------------------------------------
+# 
+#  Energy meter consumption totals in megajoules (mj), as converted from gas meter m3 reading, with retailer correction factor applied.
+#
+#  Note this reading is in 'corrected' m3, after correction factor applied.
+#  This is to get an m3 amount, to then use to apply a price too, to get provide a cost on Energy Dashboard
+
+  gas_consumed_daily_m3:
+    unique_id: gas_consumed_daily_m3
+    name: "Gas Consumed Daily m³"
+    source: sensor.kc868_1_gas_meter_reading_m3
+    source_type: gas
+    cycle: daily
+    price_entity: sensor.gas_price_m3
+
+  gas_consumed_daily_mj:
+    unique_id: gas_consumed_daily_mj 
+    name: Gas Consumed Daily mj
+    source: sensor.kc868_1_gas_meter_reading_mj
+    source_type: gas
+    cycle: daily
+    price_entity: &entity-price sensor.gas_price_mj
+
+  gas_consumed_monthly_mj:
+    unique_id: gas_consumed_monthly_mj
+    name: Gas Consumed Monthly mj
+    source: sensor.kc868_1_gas_meter_reading_mj
+    source_type: gas
+    cycle: monthly
+    price_entity: *entity-price
+
+  gas_consumed_quarterly_mj:
+    unique_id: gas_consumed_quarterly_mj
+    name: Gas Consumed Quarterly mj
+    source: sensor.kc868_1_gas_meter_reading_mj
+    source_type: gas
+    cycle: quarterly
+    price_entity: *entity-price
+
+  gas_consumed_yearly_mj:
+    unique_id: gas_consumed_yearly_mj
+    name: Gas Consumed Yearly mj
+    source: sensor.kc868_1_gas_meter_reading_mj
+    source_type: gas
+    cycle: yearly
+    price_entity: *entity-price
+
+# ---------------------------------------------------------------------------
+#
+# Automation to monitor (quarterly mj reading) and switch tarrifs as they hit mj consumed thresholds for the quarter.
+#
+
+automation:
+
+  - alias: Gas - Energy Meter Reset
+    description: Use the utility_meter.calibrate service to set the gas MJ and Cost to ZERO.
+    trigger:
+      - platform: calendar
+        event: start
+        offset: "8:0:0"
+        entity_id: calendar.gas_meter_reset
+    condition: []
+    action:
+      - service: utility_meter.calibrate
+        data:
+          value: "0"
+        target:
+          entity_id:
+            - sensor.gas_consumed_quarterly_mj
+            - sensor.gas_consumed_quarterly_mj_cost
+    mode: single

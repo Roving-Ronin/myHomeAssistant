@@ -1,0 +1,114 @@
+template:
+
+#############################
+#   
+#   WLCRS - Huawei Solar Integrattion - Combine multiple inverter values
+#   See: https://github.com/wlcrs/huawei_solar/wiki/Connecting-to-daisy-chained-inverters
+#
+#   If your HA instance has a /config/packages directory configured, this may be deployed by saving this text into a file
+#   in that location. i.e.   /config/packages/huawei_derived_sensors.yaml
+#
+
+  # Shows the combined current production of all inverters, in Watts
+  - sensor:
+    - name: "Inverters Input Power"
+      unique_id: inverters_input_power
+      unit_of_measurement: "W"
+      device_class: "power"
+      state_class: measurement
+      state: "{{ (states('sensor.inverter1_input_power') | float) + (states('sensor.inverter2_input_power') | float)}}"
+#      availability: >-
+#        {{ (states('sensor.inverter1_input_power')|is_number)
+#            and (states('sensor.inverter2_input_power')|is_number) }}
+
+
+  # Shows 'Daily Solar Yield' being the yield of your solar panels, minus any efficiency losses by the inverter
+  # See: https://github.com/wlcrs/huawei_solar/wiki/Daily-Solar-Yield
+  - sensor:
+    - name: "Inverters Input Power with Efficiency Loss"
+      unique_id: inverters_input_power_with_efficiency_loss
+      unit_of_measurement: "W"
+      device_class: power
+      state_class: measurement
+      state: >
+        {% set inverter1_input_with_efficiency = (states('sensor.inverter1_efficiency') | float(0) /100) * states('sensor.inverter1_input_power') | float(0) %}
+        {% set inverter2_input_with_efficiency = (states('sensor.inverter2_efficiency') | float(0) /100) * states('sensor.inverter2_input_power') | float(0) %}
+        {{ (inverter1_input_with_efficiency + inverter2_input_with_efficiency) | round(3) }}
+      availability: >-
+        {{ (states('sensor.inverter1_efficiency')|is_number)
+            and (states('sensor.inverter2_efficiency')|is_number) 
+              and (states('sensor.inverter1_input_power')|is_number) 
+                and (states('sensor.inverter2_input_power')|is_number) }}
+
+
+  # Shows the combined current battery capacity, as percentage
+#  - sensor:
+#    - name: "Batteries State of Capacity"
+#      unique_id: batteries_state_of_capacity
+#      unit_of_measurement: "%"
+#      device_class: "battery"
+#      state_class: measurement
+#      state: "{{ (((states('sensor.battery1_state_of_capacity') | float) + (states('sensor.battery2_state_of_capacity') | float))/2) | round(2)}}"
+#       availability: >-
+#         {{ (states('sensor.battery1_state_of_capacity')|is_number)
+#             and (states('sensor.battery2_state_of_capacity')|is_number) }}
+
+
+  # Shows the combined current battery charge / discharge power, in Watts
+#  - sensor:
+#    - name: "Batteries Charge Discharge Power"
+#      unique_id: batteries_charge_discharge_power
+#      unit_of_measurement: "W"
+#      device_class: "power"
+#      state_class: measurement
+#      state: "{{ (states('sensor.battery1_charge_discharge_power') | float) + (states('sensor.battery2_charge_discharge_power') | float)}}"
+#       availability: >-
+#         {{ (states('sensor.battery1_charge_discharge_power')|is_number)
+#             and (states('sensor.battery2_charge_discharge_power')|is_number) }}
+
+
+  # Shows the combined daily production of all inverters, in kWh. Max 0 is to stop it reporting negative numbers.
+  - sensor:
+    - name: "Inverters Total Daily Yield"
+      unique_id: inverters_total_daily_yield
+      unit_of_measurement: "kWh"
+      device_class: "energy"
+      state_class: total_increasing
+      # total used instead of total_increasing in case of negative yield on L1 / M1 inverters overnight
+      state: "{{ states('sensor.inverter1_daily_yield') | float + (states('sensor.inverter2_daily_yield') | float) }}"
+      availability: >-
+        {{ (states('sensor.inverter1_daily_yield')|is_number)
+            and (states('sensor.inverter2_daily_yield')|is_number) }}
+
+
+  # Shows the combined current Active Power of all inverters, in Watts
+  - sensor:
+    - name: "Inverters Active Power"
+      unique_id: inverters_active_power
+      unit_of_measurement: "W"
+      device_class: "power"
+      state_class: measurement
+      state: "{{ (states('sensor.inverter1_active_power') | float) + (states('sensor.inverter2_active_power') | float) }}"
+      availability: >-
+        {{ (states('sensor.inverter1_active_power')|is_number)
+            and (states('sensor.inverter2_active_power')|is_number) }}
+
+
+  # Shows the calculated current load, in Watts
+  - sensor:
+    - name: "House Consumption Power"
+      unique_id: house_consumption_power
+      unit_of_measurement: "W"
+      icon: mdi:solar-power
+      device_class: "power"
+      state_class: measurement
+      state: >-
+        {% set inv_active_power = states('sensor.inverters_active_power')|float(0) %}
+        {% set pm_active_power = states('sensor.power_meter_active_power')|float(0) %}
+        {{ (inv_active_power - pm_active_power)|float(0)|round(0) }}
+      availability: >-
+        {{ (states('sensor.inverters_active_power')|is_number)
+            and (states('sensor.power_meter_active_power')|is_number) }}
+
+
+#############################
