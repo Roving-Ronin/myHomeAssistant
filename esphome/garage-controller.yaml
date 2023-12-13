@@ -84,7 +84,7 @@ packages:
   # Enable Home Assistant API
 api:
   encryption:
-    key: !secret api_key  # 5I/OHEaD1FhLrW14sxx5xYOI/y1c18olYOsluzeT3YY=
+    key: !secret api_key
 
   # Over the Air Firmware Updates
 ota:
