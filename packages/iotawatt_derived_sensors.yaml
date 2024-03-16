@@ -12,8 +12,12 @@ template:
       state_class: total
       state: >
         {% set total = states('sensor.gpo_2a_wh') | float / 1000 %}
-        {% set filtered = states('sensor.ups_study_energy_daily')| float(0) %}
+        {% set filtered = states('sensor.gpo_ups_study_energy')| float(0) %}
         {{ [ total - filtered, 0 ] | max | round(3) }}
+      availability: >-
+        {{  states('sensor.gpo_2a_wh') | is_number
+         and states('sensor.gpo_ups_study_energy') | is_number }} 
+
 
 #      state: "{{ states('sensor.gpo_2a_kwh') | float(0) - states('sensor.ups_study_energy_daily') | float(0) | round(3) }}"
 
@@ -30,10 +34,14 @@ template:
       state_class: total
       state: >
         {% set total = states('sensor.gpo_3b_wh') | float / 1000 %}
-        {% set filtered = states('sensor.clothes_dryer_energy_daily')| float(0) %}
+        {% set filtered = states('sensor.gpo_clothes_dryer_energy')| float(0) %}
         {{ [ total - filtered, 0 ] | max | round(3) }}
+      availability: >-
+        {{  states('sensor.gpo_3b_wh') | is_number 
+         and states('sensor.gpo_clothes_dryer_energy') | is_number }} 
 
-#      state: "{{ states('sensor.gpo_3b_kwh') | float(0) - states('sensor.clothes_dryer_energy_daily') | float(0) | round(3) }}"
+
+#      state: "{{ states('sensor.gpo_3b_kwh') | float(0) - states('sensor.gpo_clothes_dryer_energy') | float(0) | round(3) }}"
 
 #############################
 #   Calculates the energy consumed on wall power outlets GPO 1 / Phase C, after deducting:
@@ -50,8 +58,19 @@ template:
       state_class: total
       state: >
         {% set total = states('sensor.gpo_1c_wh') | float / 1000 %}
-        {% set filtered = ( states('sensor.network_rack_fan_energy_daily')| float(0) + states('sensor.ups_network_rack_energy_daily')| float(0) + states('sensor.ups_servers_energy_daily')| float(0) + states('sensor.oven_c_kwh')| float(0) ) %}
+        {% set filtered = ( states('sensor.gpo_rack_fan_energy')| float(0) 
+          + states('sensor.gpo_ups_server_energy')| float(0) 
+          + states('sensor.oven_c_kwh')| float(0) ) %}
         {{ [ total - filtered, 0 ] | max | round(3) }}
+      availability: >-
+        {{ states('sensor.gpo_1c_wh') | is_number 
+          and states('sensor.gpo_rack_fan_energy') | is_number 
+          and states('sensor.gpo_ups_server_energy') | is_number 
+          and states('sensor.oven_c_kwh') | is_number  }}
+
+
+# REMOVED AS PLUG FAULTY          + states('sensor.ups_network_rack_energy_daily')| float(0) 
+#                                         and states('sensor.ups_network_rack_energy_daily') | is_number 
 
 #      state: "{{ states('sensor.gpo_1c_kwh') | float(0) - states('sensor.network_rack_fan_energy_daily') | float(0) - states('sensor.ups_network_rack_energy_daily') | float(0)  - states('sensor.ups_servers_energy_daily') | float(0) - states('sensor.oven_c_kwh') | float(0) | round(3) }}"
 
@@ -70,7 +89,7 @@ template:
 #      state: "{{ states('sensor.lights_ab_wh_to_kwh') | float(0) - states('sensor.ixl_3in1_all_bathroom') | float(0) | round(3) }}"
 
 #############################
-#   Conversion for IoTaWATT to convert lights_ab_wh as a new sensor in kWh.
+#   Conversion for IoTaWatt to convert lights_ab_wh as a new sensor in kWh.
 #   The new sensor.lights_a_wh_to_kwh is then used in derived sensor derived_lights_kwh, to calculate kWh usage for lights.
 #   Required as original WH sensor from IoTaWatt when set to kWh output, provides a negative output in Energy Dashboard
 #
@@ -83,6 +102,9 @@ template:
       state_class: total
       state: "{{ [ ( states('sensor.gpo_1c_wh') | float / 1000), 0 ] | max | round(3) }}"
       icon: mdi:lightning-bolt-outline
+      availability: >-
+        {{  states('sensor.gpo_1c_wh') | is_number }}
+
 
   - sensor:
     - name: "GPO 2A - kWh"
@@ -92,6 +114,9 @@ template:
       state_class: total
       state: "{{ [ ( states('sensor.gpo_2a_wh') | float / 1000), 0 ] | max | round(3) }}"
       icon: mdi:lightning-bolt-outline
+      availability: >-
+        {{  states('sensor.gpo_2a_wh') | is_number }}
+
 
   - sensor:
     - name: "GPO 3B - kWh"
@@ -101,6 +126,9 @@ template:
       state_class: total
       state: "{{ [ ( states('sensor.gpo_3b_wh') | float / 1000), 0 ] | max | round(3) }}"
       icon: mdi:lightning-bolt-outline
+      availability: >-
+        {{  states('sensor.gpo_3b_wh') | is_number }}
+
 
   - sensor:
     - name: "Lights A - kWh"  # Rename in GUI to: Lights - kWh Daily
@@ -110,6 +138,9 @@ template:
       state_class: total
       state: "{{ [ ( states('sensor.lights_a_wh') | float / 1000), 0 ] | max | round(3) }}"
       icon: mdi:lightning-bolt-outline
+      availability: >-
+        {{  states('sensor.lights_a_wh') | is_number }}
+
 
   - sensor:
     - name: "Aircon - kWh"  # Rename in GUI to: Air Conditioner - kWh Daily
@@ -119,6 +150,9 @@ template:
       state_class: total
       state: "{{ [ ( states('sensor.aircon_wh') | float / 1000), 0 ] | max | round(3) }}"
       icon: mdi:lightning-bolt-outline
+      availability: >-
+        {{  states('sensor.aircon_wh') | is_number }}
+
 
   - sensor:
     - name: "Oven C - kWh"  # Rename in GUI to: Oven - kWh Daily
@@ -128,6 +162,9 @@ template:
       state_class: total
       state: "{{ [ ( states('sensor.oven_c_wh') | float / 1000), 0 ] | max | round(3) }}"
       icon: mdi:lightning-bolt-outline
+      availability: >-
+        {{  states('sensor.oven_c_wh') | is_number }}
+
 
   - sensor:
     - name: "Consume - kWh"  # Rename in GUI to: Consumption - kWh Daily
@@ -137,6 +174,9 @@ template:
       state_class: total
       state: "{{ [ ( states('sensor.consume_wh') | float / 1000), 0 ] | max | round(3) }}"
       icon: mdi:lightning-bolt-outline
+      availability: >-
+        {{  states('sensor.consume_wh') | is_number }}
+
 
   - sensor:
     - name: "Cons Self - kWh"  # Rename in GUI to: Consumption (Self) - kWh Daily
@@ -146,6 +186,9 @@ template:
       state_class: total
       state: "{{ [ ( states('sensor.cons_self_wh') | float / 1000), 0 ] | max | round(3) }}"
       icon: mdi:lightning-bolt-outline
+      availability: >-
+        {{  states('sensor.cons_self_wh') | is_number }}
+
 
   - sensor:
     - name: "Grid - Net kWh"  # Rename in GUI to: "Grid - NET kWh Daily"
@@ -153,8 +196,11 @@ template:
       unit_of_measurement: "kWh"
       device_class: "energy"
       state_class: total
-      state: "{{ [ ( states('sensor.grid_net_wh') | float / 1000), 0 ] | max | round(3) }}"
+      state: "{{ [ ( states('sensor.grid_wh') | float / 1000), 0 ] | max | round(3) }}"
       icon: mdi:lightning-bolt-outline
+      availability: >-
+        {{  states('sensor.grid_wh') | is_number }}
+
 
   - sensor:
     - name: "Grid - Export kWh"     # Rename in GUI to: "Grid Export - kWh Daily"
@@ -164,6 +210,9 @@ template:
       state_class: total
       state: "{{ [ ( states('sensor.grid_export_wh') | float / 1000), 0 ] | max | round(3) }}"
       icon: mdi:lightning-bolt-outline
+      availability: >-
+        {{  states('sensor.grid_export_wh') | is_number }}
+
 
   - sensor:
     - name: "Grid - Import kWh"     # Rename in GUI to: "Grid Import - kWh Daily"
@@ -173,6 +222,9 @@ template:
       state_class: total
       state: "{{ [ ( states('sensor.grid_import_wh') | float / 1000), 0 ] | max | round(3) }}"
       icon: mdi:lightning-bolt-outline
+      availability: >-
+        {{  states('sensor.grid_import_wh') | is_number }}
+
 
   - sensor:
     - name: "Misc - kWh"  # Rename in GUI to: Miscellaneous - kWh Daily
@@ -182,6 +234,9 @@ template:
       state_class: total
       state: "{{ [ ( states('sensor.misc_wh') | float / 1000), 0 ] | max | round(3) }}"
       icon: mdi:lightning-bolt-outline
+      availability: >-
+        {{  states('sensor.misc_wh') | is_number }}
+
 
   - sensor:
     - name: "Total Load - kWh"  # Rename in GUI to: Total Load - kWh Daily
@@ -191,6 +246,9 @@ template:
       state_class: total
       state: "{{ [ ( states('sensor.total_load_wh') | float / 1000), 0 ] | max | round(3) }}"
       icon: mdi:lightning-bolt-outline
+      availability: >-
+        {{  states('sensor.total_load_wh') | is_number }}
+
 
 
 #############################
