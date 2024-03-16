@@ -6,9 +6,9 @@
 #                 from ESP device, it does not see HA taking a double reading of the gas meter
 #
 #  Version: 1.1 - Updated to use the energy_meter integration, and converted to using a gas_price sensor that automatically updates to reflect the current MJ cost
-#                 as based upon total MJ consumed for the quarter.
+#                 as based upon total MJ consumed for the quarter. https://github.com/zeronounours/HA-custom-component-energy-meter
 #
-#  Version: 1.2 - Updated to use the energy_meter integration's, source_type: gas
+#  Version: 1.2 - Updated to use the energy_meter integration's, new source_type: gas
 #
 
 template: 
@@ -33,21 +33,24 @@ template:
         {% endif %}
 
 #
-#  Meter Reading x 0.9961 x 38.15 MJ = 38.001215 MJ per m³
-#  M3 price is MJ rate x 38.001215 MJ in 1m³. 
+# 10 Nov 2023 - Meter Reading x 0.9961 x 38.15 MJ = 38.001215 MJ per m³
+#             - M3 price is MJ rate x 38.001215 MJ in 1m³. 
+#
+#  8 Feb 2024 - Meter Reading x 0.9961 x 38.15 MJ = 36.90904 MJ per m³
+#             - M3 price is MJ rate x 36.90904 MJ in 1m³. 
 #
   - sensor:
     - name: "Gas - Price (m³)"
       unique_id: gas_price_m3
-      unit_of_measurement: "AUD/m³"
+      unit_of_measurement: "$/m³"
       device_class: monetary
       state: >
         {## Enter cost per m3 rates below ##}
-        {% set rate1 = 1.3710838372 %}
-        {% set rate2 = 1.1620771547 %}
-        {% set rate3 = 1.0678341415 %}
-        {% set rate4 = 1.0366731452 %}
-        {% set rate5 = 0.9196294030 %}
+        {% set rate1 = 1.3316781632 %}
+        {% set rate2 = 1.1286784432 %}
+        {% set rate3 = 1.037144024 %}
+        {% set rate4 = 1.0068786112 %}
+        {% set rate5 = 0.893198768 %}
         {% set gas_consumption = states('sensor.gas_consumed_quarterly_mj') | float %}
         {% if gas_consumption <= 1890 %} {{rate1}}
         {% elif gas_consumption <= 3750 %} {{rate2}}
@@ -81,16 +84,20 @@ energy_meter:
 
 #  Note this reading is in 'corrected' m3, after correction factor applied.
 #  This is to get an m3 amount, to then use to apply a price too, to get provide a cost on Energy Dashboard
-#  gas_consumed_daily_m3:
-#    unique_id: gas_consumed_daily_m3
-#    source: sensor.kc868_1_gas_meter_reading_m3
-#    name: Gas Consumed Daily m³
-#    cycle: daily
+#
+  gas_consumed_daily_m3:
+    unique_id: gas_consumed_daily_m3
+    name: "Gas Consumed Daily m³"
+    source: sensor.kc868_1_gas_meter_reading_m3
+    source_type: gas
+    cycle: daily
+    price_entity: sensor.gas_price_m3
 
 #   Quarterly m3 total only included to allow validation against the retailers m3 reading on their quarterly invoice.
 #  gas_consumed_quarterly_m3:
 #    unique_id: gas_consumed_quarterly_m3
 #    source: sensor.kc868_1_gas_meter_reading_m3
+#    source_type: gas
 #    name: Gas Consumed Quarterly m³
 #    cycle: quarterly
 #    offset:
@@ -100,6 +107,7 @@ energy_meter:
 #  gas_consumed_yearly_m3:
 #    unique_id: gas_consumed_yearly_m3
 #    source: sensor.kc868_1_gas_meter_reading_m3
+#    source_type: gas
 #    name: Gas Consumed Yearly m³
 #    cycle: yearly
 
@@ -109,14 +117,6 @@ energy_meter:
 #
 #  Note this reading is in 'corrected' m3, after correction factor applied.
 #  This is to get an m3 amount, to then use to apply a price too, to get provide a cost on Energy Dashboard
-
-  gas_consumed_daily_m3:
-    unique_id: gas_consumed_daily_m3
-    name: "Gas Consumed Daily m³"
-    source: sensor.kc868_1_gas_meter_reading_m3
-    source_type: gas
-    cycle: daily
-    price_entity: sensor.gas_price_m3
 
   gas_consumed_daily_mj:
     unique_id: gas_consumed_daily_mj 
@@ -157,20 +157,20 @@ energy_meter:
 
 automation:
 
-  - alias: Gas - Energy Meter Reset
-    description: Use the utility_meter.calibrate service to set the gas MJ and Cost to ZERO.
-    trigger:
-      - platform: calendar
-        event: start
-        offset: "8:0:0"
-        entity_id: calendar.gas_meter_reset
-    condition: []
-    action:
-      - service: utility_meter.calibrate
-        data:
-          value: "0"
-        target:
-          entity_id:
-            - sensor.gas_consumed_quarterly_mj
-            - sensor.gas_consumed_quarterly_mj_cost
-    mode: single
+#  - alias: Gas - Energy Meter Reset
+#    description: Use the utility_meter.calibrate service to set the gas MJ and Cost to ZERO.
+#    trigger:
+#      - platform: calendar
+#        event: start
+#        offset: "8:0:0"
+#        entity_id: calendar.gas_meter_reset
+#    condition: []
+#    action:
+#      - service: utility_meter.calibrate
+#        data:
+#          value: "0"
+#        target:
+#          entity_id:
+#            - sensor.gas_consumed_quarterly_mj
+#            - sensor.gas_consumed_quarterly_mj_cost
+#    mode: single
