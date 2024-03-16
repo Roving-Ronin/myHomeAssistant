@@ -6,6 +6,25 @@ template:
 #   Derived sensors that are used upon the card
 #
 
+
+  # Sensor to show the House Active Power Consumption less the sunsynk_power_flow  aux_active_power and non_essential_active_power sensors.
+  # Used by card entry: essential_power
+  - sensor:
+    - name: "House Consumption - Power - Less AUX Non-Essential"
+      unique_id: house_consumption_power_less_aux_non_essential
+      unit_of_measurement: "W"
+      device_class: "power"
+      state_class: measurement
+      state: >-
+        {{ max(0, (states('sensor.house_consumption_power')|float -
+            states('sensor.sunsynk_card_aux_active_power')|float -
+            states('sensor.sunsynk_card_non_essential_active_power')|float) | round(2)) }}
+      availability: >-
+        {{ (states('sensor.house_consumption_power')|is_number)
+              and (states('sensor.sunsynk_card_aux_active_power')|is_number) 
+                and (states('sensor.sunsynk_card_non_essential_active_power')|is_number) | round(2) }}
+
+
   # Sensor to show the Active Power for all the GPO's in the house, less the Network Rack and Fan, Servers and Study UPS sensors.
   # Used card entry: essential_load2
   - sensor:
@@ -18,28 +37,19 @@ template:
         {% set gpo_total_active_power = states('sensor.gpo_total')|float(0) %}
         {% set all_it_active_power = states('sensor.it_hardware_active_power')|float(0) %}
         {% set whitegoods = states('sensor.gpo_clothes_dryer_power')|float(0) %}
-        {{ (gpo_total_active_power - ( all_it_active_power + whitegoods ))|float(0)|round(0) }}
+        {{ max(0, (gpo_total_active_power - ( all_it_active_power + whitegoods ))|float(0)|round(0)) }}
       availability: >-
         {{ (states('sensor.gpo_total')|is_number)
             and (states('sensor.it_hardware_active_power')|is_number) 
               and (states('sensor.gpo_clothes_dryer_power')|is_number) }}
 
 
-  # Sensor to show the House Active Power Consumption less the sunsynk_power_flow  aux_active_power and non_essential_active_power sensors.
-  # Used by card entry: essential_power
-  - sensor:
-    - name: "House Consumption Power Less Known"
-      unique_id: house_consumption_power_less_known
-      unit_of_measurement: "W"
-      device_class: "power"
-      state_class: measurement
+  # Queries the group sensor.sunsynk_power_flow_aux_active_power and if the ouput of that sensor is >0 (showing power being used) 
+  # then outputs 'on', else 'off'
+  # Used card entry: aux_connected_status
+  - binary_sensor:
+    - name: "Sunsynk Card - AUX - Connected Status"
+      unique_id: sunsynk_card_aux_connected_status
+      device_class: power
       state: >-
-        {% set house_consumption_active_power = states('sensor.house_consumption_power')|float(0) %}
-        {% set aux_active_power = states('sensor.sunsynk_power_flow_aux_active_power')|float(0) %}
-        {% set non_essential_active_power = states('sensor.sunsynk_power_flow_non_essential_active_power')|float(0) %}
-        {{ (house_consumption_active_power - ( aux_active_power + non_essential_active_power))|float(0)|round(0) }}
-      availability: >-
-        {{ (states('sensor.house_consumption_power')|is_number)
-            and (states('sensor.sunsynk_power_flow_aux_active_power')|is_number) 
-              and (states('sensor.sunsynk_power_flow_non_essential_active_power')|is_number) }}
- 
+        {{ 'on' if states('sensor.sunsynk_card_aux_active_power') | float(default=0) > 0 else 'off' }}
