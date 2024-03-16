@@ -9,7 +9,7 @@
 # Create an automation to notify you when a value changes, e.g altReasonCode or targetEligibilityQuarter
 
 rest:
-  resource: "https://places.nbnco.net.au/places/v2/details/LOC000121434940"
+  resource: "https://places.nbnco.net.au/places/v2/details/LOC000121xxxxx"
   headers:
     Referer: https://www.nbnco.com.au/
   scan_interval: 3600 # Update every 4 hours
