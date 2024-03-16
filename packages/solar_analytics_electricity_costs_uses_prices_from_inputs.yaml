@@ -58,11 +58,11 @@ utility_meter:
 
   sa_power_imported_daily:
     unique_id: sa_power_imported_daily
+    name: SA Power Imported - Daily
     source: sensor.sa_todays_energy_imported
 #    source_type: from_grid
-    name: SA Power Imported - Daily
     cycle: daily
-#    price_entity: &entity-price sensor.electricity_price
+#    price_entity: &electricity-price sensor.electricity_price
     tariffs:
       - peak
       - shoulder
@@ -70,11 +70,11 @@ utility_meter:
 
   sa_power_imported_monthly:
     unique_id: sa_power_imported_monthly
+    name: SA Power Imported - Monthly
     source: sensor.sa_todays_energy_imported
 #    source_type: from_grid
-    name: SA Power Imported - Monthly
     cycle: monthly
-#    price_entity: *entity-price
+#    price_entity: *electricity-price
     tariffs:
       - peak
       - shoulder
@@ -82,11 +82,11 @@ utility_meter:
 
   sa_power_imported_yearly:
     unique_id: sa_power_imported_yearly
+    name: SA Power Imported - Yearly
     source: sensor.sa_todays_energy_imported
 #    source_type: from_grid
-    name: SA Power Imported - Yearly
     cycle: yearly
-#    price_entity: *entity-price
+#    price_entity: *electricity-price
     tariffs:
       - peak
       - shoulder
@@ -102,27 +102,27 @@ energy_meter:
 
   sa_power_exported_daily:
     unique_id: sa_power_exported_daily
+    name: SA Power Exported - Daily
     source: sensor.sa_todays_energy_exported
     source_type: to_grid
-    name: SA Power Exported - Daily
-    price: 0.07
     cycle: daily
+    price_entity: &fit-rate sensor.electricity_fit
 
   sa_power_exported_monthly:
     unique_id: sa_power_exported_monthly
+    name: SA Power Exported - Monthly
     source: sensor.sa_todays_energy_exported
     source_type: to_grid
-    name: SA Power Exported - Monthly
-    price: 0.07
     cycle: monthly
+    price_entity: *fit-rate
 
   sa_power_exported_yearly:
     unique_id: sa_power_exported_yearly
+    name: SA Power Exported - Yearly
     source: sensor.sa_todays_energy_exported
     source_type: to_grid
-    name: SA Power Exported - Yearly
-    price: 0.07
     cycle: yearly
+    price_entity: *fit-rate
 
 ###############
 #
