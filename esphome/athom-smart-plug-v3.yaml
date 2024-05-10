@@ -7,7 +7,7 @@ substitutions:
   project_name: "Athom Technology.Smart Plug V3"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
   project_version: "v1.0.1"
-  relay_restore_mode: RESTORE_DEFAULT_ON
+  relay_restore_mode: ALWAYS_ON      # RESTORE_DEFAULT_ON
   sensor_update_interval: 10s
   # Current Limit in Amps. AU Plug = 10. IL, BR, EU, UK, US Plug = 16.
   current_limit : "10"
