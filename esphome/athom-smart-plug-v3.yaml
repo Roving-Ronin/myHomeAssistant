@@ -17,6 +17,10 @@ substitutions:
   timezone: "Australia/Sydney"
   # Set the duration between the sntp service polling ntp.org servers for an update
   sntp_update_interval: 6h
+  # Network time servers for your region, enter from lowest to highest priority
+  sntp_server_1: "2.au.pool.ntp.org"
+  sntp_server_2: "1.au.pool.ntp.org"
+  sntp_server_3: "0.au.pool.ntp.org"  
   # Enables faster network connections, with last connected SSID being connected to and no full scan for SSID being undertaken
   wifi_fast_connect: "true"
 
@@ -71,6 +75,8 @@ captive_portal:
 dashboard_import:
   package_import_url: github://athom-tech/esp32-configs/athom-smart-plug.yaml
 
+#####################################################################
+
 uart:
   rx_pin: GPIO20
   baud_rate: 4800
@@ -83,6 +89,8 @@ globals:
     type: float
     restore_value: yes
     initial_value: '0.0'
+
+#####################################################################
 
 binary_sensor:
   - platform: status
@@ -312,6 +320,11 @@ time:
     timezone: "${timezone}"
   # Change sync interval from default 5min to 6 hours
     update_interval: "${sntp_update_interval}"
+  # Set specific sntp servers to use
+    servers: 
+      - "${sntp_server_1}"
+      - "${sntp_server_2}"
+      - "${sntp_server_3}"    
   # Publish the time the device was last restarted
     on_time_sync:
       then:
