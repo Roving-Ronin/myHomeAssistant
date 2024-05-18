@@ -140,10 +140,12 @@ switch:
     # synchronise the LED with the relay
     on_turn_on:
       then:
-        - output.turn_on: button_led
+#        - output.turn_on: button_led
+        - light.turn_on: button_led
     on_turn_off:
       then:
-        - output.turn_off: button_led
+#        - output.turn_off: button_led
+        - light.turn_off: button_led
 
  # The backlight in the socket on/off button
 #output:        
