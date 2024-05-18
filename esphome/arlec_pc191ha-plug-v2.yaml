@@ -55,6 +55,7 @@ esphome:
     name: "${project_name}"
     version: "${project_version}"
 
+
 #########################################################################
 
 bk72xx:
@@ -306,7 +307,6 @@ sensor:
     accuracy_decimals: 3
     lambda: |-
       return id(total_energy);
-#    update_interval: never
 
 button:
   - platform: restart
@@ -358,7 +358,7 @@ text_sensor:
     entity_category: diagnostic
     lambda: |-
       return {"${project_name}"};
-    update_interval: never
+    update_interval: 6h
 
   #  Creates a sensor of the version of installed project
   - platform: template
@@ -368,7 +368,7 @@ text_sensor:
     entity_category: diagnostic
     lambda: |-
       return {"${project_version}"};
-    update_interval: never
+    update_interval: 6h
 
    #  Creates a sensor of the uptime of the device, in formatted days, hours, minutes and seconds
    #  from : https://community.home-assistant.io/t/uptime-sensor-in-hours-or-days/116392/29
