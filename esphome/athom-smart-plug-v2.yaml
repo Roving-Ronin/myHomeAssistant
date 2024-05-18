@@ -2,8 +2,11 @@ substitutions:
   name: "athom-smart-plug-v2"
   friendly_name: "Smart Plug V2"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc
-  room: ""
   device_description: "athom smart plug v2"
+  room: ""
+  # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
+  power_circuit: "TBC" 
+  #
   project_name: "Athom Technology.Smart Plug V2"
   project_version: "2.0.2"
   relay_restore_mode: RESTORE_DEFAULT_OFF
@@ -234,11 +237,20 @@ text_sensor:
     id: device_last_restart
     icon: mdi:clock
     entity_category: diagnostic
-#    device_class: timestamp
+
+  #  Creates a sensor showing power circuit / phase of the device
+  - platform: template
+    name: 'Power Circuit'
+    id: power_circuit
+    icon: "mdi:electric-switch"
+    entity_category: diagnostic
+    lambda: |-
+      return {"${power_circuit}"};
+    update_interval: 6h
 
   #  Creates a sensor of the uptime of the device, in formatted days, hours, minutes and seconds
   - platform: template
-    name: "Uptime"
+    name: "Device Uptime"
     entity_category: diagnostic
     lambda: |-
       int seconds = (id(uptime_sensor).state);
