@@ -229,7 +229,6 @@ sensor:
     accuracy_decimals: 3
     lambda: |-
       return id(total_energy);
-    update_interval: ${sensor_update_interval}
 
     # Shows the Energy kWh for the current day
   - platform: total_daily_energy
@@ -241,7 +240,6 @@ sensor:
     accuracy_decimals: 3
     filters:
       - multiply: 0.001
-    update_interval: ${sensor_update_interval}  
     icon: mdi:hours-24
 
 button:
