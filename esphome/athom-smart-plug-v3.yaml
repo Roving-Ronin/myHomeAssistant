@@ -1,6 +1,6 @@
 substitutions:
   name: "athom-smart-plug-v3"
-  friendly_name: "Athom Plug V3"
+  friendly_name: "Athom Plug v3"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   room: ""
   device_description: "athom esp32-c3 smart plug"
