@@ -5,7 +5,7 @@ substitutions:
   device_description: "Athom Plug v2 - Smart Plug (ESP8285)"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc    
   room: ""
-  project_name: "Athom Technology.Smart Plug V2"
+  project_name: "Athom Technology.Smart Plug v2"
   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
   project_version: "2.0.2"
   # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
@@ -62,6 +62,9 @@ mdns:
 
 web_server:
   port: 80
+
+#network:
+#  enable_ipv6: false
 
 wifi:
   # This spawns an AP with the device name and mac address with no password.
