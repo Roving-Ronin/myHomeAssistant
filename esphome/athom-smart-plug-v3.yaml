@@ -74,12 +74,15 @@ web_server:
 #  enable_ipv6: false
 
 wifi:
-  # This spawns an AP with the device name and mac address with no password.
-  ap: {}
+  # WiFi credentials
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
   # Allow rapid re-connection to previously connect WiFi SSID, skipping scan of all SSID
   fast_connect: "${wifi_fast_connect}"
   # Define dns domain / suffix to add to hostname
   domain: "${dns_domain}"
+  # This spawns an AP with the device name and mac address with no password.
+  ap: {}  
 
 captive_portal:
 
