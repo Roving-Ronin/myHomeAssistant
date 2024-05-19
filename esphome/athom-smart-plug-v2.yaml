@@ -241,6 +241,7 @@ switch:
     pin: GPIO12
     id: relay
     restore_mode: ${relay_restore_mode}
+    icon: mdi:power-socket-au
 
 light:
   - platform: status_led
