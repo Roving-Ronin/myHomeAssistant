@@ -32,6 +32,7 @@ substitutions:
 esphome:
   name: "${name}"
   friendly_name: "${friendly_name}"
+  comment: "${device_description}"  
   area: "${room}"
   name_add_mac_suffix: true
   # Home Assistant - Minimum version required
