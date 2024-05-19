@@ -1,18 +1,22 @@
 substitutions:
   # Default name 
-  name: "arlec_pc19ha_v2_plug"
+  name: "arlec-pc19ha-v2-plug"
   # Default friendly name 
-  friendly_name: "Arlec - PC191HA v2 Plug"
+  friendly_name: "Arlec - Smart Plug v2 (PC191HA)"
   # Description as appears in ESPHome & top of webserver page
-  device_description: "Arlec PC191HA v2 - Monitoring the power & energy of powerpoint"
+  device_description: "Arlec PC191HA v2 - Monitoring the power & energy of a device"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   room: ""
-  # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
-  power_circuit: "TBC"  
   # Project Name
   project_name: "Arlec.Smart Plug (PC191HA v2)"
   # Project Version
-  project_version: "1.0.5"
+  project_version: "1.0.6"
+  # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
+  power_circuit: "TBC"  
+  # Restore the relay (GPO switch) upon reboot to state:
+  relay_restore_mode: RESTORE_DEFAULT_ON    
+  # Set the update interval for sensors
+  sensor_update_interval: 10s
   # Define a domain for this device to use. i.e. iot.home.lan (so device will appear as athom-smart-plug-v2.iot.home.lan in DNS/DHCP logs)
   dns_domain: ".iot.home.lan"
   # Set timezone of the smart plug. Useful if the plug is in a location different to the HA server. Can be entered in unix Country/Area format (i.e. "Australia/Sydney")
@@ -23,19 +27,11 @@ substitutions:
   sntp_server_1: "2.au.pool.ntp.org"
   sntp_server_2: "1.au.pool.ntp.org"
   sntp_server_3: "0.au.pool.ntp.org"
-  # Set the update interval for sensors
-  sensor_update_interval: 10s
-  # Set the update interval for sensors only needing occassional updates (i.e. WiFi Signal %, Last Restart & Device Uptime)
-  occassional_update_sensor_interval: 5min
   # Enables faster network connections, with last connected SSID being connected to and no full scan for SSID being undertaken
   wifi_fast_connect: "true" 
-  # Restore the relay (GPO switch) upon reboot to state:
-  relay_restore_mode: ALWAYS_ON
-  #
-  disable_entities: "false"
+  # HLW8012 Power Monitoring Chip
   # Current Limit in Amps. AU Plug = 10. IL, BR, EU, UK, US Plug = 16.
   current_limit : "10"
-  # HLW8012 Power Monitoring Chip
   # https://community.home-assistant.io/t/esphome-install-does-not-update-firmware/544026/9?u=mahko_mahko
   initial_mode: "VOLTAGE"             # reports VOLTAGE or CURRENT first
   voltage_divider: "770.0"
@@ -43,7 +39,8 @@ substitutions:
   current_multiply: "0.4250"
   # If Watts are maringally out after applying the calculated settings above, then the following can be used to tweak the watts reported
   watts_factor: "1.0"
-  change_mode_every: "3"              # how many times to report before swapping between reporting Voltage or Current. Note that the first value reported should be ignored as inaccurate
+  # how many times to report before swapping between reporting Voltage or Current. Note that the first value reported should be ignored as inaccurate
+  change_mode_every: "3"
 
 #########################################################################
 
@@ -53,10 +50,11 @@ esphome:
   comment: "${device_description}"
   area: "${room}"
   name_add_mac_suffix: True
+  # Home Assistant - Minimum version required
+  min_version: 2024.2.1  
   project:
     name: "${project_name}"
     version: "${project_version}"
-
 
 #########################################################################
 
@@ -69,15 +67,9 @@ preferences:
   # Enable to allow storing of 'Read Total' between reboots and flashing.
   flash_write_interval: 5min
 
-globals:
-  - id: total_energy
-    type: float
-    restore_value: yes
-    initial_value: '0.0' 
-  - id: restore_mode
-    type: int
-    restore_value: yes
-    initial_value: "3"
+api:
+
+ota:
 
 logger:
   level: INFO        # To filter out all the power meter messages, change to WARN
@@ -88,24 +80,39 @@ logger:
   # Enables mDNS Service
 mdns:
   disabled: false
-  
-wifi:
-  # WiFi credentials
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  domain: "${dns_domain}"
-  fast_connect: true
-  ap: {}             # This spawns an AP with the device name and mac address with no password.
-
-api:
-
-ota:
 
 #  Enables the local webserver on the ESP device, upon port 80
 web_server:
   port: 80
 
+wifi:
+  # WiFi credentials
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  # Allow rapid re-connection to previously connect WiFi SSID, skipping scan of all SSID
+  fast_connect: "${wifi_fast_connect}"
+  # Define dns domain / suffix to add to hostname
+  domain: "${dns_domain}"
+  # This spawns an AP with the device name and mac address with no password.
+  ap: {}  
+
 captive_portal:
+
+dashboard_import:
+  package_import_url: github://roving-ronin/myHomeAsssint/esphome/arlec-pc191ha-plug-v2.yaml
+
+#####################################################################
+
+globals:
+  - id: total_energy
+    type: float
+    restore_value: yes
+    initial_value: '0.0' 
+
+  - id: restore_mode
+    type: int
+    restore_value: yes
+    initial_value: "3"
 
 #########################################################################
 # PC191HA basic switch operation - button, relay and LED
@@ -132,51 +139,12 @@ binary_sensor:
         - switch.toggle: relay
     internal: true
 
-  # The power relay, controls the socket being On/Off
-switch:          
-  - platform: gpio
-    pin: P6
-    name: "GPO Status"
-    id: relay
-    restore_mode: "${relay_restore_mode}"   # default when power is turned on
-    icon: mdi:power-socket-au
-    # synchronise the LED with the relay
-    on_turn_on:
-      then:
-#        - output.turn_on: button_led
-        - light.turn_on: button_led
-    on_turn_off:
-      then:
-#        - output.turn_off: button_led
-        - light.turn_off: button_led
-
- # The backlight in the socket on/off button
-#output:        
-#  - platform: gpio
-#    id: button_led
-#    pin: P26
-#    restore_mode: always off   # default when power is turned on
-
-light:
-  - platform: status_led
-    name: "Device Status LED"
-    id: button_led
-    disabled_by_default: true
-    pin:
-      number: GPIO26
-
-##########################################################################
-#
-# PC191HA sensors - power monitoring and wifi signal
-#
-
 sensor:
-
   #  Sensor uptime in seconds
   - platform: uptime
-    name: "Uptime Seconds"
-    id: uptime_seconds
-    update_interval: 3min
+    name: "Device Uptime Sensor"
+    id: uptime_sensor
+#    update_interval: 60s
     entity_category: diagnostic
     internal: True
 
@@ -241,8 +209,10 @@ sensor:
       accuracy_decimals: 2
       filters:
         - multiply: ${current_multiply}
-#        - lambda: if (x < 0.01) {return 0;} else {return x;}
-#        - throttle: ${sensor_update_interval}
+      on_value_range:
+        - above: ${current_limit}
+          then:
+            - switch.turn_off: relay
 
     voltage:
       name: Voltage
@@ -251,19 +221,15 @@ sensor:
       accuracy_decimals: 1
       filters:
         - skip_initial: 2
-#        - throttle: ${sensor_update_interval}
 
     power:
       name: Active Power
-      id:   power_sensor
+      id: active_power
       unit_of_measurement: W
       accuracy_decimals: 1
       filters:
         - multiply: ${watts_factor}
-#        - lambda: if (x < 0.01) {return 0;} else {return x;}
         - skip_initial: 2
-#        - throttle: ${sensor_update_interval}
-
 
     #   Shows the Energy kWh since the device was last booted
     energy:
@@ -274,7 +240,6 @@ sensor:
       filters:
         # Multiplication factor from W to kW is 0.001
         - multiply: 0.001
-#        - throttle: ${sensor_update_interval}
       on_value:
         then:
           - lambda: |-
@@ -287,17 +252,6 @@ sensor:
 
 #########################################################################
 
-    #   Shows the Energy kWh for the current day
-  - platform: total_daily_energy
-    name: "Energy Daily"
-    id: energy_total_daily
-    restore: true
-    power_id: power_sensor
-    unit_of_measurement: kWh
-    accuracy_decimals: 3
-    filters:
-      - multiply: 0.001
-
     #  Shows the TOTAL/Lifetime Energy kWh used by the device, may reset to zero upon firmware updates
   - platform: template
     name: "Energy Total"
@@ -309,6 +263,19 @@ sensor:
     accuracy_decimals: 3
     lambda: |-
       return id(total_energy);
+    update_interval: ${sensor_update_interval}
+    
+    #   Shows the Energy kWh for the current day
+  - platform: total_daily_energy
+    name: "Energy Daily"
+    id: energy_total_daily
+    restore: true
+    power_id: active_power
+    unit_of_measurement: kWh
+    accuracy_decimals: 3
+    filters:
+      - multiply: 0.001
+    update_interval: ${sensor_update_interval}
 
 button:
   - platform: restart
@@ -316,26 +283,57 @@ button:
     entity_category: config
 
   - platform: factory_reset
-    name: Reset with Default Settings
+    name: "Reset Device"
     id: Reset
     entity_category: config
 
   - platform: safe_mode
-    name: "Safe Mode"
+    name: "Restart Device Safe Mode"
     internal: false
     entity_category: config
 
+  # The power relay, controls the socket being On/Off
+switch:          
+  - platform: gpio
+    name: "GPO Switch"
+    pin: P6
+    id: relay
+    restore_mode: "${relay_restore_mode}"   # default when power is turned on
+    icon: mdi:power-socket-au
+    # synchronise the LED with the relay
+    on_turn_on:
+      then:
+#        - output.turn_on: button_led
+        - light.turn_on: button_led
+    on_turn_off:
+      then:
+#        - output.turn_off: button_led
+        - light.turn_off: button_led
+
+ # The backlight in the socket on/off button. Replaced below with 'light:'
+#output:        
+#  - platform: gpio
+#    id: button_led
+#    pin: P26
+#    restore_mode: always off   # default when power is turned on
+
+light:
+  - platform: status_led
+    name: "GPO Status LED"
+    id: button_led
+    disabled_by_default: true
+    pin:
+      number: GPIO26
+
+##########################################################################
+#
+# PC191HA sensors - power monitoring and wifi signal
+#
+
 text_sensor:
 
-  #  Creates a sensor showing when the device was last restarted
-  - platform: template
-    name: 'Device Last Restart'
-    id: device_last_restart
-    icon: mdi:clock
-    entity_category: diagnostic
-
-  #  Creates sensor for tracking the WiFi IP address
   - platform: wifi_info
+  #  Creates sensor for tracking the WiFi IP address    
     ip_address:
       name: 'WiFi IP Address'
       icon: mdi:wifi
@@ -351,6 +349,13 @@ text_sensor:
     mac_address:
       name: 'WiFi MAC Address'
       entity_category: diagnostic
+
+  #  Creates a sensor showing when the device was last restarted
+  - platform: template
+    name: 'Device Last Restart'
+    id: device_last_restart
+    icon: mdi:clock
+    entity_category: diagnostic
 
   #  Creates a sensor of the name of installed project
   - platform: template
@@ -382,14 +387,12 @@ text_sensor:
       return {"${power_circuit}"};
     update_interval: 6h
 
-
-   #  Creates a sensor of the uptime of the device, in formatted days, hours, minutes and seconds
-   #  from : https://community.home-assistant.io/t/uptime-sensor-in-hours-or-days/116392/29
+  #  Creates a sensor of the uptime of the device, in formatted days, hours, minutes and seconds
   - platform: template
     name: "Device Uptime"
     entity_category: diagnostic
     lambda: |-
-      int seconds = (id(uptime_seconds).state);
+      int seconds = (id(uptime_sensor).state);
       int days = seconds / (24 * 3600);
       seconds = seconds % (24 * 3600);
       int hours = seconds / 3600;
@@ -408,6 +411,7 @@ text_sensor:
         return { (String(seconds) +"s").c_str() };
       }
     icon: mdi:clock-start
+    
 
    #  Updates the devices internal clock using SNTP.     
 time:
