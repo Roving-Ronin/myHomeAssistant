@@ -153,6 +153,9 @@ sensor:
   - platform: cse7766
     current:
       name: "Current"
+      id: current
+      unit_of_measurement: A
+      accuracy_decimals: 2
       filters:
         - throttle_average: ${sensor_update_interval}
         - lambda: if (x < 0.060) return 0.0; else return x;   #For the chip will report less than 3w power when no load is connected
@@ -163,12 +166,17 @@ sensor:
 
     voltage:
       name: "Voltage"
+      id:   voltage
+      unit_of_measurement: V
+      accuracy_decimals: 1      
       filters:
         - throttle_average: ${sensor_update_interval}
 
     power:
       name: "Active Power"
       id: active_power
+      unit_of_measurement: W
+      accuracy_decimals: 1     
       filters:
         - throttle_average: ${sensor_update_interval}
         - lambda: if (x < 3.0) return 0.0; else return x;    #For the chip will report less than 3w power when no load is connected
@@ -186,6 +194,7 @@ sensor:
       name: "Energy"
       id: energy
       unit_of_measurement: kWh
+      accuracy_decimals: 3      
       filters:
         - throttle: ${sensor_update_interval}
         # Multiplication factor from W to kW is 0.001
@@ -199,6 +208,9 @@ sensor:
               previous_energy_value = current_energy_value;
               id(energy_total_sensor).update();
 
+#########################################################################
+
+    # Shows the TOTAL/Lifetime Energy kWh used by the device, may reset to zero upon firmware updates
   - platform: template
     name: "Energy Total"
     id: energy_total_sensor
@@ -211,14 +223,17 @@ sensor:
       return id(total_energy);
     update_interval: ${sensor_update_interval}
 
+    # Shows the Energy kWh for the current day
   - platform: total_daily_energy
     name: "Energy Daily"
+    id: energy_total_daily
     restore: true
     power_id: active_power
     unit_of_measurement: kWh
     accuracy_decimals: 3
     filters:
       - multiply: 0.001
+    update_interval: ${sensor_update_interval}  
 
 button:
   - platform: restart
@@ -254,12 +269,17 @@ light:
 
 text_sensor:
   - platform: wifi_info
+  #  Creates sensor for tracking the WiFi IP address 
     ip_address:
       name: "WiFi IP Address"
       entity_category: diagnostic
+      
+  #  Defines the WiFi SSID network to connect to
     ssid:
       name: "WiFi SSID"
       entity_category: diagnostic
+      
+  #  Creates sensor for tracking the WiFi IP MAC address
     mac_address:
       name: "WiFi MAC Address"
       entity_category: diagnostic
