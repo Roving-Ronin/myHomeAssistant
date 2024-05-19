@@ -161,6 +161,9 @@ sensor:
   - platform: cse7766
     current:
       name: "Current"
+      id: current
+      unit_of_measurement: A
+      accuracy_decimals: 2      
       filters:
         - throttle_average: ${sensor_update_interval}
         - lambda: if (x < 0.060) return 0.0; else return x;   #For the chip will report less than 3w power when no load is connected
@@ -171,30 +174,43 @@ sensor:
 
     voltage:
       name: "Voltage"
+      id:   voltage
+      unit_of_measurement: V
+      accuracy_decimals: 1            
       filters:
         - throttle_average: ${sensor_update_interval}
 
     power:
       name: "Active Power"
       id: active_power
+      unit_of_measurement: W
+      accuracy_decimals: 1         
       filters:
         - throttle_average: ${sensor_update_interval}
         - lambda: if (x < 0.3) return 0.0; else return x;    #For the chip will report less than 3w power when no load is connected
+      icon: mdi:power        
 
     apparent_power:
       name: "Apparent Power"
+      unit_of_measurement: VA
+      accuracy_decimals: 1         
       filters:
         - throttle_average: ${sensor_update_interval}
+      icon: mdi:power        
     
     power_factor:
       name: "Power Factor"
+      unit_of_measurement: %
+      accuracy_decimals: 0      
       filters:
         - throttle_average: ${sensor_update_interval}
+      icon: mdi:percentage-outline
 
     energy:
       name: "Energy"
       id: energy
       unit_of_measurement: kWh
+      accuracy_decimals: 3      
       filters:
         - throttle: ${sensor_update_interval}
         # Multiplication factor from W to kW is 0.001
@@ -230,6 +246,7 @@ sensor:
     accuracy_decimals: 3
     filters:
       - multiply: 0.001
+    icon: mdi:hours-24      
 
 button:
   - platform: restart
@@ -265,15 +282,23 @@ light:
 
 text_sensor:
   - platform: wifi_info
+  #  Creates sensor for tracking the WiFi IP address   
     ip_address:
       name: "WiFi IP Address"
       entity_category: diagnostic
+      icon: mdi:ip-network-outline
+      
+  #  Defines the WiFi SSID network to connect to      
     ssid:
       name: "WiFi SSID"
       entity_category: diagnostic
+      icon: mdi:wifi-lock
+      
+  #  Creates sensor for tracking the WiFi IP MAC address    
     mac_address:
       name: "WiFi MAC Address"
       entity_category: diagnostic
+      icon: mdi:wifi-cog      
 
   #  Creates a sensor showing when the device was last restarted
   - platform: template
