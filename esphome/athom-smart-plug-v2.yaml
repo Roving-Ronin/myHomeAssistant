@@ -242,7 +242,7 @@ sensor:
     accuracy_decimals: 3
     filters:
       - multiply: 0.001
-    icon: mdi:hours-24
+#    icon: mdi:hours-24
 
 button:
   - platform: restart
