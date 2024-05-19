@@ -234,9 +234,7 @@ sensor:
     accuracy_decimals: 3
     lambda: |-
       return id(total_energy);
-    update_interval: ${sensor_update_interval}
-    
-
+   
   - platform: total_daily_energy
     name: "Energy Daily"
     id: energy_total_daily
