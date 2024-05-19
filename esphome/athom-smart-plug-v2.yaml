@@ -116,6 +116,7 @@ binary_sensor:
         - ON for at least 4s
         then:
           - button.press: Reset
+    internal: true
 
 sensor:
   - platform: uptime
