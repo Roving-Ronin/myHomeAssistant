@@ -230,6 +230,7 @@ sensor:
       filters:
         - multiply: ${watts_factor}
         - skip_initial: 2
+      icon: mdi:power 
 
     #   Shows the Energy kWh since the device was last booted
     energy:
@@ -263,7 +264,6 @@ sensor:
     accuracy_decimals: 3
     lambda: |-
       return id(total_energy);
-    update_interval: ${sensor_update_interval}
     
     #   Shows the Energy kWh for the current day
   - platform: total_daily_energy
@@ -275,7 +275,7 @@ sensor:
     accuracy_decimals: 3
     filters:
       - multiply: 0.001
-    update_interval: ${sensor_update_interval}
+    icon: mdi:hours-24
 
 button:
   - platform: restart
@@ -338,17 +338,20 @@ text_sensor:
       name: 'WiFi IP Address'
       icon: mdi:wifi
       entity_category: diagnostic
+      icon: mdi:ip-network-outline
 
   #  Defines the WiFi SSID network to connect to
     ssid:
       name: 'WiFi SSID'
       icon: mdi:wifi-strength-2
       entity_category: diagnostic
+      icon: mdi:wifi-lock
 
   #  Creates sensor for tracking the WiFi IP MAC address
     mac_address:
       name: 'WiFi MAC Address'
       entity_category: diagnostic
+      icon: mdi:wifi-cog
 
   #  Creates a sensor showing when the device was last restarted
   - platform: template
