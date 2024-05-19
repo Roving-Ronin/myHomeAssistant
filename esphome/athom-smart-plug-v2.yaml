@@ -1,24 +1,32 @@
 substitutions:
   name: "athom-smart-plug-v2"
-  friendly_name: "Smart Plug V2"
+  friendly_name: "Smart Plug v2"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc
-  device_description: "athom smart plug v2"
+  device_description: "Athom Plug v2 - Smart Plug (ESP8285)"
+  # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc    
   room: ""
+  project_name: "Athom Technology.Smart Plug V2"
+  # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
+  project_version: "2.0.2"
   # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
   power_circuit: "TBC" 
   #
-  project_name: "Athom Technology.Smart Plug V2"
-  project_version: "2.0.2"
-  relay_restore_mode: RESTORE_DEFAULT_OFF
+  relay_restore_mode: RESTORE_DEFAULT_ON
   sensor_update_interval: 10s
   # Current Limit in Amps. AU Plug = 10. IL, BR, EU, UK, US Plug = 16.
-  current_limit : "16"
+  current_limit : "10"
   # Define a domain for this device to use. i.e. iot.home.lan (so device will appear as athom-smart-plug-v2.iot.home.lan in DNS/DHCP logs)
-  dns_domain: ""
+  dns_domain: ".iot.home.lan"
   # Set timezone of the smart plug. Useful if the plug is in a location different to the HA server. Can be entered in unix Country/Area format (i.e. "Australia/Sydney")
-  timezone: ""
+  timezone: "Australia/Sydney"
+  # Set the duration between the sntp service polling ntp.org servers for an update
+  sntp_update_interval: 6h
+  # Network time servers for your region, enter from lowest to highest priority
+  sntp_server_1: "2.au.pool.ntp.org"
+  sntp_server_2: "1.au.pool.ntp.org"
+  sntp_server_3: "0.au.pool.ntp.org"  
   # Enables faster network connections, with last connected SSID being connected to and no full scan for SSID being undertaken
-  wifi_fast_connect: "false" 
+  wifi_fast_connect: "true" 
   
 
 esphome:
@@ -26,6 +34,7 @@ esphome:
   friendly_name: "${friendly_name}"
   area: "${room}"
   name_add_mac_suffix: true
+  # Home Assistant - Minimum version required
   min_version: 2024.2.1
   project:
     name: "${project_name}"
@@ -38,13 +47,15 @@ esp8266:
 preferences:
   flash_write_interval: 5min
 
-
 api:
 
 ota:
 
 logger:
+  level: INFO    # WARN
   baud_rate: 0
+  logs:
+    component: ERROR # Fix for issue #4717 "Component xxxxxx took a long time for an operation"
 
 mdns:
   disabled: false
@@ -53,14 +64,19 @@ web_server:
   port: 80
 
 wifi:
-  ap: {} # This spawns an AP with the device name and mac address with no password.
+  # This spawns an AP with the device name and mac address with no password.
+  ap: {}
+  # Allow rapid re-connection to previously connect WiFi SSID, skipping scan of all SSID
   fast_connect: "${wifi_fast_connect}"
+  # Define dns domain / suffix to add to hostname
   domain: "${dns_domain}"
 
 captive_portal:
 
 dashboard_import:
   package_import_url: github://athom-tech/athom-configs/athom-smart-plug-v2.yaml
+
+#####################################################################
 
 uart:
   rx_pin: RX
@@ -72,9 +88,11 @@ globals:
     restore_value: yes
     initial_value: '0.0'
 
+#####################################################################
+
 binary_sensor:
   - platform: status
-    name: "Status"
+    name: "Device Status"
     entity_category: diagnostic    
 
   - platform: gpio
@@ -97,27 +115,32 @@ binary_sensor:
 
 sensor:
   - platform: uptime
-    name: "Uptime Sensor"
+    name: "Device Uptime Sensor"
     id: uptime_sensor
     entity_category: diagnostic
     internal: true
 
-  - platform: wifi_signal
-    name: "WiFi Signal"
-    id: wifi_signal_db
-    update_interval: 60s
-    entity_category: diagnostic
-    internal: true
+  # Reports the WiFi signal strength/RSSI in dB
+#  - platform: wifi_signal
+#    id: wifi_signal_db
+#    name: "WiFi Signal dB"
+#    update_interval: 5min
+#    entity_category: "diagnostic"
+#    internal: true
 
   # Reports the WiFi signal strength in %
-  - platform: copy
-    source_id: wifi_signal_db
-    name: "WiFi Strength"
-    filters:
-      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
-    unit_of_measurement: "%"
-    entity_category: diagnostic
+#  - platform: copy
+#    source_id: wifi_signal_db
+#    name: "WiFi Signal"
+#    filters:
+#      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
+#    unit_of_measurement: "%"
+#    entity_category: "diagnostic"    
 
+#####################################################################
+#
+# Power / Current / Energy monitoring sensors
+#
   - platform: cse7766
     current:
       name: "Current"
@@ -135,11 +158,20 @@ sensor:
         - throttle_average: ${sensor_update_interval}
 
     power:
-      name: "Power"
-      id: power_sensor
+      name: "Active Power"
+      id: active_power
       filters:
         - throttle_average: ${sensor_update_interval}
         - lambda: if (x < 3.0) return 0.0; else return x;    #For the chip will report less than 3w power when no load is connected
+
+    apparent_power:
+      name: "Apparent Power"
+      filters:
+        - throttle_average: ${sensor_update_interval}
+    power_factor:
+      name: "Power Factor"
+      filters:
+        - throttle_average: ${sensor_update_interval}
 
     energy:
       name: "Energy"
@@ -158,18 +190,9 @@ sensor:
               previous_energy_value = current_energy_value;
               id(total_energy_sensor).update();
 
-    apparent_power:
-      name: "Apparent Power"
-      filters:
-        - throttle_average: ${sensor_update_interval}
-    power_factor:
-      name: "Power Factor"
-      filters:
-        - throttle_average: ${sensor_update_interval}
-
   - platform: template
-    name: "Total Energy"
-    id: total_energy_sensor
+    name: "Energy Total"
+    id: energy_total_sensor
     unit_of_measurement: kWh
     device_class: "energy"
     state_class: "total_increasing"
@@ -177,12 +200,12 @@ sensor:
     accuracy_decimals: 3
     lambda: |-
       return id(total_energy);
-    update_interval: never
+    update_interval: ${sensor_update_interval}
 
   - platform: total_daily_energy
-    name: "Total Daily Energy"
+    name: "Energy Daily"
     restore: true
-    power_id: power_sensor
+    power_id: active_power
     unit_of_measurement: kWh
     accuracy_decimals: 3
     filters:
@@ -190,29 +213,29 @@ sensor:
 
 button:
   - platform: restart
-    name: "Restart"
+    name: "Restart Device"
     entity_category: config
 
   - platform: factory_reset
-    name: "Factory Reset"
+    name: "Reset Device"
     id: Reset
     entity_category: config
 
   - platform: safe_mode
-    name: "Safe Mode"
+    name: "Restart Device Safe Mode"
     internal: false
     entity_category: config
 
 switch:
   - platform: gpio
-    name: "Switch"
+    name: "GPO Switch"
     pin: GPIO12
     id: relay
     restore_mode: ${relay_restore_mode}
 
 light:
   - platform: status_led
-    name: "Status LED"
+    name: "Device Status LED"
     id: blue_led
     disabled_by_default: true
     pin:
@@ -222,21 +245,42 @@ light:
 text_sensor:
   - platform: wifi_info
     ip_address:
-      name: "IP Address"
+      name: "WiFi IP Address"
       entity_category: diagnostic
     ssid:
-      name: "Connected SSID"
+      name: "WiFi SSID"
       entity_category: diagnostic
     mac_address:
-      name: "Mac Address"
+      name: "WiFi MAC Address"
       entity_category: diagnostic
 
   #  Creates a sensor showing when the device was last restarted
   - platform: template
-    name: 'Last Restart'
+    name: 'Device Last Restart'
     id: device_last_restart
     icon: mdi:clock
     entity_category: diagnostic
+#    device_class: timestamp
+
+  #  Creates a sensor of the name of installed project
+  - platform: template
+    name: 'Project Name'
+    id: project_name
+    icon: "mdi:label-outline"
+    entity_category: diagnostic
+    lambda: |-
+      return {"${project_name}"};
+    update_interval: 6h
+
+  #  Creates a sensor of the version of installed project
+  - platform: template
+    name: 'Project Version'
+    id: project_version
+    icon: "mdi:label-outline"
+    entity_category: diagnostic
+    lambda: |-
+      return {"${project_version}"};
+    update_interval: 6h
 
   #  Creates a sensor showing power circuit / phase of the device
   - platform: template
@@ -279,7 +323,12 @@ time:
   # Define the timezone of the device
     timezone: "${timezone}"
   # Change sync interval from default 5min to 6 hours
-    update_interval: 360min    
+    update_interval: "${sntp_update_interval}"
+  # Set specific sntp servers to use
+    servers: 
+      - "${sntp_server_1}"
+      - "${sntp_server_2}"
+      - "${sntp_server_3}"    
   # Publish the time the device was last restarted
     on_time_sync:
       then:
