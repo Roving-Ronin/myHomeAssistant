@@ -70,6 +70,9 @@ mdns:
 web_server:
   port: 80
 
+#network:
+#  enable_ipv6: false
+
 wifi:
   # This spawns an AP with the device name and mac address with no password.
   ap: {}
