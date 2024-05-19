@@ -194,8 +194,6 @@ sensor:
     
     power_factor:
       name: "Power Factor"
-      unit_of_measurement: "%"
-      accuracy_decimals: 0
       filters:
         - throttle_average: ${sensor_update_interval}
       icon: mdi:percentage-outline        
