@@ -84,7 +84,8 @@ wifi:
 captive_portal:
 
 dashboard_import:
-  package_import_url: github://athom-tech/esp32-configs/athom-smart-plug.yaml
+  package_import_url: github://roving-ronin/myHomeAsssint/esphome/athom-smart-plug-v3.yaml
+#  package_import_url: github://athom-tech/esp32-configs/athom-smart-plug.yaml
 
 #####################################################################
 
