@@ -180,15 +180,23 @@ sensor:
       filters:
         - throttle_average: ${sensor_update_interval}
         - lambda: if (x < 3.0) return 0.0; else return x;    #For the chip will report less than 3w power when no load is connected
+      icon: mdi:power  
 
     apparent_power:
       name: "Apparent Power"
+      unit_of_measurement: VA
+      accuracy_decimals: 1       
       filters:
         - throttle_average: ${sensor_update_interval}
+      icon: mdi:power        
+    
     power_factor:
       name: "Power Factor"
+      unit_of_measurement: %
+      accuracy_decimals: 0
       filters:
         - throttle_average: ${sensor_update_interval}
+      icon: mdi:percentage-outline        
 
     energy:
       name: "Energy"
@@ -234,6 +242,7 @@ sensor:
     filters:
       - multiply: 0.001
     update_interval: ${sensor_update_interval}  
+    icon: mdi:hours-24
 
 button:
   - platform: restart
@@ -273,16 +282,19 @@ text_sensor:
     ip_address:
       name: "WiFi IP Address"
       entity_category: diagnostic
+      icon: mdi:ip-network-outline
       
   #  Defines the WiFi SSID network to connect to
     ssid:
       name: "WiFi SSID"
       entity_category: diagnostic
+      icon: mdi:wifi-lock
       
   #  Creates sensor for tracking the WiFi IP MAC address
     mac_address:
       name: "WiFi MAC Address"
       entity_category: diagnostic
+      icon: mdi:wifi-cog
 
   #  Creates a sensor showing when the device was last restarted
   - platform: template
