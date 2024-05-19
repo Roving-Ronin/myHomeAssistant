@@ -1,9 +1,9 @@
 substitutions:
   name: "athom-smart-plug-v3"
   friendly_name: "Athom Plug v3"
+  device_description: "Athom Plug v3 - Smart Plug (ESP32-C3)"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   room: ""
-  device_description: "athom esp32-c3 smart plug"
   project_name: "Athom Technology.Smart Plug v3"
   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
   project_version: "v1.0.1"
@@ -33,6 +33,8 @@ esphome:
   comment: "${device_description}"
   area: "${room}"  
   name_add_mac_suffix: true
+  # Home Assistant - Minimum version required
+  min_version: 2024.2.1
   project:
     name: "${project_name}"
     version: "${project_version}"
@@ -57,7 +59,10 @@ api:
 ota:
 
 logger:
+  level: INFO    # WARN
   baud_rate: 0
+  logs:
+    component: ERROR # Fix for issue #4717 "Component xxxxxx took a long time for an operation"
 
 mdns:
   disabled: false
@@ -142,8 +147,10 @@ sensor:
 #    unit_of_measurement: "%"
 #    entity_category: "diagnostic"    
 
-
-  # Power / Current / Energy monitoring sensors
+#####################################################################
+#
+# Power / Current / Energy monitoring sensors
+#
   - platform: cse7766
     current:
       name: "Current"
@@ -167,6 +174,16 @@ sensor:
         - throttle_average: ${sensor_update_interval}
         - lambda: if (x < 0.3) return 0.0; else return x;    #For the chip will report less than 3w power when no load is connected
 
+    apparent_power:
+      name: "Apparent Power"
+      filters:
+        - throttle_average: ${sensor_update_interval}
+    
+    power_factor:
+      name: "Power Factor"
+      filters:
+        - throttle_average: ${sensor_update_interval}
+
     energy:
       name: "Energy"
       id: energy
@@ -183,18 +200,6 @@ sensor:
               id(total_energy) += current_energy_value - previous_energy_value;
               previous_energy_value = current_energy_value;
               id(energy_total_sensor).update();
-
-
-    apparent_power:
-      name: "Apparent Power"
-      filters:
-        - throttle_average: ${sensor_update_interval}
-    
-    power_factor:
-      name: "Power Factor"
-      filters:
-        - throttle_average: ${sensor_update_interval}
-
 
   - platform: template
     name: "Energy Total"
@@ -236,7 +241,7 @@ button:
 
 switch:
   - platform: gpio
-    name: "GPO Status"
+    name: "GPO Switch"
     pin: GPIO5
     id: relay
     restore_mode: ${relay_restore_mode}
