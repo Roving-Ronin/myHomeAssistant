@@ -205,7 +205,6 @@ sensor:
       name: "Power Factor"
       filters:
         - throttle_average: ${sensor_update_interval}
-      icon: mdi:percentage-outline
 
     energy:
       name: "Energy"
