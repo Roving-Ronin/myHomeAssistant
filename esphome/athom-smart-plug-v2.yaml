@@ -276,21 +276,23 @@ light:
 
 text_sensor:
   - platform: wifi_info
-  #  Creates sensor for tracking the WiFi IP address 
+  #  Creates sensor for tracking the WiFi IP address    
     ip_address:
-      name: "WiFi IP Address"
+      name: 'WiFi IP Address'
+#      icon: mdi:wifi
       entity_category: diagnostic
       icon: mdi:ip-network-outline
-      
+
   #  Defines the WiFi SSID network to connect to
     ssid:
-      name: "WiFi SSID"
+      name: 'WiFi SSID'
+#      icon: mdi:wifi-strength-2
       entity_category: diagnostic
       icon: mdi:wifi-lock
-      
+
   #  Creates sensor for tracking the WiFi IP MAC address
     mac_address:
-      name: "WiFi MAC Address"
+      name: 'WiFi MAC Address'
       entity_category: diagnostic
       icon: mdi:wifi-cog
 
