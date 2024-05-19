@@ -336,14 +336,14 @@ text_sensor:
   #  Creates sensor for tracking the WiFi IP address    
     ip_address:
       name: 'WiFi IP Address'
-      icon: mdi:wifi
+#      icon: mdi:wifi
       entity_category: diagnostic
       icon: mdi:ip-network-outline
 
   #  Defines the WiFi SSID network to connect to
     ssid:
       name: 'WiFi SSID'
-      icon: mdi:wifi-strength-2
+#      icon: mdi:wifi-strength-2
       entity_category: diagnostic
       icon: mdi:wifi-lock
 
