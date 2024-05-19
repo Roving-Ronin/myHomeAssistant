@@ -191,7 +191,7 @@ sensor:
               float current_energy_value = id(energy).state;
               id(total_energy) += current_energy_value - previous_energy_value;
               previous_energy_value = current_energy_value;
-              id(total_energy_sensor).update();
+              id(energy_total_sensor).update();
 
   - platform: template
     name: "Energy Total"
