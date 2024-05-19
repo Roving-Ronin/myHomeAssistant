@@ -252,7 +252,7 @@ switch:
 
 light:
   - platform: status_led
-    name: "Device Status LED"
+    name: "GPO Status LED"
     id: blue_led
     disabled_by_default: true
     pin:
