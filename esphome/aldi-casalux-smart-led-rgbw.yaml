@@ -53,7 +53,7 @@ esphome:
           id: downlight
 
 #bk72xx:
-#  board: lsc-lma35-t
+#  board: generic-bk7231t-qfn32-tuya
 
 #########################################################################
 
