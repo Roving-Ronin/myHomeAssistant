@@ -46,7 +46,7 @@ esphome:
     then:
       - light.turn_on: 
           id: downlight
-          color_temperature: 3200K
+          color_temperature: 6500K
           color_mode: COLOR_TEMPERATURE
       - delay: 2.5s
       - light.turn_off:
@@ -150,7 +150,7 @@ light:
       then:
         - light.control:
             id: downlight
-            color_temperature: 3200K
+            color_temperature: 6500K
             color_mode: COLOR_TEMPERATURE
 
 
