@@ -12,9 +12,12 @@ substitutions:
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
   project_version: "1.0.7"
    # Restore the relay (Light switch) upon reboot to state:
-  relay_restore_mode: RESTORE_DEFAULT_OFF
+  light_restore_mode: RESTORE_DEFAULT_OFF
    # Define a domain for this device to use. i.e. iot.home.lan (so device will appear as athom-smart-plug-v2.iot.home.lan in DNS/DHCP logs)
   dns_domain: ".iot.home.lan"
+   # Set your locations latitude and longitude. Useful if you want to use the sun and its location in relation to the horizon to on/off (or as a condition) to control lights.
+  my_latitude: "-34.73503534407444"
+  my_longitude: "149.72998380661014"
    # Set timezone of the smart plug. Useful if the plug is in a location different to the HA server. Can be entered in unix Country/Area format (i.e. "Australia/Sydney")
   timezone: "Australia/Sydney"
    # Set the duration between the sntp service polling ntp.org servers for an update
@@ -46,6 +49,7 @@ esphome:
     then:
       - light.turn_on: 
           id: downlight
+          brightness: 100%
           color_temperature: 6500K
           color_mode: COLOR_TEMPERATURE
       - delay: 2.5s
@@ -142,7 +146,7 @@ light:
     warm_white_color_temperature: 2700 K
     gamma_correct: 2.8
     default_transition_length: 0.5s
-    restore_mode: ${relay_restore_mode}
+    restore_mode: ${light_restore_mode}
      # When enabled, this will prevent white leds being on at the same time as RGB leds.
     color_interlock: true
      # Reset the light to a predefined state each time it is turned on
@@ -158,11 +162,10 @@ light:
 #
 #
 #
-
   # Event on_sunrise / on_sunset etc, see: https://esphome.io/components/sun.html
 sun:
-  latitude: -34.7°
-  longitude: 149.7°
+  latitude: "${my_latitude}"
+  longitude: "${my_longitude}"
   id: sun_home
 
 binary_sensor:
