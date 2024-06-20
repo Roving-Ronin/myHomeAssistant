@@ -60,6 +60,7 @@ preferences:
 api:
 
 ota:
+  - platform: esphome
 
 logger:
   level: INFO    # WARN
