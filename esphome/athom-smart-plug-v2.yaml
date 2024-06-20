@@ -53,7 +53,8 @@ preferences:
 api:
 
 ota:
-
+  - platform: esphome
+  
 logger:
   level: INFO    # WARN
   baud_rate: 0
