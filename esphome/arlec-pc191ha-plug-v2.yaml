@@ -70,7 +70,8 @@ preferences:
 api:
 
 ota:
-
+  - platform: esphome
+  
 logger:
   level: INFO        # To filter out all the power meter messages, change to WARN
   baud_rate: 0
