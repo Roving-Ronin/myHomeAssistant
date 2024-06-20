@@ -88,8 +88,9 @@ api:
 
   # Over the Air Firmware Updates
 ota:
-  password: !secret ota_password
-  safe_mode: true
+  - platform: esphome
+    password: !secret ota_password
+    safe_mode: true
 
 wifi:
   # WiFi credentials
