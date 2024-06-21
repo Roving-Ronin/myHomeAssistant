@@ -5,21 +5,25 @@
 
 substitutions:
   # Provides substitutions or variables that are then called elsewhere multiple times in the config
-  device_name: "kc868-a16"
-  device_description: "Primary central ESP32 device with 16 I/O and RS485 support"
+  device_name: "kc868-1"
+  device_description: "Kincony KC868-A16 Unit 1 with 16 I/O and RS485 support"
   project_name: "kincony.kc868-a16"
-  project_version: "0.3"
-  set_timezone: "Australia/Sydney"
-  set_dns_domain: ".iot.home.lan"
+  project_version: "0.4"
+  timezone: "Australia/Sydney"
+  # Set the duration between the sntp service polling ntp.org servers for an update
+  sntp_update_interval: 6h
+  dns_domain: ".iot.home.lan"
   disable_entities: "false"
   relay_restore_mode: RESTORE_DEFAULT_OFF
 
 esphome:
   #  Configures these settings to use the substituions defined below
   name: "${device_name}"
-  friendly_name: "KC868-A16 Primary"
+  friendly_name: "KC868-A16 Unit 1"
   comment: "${device_description}"
+  area: "Monitoring - ESPHome"
   name_add_mac_suffix: false
+  min_version: 2024.6.0
   project:
     name: "${project_name}"
     version: "${project_version}"
@@ -64,8 +68,11 @@ api:
 
   # Over the Air Firmware Updates
 ota:
-  password: !secret ota_password
-  safe_mode: true
+  - platform: esphome
+
+logger:
+  baud_rate: 0
+  
 
 button:
   #  Reset the total energy entity (Gas Meter - Current Reading)
