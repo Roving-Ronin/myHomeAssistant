@@ -28,6 +28,7 @@ packages:
 api:
 
 ota:
+  - platform: esphome
 
 logger:
   level: WARN
