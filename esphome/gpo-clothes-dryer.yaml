@@ -24,8 +24,3 @@ packages:
     ref: main 
     files: [esphome/athom-smart-plug-v2.yaml]
     refresh: 0d # optional
-
-# Enable Home Assistant API
-api:
-
-ota:
