@@ -13,6 +13,7 @@ esphome:
   friendly_name: "${alias_name}"
   comment: '${device_description}'
   name_add_mac_suffix: false
+  min_version: 2024.6.0
   project:
     name: "${project_name}"
     version: "${project_version}"
