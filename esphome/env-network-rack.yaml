@@ -33,8 +33,10 @@ preferences:
   flash_write_interval: 5min
 
 logger:
-  level: WARN
+  level: WARN        # To filter out all the power meter messages, change to WARN
   baud_rate: 0
+  logs:
+    component: ERROR # Fix for issue #4717 "Component xxxxxx took a long time for an operation"
 
 packages:
   baseline: !include common/common.baseline.yaml
