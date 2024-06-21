@@ -71,8 +71,10 @@ ota:
   - platform: esphome
 
 logger:
+  level: INFO        # To filter out all the power meter messages, change to WARN
   baud_rate: 0
-  
+  logs:
+    component: ERROR # Fix for issue #4717 "Component xxxxxx took a long time for an operation"
 
 button:
   #  Reset the total energy entity (Gas Meter - Current Reading)
