@@ -69,8 +69,7 @@ api:
             id: button_reset_reading
 
 ota:
-  # Sets OTA password, that ESPHome must use when connecting to flash updates
-  password: "a9a3103541255b3c8f381d12941d11dc"
+  - platform: esphome
 
 button:
 
