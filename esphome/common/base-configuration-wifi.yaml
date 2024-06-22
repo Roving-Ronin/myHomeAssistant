@@ -102,23 +102,6 @@ sensor:
     entity_category: diagnostic
     internal: True
 
-   # Reports the WiFi signal strength/RSSI in dB
-#  - platform: wifi_signal
-#    id: wifi_signal_db
-#    name: "WiFi Signal dB"
-#    update_interval: 5min
-#    entity_category: "diagnostic"
-#    internal: true
-
-   # Reports the WiFi signal strength in %
-#  - platform: copy
-#    source_id: wifi_signal_db
-#    name: "WiFi Signal"
-#    filters:
-#      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
-#    unit_of_measurement: "%"
-#    entity_category: "diagnostic"    
-
 ##########################################################################
 #
 # Buttons - To trigger actions, such as reboot, reset
@@ -145,24 +128,6 @@ button:
 #
 
 text_sensor:
-
-   # Creates sensor for tracking the WiFi IP address
-  - platform: wifi_info
-    ip_address:
-      name: 'WiFi IP Address'
-      icon: mdi:wifi
-      entity_category: diagnostic
-
-   # Defines the WiFi SSID network to connect to
-    ssid:
-      name: 'WiFi SSID'
-      icon: mdi:wifi-strength-2
-      entity_category: diagnostic
-
-   # Creates sensor for tracking the WiFi IP MAC address
-    mac_address:
-      name: 'WiFi MAC Address'
-      entity_category: diagnostic
 
    # Creates a sensor showing when the device was last restarted
   - platform: template
