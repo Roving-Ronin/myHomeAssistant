@@ -93,10 +93,15 @@ wifi:
 
 captive_portal:
 
-  #dashboard_import:
-#package_import_url: github://roving-ronin/myHomeAssistant/esphome/aldi-casalux-smart-led-rgbw.yaml
+#########################################################################
+#
+# Remote Packages to be utilised
+#
 
-
+dashboard_import:
+  package_import_url: github://roving-ronin/myHomeAssistant/esphome/aldi-casalux-smart-led-rgbw.yaml@main
+  import_full_config: false
+  
 #########################################################################
 #
 #
