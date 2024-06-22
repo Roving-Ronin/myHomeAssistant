@@ -6,6 +6,10 @@
 substitutions:
    # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   location: ""
+   # The phase in the home power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)  
+  power_circuit: "TBA"  
+   # Set the update interval for sensors
+  sensor_update_interval: 10s   
    # Define a domain for this device to use. i.e. iot.home.lan (so device will appear as athom-smart-plug-v2.iot.home.lan in DNS/DHCP logs)
   dns_domain: ".iot.home.lan"
    # Set timezone of the smart plug. Useful if the plug is in a location different to the HA server. Can be entered in unix Country/Area format (i.e. "Australia/Sydney")
@@ -18,6 +22,7 @@ substitutions:
   sntp_server_3: "0.au.pool.ntp.org"
    # Enables faster network connections, with last connected SSID being connected to and no full scan for SSID being undertaken   
   wifi_fast_connect: "true" 
+
 
 #########################################################################
 
@@ -69,14 +74,22 @@ captive_portal:
 
 #########################################################################
 #
+# Remote Packages to be utilised
 #
+
+dashboard_import:
+  package_import_url: 
+
+
+#########################################################################
+#
+# Binary Sensors
 #
 
 binary_sensor:
-
-#  - platform: status
-#    name: "Device Status"
-#    entity_category: diagnostic
+  - platform: status
+    name: "Device Status"
+    entity_category: diagnostic
 
 ##########################################################################
 #
@@ -137,13 +150,6 @@ button:
 
 text_sensor:
 
-   # Creates a sensor showing when the device was last restarted
-  - platform: template
-    name: 'Device Last Restart'
-    id: device_last_restart
-    icon: mdi:clock
-    entity_category: diagnostic
-
    # Creates sensor for tracking the WiFi IP address
   - platform: wifi_info
     ip_address:
@@ -161,6 +167,13 @@ text_sensor:
     mac_address:
       name: 'WiFi MAC Address'
       entity_category: diagnostic
+
+   # Creates a sensor showing when the device was last restarted
+  - platform: template
+    name: 'Device Last Restart'
+    id: device_last_restart
+    icon: mdi:clock
+    entity_category: diagnostic
 
    # Creates a sensor of the name of installed project
   - platform: template
@@ -182,6 +195,15 @@ text_sensor:
       return {"${project_version}"};
     update_interval: 6h
 
+  #  Creates a sensor showing power circuit / phase of the device
+  - platform: template
+    name: 'Power Circuit'
+    id: power_circuit
+    icon: "mdi:electric-switch"
+    entity_category: diagnostic
+    lambda: |-
+      return {"${power_circuit}"};
+    update_interval: 6h
 
    # Creates a sensor of the uptime of the device, in formatted days, hours, minutes and seconds
    # from : https://community.home-assistant.io/t/uptime-sensor-in-hours-or-days/116392/29
