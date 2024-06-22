@@ -16,7 +16,7 @@ captive_portal:
 
 ##########################################################################
 #
-# Sensors
+# Sensors - WiFi Specific
 #
 
 sensor:
@@ -40,7 +40,7 @@ sensor:
 
 ##########################################################################
 #
-# Text Sensors
+# Text Sensors - WiFi Specific
 #
 
 text_sensor:
@@ -62,3 +62,5 @@ text_sensor:
     mac_address:
       name: 'WiFi MAC Address'
       entity_category: diagnostic
+
+##########################################################################
