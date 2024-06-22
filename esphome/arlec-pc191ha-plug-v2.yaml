@@ -6,7 +6,7 @@ substitutions:
   # Description as appears in ESPHome & top of webserver page
   device_description: "Arlec PC191HA v2 - Monitoring the power & energy of a device"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
-  room: ""
+  location: ""
   # Project Name
   project_name: "Arlec.Smart Plug (PC191HA v2)"
   # Project Version
@@ -48,7 +48,7 @@ esphome:
   name: "${name}"
   friendly_name: "${friendly_name}"
   comment: "${device_description}"
-  area: "${room}"
+  area: "${location}"
   name_add_mac_suffix: True
   # Home Assistant - Minimum version required
   min_version: 2024.6.0
