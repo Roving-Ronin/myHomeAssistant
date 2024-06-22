@@ -47,7 +47,7 @@ bk72xx:
 #
 
 dashboard_import:
-  package_import_url: github://roving-ronin/myHomeAssistant/esphome/arlec-pc191ha-plug-v2.yaml
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/arlec-pc191ha-plug-v2.yaml
   import_full_config: false
 
 packages:
