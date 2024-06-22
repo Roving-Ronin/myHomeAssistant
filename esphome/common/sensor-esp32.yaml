@@ -1,0 +1,5 @@
+sensor:
+
+   # ESP32 Internal Temperature
+  - platform: internal_temperature
+    name: "Device Temperature"
