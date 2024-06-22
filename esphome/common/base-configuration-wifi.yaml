@@ -21,7 +21,9 @@ substitutions:
   sntp_server_2: "1.au.pool.ntp.org"
   sntp_server_3: "0.au.pool.ntp.org"
    # Enables faster network connections, with last connected SSID being connected to and no full scan for SSID being undertaken   
-  wifi_fast_connect: "true" 
+  wifi_fast_connect: "true"
+   # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
+  log_level: "INFO" 
 
 
 #########################################################################
@@ -50,7 +52,7 @@ ota:
   - platform: esphome
   
 logger:
-  level: INFO    # WARN
+  level: ${log_level}
   baud_rate: 0
   logs:
     component: ERROR # Fix for issue #4717 "Component xxxxxx took a long time for an operation"
@@ -78,8 +80,13 @@ captive_portal:
 #
 
 dashboard_import:
-  package_import_url: 
+  package_import_url: github://everythingsmarthome/everything-presence-one/everything-presence-one-sen0609.yaml@main
+  import_full_config: false
 
+packages:
+  device_base: !include common/base-configuration-wifi.yaml
+  device_version: !include common/everything-presence-one-sen0395-stable.yaml
+  sen0395_base: !include common/sen0395-common.yaml
 
 #########################################################################
 #
