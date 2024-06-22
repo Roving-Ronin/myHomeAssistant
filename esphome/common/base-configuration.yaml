@@ -85,6 +85,7 @@ web_server:
 binary_sensor:
   - platform: status
     name: "Device Status"
+    id: device_status
 #    entity_category: diagnostic
 
 ##########################################################################
