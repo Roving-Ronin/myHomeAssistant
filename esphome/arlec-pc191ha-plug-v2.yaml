@@ -94,6 +94,8 @@ binary_sensor:
 # PC191HA includes a BL0937 chip for measuring power consumption
 # and BL0937 is a variation of hlw8012, but using inverted SEL pin functionality
 #
+sensor:
+
   - platform: hlw8012
     model: BL0937     # note that the model must be specified to use special calculation parameters
     sel_pin:          # I believe that cf_pin reports either Voltage or Current depending on this select pin
