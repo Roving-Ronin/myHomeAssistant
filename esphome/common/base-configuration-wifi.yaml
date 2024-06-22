@@ -5,7 +5,7 @@
 
 substitutions:
    # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
-  room: ""
+  location: ""
    # Define a domain for this device to use. i.e. iot.home.lan (so device will appear as athom-smart-plug-v2.iot.home.lan in DNS/DHCP logs)
   dns_domain: ".iot.home.lan"
    # Set timezone of the smart plug. Useful if the plug is in a location different to the HA server. Can be entered in unix Country/Area format (i.e. "Australia/Sydney")
@@ -26,7 +26,7 @@ esphome:
   name: "${name}"
   friendly_name: "${friendly_name}"
   comment: '${device_description}'
-  area: "${room}"
+  area: "${location}"
   name_add_mac_suffix: true
   min_version: 2024.6.0
   project:
