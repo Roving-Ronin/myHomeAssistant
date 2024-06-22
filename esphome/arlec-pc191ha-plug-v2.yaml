@@ -75,6 +75,8 @@ globals:
     # LED should have same on/off state as the relay.  
     # there is also a wifi_LED, but it is not seen from outside the case
 
+binary_sensor:
+
   - platform: gpio
     pin: P11
     name: "Power Button"
