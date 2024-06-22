@@ -34,7 +34,7 @@ substitutions:
   frequency_ww: "1220Hz"
 
 esphome:
-  #  Configures these settings to use the substituions defined below
+  #  Configures these settings to use the substitutions defined below
   name: "${name}"
   friendly_name: "${friendly_name}"
   comment: '${device_description}'
