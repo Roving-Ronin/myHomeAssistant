@@ -63,17 +63,6 @@ mdns:
 web_server:
   port: 80
 
-wifi:
-   # This spawns an AP with the device name and mac address with no password.
-  ap: {}
-   # Allow rapid re-connection to previously connect WiFi SSID, skipping scan of all SSID
-  fast_connect: "${wifi_fast_connect}"
-   # Define dns domain / suffix to add to hostname
-  domain: "${dns_domain}"
-
-   # Only works for WiFi connected devices 
-captive_portal:
-
 #########################################################################
 #
 # Remote Packages to be utilised
