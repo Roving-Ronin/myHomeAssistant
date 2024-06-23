@@ -22,6 +22,9 @@ substitutions:
   frequency_rgb: "100Hz"
   frequency_cw: "1220Hz"
   frequency_ww: "1220Hz"
+   # Set the default colour temperature desired (min. 2700 K / max. 65000 K). 3000 K = Warm White, 4000 K = Cool White, 5000 K = Daylight, 6500 K = Cool Daylight.
+   # Normally this can be left at '6500 K' and is defined in Home Assistant Automation / Blueprints, where they can be varied per automation/blueprint used.
+  default_colour_temperature: "6500 K"
 
 #########################################################################
 
@@ -124,7 +127,7 @@ light:
       then:
         - light.control:
             id: downlight
-            color_temperature: 6500K
+            color_temperature: "${default_colour_temperature}"
             color_mode: COLOR_TEMPERATURE
 
 #########################################################################
