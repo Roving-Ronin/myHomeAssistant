@@ -30,6 +30,8 @@ substitutions:
   # Enables faster network connections, with last connected SSID being connected to and no full scan for SSID being undertaken
   wifi_fast_connect: "true"
 
+########################## End of Substitutions #########################
+
 esphome:
   name: "${name}"
   friendly_name: "${friendly_name}"
