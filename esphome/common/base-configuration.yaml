@@ -23,8 +23,10 @@ substitutions:
    # Enables faster network connections, with last connected SSID being connected to and no full scan for SSID being undertaken   
   wifi_fast_connect: "true"
    # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
-  log_level: "INFO" 
-
+  log_level: "INFO"
+   # Enable or disable the use of IPv6 networking on the device
+  ipv6_enable: "false"
+ 
 
 #########################################################################
 
@@ -62,6 +64,9 @@ mdns:
 
 web_server:
   port: 80
+
+network:
+  enable_ipv6: ${ipv6_enable}
 
 #########################################################################
 #
