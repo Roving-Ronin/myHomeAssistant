@@ -1,10 +1,14 @@
-preferences:
-  # Enable to allow storing of 'Read Total' between reboots and flashing.
-  flash_write_interval: 5min
+#####################################################################
+#
+# This file contains all the common sensors that are used by
+# Athom v2 and v3 Power Plugs.
+#
 
-uart:
-  rx_pin: RX
-  baud_rate: 4800
+
+#####################################################################
+#
+# Used to store the Total kWh used (lifetime) between reboots
+#
 
 globals:
   - id: total_energy
@@ -12,14 +16,10 @@ globals:
     restore_value: yes
     initial_value: '0.0' 
 
-binary_sensor:
-  - platform: status
-    name: "Device Status"
-    entity_category: diagnostic
-
+    # Defines the Power On/Off button and its GPIO PIN#
   - platform: gpio
     pin:
-      number: 5
+      number: ${power_button_pin}
       mode: INPUT_PULLUP
       inverted: true
     name: "Power Button"
@@ -36,15 +36,13 @@ binary_sensor:
           - button.press: Reset
     internal: true
 
-sensor:
+#####################################################################
+#
+# Power / Current / Energy monitoring sensors. 
+# The chipset used is self calibrating, so no tuning is required.
+#
 
-  #  Sensor uptime in seconds
-  - platform: uptime
-    name: "Uptime Seconds"
-    id: uptime_seconds
-    update_interval: 120s
-    entity_category: diagnostic
-    internal: True
+sensor:
 
   - platform: cse7766
     update_interval: 10s
