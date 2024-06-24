@@ -9,40 +9,27 @@ substitutions:
   location: ""
   project_name: "Athom Technology.Smart Plug v3"
   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "v1.0.2"
+  project_version: "v1.0.3"
   # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
   power_circuit: "TBC"  
   # Restore the relay (GPO switch) upon reboot to state:
   relay_restore_mode: ALWAYS_ON      # RESTORE_DEFAULT_ON
-  sensor_update_interval: 10s
+  
+  # cse7766 Power Monitoring Chip 
   # Current Limit in Amps. AU Plug = 10. IL, BR, EU, UK, US Plug = 16.
   current_limit : "10"
-  # Define a domain for this device to use. i.e. iot.home.lan (so device will appear as athom-smart-plug-v2.iot.home.lan in DNS/DHCP logs)
-  dns_domain: ".iot.home.lan"
-  # Set timezone of the smart plug. Useful if the plug is in a location different to the HA server. Can be entered in unix Country/Area format (i.e. "Australia/Sydney")
-  timezone: "Australia/Sydney"
-  # Set the duration between the sntp service polling ntp.org servers for an update
-  sntp_update_interval: 6h
-  # Network time servers for your region, enter from lowest to highest priority
-  sntp_server_1: "2.au.pool.ntp.org"
-  sntp_server_2: "1.au.pool.ntp.org"
-  sntp_server_3: "0.au.pool.ntp.org"  
-  # Enables faster network connections, with last connected SSID being connected to and no full scan for SSID being undertaken
-  wifi_fast_connect: "true"
+ 
+  # DO NOT CHANGE THESE SETTINGS. They are specific to the Plug Hardware Version, as defined by Athom.
+  power_button_pin:   "GPIO3"
+  gpo_switch_pin:     "GPIO5"
+  gpo_status_led_pin: "GPIO6"
 
 ########################## End of Substitutions #########################
+#
+# Defines the type of ESP chip used on the device
+#
 
 esphome:
-  name: "${name}"
-  friendly_name: "${friendly_name}"
-  comment: "${device_description}"
-  area: "${location}"  
-  name_add_mac_suffix: true
-  # Home Assistant - Minimum version required
-  min_version: 2024.6.0
-  project:
-    name: "${project_name}"
-    version: "${project_version}"
   platformio_options:
     board_build.mcu: esp32c3
     board_build.variant: esp32c3
@@ -56,54 +43,24 @@ esp32:
     type: arduino
     version: recommended
 
-preferences:
-  flash_write_interval: 5min
-
-api:
-
-ota:
-  - platform: esphome
-
-logger:
-  level: INFO    # WARN
-  baud_rate: 0
-  logs:
-    component: ERROR # Fix for issue #4717 "Component xxxxxx took a long time for an operation"
-
-mdns:
-  disabled: false
-
-web_server:
-  port: 80
-
-#network:
-#  enable_ipv6: false
-
-wifi:
-  # WiFi credentials
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  # Allow rapid re-connection to previously connect WiFi SSID, skipping scan of all SSID
-  fast_connect: "${wifi_fast_connect}"
-  # Define dns domain / suffix to add to hostname
-  domain: "${dns_domain}"
-  # This spawns an AP with the device name and mac address with no password.
-  ap: {}  
-
-captive_portal:
+#########################################################################
+#
+# Remote Packages to be utilised
+#
 
 dashboard_import:
-  package_import_url: github://roving-ronin/myHomeAsssint/esphome/athom-smart-plug-v3.yaml
-#  package_import_url: github://athom-tech/esp32-configs/athom-smart-plug.yaml
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/athom-smart-plug-v3.yaml@main
+  import_full_config: false
 
+packages:
+  base-config:         !include common/base-configuration.yaml
+  wifi-config:         !include common/network-wifi.yaml
+  athom-power-sensors: !include common/sensor-athom-power-plug.yaml
+ 
 #####################################################################
-
-uart:
-  rx_pin: GPIO20
-  baud_rate: 4800
-  data_bits: 8
-  stop_bits: 1
-  parity: EVEN
+#
+# Used to store the Total kWh used (lifetime) between reboots
+#
 
 globals:
   - id: total_energy
@@ -112,11 +69,23 @@ globals:
     initial_value: '0.0'
 
 #####################################################################
+#
+# Define the COMs Port
+#
+
+uart:
+  rx_pin: GPIO20
+  baud_rate: 4800
+  data_bits: 8
+  stop_bits: 1
+  parity: EVEN
+
+#####################################################################
+#
+# Binary Sensors
+#
 
 binary_sensor:
-  - platform: status
-    name: "Device Status"
-    entity_category: diagnostic    
 
   - platform: gpio
     pin:
@@ -136,34 +105,12 @@ binary_sensor:
         then:
           - button.press: Reset
 
-sensor:
-  - platform: uptime
-    name: "Device Uptime Sensor"
-    id: uptime_sensor
-    entity_category: diagnostic
-    internal: true
-
-  # Reports the WiFi signal strength/RSSI in dB
-#  - platform: wifi_signal
-#    id: wifi_signal_db
-#    name: "WiFi Signal dB"
-#    update_interval: 5min
-#    entity_category: "diagnostic"
-#    internal: true
-
-  # Reports the WiFi signal strength in %
-#  - platform: copy
-#    source_id: wifi_signal_db
-#    name: "WiFi Signal"
-#    filters:
-#      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
-#    unit_of_measurement: "%"
-#    entity_category: "diagnostic"    
-
 #####################################################################
 #
-# Power / Current / Energy monitoring sensors
+# Power / Current / Energy monitoring sensors. 
+# The chipset used is self calibrating, so no tuning is required.
 #
+
   - platform: cse7766
     current:
       name: "Current"
@@ -227,6 +174,9 @@ sensor:
               previous_energy_value = current_energy_value;
               id(energy_total_sensor).update();
 
+#########################################################################
+
+    # Shows the TOTAL/Lifetime Energy kWh used by the device, may reset to zero upon firmware updates
   - platform: template
     name: "Energy Total"
     id: energy_total_sensor
@@ -249,20 +199,11 @@ sensor:
       - multiply: 0.001
     icon: mdi:hours-24      
 
-button:
-  - platform: restart
-    name: "Restart Device"
-    entity_category: config
-
-  - platform: factory_reset
-    name: "Reset Device"
-    id: Reset
-    entity_category: config
-
-  - platform: safe_mode
-    name: "Restart Device Safe Mode"
-    internal: false
-    entity_category: config
+#########################################################################
+#
+# Configures basic switch operation - Bbutton that manually controls
+# the GPO socket relay and controls the blue LED backlight.
+#
 
 switch:
   - platform: gpio
@@ -281,111 +222,4 @@ light:
       inverted: true
       number: GPIO6
 
-text_sensor:
-  - platform: wifi_info
-  #  Creates sensor for tracking the WiFi IP address    
-    ip_address:
-      name: 'WiFi IP Address'
-#      icon: mdi:wifi
-      entity_category: diagnostic
-      icon: mdi:ip-network-outline
-
-  #  Defines the WiFi SSID network to connect to
-    ssid:
-      name: 'WiFi SSID'
-#      icon: mdi:wifi-strength-2
-      entity_category: diagnostic
-      icon: mdi:wifi-lock
-
-  #  Creates sensor for tracking the WiFi IP MAC address
-    mac_address:
-      name: 'WiFi MAC Address'
-      entity_category: diagnostic
-      icon: mdi:wifi-cog
-
-  #  Creates a sensor showing when the device was last restarted
-  - platform: template
-    name: 'Device Last Restart'
-    id: device_last_restart
-    icon: mdi:clock
-    entity_category: diagnostic
-#    device_class: timestamp
-
-  #  Creates a sensor of the name of installed project
-  - platform: template
-    name: 'Project Name'
-    id: project_name
-    icon: "mdi:label-outline"
-    entity_category: diagnostic
-    lambda: |-
-      return {"${project_name}"};
-    update_interval: 6h
-
-  #  Creates a sensor of the version of installed project
-  - platform: template
-    name: 'Project Version'
-    id: project_version
-    icon: "mdi:label-outline"
-    entity_category: diagnostic
-    lambda: |-
-      return {"${project_version}"};
-    update_interval: 6h
-
-  #  Creates a sensor showing power circuit / phase of the device
-  - platform: template
-    name: 'Power Circuit'
-    id: power_circuit
-    icon: "mdi:electric-switch"
-    entity_category: diagnostic
-    lambda: |-
-      return {"${power_circuit}"};
-    update_interval: 6h
-    
-  #  Creates a sensor of the uptime of the device, in formatted days, hours, minutes and seconds
-  - platform: template
-    name: "Device Uptime"
-    entity_category: diagnostic
-    lambda: |-
-      int seconds = (id(uptime_sensor).state);
-      int days = seconds / (24 * 3600);
-      seconds = seconds % (24 * 3600);
-      int hours = seconds / 3600;
-      seconds = seconds % 3600;
-      int minutes = seconds /  60;
-      seconds = seconds % 60;
-      if ( days > 3650 ) {
-        return { "Starting up" };
-      } else if ( days ) {
-        return { (String(days) +"d " + String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
-      } else if ( hours ) {
-        return { (String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
-      } else if ( minutes ) {
-        return { (String(minutes) +"m "+ String(seconds) +"s").c_str() };
-      } else {
-        return { (String(seconds) +"s").c_str() };
-      }
-    icon: mdi:clock-start
-
-time:
-  - platform: sntp
-    id: sntp_time
-  # Define the timezone of the device
-    timezone: "${timezone}"
-  # Change sync interval from default 5min to 6 hours
-    update_interval: "${sntp_update_interval}"
-  # Set specific sntp servers to use
-    servers: 
-      - "${sntp_server_1}"
-      - "${sntp_server_2}"
-      - "${sntp_server_3}"    
-  # Publish the time the device was last restarted
-    on_time_sync:
-      then:
-        # Update last restart time, but only once.
-        - if:
-            condition:
-              lambda: 'return id(device_last_restart).state == "";'
-            then:
-              - text_sensor.template.publish:
-                  id: device_last_restart
-                  state: !lambda 'return id(sntp_time).now().strftime("%a %d %b %Y - %I:%M:%S %p");'
+#########################################################################
