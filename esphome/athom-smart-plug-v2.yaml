@@ -46,17 +46,6 @@ packages:
   base-config:         !include common/base-configuration.yaml
   wifi-config:         !include common/network-wifi.yaml
   athom-power-sensors: !include common/sensor-athom-power-plug.yaml
- 
-#####################################################################
-#
-# Used to store the Total kWh used (lifetime) between reboots
-#
-
-globals:
-  - id: total_energy
-    type: float
-    restore_value: yes
-    initial_value: '0.0'
 
 #####################################################################
 #
