@@ -26,7 +26,7 @@ substitutions:
    # Normally this can be left at '6500 K' and is defined in Home Assistant Automation / Blueprints, where they can be varied per automation/blueprint used.
   default_colour_temperature: "6500 K"
   
-  ######################### End of Substitutions #########################
+########################## End of Substitutions #########################
 
 esphome:
   name_add_mac_suffix: true
