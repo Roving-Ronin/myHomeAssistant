@@ -61,10 +61,20 @@ dashboard_import:
 packages:
   base-config: !include common/base-configuration.yaml
   wifi-config: !include common/network-wifi.yaml
+
+
+#########################################################################
+#
+# Components and sensors defined in base-configuration.yaml that are
+# to be to be disabled, as not compatible or needed with this device.
+#
+
+ # Remove Network section (IPv6), as not supported on this chipset
+network: !remove
   
 #########################################################################
 #
-#
+# Define the RGBW Lights and their GPIO PINS to control them.
 #
 
 output:
@@ -101,7 +111,7 @@ output:
 
 #########################################################################
 #
-# Define RGBW Light
+# Define the RGBW LEDs as a device type 'Light'.
 #
 
 light:
