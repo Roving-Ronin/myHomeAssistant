@@ -31,7 +31,7 @@ substitutions:
   # how many times to report before swapping between reporting Voltage or Current. Note that the first value reported should be ignored as inaccurate
   change_mode_every: "3"
 
-#########################################################################
+########################## End of Substitutions #########################
 #
 # Defines the bk72xx chip that is a cheaper alternative to an ESP828x
 #
