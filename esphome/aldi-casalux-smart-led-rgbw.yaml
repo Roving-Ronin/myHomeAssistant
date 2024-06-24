@@ -29,8 +29,6 @@ substitutions:
 ########################## End of Substitutions #########################
 
 esphome:
-  name_add_mac_suffix: true
-
   on_boot:
     priority: 600.0
     then:
