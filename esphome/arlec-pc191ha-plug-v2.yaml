@@ -4,38 +4,38 @@
 # Reflash from Tuya to ESPHome with CloudCutter prior to using this code
 #
 
-  # Provides substitutions or variables that are then called elsewhere multiple times in the config
+   # Provides substitutions or variables that are then called elsewhere multiple times in the config
 substitutions:
-  # Default name 
+   # Default name 
   name: "arlec-pc19ha-v2-plug"
-  # Default friendly name 
+   # Default friendly name 
   friendly_name: "Arlec - Smart Plug v2 (PC191HA)"
-  # Description as appears in ESPHome & top of webserver page
+   # Description as appears in ESPHome & top of webserver page
   device_description: "Arlec PC191HA v2 - Monitoring the power & energy of a device"
-  # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
+   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   location: ""
-  # Project Name
+   # Project Name
   project_name: "Arlec.Smart Plug (PC191HA v2)"
-  # Project Version
+   # Project Version
   project_version: "1.0.10"
-  # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
+   # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
   power_circuit: "TBC"  
-  # Restore the relay (GPO switch) upon reboot to state:
+   # Restore the relay (GPO switch) upon reboot to state:
   relay_restore_mode: RESTORE_DEFAULT_ON    
-  # Set the update interval for sensors
+   # Set the update interval for sensors
   sensor_update_interval: 10s
 
-  # HLW8012 Power Monitoring Chip
-  # Current Limit in Amps. AU Plug = 10. IL, BR, EU, UK, US Plug = 16.
+   # HLW8012 Power Monitoring Chip
+   # Current Limit in Amps. AU Plug = 10. IL, BR, EU, UK, US Plug = 16.
   current_limit : "10"
-  # https://community.home-assistant.io/t/esphome-install-does-not-update-firmware/544026/9?u=mahko_mahko
+   # https://community.home-assistant.io/t/esphome-install-does-not-update-firmware/544026/9?u=mahko_mahko
   initial_mode: "VOLTAGE"             # reports VOLTAGE or CURRENT first
   voltage_divider: "770.0"
   current_resistor: "0.0001"
   current_multiply: "0.4250"
-  # If Watts are maringally out after applying the calculated settings above, then the following can be used to tweak the watts reported
+   # If Watts are maringally out after applying the calculated settings above, then the following can be used to tweak the watts reported
   watts_factor: "1.0"
-  # how many times to report before swapping between reporting Voltage or Current. Note that the first value reported should be ignored as inaccurate
+   # how many times to report before swapping between reporting Voltage or Current. Note that the first value reported should be ignored as inaccurate
   change_mode_every: "3"
 
 ########################## End of Substitutions #########################
@@ -103,7 +103,7 @@ binary_sensor:
     id: power_button
     disabled_by_default: true
     device_class: window
-    # when button is pressed, toggle the switch on/off
+     # when button is pressed, toggle the switch on/off
     on_press:
       then:
         - switch.toggle: relay
@@ -127,7 +127,7 @@ sensor:
     cf1_pin:          #  Power (vi_pin: 8)
       inverted: true  # the logic of BL0937 is opposite from HLW8012
       number: P8
-    # How often to measure and report values
+     # How often to measure and report values
     update_interval: ${sensor_update_interval}
 
 #########################################################################
@@ -140,7 +140,7 @@ sensor:
     change_mode_every: ${change_mode_every}  # how many times to report before swapping between
                                              # reporting Voltage or Current. Note that the first value reported should be ignored as inaccurate
 
-    # Adjust according to the actual resistor values on board to calibrate the specific unit
+     # Adjust according to the actual resistor values on board to calibrate the specific unit
     voltage_divider:  ${voltage_divider}     # LOWER VALUE GIVES LOWER VOLTAGE
     current_resistor: ${current_resistor}    # HIGHER VALUE GIVES LOWER WATTAGE
 
@@ -181,14 +181,14 @@ sensor:
         - skip_initial: 2
       icon: mdi:power 
 
-    #   Shows the Energy kWh since the device was last booted
+     # Shows the Energy kWh since the device was last booted
     energy:
       name: "Energy"
       id: energy
       unit_of_measurement: kWh
       accuracy_decimals: 3
       filters:
-        # Multiplication factor from W to kW is 0.001
+         # Multiplication factor from W to kW is 0.001
         - multiply: 0.001
       on_value:
         then:
@@ -202,7 +202,7 @@ sensor:
 
 #########################################################################
 
-    #  Shows the TOTAL/Lifetime Energy kWh used by the device, may reset to zero upon firmware updates
+     # Shows the TOTAL/Lifetime Energy kWh used by the device, may reset to zero upon firmware updates
   - platform: template
     name: "Energy Total"
     id: energy_total_sensor
@@ -214,7 +214,7 @@ sensor:
     lambda: |-
       return id(total_energy);
     
-    #   Shows the Energy kWh for the current day
+     # Shows the Energy kWh for the current day
   - platform: total_daily_energy
     name: "Energy Daily"
     id: energy_total_daily
@@ -231,7 +231,7 @@ sensor:
 # PC191HA basic switch operation - button, relay and LED
 #
 
-  # The power relay, controls the socket being On/Off
+ # The power relay, controls the socket being On/Off
 switch:          
   - platform: gpio
     name: "GPO Switch"
@@ -239,7 +239,7 @@ switch:
     id: relay
     restore_mode: "${relay_restore_mode}"   # default when power is turned on
     icon: mdi:power-socket-au
-    # synchronise the LED with the relay
+     # synchronise the LED with the relay
     on_turn_on:
       then:
 #        - output.turn_on: button_led
