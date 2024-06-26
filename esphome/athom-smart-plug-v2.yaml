@@ -10,7 +10,7 @@ substitutions:
   name: "athom-smart-plug-v2"
    # Default friendly name 
   friendly_name: "Smart Plug v2"
-   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc
+   # Description as appears in ESPHome & top of webserver page
   device_description: "Athom Plug v2 - Smart Plug (ESP8285)"
    # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc    
   location: ""
