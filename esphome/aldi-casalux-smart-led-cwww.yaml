@@ -14,7 +14,7 @@ substitutions:
    # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   location: ""
    # Project Name
-  project_name: "Aldi Casalux.Smart LED Downlight CCWW"
+  project_name: "Aldi Casalux.Smart LED Downlight CW/WW"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
   project_version: "1.0.11"
   # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
@@ -25,7 +25,6 @@ substitutions:
   my_latitude: "-34.73503534407444"
   my_longitude: "149.72998380661014"
    # From: https://esphome.io/components/output/ledc.html
-  frequency_rgb: "100Hz"
   frequency_cw: "1220Hz"
   frequency_ww: "1220Hz"
    # Set the default colour temperature desired (min. 2700 K / max. 65000 K). 3000 K = Warm White, 4000 K = Cool White, 5000 K = Daylight, 6500 K = Cool Daylight.
@@ -85,24 +84,6 @@ network: !remove
 
 output:
   - platform: libretiny_pwm
-    id: output_red
-    pin: P26
-    max_power: 100%
-    frequency: ${frequency_rgb}
-
-  - platform: libretiny_pwm
-    id: output_green
-    pin: P24
-    max_power: 100%
-    frequency: ${frequency_rgb}
-
-  - platform: libretiny_pwm
-    id: output_blue
-    pin: P6
-    max_power: 100%
-    frequency: ${frequency_rgb}
-
-  - platform: libretiny_pwm
     id: output_cold_white
     max_power: 100%
     frequency: ${frequency_cw}
@@ -118,24 +99,22 @@ output:
 #########################################################################
 #
 # Define the RGBW LEDs as a device type 'Light'.
+# See: https://esphome.io/components/light/cwww.html
 #
 
 light:
-  - platform: rgbct
+  - platform: cwww
     name: "Downlight"
     id: downlight
-    red: output_red
-    green: output_green
-    blue: output_blue
-    color_temperature: output_cold_white
-    white_brightness: output_warm_white
+    cold_white: output_cold_white
+    warm_white: output_warm_white
     cold_white_color_temperature: 6500 K
     warm_white_color_temperature: 2700 K
     gamma_correct: 2.8
     default_transition_length: 0.5s
     restore_mode: ${light_restore_mode}
      # When enabled, this will prevent white leds being on at the same time as RGB leds.
-    color_interlock: true
+    constant_brightness: true
      # Reset the light to a predefined state each time it is turned on
     on_turn_on: 
       then:
