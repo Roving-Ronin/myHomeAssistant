@@ -1,11 +1,24 @@
 substitutions:
   # Provides substitutions or variables that are then called elsewhere multiple times in the config
   device_name: env-network-rack
-  device_description: "Phase C / GPO 1 - Environment data (temp / humidity / pressure) within the network rack"
+  device_description: "Phase C / GPO 1 - Environment data (temp / humidity / pressure) of the network rack"
   project_name: "esphome.environmental"
   project_version: "1.0"
-  set_timezone: "Australia/Sydney"
-  set_dns_domain: ".iot.home.lan"
+  # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
+  power_circuit: "GPO 2"  
+   # Define a domain for this device to use. i.e. iot.home.lan (so device will appear as athom-smart-plug-v2.iot.home.lan in DNS/DHCP logs)
+  dns_domain: ""
+   # Set timezone of the device. Useful if the plug is in a location different to the HA server. Can be entered in unix Country/Area format (i.e. "Australia/Sydney")
+  timezone: "Australia/Sydney"
+   # Set the duration between the sntp service polling ntp.org servers for an update
+  sntp_update_interval: 6h
+   # Network time servers for your region, enter from lowest to highest priority
+  sntp_server_1: "2.au.pool.ntp.org"
+  sntp_server_2: "1.au.pool.ntp.org"
+  sntp_server_3: "0.au.pool.ntp.org"
+   # Enables faster network connections, with last connected SSID being connected to and no full scan for SSID being undertaken   
+  wifi_fast_connect: "true"
+   #
   disable_entities: "false"
 
   # I2C PINS - Used for BME280 sensor
@@ -17,8 +30,8 @@ esphome:
   name: env-network-rack
   friendly_name: "ENV - Network Rack"
   comment: "${device_description}"
+  area: "Network Rack"
   name_add_mac_suffix: false
-  min_version: 2024.6.0
   project:
     name: "${project_name}"
     version: "${project_version}"
@@ -32,11 +45,6 @@ preferences:
   # Enable to allow storing of 'Read Total' between reboots and flashing.
   flash_write_interval: 5min
 
-logger:
-  level: WARN        # To filter out all the power meter messages, change to WARN
-  baud_rate: 0
-  logs:
-    component: ERROR # Fix for issue #4717 "Component xxxxxx took a long time for an operation"
 
 packages:
   baseline: !include common/common.baseline.yaml
@@ -47,21 +55,29 @@ packages:
   wifi: !include common/common.wifi.yaml
   time: !include common/common.time.yaml
 
-  # Enable Home Assistant API
+# Enable Home Assistant API
 api:
 #  encryption:
-#    key: !secret api_key
+#    key: "TO/yfr+Ga7k78wVbuiA5xmsKui1tiYXqO9bd1OT4464="
 
   # Over the Air Firmware Updates
 ota:
-  - platform: esphome
+  - platform: esphome  
     password: !secret ota_password
-    safe_mode: true
+#  password: "356cd9cdcba00e8198bff82b095c3637"
+#    safe_mode: true
+
+logger:
+  level: INFO        # To filter out all the power meter messages, change to WARN
+  baud_rate: 0
+  logs:
+    component: ERROR # Fix for issue #4717 "Component xxxxxx took a long time for an operation" 
 
 wifi:
   # WiFi credentials
   ssid: !secret wifi_ssid
   password: !secret wifi_password
+
 
 captive_portal:
 
@@ -98,7 +114,7 @@ binary_sensor:
 sensor:
 
   # BME280 Sensor in I2C Port - Temperature
-  - platform: bme280
+  - platform: bme280_i2c
     address: 0x76
     update_interval: 30s
 
@@ -122,7 +138,7 @@ sensor:
       id: bme280_humidity
       accuracy_decimals: 1
       filters:
-        offset: 4.7
+        offset: 0.0
 
   # BME280 Sensor in I2C Port - Absolute Humidity
   - platform: absolute_humidity
@@ -149,7 +165,7 @@ sensor:
 
   # BME280 Sensor in I2C Port - Equivalent Sea Level Pressure (based on 655m Goulburn North)
   - platform: template
-    name: "BME280 - Pressure (Equivalent Sea Level)"
+    name: "BME280 - Pressure (Sea Level)"
     state_class: 'measurement'
     accuracy_decimals: 1
     lambda: |-
@@ -176,10 +192,10 @@ sensor:
 text_sensor:
 
 # =========================================
-status_led:
-  pin:
-    number: GPIO48 #ESP8266 Onboard LED
-    inverted: false
+#status_led:
+#  pin:
+#    number: GPIO48 #ESP8266 Onboard LED
+#    inverted: false
 
 light:
   - platform: neopixelbus
