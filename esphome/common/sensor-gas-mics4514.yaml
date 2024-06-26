@@ -1,3 +1,5 @@
+# See: https://esphome.io/components/sensor/mics_4514.html
+
 # Example configuration entry
 sensor:
   - platform: mics_4514
