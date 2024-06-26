@@ -163,8 +163,9 @@ sun:
 
 text_sensor:
   - platform: libretiny
+    id: libretiny_version  
     version:
       name: LibreTiny Version
-      id: libretiny_version
+
       
 #########################################################################
