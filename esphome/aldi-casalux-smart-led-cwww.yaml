@@ -1,7 +1,6 @@
 #########################################################################
 #
-# C
-# for temperature, humidity, pressure, dew point.
+# Aldi Casalux - LED Downlight with Cold White/ Warm White template
 #
 
    # Provides substitutions or variables that are then called elsewhere multiple times in the config
