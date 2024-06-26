@@ -9,10 +9,17 @@
 #
 
 i2c:
-  sda: $sda_pin
-  scl: $scl_pin
-  scan: true
-  id: bus_a
+  - id: bus_a
+    sda: ${bus_a_sda_pin}
+    scl: ${bus_a_scl_pin}
+    scan: true
+    frequency: ${bus_a_frequency}
+
+  - id: bus_b
+    sda: ${bus_b_sda_pin}
+    scl: ${bus_b_scl_pin}
+    scan: true
+    frequency: ${bus_b_frequency}
 
 #########################################################################
 #
