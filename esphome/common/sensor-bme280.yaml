@@ -1,6 +1,27 @@
+#########################################################################
+#
+# Pacakge to configure the use of a device with a BME280 sensor
+#
+
+#########################################################################
+#
+# Configure the i2c bus, to find and operate the BME280 sensor
+#
+
+i2c:
+  sda: $sda_pin
+  scl: $scl_pin
+  scan: true
+  id: bus_a
+
+#########################################################################
+#
+# Sensors - Specific to the BME280 sensor.
+#
+
 sensor:
 
-  # BME280 Sensor in I2C Port - Temperature
+   # BME280 Sensor in I2C Port - Temperature
   - platform: bme280
     temperature:
       name: "BME280 - Temperature"
@@ -14,40 +35,44 @@ sensor:
     address: 0x76
     update_interval: 15s
 
-  # BME280 Sensor in I2C Port - Absolute Humidity
+   # BME280 Sensor in I2C Port - Absolute Humidity
   - platform: absolute_humidity
     name: "BME280 - Humidity (Absolute)"
     temperature: bme280_temperature
     humidity: bme280_humidity
     equation: Wobus   # Wobus (Default), optional Tetens or Buck
 
-  # BME280 Sensor in I2C Port - Dew Point
+   # BME280 Sensor in I2C Port - Dew Point
   - platform: template
     name: "BME280 - Dew Point"
+    unit_of_measurement: °C
+    icon: 'mdi:thermometer-alert'    
     lambda: |-
       return (243.5*(log(id(bme280_humidity).state/100)+((17.67*id(bme280_temperature).state)/
       (243.5+id(bme280_temperature).state)))/(17.67-log(id(bme280_humidity).state/100)-
       ((17.67*id(bme280_temperature).state)/(243.5+id(bme280_temperature).state))));
-    unit_of_measurement: °C
-    icon: 'mdi:thermometer-alert'
 
-  # BME280 Sensor in I2C Port - Equivalent Sea Level Pressure (based on 655m Goulburn North)
+
+   # BME280 Sensor in I2C Port - Equivalent Sea Level Pressure 
+   # Note: This is based on 655m for Goulburn North, NSW. Australia. Update for a different location.
   - platform: template
     name: "BME280 - Equivalent Sea Level Pressure"
+    unit_of_measurement: 'hPa'    
     lambda: |-
       const float STANDARD_ALTITUDE = 656; // in meters, see note
       return id(bme280_pressure).state / powf(1 - ((0.0065 * STANDARD_ALTITUDE) /
         (id(bme280_temperature).state + (0.0065 * STANDARD_ALTITUDE) + 273.15)), 5.257); // in hPa
     update_interval: 15s
-    unit_of_measurement: 'hPa'
 
-   # Only Altitude OR Equivalent Sea Level Pressure can be run at one time, not both
+   # Note: Only Altitude OR Equivalent Sea Level Pressure can be run at one time, not both.
 #  - platform: template
 #    name: "BME280 - Altitude"
+#    unit_of_measurement: 'm'
+#    icon: 'mdi:signal'
 #    lambda: |-
 #      const float STANDARD_SEA_LEVEL_PRESSURE = 1014.1; //in hPa, see note
 #      return ((id(bme280_temperature).state + 273.15) / 0.0065) *
 #        (powf((STANDARD_SEA_LEVEL_PRESSURE / id(bme280_pressure).state), 0.190234) - 1); // in meter
 #    update_interval: 15s
-#    icon: 'mdi:signal'
-#    unit_of_measurement: 'm'
+
+#########################################################################
