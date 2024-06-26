@@ -1,3 +1,9 @@
+#########################################################################
+#
+# Device configuration for Athom Smart Plug v2 (ESP8285)
+# providing power and energy monitoring sensors.
+#
+
 substitutions:
   # Default name
   name: "athom-smart-plug-v2"
