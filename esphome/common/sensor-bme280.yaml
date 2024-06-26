@@ -8,18 +8,18 @@
 # Configure the i2c bus, to find and operate the BME280 sensor
 #
 
-i2c:
-  - id: bus_a
-    sda: ${bus_a_sda_pin}
-    scl: ${bus_a_scl_pin}
-    scan: true
-    frequency: ${bus_a_frequency}
+#i2c:
+#  - id: bus_a
+#    sda: ${bus_a_sda_pin}
+#    scl: ${bus_a_scl_pin}
+#    scan: true
+#    frequency: ${bus_a_frequency}
 
-  - id: bus_b
-    sda: ${bus_b_sda_pin}
-    scl: ${bus_b_scl_pin}
-    scan: true
-    frequency: ${bus_b_frequency}
+#  - id: bus_b
+#    sda: ${bus_b_sda_pin}
+#    scl: ${bus_b_scl_pin}
+#    scan: true
+#    frequency: ${bus_b_frequency}
 
 #########################################################################
 #
