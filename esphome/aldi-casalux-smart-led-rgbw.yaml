@@ -17,7 +17,7 @@ substitutions:
    # Project Name
   project_name: "Aldi Casalux.Smart LED Downlight RGBW"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "1.0.10"
+  project_version: "1.0.11"
   # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
   power_circuit: "TBC"  
    # Restore the relay (Light switch) upon reboot to state:
@@ -156,4 +156,14 @@ sun:
   longitude: "${my_longitude}"
   id: sun_home
 
+#########################################################################
+#
+# Text Sensors - Specific to the Aldi Casalux LED
+#
+
+text_sensor:
+  - platform: libretiny
+    version:
+      name: LibreTiny Version
+      
 #########################################################################
