@@ -1,0 +1,23 @@
+#########################################################################
+#
+# Conditional checks, called by the /common/sensor-bme280.yaml file
+# allowing dynamic enabling/disabling in substitutions of i2c bus(es).
+#
+
+{% if enable_bus_a == 'true' %}
+i2c:
+  - id: bus_a
+    sda: ${bus_a_sda_pin}
+    scl: ${bus_a_scl_pin}
+    frequency: ${bus_a_frequency}
+    scan: true
+{% endif %}
+
+{% if enable_bus_b == 'true' %}
+i2c:
+  - id: bus_b
+    sda: ${bus_b_sda_pin}
+    scl: ${bus_b_scl_pin}
+    frequency: ${bus_a_frequency}
+    scan: true
+{% endif %}
