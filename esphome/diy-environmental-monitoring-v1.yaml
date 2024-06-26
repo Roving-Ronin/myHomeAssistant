@@ -10,7 +10,7 @@ substitutions:
   name: "environmental-monitor"
    # Default friendly name 
   friendly_name: "Environmental Monitor"
-   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc
+   # Description of the device and its function(s)
   device_description: "DIY - Environmental Monitor (Temp./Humidity/Pressure)"
    # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc    
   location: ""  
