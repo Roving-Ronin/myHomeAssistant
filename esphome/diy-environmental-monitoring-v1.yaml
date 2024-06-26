@@ -14,16 +14,19 @@ substitutions:
   device_description: "DIY - Environmental Monitor (Temp./Humidity/Pressure)"
    # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc    
   location: ""  
-   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc      
+   # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
+  power_circuit: "TBC"  
+   # Project Name
   project_name: "ESPHome DIY.Environmental Monitor v1"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
   project_version: "1.0.1"
-  # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
-  power_circuit: "TBC"  
+
+  # If true, entity should not be added to Home Assistant frontend, without the user manually enabling it.
+  disable_by_default: "false"
 
   # I2C PINS - Used for BME280 sensor
-  sda_pin: GPIO20   # Default on ESP32 is SDA = PIN 21. ES32 S3 use 20
-  scl_pin: GPIO21   # Default on ESP32 is SLC = PIN 22. ES32 S3 use 21
+  sda_pin: GPIO20   # Default on ESP32 is SDA = PIN 21. ES32-S3 use 20
+  scl_pin: GPIO21   # Default on ESP32 is SLC = PIN 22. ES32-S3 use 21
 
 ########################## End of Substitutions #########################
 #
