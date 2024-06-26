@@ -1,3 +1,10 @@
+#########################################################################
+#
+# Device setup for the Arlec PC191HA Plug v2, as sold at Bunnings
+# Reflash from Tuya to ESPHome with CloudCutter prior to using this code
+#
+
+  # Provides substitutions or variables that are then called elsewhere multiple times in the config
 substitutions:
   # Default name 
   name: "arlec-pc19ha-v2-plug"
