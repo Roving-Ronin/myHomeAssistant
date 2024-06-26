@@ -34,19 +34,20 @@ sensor:
     address: 0x76
     update_interval: 30s
 
-   # BME280 Sensor in I2C Port - Temperature
-  - platform: bme280
+     # Temperature in °C
     temperature:
       name: "BME280 - Temperature"
       id: bme280_temperature
+
+     # Pressure in hPa
     pressure:
       name: "BME280 - Pressure"
       id: bme280_pressure
+    
+     # Relative humidity %
     humidity:
       name: "BME280 - Humidity (Relative)"
       id: bme280_humidity
-    address: 0x76
-    update_interval: 15s
 
    # BME280 Sensor in I2C Port - Absolute Humidity
   - platform: absolute_humidity
