@@ -7,7 +7,7 @@ light:
   - platform: neopixelbus
     type: GRB
     variant: WS2812x
-    pin: 48
+    pin: 39 #48
     num_leds: 1
     name: "Onboard RGB LED"
     id: onboard_led
