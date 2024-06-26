@@ -1,17 +1,19 @@
 #########################################################################
 #
-# Environmental monitoring using ESP32 chipset and BME280 sensor
-# for temperature, humidity, pressure, dew point.
+# Environmental monitoring using ESP32-S3 chipset and BME280 sensor(s)
+# for temperature, humidity, pressure & dew point.
 #
 
    # Provides substitutions or variables that are then called elsewhere multiple times in the config
 substitutions:
    # Default name  
-  name: "environ-monitor"
+  name: "environmental-monitor"
    # Default friendly name 
   friendly_name: "Environmental Monitor"
    # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc
-  device_description: "DIY - Environmental Monitor (Temp./Humidity/Pressure/Gas)"
+  device_description: "DIY - Environmental Monitor (Temp./Humidity/Pressure)"
+   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc    
+  location: ""  
    # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc      
   project_name: "ESPHome DIY.Environmental Monitor v1"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
@@ -25,13 +27,14 @@ substitutions:
 
 ########################## End of Substitutions #########################
 #
-# Defines the type of ESP chip used on the device
+# Defines the type of ESP chip used on the device. 
+# Must be in the local devices configuration file.
 #
 
-esp32:
-  board: esp32-s3-devkitc-1
-  framework:
-    type: arduino
+#esp32:
+#  board: esp32-s3-devkitc-1
+#  framework:
+#    type: arduino
 
 #########################################################################
 #
@@ -39,34 +42,13 @@ esp32:
 #
 
 dashboard_import:
-  package_import_url: github://roving-ronin/myhomeassistant/esphome/diy-environmental-monitoring.yaml@main
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/diy-environmental-monitoring-v1.yaml@main
   import_full_config: false
 
 packages:
   base-config:    !include common/base-configuration.yaml
   wifi-config:    !include common/network-wifi.yaml
   bme280-sensors: !include common/sensor-bme280.yaml
-
-#########################################################################
-#
-# Configure the onboard RGB LED of the 
-#
-
-light:
-  - platform: neopixelbus
-    type: GRB
-    variant: WS2812x
-    pin: 48
-    num_leds: 1
-    name: "Onboard RGB LED"
-    id: onboard_led
-    effects:
-      - strobe:
-      - addressable_rainbow:
-      - addressable_scan:
-      - addressable_twinkle:
-      - addressable_random_twinkle:
-      - addressable_fireworks:
-      - addressable_flicker:
+  esp-board:      !include boards/esp32-s3.yaml
 
 #########################################################################
