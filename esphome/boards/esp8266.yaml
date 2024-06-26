@@ -1,0 +1,14 @@
+#########################################################################
+#
+# ESP828x Ony - Settings and Sensors
+#
+
+esphome:
+  platform: ESP8266
+  board: ${board}
+  esp8266_restore_from_flash: ${restore_from_flash}
+  build_path: ./build/${node_name}
+
+preferences:
+  # Enable to allow storing of 'Read Total' between reboots and flashing.
+  flash_write_interval: 5min
