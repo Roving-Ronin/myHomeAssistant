@@ -18,6 +18,6 @@ i2c:
   - id: bus_b
     sda: ${bus_b_sda_pin}
     scl: ${bus_b_scl_pin}
-    frequency: ${bus_a_frequency}
+    frequency: ${bus_b_frequency}
     scan: true
 {% endif %}
