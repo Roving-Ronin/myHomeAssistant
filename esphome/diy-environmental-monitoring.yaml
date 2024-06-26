@@ -1,6 +1,14 @@
+#########################################################################
+#
+# Environmental monitoring using ESP32 chipset and BME280 sensor
+# for temperature, humidity, pressure, dew point.
+#
+
+   # Provides substitutions or variables that are then called elsewhere multiple times in the config
 substitutions:
-  # Provides substitutions or variables that are then called elsewhere multiple times in the config
-  device_name: env-network-rack
+   # Default name  
+  name: env-network-rack
+  
   device_description: "Phase C / GPO 1 - Environment data (temp / humidity / pressure) of the network rack"
   project_name: "esphome.environmental"
   project_version: "1.0"
