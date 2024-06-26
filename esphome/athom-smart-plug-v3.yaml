@@ -4,6 +4,7 @@
 # providing power and energy monitoring sensors.
 #
 
+  # Provides substitutions or variables that are then called elsewhere multiple times in the config
 substitutions:
   # Default name
   name: "athom-smart-plug-v3"
