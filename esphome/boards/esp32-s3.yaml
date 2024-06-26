@@ -1,1 +1,23 @@
+#########################################################################
 #
+# Configure the onboard RGB LED of the ESP32-S3 board
+#
+
+light:
+  - platform: neopixelbus
+    type: GRB
+    variant: WS2812x
+    pin: 48
+    num_leds: 1
+    name: "Onboard RGB LED"
+    id: onboard_led
+    effects:
+      - strobe:
+      - addressable_rainbow:
+      - addressable_scan:
+      - addressable_twinkle:
+      - addressable_random_twinkle:
+      - addressable_fireworks:
+      - addressable_flicker:
+
+#########################################################################
