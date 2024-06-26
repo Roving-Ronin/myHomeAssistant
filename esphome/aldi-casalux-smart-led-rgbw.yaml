@@ -165,5 +165,6 @@ text_sensor:
   - platform: libretiny
     version:
       name: LibreTiny Version
+      id: libretiny_version
       
 #########################################################################
