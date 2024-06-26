@@ -21,17 +21,21 @@ substitutions:
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
   project_version: "1.0.1"
 
-  # If true, entity should not be added to Home Assistant frontend, without the user manually enabling it.
+   # If true, entity should not be added to Home Assistant frontend, without the user manually enabling it.
   disable_by_default: "false"
 
-  # I2C PINS - Used for BME280 sensor
-  bus_a_sda_pin: "GPIO20"   # Default on ESP32 is SDA = PIN 21. ES32-S3 use 20
-  bus_a_scl_pin: "GPIO21"   # Default on ESP32 is SLC = PIN 22. ES32-S3 use 21
-  bus_a_frequency: ""       # Optional: 100kHz
+   # I2C Bus - Enable or Disable as required, depending upon number of sensors connected
+  enable_bus_a: 'true'  # Change to 'false' to disable bus_a
+  enable_bus_b: 'true'  # Change to 'false' to disable bus_b   
 
-  bus_b_sda_pin: ""         # Default on ESP32 is SDA = PIN14 ??. ES32-S3 use ??
-  bus_b_scl_pin: ""         # Default on ESP32 is SLC = PIN15 ??. ES32-S3 use ??  
-  bus_b_frequency: ""       # Optional: 100kHz
+  # I2C PINS - Used for BME280 sensor
+  bus_a_sda_pin: "GPIO20"      # Default on ESP32 is SDA = PIN 21. ES32-S3 use 20
+  bus_a_scl_pin: "GPIO21"      # Default on ESP32 is SLC = PIN 22. ES32-S3 use 21
+  bus_a_frequency: "100kHz"    # Optional: 100kHz
+
+  bus_b_sda_pin: "GPIO14"      # Default on ESP32 is SDA = PIN14 ??. ES32-S3 use ??
+  bus_b_scl_pin: "GPIO15"      # Default on ESP32 is SLC = PIN15 ??. ES32-S3 use ??  
+  bus_b_frequency: "100kHz"    # Optional: 100kHz
 
 ########################## End of Substitutions #########################
 #
@@ -58,5 +62,7 @@ packages:
   wifi-config:    !include common/network-wifi.yaml
   bme280-sensors: !include common/sensor-bme280.yaml
   esp-board:      !include boards/esp32-s3.yaml
+  # Conditionally include I2C bus configurations
+  i2c-enable:     !include conditions/i2c-bus-enable.yaml
 
 #########################################################################
