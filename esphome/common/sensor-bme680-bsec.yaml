@@ -1,7 +1,7 @@
 #########################################################################
 #
 # Pacakge to configure the use of a device with a BME680 sensor
-# see: https://esphome.io/components/sensor/bme680
+# see: https://esphome.io/components/sensor/bme680_bsec
 
 substitutions:
    
@@ -125,19 +125,6 @@ sensor:
         - median
 
 #########################################################################
-#
-# Text Sensors - Specific to the BME680 sensor.
-#
-
-text_sensor:
-
-     # IAQ accuracy as a text value of Stabilizing, Uncertain, Calibrating, Calibrated
-  - platform: bme680_bsec
-    iaq_accuracy:
-        name: "BME680 IAQ Accuracy"
-
-
-#########################################################################
 
    # BME680 Sensor in I2C Port - Absolute Humidity
   - platform: absolute_humidity
@@ -188,12 +175,18 @@ text_sensor:
       return log(id(gas_resistance).state) + 0.04 *  id(bme680_humidity).state;
     state_class: "measurement"
 
+
 #########################################################################
 #
-# BME680 - Text Sensors
+# Text Sensors - Specific to the BME680 sensor.
 #
 
 text_sensor:
+
+     # IAQ accuracy as a text value of Stabilizing, Uncertain, Calibrating, Calibrated
+  - platform: bme680_bsec
+    iaq_accuracy:
+        name: "BME680 IAQ Accuracy"
 
   - platform: template
     name: "BME680 - IAQ Classification"
