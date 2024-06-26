@@ -31,7 +31,7 @@ substitutions:
 
   bus_b_sda_pin: ""         # Default on ESP32 is SDA = PIN14 ??. ES32-S3 use ??
   bus_b_scl_pin: ""         # Default on ESP32 is SLC = PIN15 ??. ES32-S3 use ??  
-  bus_a_frequency: ""       # Optional: 100kHz
+  bus_b_frequency: ""       # Optional: 100kHz
 
 ########################## End of Substitutions #########################
 #
