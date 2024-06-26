@@ -1,1 +1,10 @@
-# PLACE HOLDER
+#########################################################################
+#
+# ESP32-C6 16Mb Boards - Settings and Sensors
+#
+
+sensor:
+
+   # ESP32 Internal Temperature
+  - platform: internal_temperature
+    name: "Device Temperature"
