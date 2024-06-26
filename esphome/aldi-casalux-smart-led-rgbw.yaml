@@ -161,11 +161,10 @@ sun:
 # Text Sensors - Specific to the Aldi Casalux LED
 #
 
-text_sensor:
-  - platform: libretiny
-    id: libretiny_version  
-    version:
-      name: LibreTiny Version
-
+#text_sensor:
+#  - platform: libretiny
+#    id: libretiny_version  
+#    version:
+#      name: LibreTiny Version
       
 #########################################################################
