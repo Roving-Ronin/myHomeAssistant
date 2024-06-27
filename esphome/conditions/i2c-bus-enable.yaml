@@ -7,17 +7,15 @@
 {% if enable_bus_a == 'true' %}
 i2c:
   - id: bus_a
-    sda: ${bus_a_sda_pin}
-    scl: ${bus_a_scl_pin}
-    frequency: ${bus_a_frequency}
+    sda: GPIO21
+    scl: GPIO22
     scan: true
 {% endif %}
 
 {% if enable_bus_b == 'true' %}
-i2c:
+{% if enable_bus_a != 'true' %}i2c: {% endif %}
   - id: bus_b
-    sda: ${bus_b_sda_pin}
-    scl: ${bus_b_scl_pin}
-    frequency: ${bus_b_frequency}
+    sda: GPIO19
+    scl: GPIO23
     scan: true
 {% endif %}
