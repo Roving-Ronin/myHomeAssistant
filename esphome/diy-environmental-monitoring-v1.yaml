@@ -60,9 +60,9 @@ dashboard_import:
 packages:
   base-config:    !include common/base-configuration.yaml
   wifi-config:    !include common/network-wifi.yaml
-  bme280-sensors: !include common/sensor-bme280.yaml
-  # Conditionally include I2C bus configurations
+   # Conditionally include I2C bus configurations
   i2c-enable:     !include conditions/i2c-bus-enable.yaml
+  bme280-sensors: !include common/sensor-bme280.yaml
 
 
 #########################################################################
