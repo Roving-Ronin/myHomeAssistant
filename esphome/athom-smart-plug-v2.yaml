@@ -22,6 +22,8 @@ substitutions:
   power_circuit: "TBC" 
    # Restore the relay (GPO switch) upon reboot to state:
   relay_restore_mode: RESTORE_DEFAULT_ON
+   # Enable or disable the use of IPv6 networking on the device
+  ipv6_enable: "false"  
 
    # cse7766 Power Monitoring Chip  
    # Current Limit in Amps. AU Plug = 10. IL, BR, EU, UK, US Plug = 16.
