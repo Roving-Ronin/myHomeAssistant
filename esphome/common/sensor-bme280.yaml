@@ -2,6 +2,14 @@
 #
 # Pacakge to configure the use of a device with a BME280 sensor
 #
+substitutions:
+   # Calibrate the outpute of the temperature sensor.
+  temperature_offset: "0.0"
+   # Calibrate the outpute of the pressure sensor.
+  pressure_offset: "0.0"
+   # Calibrate the outpute of the humidity sensor.
+  humidity_offset: "0.0"
+
 
 #########################################################################
 #
@@ -38,16 +46,25 @@ sensor:
     temperature:
       name: "BME280 - Temperature"
       id: bme280_temperature
-
+      accuracy_decimals: 1
+      filters:
+        offset: ${temperature_offset}
+        
      # Pressure in hPa
     pressure:
       name: "BME280 - Pressure"
       id: bme280_pressure
+      accuracy_decimals: 1
+      filters:
+        offset: ${pressure_offset}
     
      # Relative humidity %
     humidity:
       name: "BME280 - Humidity (Relative)"
       id: bme280_humidity
+      accuracy_decimals: 1
+      filters:
+        offset: ${humidity_offset}
 
    # BME280 Sensor in I2C Port - Absolute Humidity
   - platform: absolute_humidity
