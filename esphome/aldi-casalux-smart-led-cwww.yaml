@@ -16,7 +16,7 @@ substitutions:
    # Project Name
   project_name: "Aldi Casalux.Smart LED Downlight CW/WW"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "1.0.12"
+  project_version: "1.0.13"
   # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
   power_circuit: "TBC"  
    # Restore the relay (Light switch) upon reboot to state:
@@ -85,22 +85,16 @@ network: !remove
 output:
   - platform: libretiny_pwm
     id: output_cold_white
+    max_power: 100%
+    frequency: ${frequency_cw}
     pin: P7
-#    frequency: ${frequency_cw}
-    
-#  - platform: libretiny_pwm
-#    id: output_cold_white
-#    max_power: 100%
-#    frequency: ${frequency_cw}
-#    pin: P7
-#    inverted: True
+    inverted: True
 
   - platform: libretiny_pwm
     id: output_warm_white
-#    id: output_warm_white
     pin: P8
     max_power: 100%
-#    frequency: ${frequency_ww}
+    frequency: ${frequency_ww}
 
 #########################################################################
 #
@@ -112,23 +106,19 @@ light:
   - platform: cwww
     name: "Downlight"
     id: downlight
-#    colour_temperature: colour_temp
     cold_white: output_cold_white
     warm_white: output_warm_white
     cold_white_color_temperature: 6500 K
     warm_white_color_temperature: 2700 K
-#    gamma_correct: 2.8
-#    default_transition_length: 0.5s
+    gamma_correct: 2.8
+    default_transition_length: 0.5s
     restore_mode: ${light_restore_mode}
-     # When enabled, this will prevent white leds being on at the same time as RGB leds.
-    constant_brightness: true
-     # Reset the light to a predefined state each time it is turned on
-#    on_turn_on: 
-#      then:
-#        - light.control:
-#            id: downlight
-#            color_temperature: "${default_colour_temperature}"
-#            color_mode: COLOR_TEMPERATURE
+    on_turn_on: 
+      then:
+        - light.control:
+            id: downlight
+            color_temperature: "${default_colour_temperature}"
+            color_mode: COLOR_TEMPERATURE
 
 #########################################################################
 #
