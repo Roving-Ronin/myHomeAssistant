@@ -3,6 +3,13 @@
 # HC-SR04+ Ultrasonic Sensor - Used to measure distances
 #
 
+substitutions:
+  # Ultrasonic HC-SR04+ PINs
+  sonar_trigger_pin: GPIO19
+  sonar_echo_pin:    GPIO18
+
+#########################################################################
+
 sensor:
 
   # HC-SR04+ Ultrasonic Sensor - Connected to 5V (with BME280) - 2cm to 450cm. Wide Voltage Operation: 3V-5.5V
