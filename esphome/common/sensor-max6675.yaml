@@ -1,0 +1,49 @@
+#
+https://esphome.io/components/spi
+
+https://esphome.io/components/sensor/max31855
+
+
+
+# Example configuration entry - single controller
+spi:
+  miso_pin: GPIO12
+  clk_pin: GPIO14
+  
+# Example configuration entry - three controllers, one using quad SPI
+spi:
+  - id: spi_bus0
+    clk_pin: GPIOXX
+    mosi_pin: GPIOXX
+    miso_pin: GPIOXX
+    interface: hardware
+  - id: spi_bus1
+    clk_pin: GPIOXX
+    mosi_pin: GPIOXX
+    miso_pin: GPIOXX
+    interface: any
+
+sensor:
+  - platform: max31855
+    name: "Fireplace - Temperature"
+    id: fireplace_temperature
+    cs_pin: GPIO14
+    Accuracy Decimals: 1
+    update_interval: 15s
+
+  - platform: max31855
+    name: "Fireplace - Flue Temperature"
+    cs_pin: GPIO15
+    Accuracy Decimals: 1
+    update_interval: 15s
+
+
+  - platform: template
+    name: "Fireplace - Status"
+    icon: "mdi:fire"
+    lambda: |-
+     if (id(fireplace_temperature).state  > 50)
+      return {"ON"}
+     ;else
+      return {"OFF"};
+    update_interval: 15s  
