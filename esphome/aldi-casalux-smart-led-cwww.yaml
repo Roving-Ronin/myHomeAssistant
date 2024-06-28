@@ -41,7 +41,7 @@ esphome:
           id: downlight
           brightness: 100%
           color_temperature: 6500K
-          color_mode: COLOR_TEMPERATURE
+#          color_mode: COLOR_TEMPERATURE
       - delay: 2.5s
       - light.turn_off:
           id: downlight
@@ -121,7 +121,7 @@ light:
         - light.control:
             id: downlight
             color_temperature: "${default_colour_temperature}"
-            color_mode: COLOR_TEMPERATURE
+#            color_mode: COLOR_TEMPERATURE
 
 #########################################################################
 #
