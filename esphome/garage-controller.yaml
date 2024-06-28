@@ -137,7 +137,7 @@ binary_sensor:
     name: "Garage Door - Sensor (Open)"
     id: garage_door_open_sensor
     disabled_by_default: $disable_by_default
-    # Hides this sensor from ESPHome web interface
+     # Hides this sensor from ESPHome web interface
     internal: true
     filters:
       - delayed_on_off: $debounce_time
@@ -215,7 +215,7 @@ switch:
     name: "Garage Door - Virtual Lock"
     id: virtual_lock
     optimistic: true
-    restore_mode: RESTORE_DEFAULT_ON
+    restore_mode: ALWAYS_ON
 
 #########################################################################
 
