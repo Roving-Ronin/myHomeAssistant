@@ -111,14 +111,7 @@ light:
     warm_white: output_warm_white
     cold_white_color_temperature: 6500 K
     warm_white_color_temperature: 2700 K
-#    gamma_correct: 2.8
-#    default_transition_length: 0.5s
     restore_mode: ${light_restore_mode}
-    on_turn_on: 
-      then:
-        - light.turn_on:
-            id: downlight
-            color_temperature: "${default_colour_temperature}"
 
 #########################################################################
 #
