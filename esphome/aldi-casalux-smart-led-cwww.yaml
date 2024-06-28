@@ -84,17 +84,23 @@ network: !remove
 
 output:
   - platform: libretiny_pwm
-    id: output_cold_white
-    max_power: 100%
-    frequency: ${frequency_cw}
+    id: colour_temp
     pin: P7
-    inverted: True
+#    frequency: ${frequency_cw}
+    
+#  - platform: libretiny_pwm
+#    id: output_cold_white
+#    max_power: 100%
+#    frequency: ${frequency_cw}
+#    pin: P7
+#    inverted: True
 
   - platform: libretiny_pwm
-    id: output_warm_white
+    id: brightness
+#    id: output_warm_white
     pin: P8
     max_power: 100%
-    frequency: ${frequency_ww}
+#    frequency: ${frequency_ww}
 
 #########################################################################
 #
@@ -106,8 +112,10 @@ light:
   - platform: cwww
     name: "Downlight"
     id: downlight
-    cold_white: output_cold_white
-    warm_white: output_warm_white
+    colour_temperature: colour_temp
+    brightness: bright
+#    cold_white: output_cold_white
+#    warm_white: output_warm_white
     cold_white_color_temperature: 6500 K
     warm_white_color_temperature: 2700 K
     gamma_correct: 2.8
