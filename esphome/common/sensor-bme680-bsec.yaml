@@ -80,7 +80,7 @@ sensor:
 
      # Temperature in °C
     temperature:
-      name: "BME680 Temperature"
+      name: "BME680 - Temperature"
       id: bme680_temperature
       sample_rate: lp
       filters:
@@ -88,7 +88,7 @@ sensor:
 
      # Pressure in hPa
     pressure:
-      name: "BME680 Pressure"
+      name: "BME680 - Pressure"
       id: bme680_pressure
       sample_rate: lp
       filters:
@@ -96,7 +96,7 @@ sensor:
 
      # Relative humidity %
     humidity:
-      name: "BME680 Humidity"
+      name: "BME680 - Humidity"
       id: bme680_humidity
       sample_rate: lp
       filters:
@@ -104,33 +104,33 @@ sensor:
 
      # Gas resistance in Ω
     gas_resistance:
-      name: "BME680 Gas Resistance"
+      name: "BME680 - Gas Resistance"
       id: bme680_gas_resistance
       filters:
         - median
 
      # Indoor Air Quality Value
     iaq:
-      name: "BME680 IAQ"
+      name: "BME680 - IAQ"
       id: bme680_iaq
       filters:
         - median
 
      # Indoor Air Quality Accuracy - Numeric value of 0, 1, 2, 3
     iaq_accuracy:
-      name: "BME680 Numeric IAQ Accuracy"
+      name: "BME680 - Numeric IAQ Accuracy"
       id: bme680_numeric_iaq_accuracy
 
      # CO2 equivalent estimate in ppm 
     co2_equivalent:
-      name: "BME680 CO2 Equivalent"
+      name: "BME680 - CO2 Equivalent"
       id: bme680_c02_equivalent
       filters:
         - median
 
      # Volatile organic compounds equivalent estimate in ppm
     breath_voc_equivalent:
-      name: "BME680 Breath VOC Equivalent"
+      name: "BME680 - Breath VOC Equivalent"
       id: bme680_breath_voc_equivalent
       filters:
         - median
@@ -197,7 +197,7 @@ text_sensor:
      # IAQ accuracy as a text value of Stabilizing, Uncertain, Calibrating, Calibrated
   - platform: bme680_bsec
     iaq_accuracy:
-        name: "BME680 IAQ Accuracy"
+        name: "BME680 - IAQ Accuracy"
 
   - platform: template
     name: "BME680 - IAQ Classification"
