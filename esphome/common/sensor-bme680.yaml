@@ -3,6 +3,7 @@
 # Pacakge to configure the use of a device with a BME680 sensor
 # see: https://esphome.io/components/sensor/bme680
 
+  # Provides substitutions or variables that are then called elsewhere multiple times in the config
 substitutions:
    
    # Define i2C bus address, either 0x76 (default) or 0x77 (alternative)
@@ -11,16 +12,31 @@ substitutions:
    # NONE, 1x, 2x, 4x, 8x or 16x (default)
   temp_oversampling_rate: 16x
 
+   # BME 280 / BME680 Sensor
+   # Calibrate the outpute of the temperature sensor.
+  temperature_offset: "0.0"
+   # Calibrate the outpute of the pressure sensor.
+  pressure_offset: "0.0"
+   # Calibrate the outpute of the humidity sensor.
+  humidity_offset: "0.0"  
+
 #########################################################################
 #
 # Configure the i2c bus, to find and operate the BME680 sensor
 #
 
 i2c:
-  sda: $sda_pin
-  scl: $scl_pin
-  scan: true
-  id: bus_a
+  - id: bus_a
+    sda: ${bus_a_sda_pin}
+    scl: ${bus_a_scl_pin}
+    scan: true
+    frequency: ${bus_a_frequency}
+
+  - id: bus_b
+    sda: ${bus_b_sda_pin}
+    scl: ${bus_b_scl_pin}
+    scan: true
+    frequency: ${bus_b_frequency}
 
 #########################################################################
 #
@@ -35,14 +51,23 @@ sensor:
       name: "BME680 - Temperature"
       id: bme680_temperature
       oversampling: ${temp_oversampling_rate}
+      accuracy_decimals: 1
+      filters:
+        offset: ${temperature_offset}
 
     pressure:
       name: "BME680 - Pressure"
       id: bme680_pressure
+      accuracy_decimals: 1
+      filters:
+        offset: ${pressure_offset}      
 
     humidity:
       name: "BME680 - Humidity (Relative)"
       id: bme680_humidity
+      accuracy_decimals: 1
+      filters:
+        offset: ${humidity_offset}
 
     gas_resistance:
       id: "gas_resistance"
