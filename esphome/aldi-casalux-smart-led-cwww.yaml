@@ -35,15 +35,15 @@ substitutions:
 
 esphome:
   # Automation to turn on the light for 2.5 seconds on boot
-on_boot:
-  priority: -10
-  then:
-    - light.turn_on:
-        id: downlight
-        brightness: 100%
-    - delay: 2.5s
-    - light.turn_off:
-        id: downlight
+  on_boot:
+    priority: -10
+    then:
+      - light.turn_on:
+          id: downlight
+          brightness: 100%
+      - delay: 2.5s
+      - light.turn_off:
+          id: downlight
 
 #########################################################################
 #
