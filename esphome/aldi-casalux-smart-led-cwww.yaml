@@ -34,18 +34,16 @@ substitutions:
 ########################## End of Substitutions #########################
 
 esphome:
+  # Automation to turn on the light for 2.5 seconds on boot
   on_boot:
-    priority: 600.0
+    priority: -10
     then:
-      - logger.log: "Boot sequence start"
-      - light.turn_on: 
+      - light.turn_on:
           id: downlight
           brightness: 100%
-          color_temperature: 6500K
       - delay: 2.5s
       - light.turn_off:
           id: downlight
-      - logger.log: "Boot sequence end"
 
 #########################################################################
 #
