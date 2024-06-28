@@ -35,15 +35,15 @@ substitutions:
 
 esphome:
   # Automation to turn on the light for 2.5 seconds on boot
-  on_boot:
-    priority: -10
-    then:
-      - light.turn_on:
-          id: downlight
-          brightness: 100%
-      - delay: 2.5s
-      - light.turn_off:
-          id: downlight
+#  on_boot:
+#    priority: -10
+#    then:
+#      - light.turn_on:
+#          id: downlight
+#          brightness: 100%
+#      - delay: 2.5s
+#      - light.turn_off:
+#          id: downlight
 
 #########################################################################
 #
@@ -110,7 +110,7 @@ light:
     cold_white_color_temperature: 6500 K
     warm_white_color_temperature: 2700 K
     restore_mode: ${light_restore_mode}
-    default_transition_length: 0s
+#    default_transition_length: 0s
 #    on_turn_on:
 #      - light.turn_on:
 #          id: downlight
