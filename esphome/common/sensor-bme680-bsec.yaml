@@ -10,9 +10,12 @@ substitutions:
    # Define the number of measurements the BME680 will take, when updating 
    # NONE, 1x, 2x, 4x, 8x or 16x (default)
   temp_oversampling_rate: "16x"
-   # Temperature offset - If readnigs are 5C too high, set this to 5
-   # This also corrects the relative humidity readings
-  temp_offset: "0"
+   # Temperature offset - If readnigs are 5C too high, set this to 5. This also corrects the relative humidity readings
+  temp_offset: "0.0"
+   # Calibrate the outpute of the pressure sensor.
+  pressure_offset: "0.0"
+   # Calibrate the outpute of the humidity sensor.
+  humidity_offset: "0.0"
    # IAQ calculation mode - Available options:
    # - static (for fixed position devices) - Default
    # - mobile (for on a person or other moveable devices)
@@ -25,7 +28,6 @@ substitutions:
   bme_sample_rate: "ulp"
    # Interval at which to save BSEC state (6h is Default)
   save_bsec_interval: "6h"
-  
 
 #########################################################################
 #
