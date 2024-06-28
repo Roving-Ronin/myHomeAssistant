@@ -34,16 +34,6 @@ substitutions:
 ########################## End of Substitutions #########################
 
 esphome:
-  # Automation to turn on the light for 2.5 seconds on boot
-  on_boot:
-    priority: -10
-    then:
-      - light.turn_on:
-          id: downlight
-          brightness: 100%
-      - delay: 2.5s
-      - light.turn_off:
-          id: downlight
 
 #########################################################################
 #
@@ -66,12 +56,6 @@ packages:
   base-config: !include common/base-configuration.yaml
   wifi-config: !include common/network-wifi.yaml
 
-external_components:
-  - source:
-      type: git
-      url: https://github.com/ssieb/esphome_components
-#    components: [ all ]
-
 #########################################################################
 #
 # Components and sensors defined in base-configuration.yaml that are
@@ -88,17 +72,13 @@ network: !remove
 
 output:
   - platform: libretiny_pwm
-    id: output_cold_white
-    max_power: 100%
-    frequency: ${frequency_cw}
+    id: colour_temp
     pin: P7
     inverted: True
 
   - platform: libretiny_pwm
-    id: output_warm_white
+    id: bright_control
     pin: P8
-    max_power: 100%
-    frequency: ${frequency_ww}
 
 #########################################################################
 #
@@ -110,16 +90,11 @@ light:
   - platform: cwww
     name: "Downlight"
     id: downlight
-    cold_white: output_cold_white
-    warm_white: output_warm_white
+    colour_temperature: colour_temp
+    brightness: bright_control
     cold_white_color_temperature: 6536 K
     warm_white_color_temperature: 2000 K
     restore_mode: ${light_restore_mode}
-    default_transition_length: 1s
-    on_turn_on:
-      - light.turn_on:
-          id: downlight
-          brightness: 100%
 
 #########################################################################
 #
