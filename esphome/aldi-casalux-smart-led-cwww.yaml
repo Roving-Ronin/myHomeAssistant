@@ -87,7 +87,7 @@ output:
 #
 
 light:
-  - platform: cwww
+  - platform: color_temperature
     name: "Downlight"
     id: downlight
     colour_temperature: colour_temp
