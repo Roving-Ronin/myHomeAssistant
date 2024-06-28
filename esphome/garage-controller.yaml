@@ -215,7 +215,6 @@ switch:
     name: "Garage Door - Virtual Lock"
     id: virtual_lock
     optimistic: true
-    restore_state: true
     restore_mode: RESTORE_DEFAULT_ON
 
 #########################################################################
