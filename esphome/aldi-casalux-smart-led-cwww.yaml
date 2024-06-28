@@ -41,6 +41,7 @@ esphome:
       - light.turn_on:
           id: downlight
           brightness: 100%
+          cold_white: 100%
       - delay: 2.5s
       - light.turn_off:
           id: downlight
@@ -115,7 +116,7 @@ light:
       - light.turn_on:
           id: downlight
           brightness: 100%
-          cold_white: 6500K
+          cold_white: 100%
 
 #########################################################################
 #
