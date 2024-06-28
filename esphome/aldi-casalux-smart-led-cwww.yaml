@@ -115,10 +115,9 @@ light:
     restore_mode: ${light_restore_mode}
     on_turn_on: 
       then:
-        - light.control:
+        - light.turn_on:
             id: downlight
             color_temperature: "${default_colour_temperature}"
-            color_mode: COLOR_TEMPERATURE
 
 #########################################################################
 #
