@@ -22,27 +22,27 @@ substitutions:
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
   project_version: "1.0.1"
 
-  # If true, entity should not be added to Home Assistant frontend, without the user manually enabling it.
+   # If true, entity should not be added to Home Assistant frontend, without the user manually enabling it.
   disable_by_default: "false"
 
-  # I2C PINS - Used for BME280 sensor
+   # I2C PINS - Used for BME280 sensor
   sda_pin: GPIO21   # Default on ESP32 is SDA = PIN 21. ES32 S3 use 20
   scl_pin: GPIO22   # Default on ESP32 is SLC = PIN 22. ES32 S3 use 21
 
-  # Ultrasonic HC-SR04+ PINs
+   # Ultrasonic HC-SR04+ PINs
   sonar_trigger_pin: GPIO19
   sonar_echo_pin: GPIO18
 
-  # Garage Door Cover - Time to open or close (1,000ms = 1sec)
+   # Garage Door Cover - Time to open or close (1,000ms = 1sec)
   open_duration: "14000" # ms
   close_duration: "12500" # ms
 
-  # Garage Door Opener (Relay) Switch config
+   # Garage Door Opener (Relay) Switch config
   garage_door_relay_pin: GPIO32 # gpio pin that trigger the door opening/closing/stop
   active_switch_duration: 200ms # amount of time relay is closed
   push_interval: "1500" # safe time between relay activations in ms
 
-  # Reed Switch Sensors
+   # Reed Switch Sensors
   garage_door_open_sensor_pin: GPIO26 # gpio pin for open endstop sensor
   garage_door_closed_sensor_pin: GPIO27 # gpio pin for close endstop sensor
   debounce_time: 30ms # debounce time for open/close endstops
