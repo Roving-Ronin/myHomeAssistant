@@ -112,23 +112,22 @@ light:
   - platform: cwww
     name: "Downlight"
     id: downlight
-    colour_temperature: colour_temp
-    brightness: bright
+#    colour_temperature: colour_temp
 #    cold_white: output_cold_white
 #    warm_white: output_warm_white
     cold_white_color_temperature: 6500 K
     warm_white_color_temperature: 2700 K
-    gamma_correct: 2.8
-    default_transition_length: 0.5s
+#    gamma_correct: 2.8
+#    default_transition_length: 0.5s
     restore_mode: ${light_restore_mode}
      # When enabled, this will prevent white leds being on at the same time as RGB leds.
     constant_brightness: true
      # Reset the light to a predefined state each time it is turned on
-    on_turn_on: 
-      then:
-        - light.control:
-            id: downlight
-            color_temperature: "${default_colour_temperature}"
+#    on_turn_on: 
+#      then:
+#        - light.control:
+#            id: downlight
+#            color_temperature: "${default_colour_temperature}"
 #            color_mode: COLOR_TEMPERATURE
 
 #########################################################################
