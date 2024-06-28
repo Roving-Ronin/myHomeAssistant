@@ -25,9 +25,15 @@ substitutions:
    # If true, entity should not be added to Home Assistant frontend, without the user manually enabling it.
   disable_by_default: "false"
 
-   # I2C PINS - Used for BME280 sensor
-  sda_pin: GPIO21   # Default on ESP32 is SDA = PIN 21. ES32 S3 use 20
-  scl_pin: GPIO22   # Default on ESP32 is SLC = PIN 22. ES32 S3 use 21
+   # I2C PINS - Used for BME280 sensor Bus A
+  bus_a_sda_pin: "GPIO21"      # Default on ESP32 is SDA = PIN 21. ES32-S3 use 20
+  bus_a_scl_pin: "GPIO22"      # Default on ESP32 is SLC = PIN 22. ES32-S3 use 21
+  bus_a_frequency: "100kHz"    # Optional: 100kHz
+
+   # I2C PINS - Used for BME280 sensor Bus B
+  bus_b_sda_pin: "GPIO14"      # Default on ESP32 is SDA = PIN14 ??. ES32-S3 use ??
+  bus_b_scl_pin: "GPIO15"      # Default on ESP32 is SLC = PIN15 ??. ES32-S3 use ??  
+  bus_b_frequency: "100kHz"    # Optional: 100kHz
 
    # Ultrasonic HC-SR04+ PINs
   sonar_trigger_pin: GPIO19
