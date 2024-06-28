@@ -2,13 +2,6 @@
 #
 # Pacakge to configure the use of a device with a BME280 sensor
 #
-substitutions:
-   # Calibrate the outpute of the temperature sensor.
-  temperature_offset: "0.0"
-   # Calibrate the outpute of the pressure sensor.
-  pressure_offset: "0.0"
-   # Calibrate the outpute of the humidity sensor.
-  humidity_offset: "0.0"
 
 
 #########################################################################
