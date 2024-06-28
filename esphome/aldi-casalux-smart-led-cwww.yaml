@@ -66,6 +66,11 @@ packages:
   base-config: !include common/base-configuration.yaml
   wifi-config: !include common/network-wifi.yaml
 
+external_components:
+  - source:
+      type: git
+      url: https://github.com/ssieb/esphome_components
+#    components: [ all ]
 
 #########################################################################
 #
