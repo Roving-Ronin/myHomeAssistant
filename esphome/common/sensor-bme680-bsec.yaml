@@ -11,7 +11,7 @@ substitutions:
    # NONE, 1x, 2x, 4x, 8x or 16x (default)
   temp_oversampling_rate: "16x"
    # Temperature offset - If readnigs are 5C too high, set this to 5. This also corrects the relative humidity readings
-  temp_offset: "0.0"
+  temperature_offset: "0.0"
    # Calibrate the outpute of the pressure sensor.
   pressure_offset: "0.0"
    # Calibrate the outpute of the humidity sensor.
@@ -49,7 +49,7 @@ bme680_bsec:
     # i2c address
     address: ${i2c_address}
     # Temperature offset
-    temperature_offset: ${temp_offset}
+    temperature_offset: ${temperature_offset}
     # IAQ calculation mode
     iaq_mode: ${iaq_calc_mode}
     # Supply voltage
