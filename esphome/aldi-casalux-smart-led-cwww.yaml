@@ -102,7 +102,7 @@ output:
 #
 
 light:
-  - platform: cwww
+  - platform: cwww2
     name: "Downlight"
     id: downlight
     cold_white: output_cold_white
