@@ -8,7 +8,7 @@
   # Provides substitutions or variables that are then called elsewhere multiple times in the config
 substitutions:
    # Default name
-  device_name: "garage-controller"
+  name: "garage-controller"
    # Default friendly name
   friendly_name: "Garage Door Controller"
    # Description as appears in ESPHome & top of webserver page
