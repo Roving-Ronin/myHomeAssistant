@@ -35,6 +35,15 @@ substitutions:
 
 esphome:
 
+  on_boot:
+    priority: 600
+    then:
+      - light.turn_on: 
+          id: downlight
+          brightness: 100%
+          color_temperature: 6500K
+
+
 #########################################################################
 #
 # Defines the bk72xx chip that is a cheaper alternative to an ESP828x
@@ -71,7 +80,7 @@ network: !remove
 #
 
 output:
-  - platform: libretiny_pwm
+  - platform: ledc #libretiny_pwm
     id: colour_temp
     pin: P7
     inverted: True
