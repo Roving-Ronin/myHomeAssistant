@@ -111,10 +111,11 @@ light:
     warm_white_color_temperature: 2700 K
     restore_mode: ${light_restore_mode}
     default_transition_length: 0s
-    color_interlock: true
-    cold_white_level: 100%
-    warm_white_level: 0%
-    color_temperature: 6500 K    
+    on_turn_on:
+      - light.turn_on:
+          id: downlight
+          brightness: 100%
+          color_temperature: 6500 K
 
 #########################################################################
 #
