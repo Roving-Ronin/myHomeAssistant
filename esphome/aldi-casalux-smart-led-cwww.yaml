@@ -115,6 +115,7 @@ light:
       - light.turn_on:
           id: downlight
           brightness: 100%
+          cold_white: 6500K
 
 #########################################################################
 #
