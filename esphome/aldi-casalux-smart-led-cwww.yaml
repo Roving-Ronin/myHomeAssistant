@@ -80,7 +80,7 @@ network: !remove
 #
 
 output:
-  - platform: ledc #libretiny_pwm
+  - platform: libretiny_pwm
     id: colour_temp
     pin: P7
     inverted: True
