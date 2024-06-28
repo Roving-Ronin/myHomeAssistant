@@ -1,11 +1,26 @@
-substitutions:
+#########################################################################
+#
+# Controls the garage door and provides remote status and control, and 
+# environmental monitoring using ESP32-S3 chipset and BME280 sensor(s)
+# for temperature, humidity, pressure & dew point.
+#
+
   # Provides substitutions or variables that are then called elsewhere multiple times in the config
+substitutions:
+   # Default name
   device_name: "garage-controller"
+   # Default friendly name
+  friendly_name: "Garage Door Controller"
+   # Description as appears in ESPHome & top of webserver page
   device_description: "Garage - Door status and remote control, car park occupancy, temperature & humidty"
-  project_name: "esphome.garage"
-  project_version: "1.0"
-  set_timezone: "Australia/Sydney"
-  set_dns_domain: ".iot.home.lan"
+   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc    
+  location: "Garage"
+   # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
+  power_circuit: "GPO 3"  
+   # Project Name
+  project_name: "ESPHome DIY.Garage Controller"
+   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
+  project_version: "1.0.1"
 
   # If true, entity should not be added to Home Assistant frontend, without the user manually enabling it.
   disable_by_default: "false"
@@ -32,17 +47,10 @@ substitutions:
   garage_door_closed_sensor_pin: GPIO27 # gpio pin for close endstop sensor
   debounce_time: 30ms # debounce time for open/close endstops
 
-###############################################################################################  
+########################## End of Substitutions #########################
 
 esphome:
-  name: "garage-controller"
-  friendly_name: Garage Controller
-  comment: "${device_description}"
-  name_add_mac_suffix: false
-  min_version: 2024.6.0
-  project:
-    name: "${project_name}"
-    version: "${project_version}"
+
   on_boot:
     priority: -10
     then:
@@ -67,72 +75,51 @@ esphome:
             // last dir not know, so let cover restore last state
           }
 
-esp32:
-  # Board Type = esp32-s3
-  board: esp32dev
-  framework:
-    type: arduino
+#########################################################################
+#
+# Remote Packages to be utilised
+#
+
+dashboard_import:
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/diy-environmental-monitoring-v1.yaml@main
+  import_full_config: false
 
 packages:
-  baseline: !include common/common.baseline.yaml
-  sensor: !include common/common.sensor.yaml
-#  binary_sensor: !include common/common.binary_sensor.yaml
-  text_sensor: !include common/common.text_sensor.yaml
-  button: !include common/common.button.yaml
-  wifi: !include common/common.wifi.yaml
-  time: !include common/common.time.yaml
+  base-config:     !include common/base-configuration.yaml
+  wifi-config:     !include common/network-wifi.yaml
+  bme280-sensors:  !include common/sensor-bme280.yaml
+  hc-sr04-sensors: !include common/sensor-hc-sr04-ultrasonic.yaml
 
-  # Enable Home Assistant API
-api:
-  encryption:
-    key: !secret api_key
-
-  # Over the Air Firmware Updates
-ota:
-  - platform: esphome
-
-logger:
-  level: WARN        # To filter out all the power meter messages, change to WARN
-  baud_rate: 0
-  logs:
-    component: ERROR # Fix for issue #4717 "Component xxxxxx took a long time for an operation"
-
-wifi:
-  # WiFi credentials
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-
-captive_portal:
-
-button:
-
-
-# ======================================================================================
+#########################################################################
 
 globals:
   - id: last_dir
     type: esphome::cover::CoverOperation
     restore_value: yes
     initial_value: esphome::cover::COVER_OPERATION_IDLE
+  
   - id: target_action
     type: int
     restore_value: no
     initial_value: "3" # Idle: 0, Open: 1, Close: 2, None: 3
+  
   - id: push_interval
     type: int
     restore_value: no
     initial_value: $push_interval
+  
   - id: open_duration
     type: uint32_t
     restore_value: no
     initial_value: $open_duration
+  
   - id: close_duration
     type: uint32_t
     restore_value: no
     initial_value: $close_duration
 
 
-# =========================================
+#########################################################################
 
 binary_sensor:
 
@@ -168,6 +155,7 @@ binary_sensor:
             id(garage_door).current_operation = esphome::cover::COVER_OPERATION_CLOSING;
             id(garage_door).publish_state();
 
+
   # Reed switch used to detect if the garage door is in the CLOSED position
   - platform: gpio
     pin:
@@ -201,7 +189,7 @@ binary_sensor:
             id(garage_door).publish_state();
 
 
-# =========================================
+#########################################################################
 
 switch:
 
@@ -227,79 +215,9 @@ switch:
     restore_mode: RESTORE_DEFAULT_ON
 
 
-# =========================================
-
-i2c:
-  sda: $sda_pin
-  scl: $scl_pin
-  scan: true
-  id: bus_a
-
-# =========================================
+#########################################################################
 
 sensor:
-
-  # BME280 Sensor in I2C Port - Temperature. Connected to 5V (with Ultrasonic).
-  - platform: bme280
-    address: 0x76
-    update_interval: 30s
-
-    # Temperature sensor - defaults to celcius
-    temperature:
-      name: "BME280 - Temperature"
-      id: bme280_temperature
-      accuracy_decimals: 1
-      filters:
-        offset: 0.0
-
-    # Pressure sensor - defaults to hPa
-    pressure:
-      name: "BME280 - Pressure"
-      id: bme280_pressure
-      accuracy_decimals: 1
-
-    # Relative Humidity sensor
-    humidity:
-      name: "BME280 - Humidity (Relative)"
-      id: bme280_humidity
-      accuracy_decimals: 1
-      filters:
-        offset: -3.0      
-
-  # BME280 Sensor in I2C Port - Absolute Humidity
-  - platform: absolute_humidity
-    name: "BME280 - Humidity (Absolute)"
-    state_class: 'measurement'
-    accuracy_decimals: 1
-    temperature: bme280_temperature
-    humidity: bme280_humidity
-    equation: Wobus   # Wobus (Default), optional Tetens or Buck
-
-  # BME280 Sensor in I2C Port - Dew Point
-  - platform: template
-    name: "BME280 - Dew Point"
-    state_class: 'measurement'
-    accuracy_decimals: 1
-    lambda: |-
-      return (243.5*(log(id(bme280_humidity).state/100)+((17.67*id(bme280_temperature).state)/
-      (243.5+id(bme280_temperature).state)))/(17.67-log(id(bme280_humidity).state/100)-
-      ((17.67*id(bme280_temperature).state)/(243.5+id(bme280_temperature).state))));
-    unit_of_measurement: °C
-    icon: 'mdi:thermometer-alert'
-    filters:
-      - filter_out: nan
-
-  # BME280 Sensor in I2C Port - Equivalent Sea Level Pressure (based on 655m Goulburn North)
-  - platform: template
-    name: "BME280 - Pressure (Equivalent Sea Level)"
-    state_class: 'measurement'
-    accuracy_decimals: 1
-    lambda: |-
-      const float STANDARD_ALTITUDE = 656; // in meters, see note
-      return id(bme280_pressure).state / powf(1 - ((0.0065 * STANDARD_ALTITUDE) /
-        (id(bme280_temperature).state + (0.0065 * STANDARD_ALTITUDE) + 273.15)), 5.257); // in hPa
-    update_interval: 15s
-    unit_of_measurement: 'hPa'
 
   # HC-SR04+ Ultrasonic Sensor - Connected to 5V (with BME280) - 2cm to 450cm. Wide Voltage Operation: 3V-5.5V
   - platform: ultrasonic
@@ -319,7 +237,7 @@ sensor:
     # Hides this sensor from ESPHome web interface
 #    internal: true
 
-# =========================================
+#########################################################################
 
 text_sensor:
   - platform: template
@@ -359,7 +277,7 @@ text_sensor:
     update_interval: 30s
 
 
-# =========================================
+#########################################################################
 
 cover:
   - platform: template
