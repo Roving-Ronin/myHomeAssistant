@@ -99,7 +99,7 @@ light:
   - platform: color_temperature
     name: "Downlight"
     id: downlight
-    colour_temperature: colour_temp
+    color_temperature: colour_temp
     brightness: bright_control
     cold_white_color_temperature: 6536 K
     warm_white_color_temperature: 2000 K
