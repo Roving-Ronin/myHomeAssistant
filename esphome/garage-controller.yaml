@@ -338,8 +338,7 @@ cover:
         id(target_action) = 3;
       }
       return {};
-
-     open_action:
+    open_action:
         - if:
             condition:
               - and:
@@ -355,7 +354,6 @@ cover:
                   {
                     id(target_action) = COVER_OPERATION_OPENING;
                   }
-    
     close_action:
       - if:
           condition:
@@ -372,7 +370,6 @@ cover:
                   {
                     id(target_action) = COVER_OPERATION_CLOSING;
                   }
-
     stop_action:
       - if:
           condition:
