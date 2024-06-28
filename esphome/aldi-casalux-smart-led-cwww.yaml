@@ -107,7 +107,7 @@ output:
 #
 
 light:
-  - platform: cwww2
+  - platform: cwww
     name: "Downlight"
     id: downlight
     cold_white: output_cold_white
@@ -115,11 +115,11 @@ light:
     cold_white_color_temperature: 6536 K
     warm_white_color_temperature: 2000 K
     restore_mode: ${light_restore_mode}
-#    default_transition_length: 0s
-#    on_turn_on:
-#      - light.turn_on:
-#          id: downlight
-#          brightness: 100%
+    default_transition_length: 1s
+    on_turn_on:
+      - light.turn_on:
+          id: downlight
+          brightness: 100%
 
 #########################################################################
 #
