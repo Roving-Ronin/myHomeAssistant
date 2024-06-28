@@ -81,7 +81,7 @@ esphome:
 #
 
 dashboard_import:
-  package_import_url: github://roving-ronin/myhomeassistant/esphome/diy-environmental-monitoring-v1.yaml@main
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/garage-controller.yaml@main
   import_full_config: false
 
 packages:
@@ -117,7 +117,6 @@ globals:
     type: uint32_t
     restore_value: no
     initial_value: $close_duration
-
 
 #########################################################################
 
@@ -188,7 +187,6 @@ binary_sensor:
             id(garage_door).current_operation = esphome::cover::COVER_OPERATION_OPENING;
             id(garage_door).publish_state();
 
-
 #########################################################################
 
 switch:
@@ -213,7 +211,6 @@ switch:
     optimistic: true
     restore_state: true
     restore_mode: RESTORE_DEFAULT_ON
-
 
 #########################################################################
 
@@ -261,7 +258,6 @@ text_sensor:
         return {"Unknown"};  
       }
     update_interval: 30s
-
 
     # Use the distance under the ultrasonic sensor to determine if the parking space is occupied or empty
   - platform: template
