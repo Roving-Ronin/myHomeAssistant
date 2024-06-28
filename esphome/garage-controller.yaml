@@ -123,7 +123,7 @@ globals:
 
 binary_sensor:
 
-  # Reed switch used to detect if the garage door is in the OPEN position
+     # Reed switch used to detect if the garage door is in the OPEN position
   - platform: gpio
     pin:
       number: $garage_door_open_sensor_pin
@@ -147,7 +147,7 @@ binary_sensor:
             id(last_dir) = esphome::cover::COVER_OPERATION_OPENING;
             id(garage_door).publish_state();
     on_release:
-      # Door was commanded manually (not ESPhome)
+       # Door was commanded manually (not ESPhome)
       then:
         - lambda: |-          
             // set state as closing. This will start position update and reporting
@@ -156,7 +156,7 @@ binary_sensor:
             id(garage_door).publish_state();
 
 
-  # Reed switch used to detect if the garage door is in the CLOSED position
+     # Reed switch used to detect if the garage door is in the CLOSED position
   - platform: gpio
     pin:
       number: $garage_door_closed_sensor_pin
@@ -180,7 +180,7 @@ binary_sensor:
             id(last_dir) = esphome::cover::COVER_OPERATION_CLOSING;
             id(garage_door).publish_state();
     on_release:
-      # door was commanded manually (not ESPhome)
+       # door was commanded manually (not ESPhome)
       then:
         - lambda: |-
             // set state as opening. This will start position update and reporting
@@ -193,7 +193,7 @@ binary_sensor:
 
 switch:
 
-  # Relay with wire to garage door motor/opener, to send open/close signal
+     # Relay with wire to garage door motor/opener, to send open/close signal
   - platform: gpio
     pin: $garage_door_relay_pin
     name: "Garage Door - Relay"
@@ -206,7 +206,7 @@ switch:
       - delay: $active_switch_duration
       - switch.turn_off: garage_door_relay
 
-  # Virtual lock, if enabled will stop the garage door (via relay) from being triggered to open/close
+     # Virtual lock, if enabled will stop the garage door (via relay) from being triggered to open/close
   - platform: template
     name: "Garage Door - Virtual Lock"
     id: virtual_lock
@@ -232,14 +232,15 @@ sensor:
 #    pulse_time: 20us
     filters:
       - filter_out: nan
-    # Maximum distance reading possible. Enter distance from sensor to floor.
+      # Maximum distance reading possible. Enter distance from sensor to floor.
     timeout: 3.0m
-    # Hides this sensor from ESPHome web interface
+      # Hides this sensor from ESPHome web interface
 #    internal: true
 
 #########################################################################
 
 text_sensor:
+
   - platform: template
     name: "Garage - State"
     id: garage_state
@@ -261,6 +262,7 @@ text_sensor:
       }
     update_interval: 30s
 
+
     # Use the distance under the ultrasonic sensor to determine if the parking space is occupied or empty
   - platform: template
     name: "Garage - Parking Space"
@@ -276,10 +278,10 @@ text_sensor:
       }
     update_interval: 30s
 
-
 #########################################################################
 
 cover:
+
   - platform: template
     name: Garage Door
     id: garage_door
@@ -341,8 +343,7 @@ cover:
       }
       return {};
 
- 
-    open_action:
+     open_action:
         - if:
             condition:
               - and:
@@ -358,6 +359,7 @@ cover:
                   {
                     id(target_action) = COVER_OPERATION_OPENING;
                   }
+    
     close_action:
       - if:
           condition:
@@ -374,6 +376,7 @@ cover:
                   {
                     id(target_action) = COVER_OPERATION_CLOSING;
                   }
+
     stop_action:
       - if:
           condition:
@@ -391,6 +394,9 @@ cover:
                   {
                     id(target_action) = COVER_OPERATION_IDLE;
                   }
+
+#########################################################################
+
 script:
   - id: push_one
     mode: single
@@ -419,3 +425,5 @@ script:
             }
           }
           id(garage_door).publish_state();
+
+#########################################################################
