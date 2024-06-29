@@ -129,8 +129,8 @@ sensor:
       return id(total_energy);
    
   - platform: total_daily_energy
-    name: "Energy Daily"
-    id: energy_total_daily
+    name: "Energy Today"
+    id: energy_total_today
     restore: true
     power_id: active_power
     unit_of_measurement: kWh
