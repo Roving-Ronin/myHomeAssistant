@@ -52,8 +52,8 @@ esphome:
 # Defines the bk72xx chip that is a cheaper alternative to an ESP828x
 #
 
-#bk72xx:
-#  board: generic-bk7231t-qfn32-tuya
+bk72xx:
+  board: generic-bk7231t-qfn32-tuya
 
 #########################################################################
 #
