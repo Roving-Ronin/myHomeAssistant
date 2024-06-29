@@ -93,8 +93,8 @@ dashboard_import:
 packages:
   base-config:     !include common/base-configuration.yaml
   wifi-config:     !include common/network-wifi.yaml
-  bme280-sensors:  !include common/sensor-bme280.yaml
-  hc-sr04-sensors: !include common/sensor-hc-sr04-ultrasonic.yaml
+  bme280-sensors:  !include sensors/bme280.yaml
+  hc-sr04-sensors: !include sensors/hc-sr04-ultrasonic.yaml
 
 #########################################################################
 
