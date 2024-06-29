@@ -1,0 +1,231 @@
+#########################################################################
+#
+# Pacakge to configure the use of a device with a BME680 sensor
+# see: https://esphome.io/components/sensor/bme680_bsec
+
+substitutions:
+   
+   # Define i2C bus address, either 0x76 (default) or 0x77 (alternative)
+  i2c_address: "0x76"
+   # Define the number of measurements the BME680 will take, when updating 
+   # NONE, 1x, 2x, 4x, 8x or 16x (default)
+  temp_oversampling_rate: "16x"
+   # Temperature offset - If readnigs are 5C too high, set this to 5. This also corrects the relative humidity readings
+  temperature_offset: "0.0"
+   # Calibrate the outpute of the pressure sensor.
+  pressure_offset: "0.0"
+   # Calibrate the outpute of the humidity sensor.
+  humidity_offset: "0.0"
+   # IAQ calculation mode - Available options:
+   # - static (for fixed position devices) - Default
+   # - mobile (for on a person or other moveable devices)
+  iaq_calc_mode: "static"
+   # BME680 Supply Voltage. Options - 3.3V (Default) or 1.8V
+  bme_voltage: "3.3V"
+   # BME680 Sampling Rate:  
+    # - lp (low power - samples every 3 seconds) - Default
+    # - ulp (ultra-low power - samples every 5 minutes)
+  bme_sample_rate: "ulp"
+   # Interval at which to save BSEC state (6h is Default)
+  save_bsec_interval: "6h"
+
+#########################################################################
+#
+# i2c Hardware configuration and Bosch Sensortec Environmental Cluster 
+# (BSEC) software library enabling.
+#
+
+ # Configure the i2c bus, to find and operate the BME680 sensor
+i2c:
+  - id: bus_a
+    sda: ${bus_a_sda_pin}
+    scl: ${bus_a_scl_pin}
+    scan: true
+    frequency: ${bus_a_frequency}
+
+  - id: bus_b
+    sda: ${bus_b_sda_pin}
+    scl: ${bus_b_scl_pin}
+    scan: true
+    frequency: ${bus_b_frequency}
+
+#########################################################################
+
+ # Configure the BSEC component
+bme680_bsec:
+    # Component ID - useful when working with multiple devices.
+    id: bme680_internal
+    # i2c address
+    address: ${i2c_address}
+    # Temperature offset
+    temperature_offset: ${temperature_offset}
+    # IAQ calculation mode
+    iaq_mode: ${iaq_calc_mode}
+    # Supply voltage
+    supply_voltage: ${bme_voltage}
+    # Sample rate
+    sample_rate: ${bme_sample_rate}
+    # Interval at which to save BSEC state
+    state_save_interval: ${save_bsec_interval}
+
+#########################################################################
+#
+# Sensors - Specific to the BME680 sensor.
+#
+
+sensor:
+     # Bosch Sensortec Environmental Cluster
+  - platform: bme680_bsec
+    bme680_bsec_id: bme680_internal
+
+     # Temperature in °C
+    temperature:
+      name: "BME680 - Temperature"
+      id: bme680_temperature
+      sample_rate: lp
+      filters:
+        - median
+
+     # Pressure in hPa
+    pressure:
+      name: "BME680 - Pressure"
+      id: bme680_pressure
+      sample_rate: lp
+      filters:
+        - median
+
+     # Relative humidity %
+    humidity:
+      name: "BME680 - Humidity"
+      id: bme680_humidity
+      sample_rate: lp
+      filters:
+        - median      
+
+     # Gas resistance in Ω
+    gas_resistance:
+      name: "BME680 - Gas Resistance"
+      id: bme680_gas_resistance
+      filters:
+        - median
+
+     # Indoor Air Quality Value
+    iaq:
+      name: "BME680 - IAQ"
+      id: bme680_iaq
+      filters:
+        - median
+
+     # Indoor Air Quality Accuracy - Numeric value of 0, 1, 2, 3
+    iaq_accuracy:
+      name: "BME680 - Numeric IAQ Accuracy"
+      id: bme680_numeric_iaq_accuracy
+
+     # CO2 equivalent estimate in ppm 
+    co2_equivalent:
+      name: "BME680 - CO2 Equivalent"
+      id: bme680_c02_equivalent
+      filters:
+        - median
+
+     # Volatile organic compounds equivalent estimate in ppm
+    breath_voc_equivalent:
+      name: "BME680 - Breath VOC Equivalent"
+      id: bme680_breath_voc_equivalent
+      filters:
+        - median
+
+#########################################################################
+
+   # BME680 Sensor in I2C Port - Absolute Humidity
+  - platform: absolute_humidity
+    name: "BME680 - Humidity (Absolute)"
+    temperature: bme680_temperature
+    humidity: bme680_humidity
+    equation: Wobus   # Wobus (Default), optional Tetens or Buck
+
+   # BME680 Sensor in I2C Port - Dew Point
+  - platform: template
+    name: "BME680 - Dew Point"
+    unit_of_measurement: °C
+    icon: 'mdi:thermometer-alert'    
+    lambda: |-
+      return (243.5*(log(id(bme680_humidity).state/100)+((17.67*id(bme680_temperature).state)/
+      (243.5+id(bme680_temperature).state)))/(17.67-log(id(bme680_humidity).state/100)-
+      ((17.67*id(bme680_temperature).state)/(243.5+id(bme680_temperature).state))));
+
+
+   # BME680 Sensor in I2C Port - Equivalent Sea Level Pressure 
+   # Note: This is based on 655m for Goulburn North, NSW. Australia. Update for a different location.
+  - platform: template
+    name: "BME680 - Equivalent Sea Level Pressure"
+    unit_of_measurement: 'hPa'    
+    lambda: |-
+      const float STANDARD_ALTITUDE = 656; // in meters, see note
+      return id(bme680_pressure).state / powf(1 - ((0.0065 * STANDARD_ALTITUDE) /
+        (id(bme680_temperature).state + (0.0065 * STANDARD_ALTITUDE) + 273.15)), 5.257); // in hPa
+    update_interval: 15s
+
+   # Note: Only Altitude OR Equivalent Sea Level Pressure can be run at one time, not both.
+#  - platform: template
+#    name: "BME680 - Altitude"
+#    unit_of_measurement: 'm'
+#    icon: 'mdi:signal'
+#    lambda: |-
+#      const float STANDARD_SEA_LEVEL_PRESSURE = 1014.1; //in hPa, see note
+#      return ((id(bme680_temperature).state + 273.15) / 0.0065) *
+#        (powf((STANDARD_SEA_LEVEL_PRESSURE / id(bme680_pressure).state), 0.190234) - 1); // in meter
+#    update_interval: 15s
+
+  - platform: template
+    name: "BME680 - Indoor Air Quality"
+    id: bme680_iaq
+    icon: "mdi:gauge"
+     # Calculation: comp_gas = log(R_gas[ohm]) + 0.04 log(Ohm)/%rh * hum[%rh]
+    lambda: |-
+      return log(id(gas_resistance).state) + 0.04 *  id(bme680_humidity).state;
+    state_class: "measurement"
+
+
+#########################################################################
+#
+# Text Sensors - Specific to the BME680 sensor.
+#
+
+text_sensor:
+
+     # IAQ accuracy as a text value of Stabilizing, Uncertain, Calibrating, Calibrated
+  - platform: bme680_bsec
+    iaq_accuracy:
+        name: "BME680 - IAQ Accuracy"
+
+  - platform: template
+    name: "BME680 - IAQ Classification"
+    icon: "mdi:checkbox-marked-circle-outline"
+    lambda: |-
+      if (int(id(bme680_iaq).state) <= 50) {
+        return {"Excellent"};
+      }
+      else if (int(id(bme680_iaq).state) <= 100) {
+        return {"Good"};
+      }
+      else if (int(id(bme680_iaq).state) <= 150) {
+        return {"Lightly polluted"};
+      }
+      else if (int(id(bme680_iaq).state) <= 200) {
+        return {"Moderately polluted"};
+      }
+      else if (int(id(bme680_iaq).state) <= 250) {
+        return {"Heavily polluted"};
+      }
+      else if (int(id(bme680_iaq).state) <= 350) {
+        return {"Severely polluted"};
+      }
+      else if (int(id(bme680_iaq).state) <= 500) {
+        return {"Extremely polluted"};
+      }
+      else {
+        return {"unknown"};
+      }
+
+#########################################################################

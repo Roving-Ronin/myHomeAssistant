@@ -1,0 +1,18 @@
+# See: https://esphome.io/components/sensor/mics_4514.html
+
+# Example configuration entry
+sensor:
+  - platform: mics_4514
+    nitrogen_dioxide:
+      name: Nitrogen Dioxide
+    carbon_monoxide:
+      name: Carbon Monoxide
+    hydrogen:
+      name: Hydrogen
+    ethanol:
+      name: Ethanol
+    methane:
+      name: Methane
+    ammonia:
+      name: Ammonia
+    update_interval: 60s

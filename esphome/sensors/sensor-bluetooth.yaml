@@ -1,0 +1,14 @@
+#########################################################################
+#
+# Configuration to add Bluetooth Proxy/Tracker and Sensors
+#
+
+esp32_ble_tracker:
+  scan_parameters:
+# Adjust timing if the defaults do not work in your environment
+    interval: 1100ms
+    window: 1100ms
+    active: true
+
+bluetooth_proxy:
+  active: true
