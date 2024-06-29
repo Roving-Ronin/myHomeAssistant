@@ -1,0 +1,31 @@
+#########################################################################
+#
+# HC-SR04+ Ultrasonic Sensor - Used to measure distances
+#
+
+substitutions:
+  # Ultrasonic HC-SR04+ PINs
+  sonar_trigger_pin: GPIO19
+  sonar_echo_pin:    GPIO18
+
+#########################################################################
+
+sensor:
+
+  # HC-SR04+ Ultrasonic Sensor - Connected to 5V (with BME280) - 2cm to 450cm. Wide Voltage Operation: 3V-5.5V
+  - platform: ultrasonic
+    name: "Garage - Parking Sonar"
+    id: garage_ultrasonic_sensor
+    disabled_by_default: $disable_by_default
+    state_class: 'measurement'
+#    unit_of_measurement: cm  # Default is meters. If using cm then lambdas need to be changed to reflect
+    trigger_pin: $sonar_trigger_pin
+    echo_pin: $sonar_echo_pin
+    update_interval: 30s
+#    pulse_time: 20us
+    filters:
+      - filter_out: nan
+    # Maximum distance reading possible. Enter distance from sensor to floor.
+    timeout: 3.0m
+    # Hides this sensor from ESPHome web interface
+#    internal: true
