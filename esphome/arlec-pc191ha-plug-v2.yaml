@@ -217,7 +217,7 @@ sensor:
      # Shows the Energy kWh for the current day
   - platform: total_daily_energy
     name: "Energy Today"
-    id: energy_total_daily
+    id: energy_total_today
     restore: true
     power_id: active_power
     unit_of_measurement: kWh
