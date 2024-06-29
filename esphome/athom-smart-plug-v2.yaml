@@ -55,7 +55,7 @@ dashboard_import:
 packages:
   base-config:         !include common/base-configuration.yaml
   wifi-config:         !include common/network-wifi.yaml
-  athom-power-sensors: !include common/sensor-athom-power-plug.yaml
+  athom-power-sensors: !include sensors/athom-power-plugs.yaml
 
 #####################################################################
 #
