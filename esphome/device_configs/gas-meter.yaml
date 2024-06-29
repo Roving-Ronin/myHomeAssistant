@@ -1,0 +1,189 @@
+  #  Go to HA Developer Tools --> Services and select the 'Utility Meter: Calibrate' and sensor 
+  #  'Gas Consumed Quarterly mj Total'and enter your physical meter reading after subtracting the
+  #  last meter reading from your last bill. Remeber to use use the m3 with your retailers correction factor applied
+  #
+  #  v1.2 - Remove friendly name prefix from all sensors, as 2023.2.5 adds this prefix with HA by default
+  #  v1.3 - Moved to using common settings stored in common files, and pulling these from GitHub
+
+substitutions:
+  # Provides substitutions or variables that are then called elsewhere multiple times in the config
+  device_name: gas-meter
+  device_description: "Measure the household gas consumption, on Elster 750 meter"
+  project_name: "esphome.gas-meter"
+  project_version: "1.3"
+  set_timezone: "Australia/Sydney"
+  set_dns_domain: ".iot.home.lan"
+  disable_entities: "false"
+
+esphome:
+  #  Configures these settings to use the substituions defined below
+  name: "${device_name}"
+  friendly_name: "Gas Meter"
+  comment: "${device_description}"
+  name_add_mac_suffix: false
+  min_version: 2024.6.0
+  project:
+    name: "${project_name}"
+    version: "${project_version}"
+
+# Choose the right Platform
+# esp32: https://esphome.io/components/esp32.html
+# esp8266: https://esphome.io/components/esp8266.html
+esp8266:
+  # Define the type of ESP8266 board being used
+  board: esp01_1m
+  # Enables the ESP to restore the 'pulse count' used to record the 'Reading Total' sensor. Not required for ESP32.
+  restore_from_flash: true
+
+preferences:
+  # Enable to allow storing of 'Read Total' between reboots and flashing.
+  flash_write_interval: 5min
+
+packages:
+  baseline: !include common/common.baseline.yaml
+  sensor: !include common/common.sensor.yaml
+  binary_sensor: !include common/common.binary_sensor.yaml
+  text_sensor: !include common/common.text_sensor.yaml
+  button: !include common/common.button.yaml
+  wifi: !include common/common.wifi.yaml
+  time: !include common/common.time.yaml
+
+captive_portal:
+  #  Enables the fall back WiFi hotspot and ability to connect and recover the device.
+  #  See: https://esphome.io/components/captive_portal.html
+
+wifi:
+  # WiFi credentials
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+api:
+  # Enable encryption with Home Assistant API
+  encryption:
+    key: "YamQPfQvLIPBEtRZTRA5u7+QajSe+oFWyQZwcOqp13A="
+  # Define service that calls the 'button:' defined below to reset the (current) Reading'
+  services:
+    - service: reset_total_energy
+      then:
+        - button.press:
+            id: button_reset_reading
+
+ota:
+  - platform: esphome
+
+logger:
+  level: WARN        # To filter out all the power meter messages, change to WARN
+  baud_rate: 0
+  logs:
+    component: ERROR # Fix for issue #4717 "Component xxxxxx took a long time for an operation"
+
+button:
+
+  #  Reset the total energy entity (Gas Meter - Reading)
+  - platform: template
+    name: 'Reset Reading'
+    entity_category: diagnostic
+    id: button_reset_reading
+    on_press:
+      - pulse_meter.set_total_pulses:
+          id: sensor_gas_flow_rate
+          value: 0
+
+globals:
+  #  Globals for use with pulse meter, to allow storing and setting a base reading
+  - id: total_m3
+    type: float
+    restore_value: yes
+#  initial_value: "0"
+
+binary_sensor:
+
+
+text_sensor:
+
+
+sensor:
+############ DEVICE SPECIFIC SETTINGS ############
+
+  #  Gas pulse meter on GPIO 5 & 0.01m3 (10L) increments
+  - platform: pulse_meter
+    name: 'Gas Flow Rate'
+    id: "sensor_gas_flow_rate"
+    unit_of_measurement: "m³/h"
+    state_class: measurement
+    device_class: gas
+    icon: "mdi:pump"
+    accuracy_decimals: 2
+    pin:
+      number: 5
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    internal_filter_mode: PULSE
+    internal_filter: 2s
+    timeout: 5min
+    filters:
+      - multiply: 1.0
+    #  Uses the above pulse_meter and adds sensor and calculations for tracking m3
+    total:    
+      name: 'Gas Reading'
+      id: sensor_gas_reading
+      unit_of_measurement: "m³"
+      icon: "mdi:counter"
+      state_class: "total_increasing"
+      device_class: gas
+      accuracy_decimals: 2
+      filters:
+        - multiply: 0.01
+    #  Adds the calculation for 'Reading Total' 
+      on_value: 
+        then:
+          - lambda: |-
+              static float previous_m3_value = 0.0;
+              float current_m3_value = id(sensor_gas_reading).state;
+              id(total_m3) += current_m3_value - previous_m3_value;
+              previous_m3_value = current_m3_value;
+
+  #  Adds the 'Reading Total' that tracks the LIFETIME total of m3
+  - platform: template
+    name: "Gas Reading Total"
+    id: sensor_gas_reading_total
+    unit_of_measurement: "m³"
+    device_class: gas
+    state_class: "total_increasing"
+    icon: "mdi:counter"
+    accuracy_decimals: 2
+    # The number 5251.07 should be replaced with your own gas meters physical reading
+    lambda: |-
+          return (id(total_m3) + 5387.73);
+    # Set interval that updates are sent to HA instance
+    update_interval: 15s
+    filters:
+      - delta : 0.001
+
+
+#  - platform: template
+#    name: "Gas Meter Reading - Adjusted"
+#    id: gas_meter_reading_m3_adjusted
+#    unit_of_measurement: "m³"
+#    device_class: gas
+#    state_class: "total_increasing"
+#    icon: "mdi:meter-gas-outline"
+#    accuracy_decimals: 5
+    # 0.9775 is the correction factor used by the gas retailer, that is applied to the physical meter reading
+#    lambda: |-
+#          return (id(sensor_gas_reading).state * 0.9775);
+
+
+#  - platform: template
+#    name: "Gas Meter Reading - MJ"
+#    id: gas_meter_reading_mj
+#    unit_of_measurement: "MJ"
+#    device_class: energy
+#    state_class: "total_increasing"
+#    icon: "mdi:meter-gas-outline"
+#    accuracy_decimals: 5
+#    # 38.29 is the multiplier factor used by the gas retailer, to convert from 'm3 adjusted' to megajoules of energy (MJ)
+#    lambda: |-
+#          return (id(gas_meter_reading_m3_adjusted).state * 38.29);
