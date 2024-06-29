@@ -37,12 +37,6 @@ substitutions:
 # Defines the type of ESP chip used on the device
 #
 
-esphome:
-  platformio_options:
-    board_build.mcu: esp32c3
-    board_build.variant: esp32c3
-    board_build.flash_mode: dio
-
 esp32:
   board: esp32-c3-devkitm-1
   flash_size: 4MB
@@ -50,6 +44,13 @@ esp32:
   framework:
     type: arduino
     version: recommended
+    
+
+esphome:
+  platformio_options:
+    board_build.mcu: esp32c3
+    board_build.variant: esp32c3
+    board_build.flash_mode: dio
 
 #########################################################################
 #
