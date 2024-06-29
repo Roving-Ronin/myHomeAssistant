@@ -116,7 +116,7 @@ sensor:
 
 #########################################################################
 
-    # Shows the TOTAL/Lifetime Energy kWh used by the device, may reset to zero upon firmware updates
+    # Shows the TOTAL/Lifetime Energy kWh used by the device, will be reset to zero upon firmware updates though.
   - platform: template
     name: "Energy Total"
     id: energy_total_sensor
