@@ -5,10 +5,14 @@
 
 substitutions:
   # Provides substitutions or variables that are then called elsewhere multiple times in the config
-  device_name: "kc868-1"
-  device_description: "Kincony KC868-A16 with 16 I/O and RS485 support"
+  name: "kc868-a16"
+  device_description: "Kincony KC868-A16 Smart Controller with 16 I/O and RS485 support"
+  
+  
   project_name: "Kincony.KC868-A16"
-  project_version: "0.5"
+  project_version: "1.0.0"
+  
+  
   timezone: "Australia/Sydney"
   # Set the duration between the sntp service polling ntp.org servers for an update
   sntp_update_interval: 6h
@@ -18,10 +22,10 @@ substitutions:
 
 esphome:
   #  Configures these settings to use the substituions defined below
-  name: "${device_name}"
+  name: "${name}"
   friendly_name: "Kincony KC868-A16"
   comment: "${device_description}"
-  area: "Monitoring - ESPHome"
+  area: "${location}"
   name_add_mac_suffix: false
   min_version: 2024.6.0
   project:
