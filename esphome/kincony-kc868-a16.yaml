@@ -42,29 +42,21 @@ packages:
 #  ethernet-config: !include common/network-ethernet.yaml
   bme280-sensors:  !include sensors/bme280.yaml
 
+# ADD GAS AND WATER SENSORS
+
 #########################################################################
+#
+# Sun Azimuth and Elevation for Home Address
+#
 
-
-
-packages:
-  baseline: !include common/common.baseline.yaml
-  sensor: !include common/common.sensor.yaml
-  binary_sensor: !include common/common.binary_sensor.yaml
-  text_sensor: !include common/common.text_sensor.yaml
-  button: !include common/common.button.yaml
-  wifi: !include common/common.wifi.yaml
-  time: !include common/common.time.yaml
-
-  # Sun Azimuth and Elevation for Home Address
 sun:
   latitude: -34.726460°
   longitude: 149.724503°
   id: sun_home
 
+#########################################################################
   # Enable Home Assistant API
 api:
-  encryption:
-    key: !secret api_key  
   # Define service that calls the 'button:' defined below to reset the Gas Meter - Current Reading'
   services:
     - service: reset_total_energy
@@ -78,16 +70,7 @@ api:
         - button.press:
             id: button_reset_water_reading_current
 
-
-  # Over the Air Firmware Updates
-ota:
-  - platform: esphome
-
-logger:
-  level: INFO        # To filter out all the power meter messages, change to WARN
-  baud_rate: 0
-  logs:
-    component: ERROR # Fix for issue #4717 "Component xxxxxx took a long time for an operation"
+#########################################################################
 
 button:
   #  Reset the total energy entity (Gas Meter - Current Reading)
