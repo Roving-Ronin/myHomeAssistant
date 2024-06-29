@@ -22,10 +22,10 @@ substitutions:
 # Must be in the local devices configuration file.
 #
 
-# esp32:
-#   board: esp32dev
-#   framework:
-#     type: arduino
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
 
 #########################################################################
 #
