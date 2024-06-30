@@ -284,16 +284,18 @@ switch:
 #        - output.turn_off: button_led
         - light.turn_off: button_led
 
- # The backlight in the socket on/off button. Replaced below with 'light:'
-output:        
-  - platform: gpio
-    pin: P26
-    restore_mode: always off   # default when power is turned on
+  # The backlight in the socket on/off button. Replaced below with 'light:'
+#output:        
+#  - platform: gpio
+#    id: button_led
+#    pin: P26
+#    restore_mode: always off   # default when power is turned on
 
 light:
   - platform: status_led
     name: "GPO Status LED"
     id: button_led
+   restore_mode: restore_and_off
     disabled_by_default: true
     pin:
       number: GPIO26
