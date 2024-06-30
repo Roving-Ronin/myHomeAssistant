@@ -113,7 +113,7 @@ binary_sensor:
     name: "Power Button"
     id: power_button
     disabled_by_default: true
-    device_class: window
+    device_class: power
      # when button is pressed, toggle the switch on/off
     on_press:
       then:
@@ -277,11 +277,9 @@ switch:
      # synchronise the LED with the relay
     on_turn_on:
       then:
-#        - output.turn_on: button_led
         - light.turn_on: button_led
     on_turn_off:
       then:
-#        - output.turn_off: button_led
         - light.turn_off: button_led
 
 light:
