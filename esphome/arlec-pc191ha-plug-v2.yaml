@@ -71,6 +71,17 @@ packages:
  # Remove Network section (IPv6), as not supported on this chipset
 network: !remove
 
+#####################################################################
+#
+# External Components
+#
+
+# Dentra Components - Adds 'Platform - Energy Statistics'
+
+# https://github.com/dentra/esphome-components/tree/master/components/energy_statistics
+external_components:
+  - source: github://dentra/esphome-components
+
 #########################################################################
 #
 # Used to store the Total kWh used (lifetime) between reboots
@@ -227,6 +238,29 @@ sensor:
       - multiply: 0.001
     icon: mdi:hours-24
 
+#####################################################################
+#
+# Function added by the Dentra Components
+#
+
+     # Dentra Components - Define the id of the sensor tracking 'Total Energy' used
+  - platform: "energy_statistics"
+    total: energy_total_sensor
+
+     # Dentra Components - Adds Energy Yesterday
+    energy_yesterday:
+      name: "Energy Yesterday"
+      accuracy_decimals: 3
+
+     # Dentra Components - Adds Energy Week
+    energy_week:
+      name: "Energy Week"
+      accuracy_decimals: 3
+
+     # Dentra Components - Adds Energy Month
+    energy_month:
+      name: "Energy Month"
+      accuracy_decimals: 3
 
 #########################################################################
 # PC191HA basic switch operation - button, relay and LED
