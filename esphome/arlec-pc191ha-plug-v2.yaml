@@ -286,7 +286,7 @@ light:
   - platform: status_led
     name: "GPO Status LED"
     id: button_led
-    restore_mode: restore_and_off
+    restore_mode: RESTORE_AND_ON
     disabled_by_default: true
     pin:
       number: GPIO26
