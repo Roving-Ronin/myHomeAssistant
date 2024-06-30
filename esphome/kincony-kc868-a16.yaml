@@ -170,10 +170,10 @@ pcf8574:
     address: 0x25
 
   - id: 'pcf8574_hub_in_1' # for input channel 1-8
-    address: 0x22
+    address: 0x21
 
   - id: 'pcf8574_hub_in_2' # for input channel 9-16
-    address: 0x21
+    address: 0x22
 
 ################################################################################
 #  Outputs - 1 to 16. DC12V/24V 500mA per channel
