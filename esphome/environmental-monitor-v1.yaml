@@ -64,7 +64,7 @@ substitutions:
 #
 
 dashboard_import:
-  package_import_url: github://roving-ronin/myhomeassistant/esphome/diy-environmental-monitoring-v1.yaml@main
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/environmental-monitor-v1.yaml@main
   import_full_config: false
 
 packages:
