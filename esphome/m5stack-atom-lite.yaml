@@ -61,7 +61,7 @@ packages:
 ## Device-specific
 
 light:
-  - platform: beken_spi_led_strip        # fastled_clockless
+  - platform: neopixelbus        # fastled_clockless
     name: "Status LED"
     id: status_led
     chipset: WS2812B
