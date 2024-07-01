@@ -36,11 +36,11 @@ esp32:
   framework:
     type: esp-idf
 
-esphome:
-  platformio_options:
-    board_build.mcu: esp32c3
-    board_build.variant: esp32c3
-    board_build.flash_mode: dio
+#esphome:
+#  platformio_options:
+#    board_build.mcu: esp32c3
+#    board_build.variant: esp32c3
+#    board_build.flash_mode: dio
 
 #########################################################################
 #
@@ -48,12 +48,13 @@ esphome:
 #
 
 dashboard_import:
-  package_import_url: github://roving-ronin/myhomeassistant/esphome/athom-smart-plug-v3.yaml@main
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/m5stack-atom-lite.yaml@main
   import_full_config: false
 
 packages:
   base-config:         !include common/base-configuration.yaml
   wifi-config:         !include common/network-wifi.yaml
+  bluetooth-proxy:     !include sensors/bluetooth.yaml
 
 #########################################################################
 
