@@ -2,16 +2,6 @@
 #
 # Pacakge to configure the use of a device with a BME280 sensor
 #
-
-  # Provides substitutions or variables that are then called elsewhere multiple times in the config
-substitutions:
-   # BME 280 / BME680 Sensor
-   # Calibrate the outpute of the temperature sensor.
-  temperature_offset: "0.0"
-   # Calibrate the outpute of the pressure sensor.
-  pressure_offset: "0.0"
-   # Calibrate the outpute of the humidity sensor.
-  humidity_offset: "0.0"
   
 #########################################################################
 #
@@ -46,7 +36,7 @@ sensor:
 
      # Temperature in °C
     temperature:
-      name: "BME280 - Temperature"
+      name: "${bme_sensor1_location}Temperature"
       id: bme280_temperature
       accuracy_decimals: 1
       filters:
@@ -54,7 +44,7 @@ sensor:
         
      # Pressure in hPa
     pressure:
-      name: "BME280 - Pressure"
+      name: "${bme_sensor1_location}Pressure"
       id: bme280_pressure
       accuracy_decimals: 1
       filters:
@@ -62,7 +52,7 @@ sensor:
     
      # Relative humidity %
     humidity:
-      name: "BME280 - Humidity (Relative)"
+      name: "${bme_sensor1_location}Humidity (Relative)"
       id: bme280_humidity
       accuracy_decimals: 1
       filters:
@@ -70,14 +60,14 @@ sensor:
 
    # BME280 Sensor in I2C Port - Absolute Humidity
   - platform: absolute_humidity
-    name: "BME280 - Humidity (Absolute)"
+    name: "${bme_sensor1_location}Humidity (Absolute)"
     temperature: bme280_temperature
     humidity: bme280_humidity
     equation: Wobus   # Wobus (Default), optional Tetens or Buck
 
    # BME280 Sensor in I2C Port - Dew Point
   - platform: template
-    name: "BME280 - Dew Point"
+    name: "${bme_sensor1_location}Dew Point"
     unit_of_measurement: °C
     icon: 'mdi:thermometer-alert'    
     lambda: |-
@@ -89,7 +79,7 @@ sensor:
    # BME280 Sensor in I2C Port - Equivalent Sea Level Pressure 
    # Note: This is based on 655m for Goulburn North, NSW. Australia. Update for a different location.
   - platform: template
-    name: "BME280 - Equivalent Sea Level Pressure"
+    name: "${bme_sensor1_location}Equivalent Sea Level Pressure"
     unit_of_measurement: 'hPa'    
     lambda: |-
       const float STANDARD_ALTITUDE = 656; // in meters, see note
