@@ -41,7 +41,7 @@ substitutions:
    # BME 280 / BME680 Sensor
    #
    # If a second BME sensor is attached, enable the sensors by setting to "true".
-  enable_bme_2: "false"
+  enable_bme_2_sensors: "false"
    # Location of BME280/680 Sensor #1. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
   bme_sensor1_location: ""
    # Location of BME280/680 Sensor #2. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
