@@ -1,4 +1,89 @@
+#########################################################################
 #
-# M5Stack ATOM Lite
+# Device configuration for M5Stack ATOM Lite (ESP32)
 #
+
+   # Provides substitutions or variables that are then called elsewhere multiple times in the config
+substitutions:
+   # Default name
+  name: "m5stack-atom-lite"
+   # Default friendly name  
+  friendly_name: "M5Stack Atom Lite"
+   # Description as appears in ESPHome & top of webserver page
+  device_description: "M5Stack Atom Lite - Base Template"
+   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
+  location: ""
+   # Project Name
+  project_name: "M5Stack.Atom Lite v1"
+   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
+  project_version: "v1.0.0"
+   # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
+  power_circuit: "TBC"  
+  
+ 
+   # DO NOT CHANGE THESE SETTINGS. They are specific to the Plug Hardware Version, as defined by Athom.
+  power_button_pin:   "GPIO3"
+  gpo_switch_pin:     "GPIO5"
+  gpo_status_led_pin: "GPIO6"
+
+########################## End of Substitutions #########################
 #
+# Defines the type of ESP chip used on the device
+#
+
+esp32:
+  board: m5stack-atom
+  framework:
+    type: esp-idf
+
+esphome:
+  platformio_options:
+    board_build.mcu: esp32c3
+    board_build.variant: esp32c3
+    board_build.flash_mode: dio
+
+#########################################################################
+#
+# Remote Packages to be utilised
+#
+
+dashboard_import:
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/athom-smart-plug-v3.yaml@main
+  import_full_config: false
+
+packages:
+  base-config:         !include common/base-configuration.yaml
+  wifi-config:         !include common/network-wifi.yaml
+
+#########################################################################
+
+## Device-specific
+
+light:
+  - platform: fastled_clockless
+    name: "Status LED"
+    id: status_led
+    chipset: WS2812B
+    pin: 27
+    num_leds: 1
+    rgb_order: GRB
+    effects:
+      - random:
+      - flicker:
+      - addressable_rainbow:
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: 39
+      inverted: true
+    name: Button
+    on_press:
+      then:
+        - light.toggle: status_led
+
+  button:
+  - platform: safe_mode
+    id: button_safe_mode
+    name: Safe Mode Boot
+    entity_category: diagnostic
