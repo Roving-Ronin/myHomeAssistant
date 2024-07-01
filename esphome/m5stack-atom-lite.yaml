@@ -48,13 +48,13 @@ esp32:
 #
 
 dashboard_import:
-  package_import_url: github://roving-ronin/myhomeassistant/esphome/m5stack-atom-lite.yaml@main
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/environmental-monitor-v1.yaml@main
   import_full_config: false
 
 packages:
-  base-config:         !include common/base-configuration.yaml
-  wifi-config:         !include common/network-wifi.yaml
-  #bluetooth-proxy:     !include sensors/bluetooth.yaml
+  base-config:    !include common/base-configuration.yaml
+  wifi-config:    !include common/network-wifi.yaml
+  bme280-sensors: !include sensors/bme280.yaml
 
 #########################################################################
 
