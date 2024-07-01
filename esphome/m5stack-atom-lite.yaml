@@ -33,8 +33,8 @@ substitutions:
 
 esp32:
   board: m5stack-atom
-  framework:
-    type: esp-idf
+#  framework:
+#    type: esp-idf
 
 #esphome:
 #  platformio_options:
@@ -61,7 +61,7 @@ packages:
 ## Device-specific
 
 light:
-  - platform: addressable_light        # fastled_clockless
+  - platform: fastled_clockless
     name: "Status LED"
     id: status_led
     chipset: WS2812B
