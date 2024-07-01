@@ -58,3 +58,33 @@ packages:
 
 #########################################################################
 
+## Device-specific
+
+light:
+  - platform: fastled_clockless
+    name: "Status LED"
+    id: status_led
+    chipset: WS2812B
+    pin: 27
+    num_leds: 1
+    rgb_order: GRB
+    effects:
+      - random:
+      - flicker:
+      - addressable_rainbow:
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: 39
+      inverted: true
+    name: "Button"
+    on_press:
+      then:
+        - light.toggle: status_led
+
+button:
+  - platform: safe_mode
+    id: button_safe_mode
+    name: Safe Mode Boot
+    entity_category: diagnostic
