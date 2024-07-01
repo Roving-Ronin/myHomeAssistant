@@ -54,7 +54,7 @@ dashboard_import:
 packages:
   base-config:         !include common/base-configuration.yaml
   wifi-config:         !include common/network-wifi.yaml
-  bluetooth-proxy:     !include sensors/bluetooth.yaml
+  #bluetooth-proxy:     !include sensors/bluetooth.yaml
 
 #########################################################################
 
