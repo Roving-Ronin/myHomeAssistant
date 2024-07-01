@@ -108,12 +108,12 @@ sensor:
     i2c_id: bus_b
     address: 0x76
     update_interval: 30s
+    enabled: ${enable_bme_2_sensors}
 
      # Temperature in °C
     temperature:
       name: "${bme_sensor2_location}Temperature"
       id: bme280_2_temperature
-      enabled: ${enable_bme_2_sensors}
       accuracy_decimals: 1
       filters:
         offset: ${temperature_2_offset}
@@ -122,7 +122,6 @@ sensor:
     pressure:
       name: "${bme_sensor2_location}Pressure"
       id: bme280_2_pressure
-      enabled: ${enable_bme_2_sensors}
       accuracy_decimals: 1
       filters:
         offset: ${pressure_2_offset}
@@ -131,7 +130,6 @@ sensor:
     humidity:
       name: "${bme_sensor2_location}Humidity (Relative)"
       id: bme280_2_humidity
-      enabled: ${enable_bme_2_sensors}
       accuracy_decimals: 1
       filters:
         offset: ${humidity_2_offset}
@@ -142,7 +140,6 @@ sensor:
     temperature: bme280_temperature
     humidity: bme280_2_humidity
     equation: Wobus   # Wobus (Default), optional Tetens or Buck
-    enabled: ${enable_bme_2_sensors}    
 
    # BME280 Sensor in I2C Port - Dew Point
   - platform: template
@@ -153,7 +150,6 @@ sensor:
       return (243.5*(log(id(bme280_2_humidity).state/100)+((17.67*id(bme280_2_temperature).state)/
       (243.5+id(bme280_2_temperature).state)))/(17.67-log(id(bme280_2_humidity).state/100)-
       ((17.67*id(bme280_2_temperature).state)/(243.5+id(bme280_2_temperature).state))));
-    enabled: ${enable_bme_2_sensors}
 
    # BME280 Sensor in I2C Port - Equivalent Sea Level Pressure 
    # Note: This is based on 655m for Goulburn North, NSW. Australia. Update for a different location.
@@ -165,7 +161,6 @@ sensor:
       return id(bme280_2_pressure).state / powf(1 - ((0.0065 * STANDARD_ALTITUDE) /
         (id(bme280_2_temperature).state + (0.0065 * STANDARD_ALTITUDE) + 273.15)), 5.257); // in hPa
     update_interval: 15s
-    enabled: ${enable_bme_2_sensors}
 
    # Note: Only Altitude OR Equivalent Sea Level Pressure can be run at one time, not both.
 #  - platform: template
@@ -177,6 +172,5 @@ sensor:
 #      return ((id(bme280_2_temperature).state + 273.15) / 0.0065) *
 #        (powf((STANDARD_SEA_LEVEL_PRESSURE / id(bme280_2_pressure).state), 0.190234) - 1); // in meter
 #    update_interval: 15s
-#    enabled: ${enable_bme_2_sensors}
 
 #########################################################################
