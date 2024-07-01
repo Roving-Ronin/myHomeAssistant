@@ -68,6 +68,12 @@ light:
     pin: 27
     num_leds: 1
     rgb_order: GRB
+    restore_mode: ALWAYS_ON
+    default_transition_length: 0s
+    color:
+      red: 100%
+      green: 0%
+      blue: 0%    
     effects:
       - random:
       - flicker:
