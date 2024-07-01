@@ -113,28 +113,28 @@ sensor:
     temperature:
       name: "${bme_sensor2_location}Temperature"
       id: bme280_2_temperature
+      enabled: ${enable_bme_2_sensors}
       accuracy_decimals: 1
       filters:
         offset: ${temperature_2_offset}
-      enabled: ${enable_bme_2_sensors}
-        
+
      # Pressure in hPa
     pressure:
       name: "${bme_sensor2_location}Pressure"
       id: bme280_2_pressure
+      enabled: ${enable_bme_2_sensors}
       accuracy_decimals: 1
       filters:
         offset: ${pressure_2_offset}
-      enabled: ${enable_bme_2_sensors}
       
      # Relative humidity %
     humidity:
       name: "${bme_sensor2_location}Humidity (Relative)"
       id: bme280_2_humidity
+      enabled: ${enable_bme_2_sensors}
       accuracy_decimals: 1
       filters:
         offset: ${humidity_2_offset}
-      enabled: ${enable_bme_2_sensors}
       
    # BME280 Sensor in I2C Port - Absolute Humidity
   - platform: absolute_humidity
