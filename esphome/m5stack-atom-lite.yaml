@@ -61,7 +61,7 @@ packages:
 ## Device-specific
 
 light:
-  - platform: neopixelbus        # fastled_clockless
+  - platform: addressable_light        # fastled_clockless
     name: "Status LED"
     id: status_led
     chipset: WS2812B
