@@ -82,6 +82,14 @@ light:
       - random:
       - flicker:
       - addressable_rainbow:
+      - strobe:
+      - addressable_rainbow:
+      - addressable_scan:
+      - addressable_twinkle:
+      - addressable_random_twinkle:
+      - addressable_fireworks:
+      - addressable_flicker:
+
 
 binary_sensor:
   - platform: gpio
