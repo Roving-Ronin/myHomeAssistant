@@ -81,7 +81,6 @@ light:
     effects:
       - random:
       - flicker:
-      - addressable_rainbow:
       - strobe:
       - addressable_rainbow:
       - addressable_scan:
