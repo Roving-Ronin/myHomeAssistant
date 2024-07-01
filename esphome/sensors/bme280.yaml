@@ -50,7 +50,7 @@ sensor:
       id: bme280_temperature
       accuracy_decimals: 1
       filters:
-        offset: ${temperature_offset}
+        offset: ${temperature_1_offset}
         
      # Pressure in hPa
     pressure:
@@ -58,7 +58,7 @@ sensor:
       id: bme280_pressure
       accuracy_decimals: 1
       filters:
-        offset: ${pressure_offset}
+        offset: ${pressure_1_offset}
     
      # Relative humidity %
     humidity:
@@ -66,7 +66,7 @@ sensor:
       id: bme280_humidity
       accuracy_decimals: 1
       filters:
-        offset: ${humidity_offset}
+        offset: ${humidity_1_offset}
 
    # BME280 Sensor in I2C Port - Absolute Humidity
   - platform: absolute_humidity
