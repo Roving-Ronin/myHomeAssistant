@@ -76,10 +76,10 @@ dashboard_import:
   import_full_config: false
 
 packages:
-  base-config:    !include common/base-configuration.yaml
-  wifi-config:    !include common/network-wifi.yaml
-  bme280a-sensors: !include sensors/bme280-bus-a.yaml
-# bme280b-sensors: !include sensors/bme280-bus-b.yaml
+  base-config:      !include common/base-configuration.yaml
+  wifi-config:      !include common/network-wifi.yaml
+  bme280a-sensors:  !include sensors/bme280-bus-a.yaml
+# bme280b-sensors:  !include sensors/bme280-bus-b.yaml
 
 
 #########################################################################
