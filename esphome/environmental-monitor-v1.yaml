@@ -19,7 +19,7 @@ substitutions:
    # Project Name
   project_name: "DIY.Environmental Monitor v1"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
-  project_version: "1.0.2"
+  project_version: "1.0.3"
 
    # If true, entity should not be added to Home Assistant frontend, without the user manually enabling it.
   disable_by_default: "false"
@@ -31,7 +31,7 @@ substitutions:
 
    # I2C PINS - Used for BME280 sensor Bus B
   bus_b_sda_pin: "GPIO18"      # Default on ESP32 is SDA = PIN14 ??. ES32-S3 use ??
-  bus_b_scl_pin: "GPIO23"      # Default on ESP32 is SLC = PIN15 ??. ES32-S3 use ??  
+  bus_b_scl_pin: "GPIO19"      # Default on ESP32 is SLC = PIN15 ??. ES32-S3 use ??  
   bus_b_frequency: "100kHz"    # Optional: 100kHz
 
    # BME 280 / BME680 Sensor
