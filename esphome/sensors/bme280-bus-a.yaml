@@ -31,7 +31,7 @@ sensor:
      # Temperature in °C
     temperature:
       name: "${bme_sensor1_location}Temperature"
-      id: bme280_temperature
+      id: bme280a_temperature
       accuracy_decimals: 1
       filters:
         offset: ${temperature_1_offset}
@@ -39,7 +39,7 @@ sensor:
      # Pressure in hPa
     pressure:
       name: "${bme_sensor1_location}Pressure"
-      id: bme280_pressure
+      id: bme280a_pressure
       accuracy_decimals: 1
       filters:
         offset: ${pressure_1_offset}
@@ -47,7 +47,7 @@ sensor:
      # Relative humidity %
     humidity:
       name: "${bme_sensor1_location}Humidity (Relative)"
-      id: bme280_humidity
+      id: bme280a_humidity
       accuracy_decimals: 1
       filters:
         offset: ${humidity_1_offset}
@@ -55,8 +55,8 @@ sensor:
    # BME280 Sensor in I2C Port - Absolute Humidity
   - platform: absolute_humidity
     name: "${bme_sensor1_location}Humidity (Absolute)"
-    temperature: bme280_temperature
-    humidity: bme280_humidity
+    temperature: bme280a_temperature
+    humidity: bme280a_humidity
     equation: Wobus   # Wobus (Default), optional Tetens or Buck
 
    # BME280 Sensor in I2C Port - Dew Point
@@ -65,9 +65,9 @@ sensor:
     unit_of_measurement: °C
     icon: 'mdi:thermometer-alert'    
     lambda: |-
-      return (243.5*(log(id(bme280_humidity).state/100)+((17.67*id(bme280_temperature).state)/
-      (243.5+id(bme280_temperature).state)))/(17.67-log(id(bme280_humidity).state/100)-
-      ((17.67*id(bme280_temperature).state)/(243.5+id(bme280_temperature).state))));
+      return (243.5*(log(id(bme280a_humidity).state/100)+((17.67*id(bme280a_temperature).state)/
+      (243.5+id(bme280a_temperature).state)))/(17.67-log(id(bme280a_humidity).state/100)-
+      ((17.67*id(bme280a_temperature).state)/(243.5+id(bme280a_temperature).state))));
 
 
    # BME280 Sensor in I2C Port - Equivalent Sea Level Pressure 
@@ -77,8 +77,8 @@ sensor:
     unit_of_measurement: 'hPa'    
     lambda: |-
       const float STANDARD_ALTITUDE = 656; // in meters, see note
-      return id(bme280_pressure).state / powf(1 - ((0.0065 * STANDARD_ALTITUDE) /
-        (id(bme280_temperature).state + (0.0065 * STANDARD_ALTITUDE) + 273.15)), 5.257); // in hPa
+      return id(bme280a_pressure).state / powf(1 - ((0.0065 * STANDARD_ALTITUDE) /
+        (id(bme280a_temperature).state + (0.0065 * STANDARD_ALTITUDE) + 273.15)), 5.257); // in hPa
     update_interval: 15s
 
    # Note: Only Altitude OR Equivalent Sea Level Pressure can be run at one time, not both.
@@ -88,8 +88,8 @@ sensor:
 #    icon: 'mdi:signal'
 #    lambda: |-
 #      const float STANDARD_SEA_LEVEL_PRESSURE = 1014.1; //in hPa, see note
-#      return ((id(bme280_temperature).state + 273.15) / 0.0065) *
-#        (powf((STANDARD_SEA_LEVEL_PRESSURE / id(bme280_pressure).state), 0.190234) - 1); // in meter
+#      return ((id(bme280a_temperature).state + 273.15) / 0.0065) *
+#        (powf((STANDARD_SEA_LEVEL_PRESSURE / id(bme280a_pressure).state), 0.190234) - 1); // in meter
 #    update_interval: 15s
 
 #########################################################################
