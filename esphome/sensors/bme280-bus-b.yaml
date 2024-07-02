@@ -32,7 +32,6 @@ sensor:
     i2c_id: bus_b
     address: 0x76
     update_interval: 30s
-    enabled: ${enable_bme_2_sensors}
 
      # Temperature in °C
     temperature:
