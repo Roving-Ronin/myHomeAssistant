@@ -1,0 +1,100 @@
+#########################################################################
+#
+# Pacakge to configure the use of a device with a BME280 sensor
+#
+  
+#########################################################################
+#
+# Configure the i2c bus, to find and operate the BME280 sensor
+#
+
+i2c:
+  - id: bus_b
+    sda: ${bus_b_sda_pin}
+    scl: ${bus_b_scl_pin}
+    scan: true
+    frequency: ${bus_b_frequency}
+
+#########################################################################
+#
+# Sensors - Specific to the BME280 sensor.
+#
+
+sensor:
+
+#########################################################################
+#
+# BME sensor on i2C Bus B. Sensors are enabled disabled using
+#
+
+  # BME280 Sensor in I2C Bus B
+  - platform: bme280_i2c
+    i2c_id: bus_b
+    address: 0x76
+    update_interval: 30s
+    enabled: ${enable_bme_2_sensors}
+
+     # Temperature in °C
+    temperature:
+      name: "${bme_sensor2_location}Temperature"
+      id: bme280_2_temperature
+      accuracy_decimals: 1
+      filters:
+        offset: ${temperature_2_offset}
+
+     # Pressure in hPa
+    pressure:
+      name: "${bme_sensor2_location}Pressure"
+      id: bme280_2_pressure
+      accuracy_decimals: 1
+      filters:
+        offset: ${pressure_2_offset}
+      
+     # Relative humidity %
+    humidity:
+      name: "${bme_sensor2_location}Humidity (Relative)"
+      id: bme280_2_humidity
+      accuracy_decimals: 1
+      filters:
+        offset: ${humidity_2_offset}
+      
+   # BME280 Sensor in I2C Port - Absolute Humidity
+  - platform: absolute_humidity
+    name: "${bme_sensor2_location}Humidity (Absolute)"
+    temperature: bme280_temperature
+    humidity: bme280_2_humidity
+    equation: Wobus   # Wobus (Default), optional Tetens or Buck
+
+   # BME280 Sensor in I2C Port - Dew Point
+  - platform: template
+    name: "${bme_sensor2_location}Dew Point"
+    unit_of_measurement: °C
+    icon: 'mdi:thermometer-alert'    
+    lambda: |-
+      return (243.5*(log(id(bme280_2_humidity).state/100)+((17.67*id(bme280_2_temperature).state)/
+      (243.5+id(bme280_2_temperature).state)))/(17.67-log(id(bme280_2_humidity).state/100)-
+      ((17.67*id(bme280_2_temperature).state)/(243.5+id(bme280_2_temperature).state))));
+
+   # BME280 Sensor in I2C Port - Equivalent Sea Level Pressure 
+   # Note: This is based on 655m for Goulburn North, NSW. Australia. Update for a different location.
+  - platform: template
+    name: "${bme_sensor2_location}Equivalent Sea Level Pressure"
+    unit_of_measurement: 'hPa'    
+    lambda: |-
+      const float STANDARD_ALTITUDE = 656; // in meters, see note
+      return id(bme280_2_pressure).state / powf(1 - ((0.0065 * STANDARD_ALTITUDE) /
+        (id(bme280_2_temperature).state + (0.0065 * STANDARD_ALTITUDE) + 273.15)), 5.257); // in hPa
+    update_interval: 15s
+
+   # Note: Only Altitude OR Equivalent Sea Level Pressure can be run at one time, not both.
+#  - platform: template
+#    name: "${bme_sensor2_location}Altitude"
+#    unit_of_measurement: 'm'
+#    icon: 'mdi:signal'
+#    lambda: |-
+#      const float STANDARD_SEA_LEVEL_PRESSURE = 1014.1; //in hPa, see note
+#      return ((id(bme280_2_temperature).state + 273.15) / 0.0065) *
+#        (powf((STANDARD_SEA_LEVEL_PRESSURE / id(bme280_2_pressure).state), 0.190234) - 1); // in meter
+#    update_interval: 15s
+
+#########################################################################
