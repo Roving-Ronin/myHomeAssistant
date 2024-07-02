@@ -24,10 +24,6 @@ substitutions:
    # If true, entity should not be added to Home Assistant frontend, without the user manually enabling it.
   disable_by_default: "false"
 
-   # I2C Bus - Enable or Disable as required, depending upon number of sensors connected
-  enable_bus_a: 'true'  # Change to 'false' to disable bus_a
-  enable_bus_b: 'false'  # Change to 'true' to enable bus_b   
-
    # I2C PINS - Used for BME280 sensor Bus A
   bus_a_sda_pin: "GPIO20"      # Default on ESP32 is SDA = PIN 21. ES32-S3 use 20
   bus_a_scl_pin: "GPIO21"      # Default on ESP32 is SLC = PIN 22. ES32-S3 use 21
