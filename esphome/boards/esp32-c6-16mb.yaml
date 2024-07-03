@@ -3,6 +3,9 @@
 # ESP32-C6 16Mb Boards - Settings and Sensors
 #
 
+esp32:
+  flash_size: 16MB
+
 sensor:
 
    # ESP32 Internal Temperature
