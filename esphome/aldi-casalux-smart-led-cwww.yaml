@@ -142,12 +142,7 @@ binary_sensor:
     name: "Light State"
     id: light_state
     lambda: |-
-      if (id(downlight).state) {
-        return true;
-      } else {
-        return false;
-      }
-    internal: true
+      return id(downlight).current_values.is_on();
 
 #########################################################################
 #
