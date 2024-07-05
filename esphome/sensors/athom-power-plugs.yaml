@@ -141,16 +141,16 @@ sensor:
     lambda: |-
       return id(total_energy);
    
-  - platform: total_daily_energy
-    name: "Energy Total Today"
-    id: energy_total_today
-    restore: true
-    power_id: active_power
-    unit_of_measurement: kWh
-    accuracy_decimals: 3
-    filters:
-      - multiply: 0.001
-    icon: mdi:hours-24      
+#  - platform: total_daily_energy
+#    name: "Energy Total Today"
+#    id: energy_total_today
+#    restore: true
+#    power_id: active_power
+#    unit_of_measurement: kWh
+#    accuracy_decimals: 3
+#    filters:
+#      - multiply: 0.001
+#    icon: mdi:hours-24      
 
 #####################################################################
 #
@@ -165,7 +165,8 @@ sensor:
     energy_today:
       name: "Energy Today"
       accuracy_decimals: 3
-      
+      icon: mdi:hours-24
+
      # Dentra Components - Adds Energy Yesterday
     energy_yesterday:
       name: "Energy Yesterday"
