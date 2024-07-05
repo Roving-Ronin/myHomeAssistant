@@ -122,8 +122,32 @@ sun:
 
 
 
+
+
+
+
+
+
+
 preferences:
-  flash_write_interval: 5min
+  flash_write_interval: 15min
+
+#########################################################################
+#
+# Define a Template Binary Sensor for Light State
+#
+
+binary_sensor:
+  - platform: template
+    name: "Light State"
+    id: light_state
+    lambda: |-
+      if (id(downlight).state) {
+        return true;
+      } else {
+        return false;
+      }
+    internal: true
 
 #########################################################################
 #
@@ -134,7 +158,7 @@ sensor:
   - platform: duty_time
     name: "Light Runtime"
     id: light_runtime
-    sensor: downlight
+    binary_sensor_id: light_state
     update_interval: 60s
 
 #########################################################################
