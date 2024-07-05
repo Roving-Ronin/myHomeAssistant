@@ -164,22 +164,26 @@ sensor:
      # Dentra Components - Adds Energy Today. Persistents if restarted, unlike 'total_daily_energy'
     energy_today:
       name: "Energy Today"
+      id: total_energy_today
       accuracy_decimals: 3
       icon: mdi:hours-24
 
      # Dentra Components - Adds Energy Yesterday
     energy_yesterday:
       name: "Energy Yesterday"
+      id: total_energy_yesterday
       accuracy_decimals: 3
 
      # Dentra Components - Adds Energy Week
     energy_week:
       name: "Energy Week"
+      id: total_energy_week
       accuracy_decimals: 3
 
      # Dentra Components - Adds Energy Month
     energy_month:
       name: "Energy Month"
+      id: total_energy_month
       accuracy_decimals: 3
 
 #########################################################################
