@@ -158,7 +158,8 @@ sensor:
   - platform: duty_time
     name: "Light Runtime"
     id: light_runtime
-    binary_sensor_id: light_state
+    binary_sensor: light_state
+#    binary_sensor_id: light_state
     update_interval: 60s
 
 #########################################################################
