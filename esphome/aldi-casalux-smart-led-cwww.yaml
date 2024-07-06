@@ -178,7 +178,7 @@ text_sensor:
     name: "Light Total Runtime"
     id: light_runtime_formatted
     lambda: |-
-      int seconds = (int)id(light_total_runtime_sensor).state;
+      int seconds = (int)id(light_total_runtime_sensor).value();
       int days = seconds / (24 * 3600);
       seconds = seconds % (24 * 3600);
       int hours = seconds / 3600;
