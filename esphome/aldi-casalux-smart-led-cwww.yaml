@@ -163,30 +163,6 @@ globals:
 # Define a Template Text Sensor for Human-Readable Format
 #
 
-text_sensor:
-  - platform: template
-    name: "Light Total Runtime"
-    id: light_runtime_formatted
-    lambda: |-
-      int seconds = (int)id(light_total_runtime_sensor).state;
-      int days = seconds / (24 * 3600);
-      seconds = seconds % (24 * 3600);
-      int hours = seconds / 3600;
-      seconds = seconds % 3600;
-      int minutes = seconds / 60;
-      seconds = seconds % 60;
-      if (days > 3650) {
-        return {"Starting up"};
-      } else if (days) {
-        return {(String(days) + "d " + String(hours) + "h " + String(minutes) + "m " + String(seconds) + "s").c_str()};
-      } else if (hours) {
-        return {(String(hours) + "h " + String(minutes) + "m " + String(seconds) + "s").c_str()};
-      } else if (minutes) {
-        return {(String(minutes) + "m " + String(seconds) + "s").c_str()};
-      } else {
-        return {(String(seconds) + "s").c_str()};
-      }
-    update_interval: 60s
 
 #########################################################################
 #
