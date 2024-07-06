@@ -207,4 +207,4 @@ interval:
   - interval: 60s
     then:
       - lambda: |-
-          id(light_total_on_time).value() += id(light_on_time).state;
+          id(light_total_runtime_sensor).value() += id(light_runtime).state;
