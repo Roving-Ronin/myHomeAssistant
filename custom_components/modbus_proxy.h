@@ -1,14 +1,16 @@
-#pragma once
-
 #include "esphome.h"
+#include <WiFi.h>
+#include <AsyncTCP.h>
 
 class ModbusProxy : public Component {
  public:
-  void setup() override {
-    // Initialize the Modbus proxy here
-  }
-  
-  void loop() override {
-    // Main loop for the Modbus proxy
-  }
+  void setup() override;
+  void loop() override;
+
+ private:
+  AsyncServer *server;
+  AsyncClient *client;
+  IPAddress modbus_server_ip;
+  uint16_t modbus_server_port;
+  void handleClient(AsyncClient *client);
 };
