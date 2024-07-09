@@ -20,8 +20,7 @@ substitutions:
    # Project Name
   project_name: "DIY.Garage Controller"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
-  project_version: "1.0.1"
-
+  project_version: "1.0.2"
    # If true, entity should not be added to Home Assistant frontend, without the user manually enabling it.
   disable_by_default: "false"
 
@@ -93,7 +92,7 @@ dashboard_import:
 packages:
   base-config:     !include common/base-configuration.yaml
   wifi-config:     !include common/network-wifi.yaml
-  bme280-sensors:  !include sensors/bme280.yaml
+  bme280-sensors:  !include sensors/bme280-bus-a.yaml
   hc-sr04-sensors: !include sensors/hc-sr04-ultrasonic.yaml
 
 #########################################################################
