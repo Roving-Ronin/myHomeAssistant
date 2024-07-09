@@ -19,20 +19,20 @@ substitutions:
    # Project Name
   project_name: "DIY.Environmental Monitor v1"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
-  project_version: "1.0.3"
+  project_version: "1.1.0"
 
    # If true, entity should not be added to Home Assistant frontend, without the user manually enabling it.
   disable_by_default: "false"
 
    # I2C PINS - Used for BME280 sensor Bus A
-  bus_a_sda_pin: "GPIO20"      # Default on ESP32 is SDA = PIN 21. ES32-S3 use 20
-  bus_a_scl_pin: "GPIO21"      # Default on ESP32 is SLC = PIN 22. ES32-S3 use 21
-#  bus_a_frequency: "100kHz"    # Optional: 100kHz
+  bus_a_sda_pin: "GPIO20"      # Default on ESP32 is SDA = PIN 21. ES32-S3 (ESP-WROOM-32D) use 20
+  bus_a_scl_pin: "GPIO21"      # Default on ESP32 is SLC = PIN 22. ES32-S3 (ESP-WROOM-32D) use 21
+  bus_a_frequency: "100kHz"    # Optional: 100kHz
 
    # I2C PINS - Used for BME280 sensor Bus B
-  bus_b_sda_pin: "GPIO14"      # Default on ESP32 is SDA = PIN14 ??. ES32-S3 use ??
-  bus_b_scl_pin: "GPIO15"      # Default on ESP32 is SLC = PIN15 ??. ES32-S3 use ??  
-#  bus_b_frequency: "100kHz"    # Optional: 100kHz
+  bus_b_sda_pin: "GPIO14"      # Default on ESP32 is SDA = PIN14 ??. ES32-S3 (ESP-WROOM-32D) use ??
+  bus_b_scl_pin: "GPIO15"      # Default on ESP32 is SLC = PIN15 ??. ES32-S3 (ESP-WROOM-32D) use ??  
+  bus_b_frequency: "100kHz"    # Optional: 100kHz
 
    # BME 280 / BME680 Sensor
    #
