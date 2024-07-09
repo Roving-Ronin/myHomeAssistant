@@ -39,8 +39,8 @@ substitutions:
   sonar_echo_pin: GPIO18
 
    # Ultrasonic sensor name and ID
-  ultrasonic_sensor_name: "Garage - Parking Sonar"
-  ultrasonic_sensor_id: "garage_ultrasonic_sensor"
+  ultrasonic_sensor_name: "Parking Sonar"
+  ultrasonic_sensor_id: "parking_sensor"
 
    # Garage Door Cover - Time to open or close (1,000ms = 1sec)
   open_duration: "14000" # ms
