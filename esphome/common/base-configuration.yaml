@@ -89,8 +89,8 @@ network:
 
 binary_sensor:
   - platform: status
-    name: "Device Status"
-    id: device_status
+    name: "ESP Status"
+    id: esp_status
     entity_category: diagnostic
 
 ##########################################################################
@@ -137,8 +137,8 @@ text_sensor:
 
    # Creates a sensor showing when the device was last restarted
   - platform: template
-    name: 'Device Last Restart'
-    id: device_last_restart
+    name: 'ESP Last Restart'
+    id: esp_last_restart
     icon: mdi:clock
     entity_category: diagnostic
 
@@ -175,7 +175,7 @@ text_sensor:
    # Creates a sensor of the uptime of the device, in formatted days, hours, minutes and seconds
    # from : https://community.home-assistant.io/t/uptime-sensor-in-hours-or-days/116392/29
   - platform: template
-    name: "Device Uptime"
+    name: "ESP Uptime"
     entity_category: diagnostic
     lambda: |-
       int seconds = (id(uptime_seconds).state);
@@ -217,8 +217,8 @@ time:
         # Update last restart time, but only once.
         - if:
             condition:
-              lambda: 'return id(device_last_restart).state == "";'
+              lambda: 'return id(esp_last_restart).state == "";'
             then:
               - text_sensor.template.publish:
-                  id: device_last_restart
+                  id: esp_last_restart
                   state: !lambda 'return id(sntp_time).now().strftime("%a %d %b %Y - %I:%M:%S %p");'
