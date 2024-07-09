@@ -115,16 +115,16 @@ sensor:
 
 button:
   - platform: restart
-    name: "Restart ESP"
+    name: "ESP - Reboot"
     entity_category: config
 
   - platform: factory_reset
-    name: "Restart ESP - Reset Settings"
+    name: "ESP - Reboot and Reset"
     id: Reset
     entity_category: config
 
   - platform: safe_mode
-    name: "Restart ESP - Safe Mode"
+    name: "ESP - Reboot Safe Mode"
     internal: false
     entity_category: config
 
