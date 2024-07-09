@@ -68,10 +68,6 @@ web_server:
 network:
   enable_ipv6: ${ipv6_enable}
 
-captive_portal:
-  #  Enables the fall back WiFi hotspot and ability to connect and recover the device.
-  #  See: https://esphome.io/components/captive_portal.html
-
 #########################################################################
 #
 # Remote Packages to be utilised
