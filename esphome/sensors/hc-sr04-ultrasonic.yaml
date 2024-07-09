@@ -9,8 +9,8 @@ substitutions:
   sonar_echo_pin:    GPIO18
 
    # Sensor name and ID
-  ultrasonic_sensor_name: "Sonar Sensor"
-  ultrasonic_sensor_id: "sonar_sensor"
+  ultrasonic_sensor_name: "Ultrasonic Sensor"
+  ultrasonic_sensor_id: "ultrasonic_sensor"
   
 #########################################################################
 
