@@ -24,9 +24,9 @@ sensor:
 
   # BME280 Sensor in I2C Bus A
   - platform: bme280_i2c
-    i2c_id: bus_a
+#    i2c_id: bus_a
     address: 0x76
-    update_interval: 30s
+    update_interval: 10s
 
      # Temperature in °C
     temperature:
