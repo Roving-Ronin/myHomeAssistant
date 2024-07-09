@@ -17,15 +17,10 @@ i2c:
 
 #########################################################################
 #
-# Sensors - Specific to the BME280 sensor.
+# Sensors - Specific to the BME280 sensor, on i2C Bus B.
 #
 
 sensor:
-
-#########################################################################
-#
-# BME sensor on i2C Bus B. Sensors are enabled disabled using
-#
 
   # BME280 Sensor in I2C Bus B
   - platform: bme280_i2c
