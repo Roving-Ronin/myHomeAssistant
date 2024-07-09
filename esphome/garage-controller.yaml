@@ -39,8 +39,8 @@ substitutions:
   sonar_echo_pin: GPIO18
 
    # Ultrasonic sensor name and ID
-  ultrasonic_sensor_name: "Parking Sonar"
-  ultrasonic_sensor_id: "parking_sensor"
+  ultrasonic_sensor_name: "Parked Car Sensorr"
+  ultrasonic_sensor_id: "parked_car_sensor"
 
    # Garage Door Cover - Time to open or close (1,000ms = 1sec)
   open_duration: "14000" # ms
@@ -229,17 +229,17 @@ text_sensor:
     name: "Parking State"
     id: parking_state
     lambda: |-
-      if (id(garage_door_open_sensor).state && id(parking_sensor).state <= 0.75) {
+      if (id(garage_door_open_sensor).state && id(parked_car_sensor).state <= 0.75) {
         return {"Door Open | Vehicle Parked"};
-      } else if (id(garage_door_closed_sensor).state && id(parking_sensor).state <= 0.75) {
+      } else if (id(garage_door_closed_sensor).state && id(parked_car_sensor).state <= 0.75) {
         return {"Door Closed | Vehicle Parked"};
-      } else if ((id(garage_door_closed_sensor).state == id(garage_door_open_sensor).state) && id(parking_sensor).state <= 0.75) {
+      } else if ((id(garage_door_closed_sensor).state == id(garage_door_open_sensor).state) && id(parked_car_sensor).state <= 0.75) {
         return {"Door Ajar | Vehicle Parked"};
-      } else if (id(garage_door_open_sensor).state && id(parking_sensor).state >= 0.80 && id(parking_sensor).state <= 3.00) {
+      } else if (id(garage_door_open_sensor).state && id(parked_car_sensor).state >= 0.80 && id(parked_car_sensor).state <= 3.00) {
         return {"Door Open | Vehicle Away"};
-      } else if (id(garage_door_closed_sensor).state && id(parking_sensor).state >= 0.80 && id(parking_sensor).state <= 3.00) {
+      } else if (id(garage_door_closed_sensor).state && id(parked_car_sensor).state >= 0.80 && id(parked_car_sensor).state <= 3.00) {
         return {"Door Closed | Vehicle Away"};
-      } else if ((id(garage_door_closed_sensor).state == id(garage_door_open_sensor).state) && id(parking_sensor).state >= 0.80 && id(parking_sensor).state <= 3.00) {
+      } else if ((id(garage_door_closed_sensor).state == id(garage_door_open_sensor).state) && id(parked_car_sensor).state >= 0.80 && id(parked_car_sensor).state <= 3.00) {
         return {"Door Ajar | Vehicle Away"};
       } else { 
         return {"Unknown"};  
@@ -251,10 +251,10 @@ text_sensor:
     name: "Parking Space"
     id: parking_space
     lambda: |-
-      if (id(parking_sensor).state <= 0.99) {
+      if (id(parked_car_sensor).state <= 0.99) {
         // car is in the garage
         return {"OCCUPIED"};
-      } else if (id(parking_sensor).state >= 1.0) {
+      } else if (id(parked_car_sensor).state >= 1.0) {
         return {"EMPTY"};
       } else { 
         return {"Unknown"};  
