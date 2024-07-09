@@ -17,7 +17,7 @@ i2c:
 
 #########################################################################
 #
-# Sensors - Specific to the BME280 sensor.
+# Sensors - Specific to the BME280 sensor, on i2C Bus A.
 #
 
 sensor:
