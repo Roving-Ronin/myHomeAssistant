@@ -223,8 +223,8 @@ sensor:
 
     # HC-SR04+ Ultrasonic Sensor - Connected to 5V (with BME280) - 2cm to 450cm. Wide Voltage Operation: 3V-5.5V
   - platform: ultrasonic
-    name: "Garage - Parking Sonar"
-    id: garage_ultrasonic_sensor
+    name: "Parking Sonar"
+    id: parking_sensor
     disabled_by_default: $disable_by_default
     state_class: 'measurement'
 #    unit_of_measurement: cm  # Default is meters. If using cm then lambdas need to be changed to reflect
@@ -244,20 +244,20 @@ sensor:
 text_sensor:
 
   - platform: template
-    name: "Garage - State"
-    id: garage_state
+    name: "Parking State"
+    id: parking_state
     lambda: |-
-      if (id(garage_door_open_sensor).state && id(garage_ultrasonic_sensor).state <= 0.75) {
+      if (id(garage_door_open_sensor).state && id(parking_sensor).state <= 0.75) {
         return {"Door Open | Vehicle Parked"};
-      } else if (id(garage_door_closed_sensor).state && id(garage_ultrasonic_sensor).state <= 0.75) {
+      } else if (id(garage_door_closed_sensor).state && id(parking_sensor).state <= 0.75) {
         return {"Door Closed | Vehicle Parked"};
-      } else if ((id(garage_door_closed_sensor).state == id(garage_door_open_sensor).state) && id(garage_ultrasonic_sensor).state <= 0.75) {
+      } else if ((id(garage_door_closed_sensor).state == id(garage_door_open_sensor).state) && id(parking_sensor).state <= 0.75) {
         return {"Door Ajar | Vehicle Parked"};
-      } else if (id(garage_door_open_sensor).state && id(garage_ultrasonic_sensor).state >= 0.80 && id(garage_ultrasonic_sensor).state <= 3.00) {
+      } else if (id(garage_door_open_sensor).state && id(parking_sensor).state >= 0.80 && id(parking_sensor).state <= 3.00) {
         return {"Door Open | Vehicle Away"};
-      } else if (id(garage_door_closed_sensor).state && id(garage_ultrasonic_sensor).state >= 0.80 && id(garage_ultrasonic_sensor).state <= 3.00) {
+      } else if (id(garage_door_closed_sensor).state && id(parking_sensor).state >= 0.80 && id(parking_sensor).state <= 3.00) {
         return {"Door Closed | Vehicle Away"};
-      } else if ((id(garage_door_closed_sensor).state == id(garage_door_open_sensor).state) && id(garage_ultrasonic_sensor).state >= 0.80 && id(garage_ultrasonic_sensor).state <= 3.00) {
+      } else if ((id(garage_door_closed_sensor).state == id(garage_door_open_sensor).state) && id(parking_sensor).state >= 0.80 && id(parking_sensor).state <= 3.00) {
         return {"Door Ajar | Vehicle Away"};
       } else { 
         return {"Unknown"};  
@@ -266,13 +266,13 @@ text_sensor:
 
     # Use the distance under the ultrasonic sensor to determine if the parking space is occupied or empty
   - platform: template
-    name: "Garage - Parking Space"
-    id: garage_parking_space
+    name: "Parking Space"
+    id: parking_space
     lambda: |-
-      if (id(garage_ultrasonic_sensor).state <= 0.99) {
+      if (id(parking_sensor).state <= 0.99) {
         // car is in the garage
         return {"OCCUPIED"};
-      } else if (id(garage_ultrasonic_sensor).state >= 1.0) {
+      } else if (id(parking_sensor).state >= 1.0) {
         return {"EMPTY"};
       } else { 
         return {"Unknown"};  
