@@ -28,6 +28,31 @@ substitutions:
   # Disable sensors
   disable_entities: "false"
 
+   # I2C PINS - Used for BME280 sensor Bus A
+  bus_a_sda_pin: "GPIO4"      # Default on ESP32 is SDA = PIN 21. ES32-S3 (ESP-WROOM-32D) use 20
+  bus_a_scl_pin: "GPIO5"      # Default on ESP32 is SLC = PIN 22. ES32-S3 (ESP-WROOM-32D) use 21
+  bus_a_frequency: "100kHz"    # Optional: 100kHz
+
+   # I2C PINS - Used for BME280 sensor Bus B
+  #bus_b_sda_pin: "GPIO14"      # Default on ESP32 is SDA = PIN14 ??. ES32-S3 (ESP-WROOM-32D) use ??
+  #bus_b_scl_pin: "GPIO15"      # Default on ESP32 is SLC = PIN15 ??. ES32-S3 (ESP-WROOM-32D) use ??  
+  #bus_b_frequency: "100kHz"    # Optional: 100kHz
+
+   # BME 280 / BME680 Sensor
+   #
+   # Location of BME280/680 Sensor #1. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
+  bme_sensor1_location: "Garage"
+   # Location of BME280/680 Sensor #2. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
+  bme_sensor2_location: ""
+   # Calibrate the outpute of the temperature sensor(s).
+  temperature_1_offset: "0.4"
+  temperature_2_offset: "0.0"
+   # Calibrate the outpute of the pressure sensor(s).
+  pressure_1_offset: "0.0"
+  pressure_2_offset: "0.0"
+   # Calibrate the outpute of the humidity sensor(s).
+  humidity_1_offset: "-8.5"
+  humidity_2_offset: "0.0"
 
 ########################## End of Substitutions #########################
 #
@@ -144,17 +169,6 @@ globals:
     restore_value: yes
    # Change initial value to 0 to reset, or enter your actual meter reading to start counting lifetime total from that number 
 #    initial_value: "0"
-
-#######################################################################################
-#
-# i2C Bus Configuration
-#
-
-i2c:
-  sda: 4
-  scl: 5
-  scan: true
-  id: bus_a
 
 #######################################################################################
 #
@@ -611,90 +625,6 @@ text_sensor:
 
 sensor:
 
-  # BME280 Sensor in I2C Port - Temperature
-  - platform: bme280
-    address: 0x76
-    update_interval: 30s
-
-    # Temperature sensor - defaults to celcius
-    temperature:
-      name: "BME280 - Temperature"
-      id: bme280_temperature
-      accuracy_decimals: 1
-      filters:
-        offset: 0.4
-
-    # Pressure sensor - defaults to hPa
-    pressure:
-      name: "BME280 - Pressure"
-      id: bme280_pressure
-      accuracy_decimals: 1
-
-    # Relative Humidity sensor
-    humidity:
-      name: "BME280 - Humidity (Relative)"
-      id: bme280_humidity
-      accuracy_decimals: 1
-      filters:
-        offset: -8.5
-
-  # BME280 Sensor in I2C Port - Absolute Humidity
-  - platform: absolute_humidity
-    name: "BME280 - Humidity (Absolute)"
-    state_class: 'measurement'
-    accuracy_decimals: 1
-    temperature: bme280_temperature
-    humidity: bme280_humidity
-    equation: Wobus   # Wobus (Default), optional Tetens or Buck
-
-  # BME280 Sensor in I2C Port - Dew Point
-  - platform: template
-    name: "BME280 - Dew Point"
-    state_class: 'measurement'
-    accuracy_decimals: 1
-    lambda: |-
-      return (243.5*(log(id(bme280_humidity).state/100)+((17.67*id(bme280_temperature).state)/
-      (243.5+id(bme280_temperature).state)))/(17.67-log(id(bme280_humidity).state/100)-
-      ((17.67*id(bme280_temperature).state)/(243.5+id(bme280_temperature).state))));
-    unit_of_measurement: °C
-    icon: 'mdi:thermometer-alert'
-    filters:
-      - filter_out: nan
-
-  # BME280 Sensor in I2C Port - Pressure in kPa
-#  - platform: template
-#    name: "BME280 - Pressure (kPa)"
-#    state_class: 'measurement'
-#    accuracy_decimals: 2
-#    lambda: |-
-#      return id(bme280_pressure).state / 10.0 ;
-#    update_interval: 15s
-#    unit_of_measurement: 'kPa'
-
-  # BME280 Sensor in I2C Port - Equivalent Sea Level Pressure (based on 655m Goulburn North)
-  - platform: template
-    name: "BME280 - Pressure (Equivalent Sea Level)"
-    state_class: 'measurement'
-    accuracy_decimals: 1
-    lambda: |-
-      const float STANDARD_ALTITUDE = 656; // in meters, see note
-      return id(bme280_pressure).state / powf(1 - ((0.0065 * STANDARD_ALTITUDE) /
-        (id(bme280_temperature).state + (0.0065 * STANDARD_ALTITUDE) + 273.15)), 5.257); // in hPa
-    update_interval: 15s
-    unit_of_measurement: 'hPa'
-
-   # Only Altitude OR Equivalent Sea Level Pressure can be run at one time, not both
-#  - platform: template
-#    name: "BME280 - Altitude"
-#    lambda: |-
-#      const float STANDARD_SEA_LEVEL_PRESSURE = 1014.1; //in hPa, see note
-#      return ((id(bme280_temperature).state + 273.15) / 0.0065) *
-#        (powf((STANDARD_SEA_LEVEL_PRESSURE / id(bme280_pressure).state), 0.190234) - 1); // in meter
-#    update_interval: 15s
-#    icon: 'mdi:signal'
-#    unit_of_measurement: 'm'
-
-
   # Provides the Sun elevation and Azimuth, based upon the Lat & Long set above
   - platform: sun
     name: Sun Elevation
@@ -708,7 +638,6 @@ sensor:
 # ADC Input Port 1 - 4-20mA
 #
 
-# sensor:
 #  - platform: adc
 #    pin: 36
 #    name: 'Analog Digital Input 1'
@@ -736,7 +665,12 @@ sensor:
 #          - 0.00 -> 0.00
 #    internal: true
 
+
+################################################################################
+#
 # ADC Input Port 2 - 4-20mA
+#
+
 #  - platform: adc
 #    pin: 34
 #    name: 'Analog Digital Input 2'
