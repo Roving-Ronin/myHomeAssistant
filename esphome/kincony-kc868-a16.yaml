@@ -22,7 +22,7 @@ substitutions:
   # Project Name
   project_name: "Kincony.KC868-A16"
   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "1.0.7"
+  project_version: "1.0.8"
   # Restore the relay (GPO switch) upon reboot to state:
   relay_restore_mode: RESTORE_DEFAULT_OFF
   # Disable sensors
@@ -118,7 +118,7 @@ button:
   #  Reset the total energy entity (Gas - Current Reading)
   - platform: template
     name: 'Gas Meter - Reset Reading'
-    entity_category: diagnostic
+    entity_category: config
     id: button_reset_gas_reading
     on_press:
       - pulse_meter.set_total_pulses:
@@ -128,7 +128,7 @@ button:
   #  Reset the total energy entity (Water - Current Reading)
   - platform: template
     name: 'Water Meter - Reset Reading'
-    entity_category: diagnostic
+    entity_category: config
     id: button_reset_water_reading
     on_press:
       - pulse_meter.set_total_pulses:
