@@ -30,6 +30,7 @@ sensor:
     name: "WiFi Signal dB"
     update_interval: 150s
     entity_category: "diagnostic"
+    entity_registry_enabled_default: false
     internal: true
 
    # Reports the WiFi signal strength in %
@@ -40,6 +41,7 @@ sensor:
       - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
     unit_of_measurement: "%"
     entity_category: "diagnostic"
+    entity_registry_enabled_default: false
     device_class: ""
 
 ##########################################################################
