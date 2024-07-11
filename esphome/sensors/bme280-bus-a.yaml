@@ -59,10 +59,21 @@ sensor:
     humidity: bme280a_humidity
     equation: Wobus   # Wobus (Default), optional Tetens or Buck
 
+   # Pressure in kPa
+#  - platform: template
+#    name: "${bme_sensor1_location}Pressure (kPa)"
+#    state_class: 'measurement'
+#    accuracy_decimals: 2
+#    lambda: |-
+#      return id(bme280a_pressure).state / 10.0 ;
+#    update_interval: 15s
+#    unit_of_measurement: 'kPa'
+   
    # BME280 Sensor in I2C Port - Dew Point
   - platform: template
     name: "${bme_sensor1_location}Dew Point"
     unit_of_measurement: °C
+#    state_class: 'measurement'
     icon: 'mdi:thermometer-alert'    
     lambda: |-
       return (243.5*(log(id(bme280a_humidity).state/100)+((17.67*id(bme280a_temperature).state)/
@@ -74,12 +85,14 @@ sensor:
    # Note: This is based on 655m for Goulburn North, NSW. Australia. Update for a different location.
   - platform: template
     name: "${bme_sensor1_location}Equivalent Sea Level Pressure"
-    unit_of_measurement: 'hPa'    
+    unit_of_measurement: 'hPa'
+#    state_class: 'measurement'
     lambda: |-
       const float STANDARD_ALTITUDE = 656; // in meters, see note
       return id(bme280a_pressure).state / powf(1 - ((0.0065 * STANDARD_ALTITUDE) /
         (id(bme280a_temperature).state + (0.0065 * STANDARD_ALTITUDE) + 273.15)), 5.257); // in hPa
     update_interval: 15s
+
 
    # Note: Only Altitude OR Equivalent Sea Level Pressure can be run at one time, not both.
 #  - platform: template
