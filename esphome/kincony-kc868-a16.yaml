@@ -41,7 +41,7 @@ substitutions:
    # BME 280 / BME680 Sensor
    #
    # Location of BME280/680 Sensor #1. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
-  bme_sensor1_location: "Garage"
+  bme_sensor1_location: "Garage - "
    # Location of BME280/680 Sensor #2. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
   bme_sensor2_location: ""
    # Calibrate the outpute of the temperature sensor(s).
