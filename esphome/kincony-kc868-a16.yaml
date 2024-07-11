@@ -45,13 +45,13 @@ substitutions:
    # Location of BME280/680 Sensor #2. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
   bme_sensor2_location: ""
    # Calibrate the outpute of the temperature sensor(s).
-  temperature_1_offset: "0.4"
+  temperature_1_offset: "0.0"
   temperature_2_offset: "0.0"
    # Calibrate the outpute of the pressure sensor(s).
   pressure_1_offset: "0.0"
   pressure_2_offset: "0.0"
    # Calibrate the outpute of the humidity sensor(s).
-  humidity_1_offset: "-8.5"
+  humidity_1_offset: "0.0"
   humidity_2_offset: "0.0"
 
 ########################## End of Substitutions #########################
