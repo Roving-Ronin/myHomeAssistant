@@ -36,6 +36,7 @@ sensor:
   - platform: copy
     source_id: wifi_signal_db
     name: "WiFi Signal"
+    id: wifi_signal
     filters:
       - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
     unit_of_measurement: "%"
