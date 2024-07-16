@@ -35,13 +35,13 @@ sensor:
       accuracy_decimals: 1
       filters:
         - offset: ${temperature_2_offset}
-        - filter_outliers:
-            window_size: 15
-            radius: 3.0
         - median:
             window_size: 7
             send_every: 4
             send_first_at: 1
+        - sliding_window_moving_average:
+            window_size: 15
+            send_every: 15
 
      # Pressure in hPa
     pressure:
@@ -50,13 +50,13 @@ sensor:
       accuracy_decimals: 1
       filters:
         - offset: ${pressure_2_offset}
-        - filter_outliers:
-            window_size: 15
-            radius: 1.5
         - median:
             window_size: 7
             send_every: 4
             send_first_at: 1
+        - sliding_window_moving_average:
+            window_size: 15
+            send_every: 15
       
      # Relative humidity %
     humidity:
@@ -65,13 +65,13 @@ sensor:
       accuracy_decimals: 1
       filters:
         - offset: ${humidity_2_offset}
-        - filter_outliers:
-            window_size: 15
-            radius: 10.0
         - median:
             window_size: 7
             send_every: 4
             send_first_at: 1
+        - sliding_window_moving_average:
+            window_size: 15
+            send_every: 15
       
    # BME280 Sensor in I2C Port - Absolute Humidity
   - platform: absolute_humidity
