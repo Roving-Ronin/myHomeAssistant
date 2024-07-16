@@ -4,7 +4,31 @@
 #
 
 esp32:
+  board: esp32-c6-devkitc-1
   flash_size: 16MB
+  variant: esp32c6
+  framework:
+    type: esp-idf
+    version: "5.2.1"
+    platform_version: 6.6.0
+    sdkconfig_options:
+      CONFIG_OPENTHREAD_ENABLED: n
+      CONFIG_ENABLE_WIFI_STATION: y
+      CONFIG_USE_MINIMAL_MDNS: y
+      CONFIG_ESPTOOLPY_FLASHSIZE_16MB: y
+      CONFIG_ZB_ENABLED: y
+      CONFIG_ZB_ZED: y
+      CONFIG_ZB_RADIO_NATIVE: y
+
+#########################################################################
+
+# fix for logger from luar123 (thanks!)
+external_components:
+    - source: github://luar123/esphome@fix_logger
+      components: [ logger ]
+      refresh: never
+
+#########################################################################
 
 sensor:
 
