@@ -43,6 +43,7 @@ sensor:
     unit_of_measurement: "s"
     update_interval: 1s
 
+text_sensor:
   - platform: template
     name: "LED Total Runtime"
     lambda: |-
