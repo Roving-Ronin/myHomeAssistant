@@ -9,5 +9,15 @@ sensor:
   - platform: duty_time
     id: led_lifetime_use
     name: "LED Lifetime Use"
+    sensor: led_state
     update_interval: 10s
+    
 
+binary_sensor:
+  - platform: template
+    name: "LED State"
+    id: led_state
+    lambda: |-
+      return id(colour_temp).state > 0;
+    update_interval: 1s
+    internal: true
