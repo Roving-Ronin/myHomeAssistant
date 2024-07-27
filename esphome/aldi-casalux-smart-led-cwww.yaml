@@ -116,9 +116,9 @@ light:
 binary_sensor:
   - platform: gpio
     name: "LED State"
-    pin: GPIO12  # Use the correct GPIO pin where the LED is connected
+    pin: GPIO7  # Use the correct GPIO pin where the LED is connected
     id: led_state
-    internat: true
+    internal: true
 
 
 #########################################################################
