@@ -9,8 +9,6 @@ globals:
     type: float
     restore_value: yes
     initial_value: '0.0'
-    unit_of_measurement: "s"
-    accuracy_decimals: 2
 
 #########################################################################
 #
