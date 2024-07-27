@@ -9,6 +9,8 @@ globals:
     type: float
     restore_value: yes
     initial_value: '0.0'
+    unit_of_measurement: "s"
+    accuracy_decimals: 2
 
 #########################################################################
 #
@@ -21,6 +23,8 @@ binary_sensor:
     id: led_state
     lambda: |-
       return id(colour_temp).state > 0;
+    filters:
+      - delayed_on: 10ms
     internal: true
 
 #########################################################################
@@ -39,7 +43,7 @@ sensor:
       }
       return id(total_runtime_seconds);
     unit_of_measurement: "s"
-#    update_interval: 1s
+    update_interval: 1s
 
   - platform: template
     name: "LED Total Runtime"
@@ -62,4 +66,4 @@ sensor:
       } else {
         return (String(seconds) +"s").c_str();
     icon: mdi:clock-start
-#    update_interval: 10s  # Update interval can be adjusted as needed
+    update_interval: 10s  # Update interval can be adjusted as needed
