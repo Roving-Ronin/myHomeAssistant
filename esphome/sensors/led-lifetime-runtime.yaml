@@ -31,17 +31,21 @@ binary_sensor:
 #
 
 sensor:
-
   - platform: template
     name: "LED Runtime Seconds"
     id: led_runtime_seconds
     lambda: |-
       if (id(led_state).state) {
-        id(total_runtime_seconds) += id(led_state).current_duration / 1000.0;
+        id(total_runtime_seconds) += id(led_state).state ? (1.0 / 1000.0) : 0.0; 
       }
       return id(total_runtime_seconds);
     unit_of_measurement: "s"
     update_interval: 1s
+
+#########################################################################
+#
+# Sensors
+#
 
 text_sensor:
   - platform: template
