@@ -11,6 +11,14 @@ sensor:
     name: "LED Lifetime Use"
     sensor: led_state
     update_interval: 10s
+
+
+  - platform: template
+    id: colour_temp_value
+    name: "Colour Temperature Value"
+    lambda: |-
+      return id(colour_temp).current_value;
+    update_interval: 1s  # Adjust as needed
     
 
 binary_sensor:
@@ -18,5 +26,5 @@ binary_sensor:
     name: "LED State"
     id: led_state
     lambda: |-
-      return id(colour_temp).state > 0;
-    internal: true
+      return id(colour_temp_value).state > 0.1
+#    internal: true
