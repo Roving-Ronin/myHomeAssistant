@@ -16,12 +16,13 @@ globals:
 #
 
 binary_sensor:
-  - platform: gpio
+  - platform: template
     name: "LED State"
-    pin: GPIO7  # Use the correct GPIO pin where the LED is connected
     id: led_state
+    lambda: |-
+      return id(colour_temp).state > 0;
+    update_interval: 1s
     internal: true
-
 
 #########################################################################
 #
