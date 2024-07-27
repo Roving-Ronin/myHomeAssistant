@@ -44,33 +44,3 @@ sensor:
             id(saved_total_lifetime_use).publish_state(id(total_lifetime_use));
     internal: true
 
-
-#########################################################################
-#
-# Text sensors
-#
-
-text_sensor:
-  - platform: template
-    name: "LED Total Runtime"
-    lambda: |-
-      int seconds = (int)(id(led_lifetime_use).state);
-      int days = seconds / (24 * 3600);
-      seconds = seconds % (24 * 3600);
-      int hours = seconds / 3600;
-      seconds = seconds % 3600;
-      int minutes = seconds /  60;
-      seconds = seconds % 60;
-      if ( days > 3650 ) {
-        return "Starting up";
-      } else if ( days > 0 ) {
-        return (String(days) +"d " + String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str();
-      } else if ( hours > 0 ) {
-        return (String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str();
-      } else if ( minutes > 0 ) {
-        return (String(minutes) +"m "+ String(seconds) +"s").c_str();
-      } else {
-        return (String(seconds) +"s").c_str();
-    icon: mdi:clock-start
-    update_interval: 10s  # Update interval can be adjusted as needed
-    
