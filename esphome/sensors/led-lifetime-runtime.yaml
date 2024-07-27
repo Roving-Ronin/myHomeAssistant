@@ -36,7 +36,7 @@ sensor:
     id: led_runtime_seconds
     lambda: |-
       if (id(led_state).state) {
-        id(total_runtime_seconds) += id(led_state).state ? (1.0 / 1000.0) : 0.0; 
+        id(total_runtime_seconds) += 1.0 / 1000.0;
       }
       return id(total_runtime_seconds);
     unit_of_measurement: "s"
