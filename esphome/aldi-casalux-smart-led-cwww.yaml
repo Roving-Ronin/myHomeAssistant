@@ -64,8 +64,9 @@ dashboard_import:
   import_full_config: false
 
 packages:
-  base-config: !include common/base-configuration.yaml
-  wifi-config: !include common/network-wifi.yaml
+  base-config:   !include common/base-configuration.yaml
+  wifi-config:   !include common/network-wifi.yaml
+  led-lifecycle: !include sensors/led-lifetime-runtime.yaml
 
 #########################################################################
 #
@@ -75,7 +76,7 @@ packages:
 
  # Remove Network section (IPv6), as not supported on this chipset
 network: !remove
-  
+
 #########################################################################
 #
 # Define the RGBW Lights and their GPIO PINS to control them.
@@ -106,61 +107,6 @@ light:
     cold_white_color_temperature: 6536 K
     warm_white_color_temperature: 2000 K
     restore_mode: ${light_restore_mode}
-
-
-#########################################################################
-#
-# Binary sensor to track the On/Off state of the LED Light
-#
-
-binary_sensor:
-  - platform: gpio
-    name: "LED State"
-    pin: GPIO7  # Use the correct GPIO pin where the LED is connected
-    id: led_state
-    internal: true
-
-
-#########################################################################
-#
-# Senso
-#
-
-sensor:
-
-  - platform: total_daily_energy
-    name: "LED Runtime Seconds"
-    power_id: led_state
-    id: led_runtime_seconds
-    unit_of_measurement: s
-    accuracy_decimals: 0
-    device_class: duration
-    state_class: total_increasing
-
-  - platform: template
-    name: "LED Total Runtime"
-    id: led_runtime
-    lambda: |-
-      int seconds = (int)(id(led_runtime_seconds).state);
-      int days = seconds / (24 * 3600);
-      seconds = seconds % (24 * 3600);
-      int hours = seconds / 3600;
-      seconds = seconds % 3600;
-      int minutes = seconds /  60;
-      seconds = seconds % 60;
-      if ( days > 3650 ) {
-        return "Starting up";
-      } else if ( days > 0 ) {
-        return (String(days) +"d " + String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str();
-      } else if ( hours > 0 ) {
-        return (String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str();
-      } else if ( minutes > 0 ) {
-        return (String(minutes) +"m "+ String(seconds) +"s").c_str();
-      } else {
-        return (String(seconds) +"s").c_str();
-      }
-    icon: mdi:clock-start
-
 
 #########################################################################
 #
