@@ -67,7 +67,7 @@ packages:
   base-config:   !include common/base-configuration.yaml
   wifi-config:   !include common/network-wifi.yaml
 #  led-lifecycle: !include sensors/led-lifetime-runtime.yaml
-  led-lifecycle: !include sensors/led_duty_time.yaml
+#  led-lifecycle: !include sensors/led_duty_time.yaml
 
 #########################################################################
 #
