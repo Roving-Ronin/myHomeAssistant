@@ -131,7 +131,7 @@ sensor:
     name: "LED Runtime Seconds"
     id: led_runtime_seconds
     sensor: led_state
-    time_unit: w
+    time_unit: s
     internal: true
 
   - platform: template
