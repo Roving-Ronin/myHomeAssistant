@@ -39,7 +39,7 @@ sensor:
       }
       return id(total_runtime_seconds);
     unit_of_measurement: "s"
-    update_interval: 1s
+#    update_interval: 1s
 
   - platform: template
     name: "LED Total Runtime"
@@ -62,4 +62,4 @@ sensor:
       } else {
         return (String(seconds) +"s").c_str();
     icon: mdi:clock-start
-    update_interval: 10s  # Update interval can be adjusted as needed
+#    update_interval: 10s  # Update interval can be adjusted as needed
