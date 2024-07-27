@@ -19,5 +19,4 @@ binary_sensor:
     id: led_state
     lambda: |-
       return id(colour_temp).state > 0;
-    update_interval: 1s
     internal: true
