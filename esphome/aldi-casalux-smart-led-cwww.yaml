@@ -127,12 +127,15 @@ binary_sensor:
 #
 
 sensor:
-  - platform: integration
+sensor:
+  - platform: total_daily_energy
     name: "LED Runtime Seconds"
+    power_id: led_state
     id: led_runtime_seconds
-    sensor: led_state
-    time_unit: s
-    internal: true
+    unit_of_measurement: s
+    accuracy_decimals: 0
+    device_class: duration
+    state_class: total_increasing
 
   - platform: template
     name: "LED Total Runtime"
