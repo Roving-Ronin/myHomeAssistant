@@ -17,8 +17,10 @@ sensor:
     id: colour_temp_value
     name: "Colour Temperature Value"
     lambda: |-
-      return id(colour_temp).current_value;
-    update_interval: 1s  # Adjust as needed
+      // Assuming you have a way to read the PWM output value; otherwise, this is a placeholder.
+      return id(colour_temp).state;  // Replace with the actual method to read the PWM value if needed
+    update_interval: 1s
+
     
 
 #binary_sensor:
