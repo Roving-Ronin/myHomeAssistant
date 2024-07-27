@@ -127,7 +127,7 @@ binary_sensor:
 #
 
 sensor:
-sensor:
+
   - platform: total_daily_energy
     name: "LED Runtime Seconds"
     power_id: led_state
