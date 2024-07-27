@@ -1,0 +1,65 @@
+#####################################################################
+#
+# Used to store the Total seconds (lifetime) of the LED Emitter
+# usage between reboots
+#
+
+globals:
+  - id: total_runtime_seconds
+    type: float
+    restore_value: yes
+    initial_value: '0.0'
+
+#########################################################################
+#
+# Binary sensor to track the On/Off state of the LED Light
+#
+
+binary_sensor:
+  - platform: gpio
+    name: "LED State"
+    pin: GPIO7  # Use the correct GPIO pin where the LED is connected
+    id: led_state
+    internal: true
+
+
+#########################################################################
+#
+# Sensors
+#
+
+sensor:
+
+  - platform: template
+    name: "LED Runtime Seconds"
+    id: led_runtime_seconds
+    lambda: |-
+      if (id(led_state).state) {
+        id(total_runtime_seconds) += id(led_state).current_duration / 1000.0;
+      }
+      return id(total_runtime_seconds);
+    unit_of_measurement: "s"
+    update_interval: 1s
+
+  - platform: template
+    name: "LED Total Runtime"
+    lambda: |-
+      int seconds = (int)(id(led_runtime_seconds).state);
+      int days = seconds / (24 * 3600);
+      seconds = seconds % (24 * 3600);
+      int hours = seconds / 3600;
+      seconds = seconds % 3600;
+      int minutes = seconds /  60;
+      seconds = seconds % 60;
+      if ( days > 3650 ) {
+        return "Starting up";
+      } else if ( days > 0 ) {
+        return (String(days) +"d " + String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str();
+      } else if ( hours > 0 ) {
+        return (String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str();
+      } else if ( minutes > 0 ) {
+        return (String(minutes) +"m "+ String(seconds) +"s").c_str();
+      } else {
+        return (String(seconds) +"s").c_str();
+    icon: mdi:clock-start
+    update_interval: 10s  # Update interval can be adjusted as needed
