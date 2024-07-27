@@ -1,9 +1,4 @@
-light:
-  - platform: status_led
-    name: "LED State"
-    id: led_state
-    pin: GPIO7
-    internal: true
+
 
 #####################################################################
 #
