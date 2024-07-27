@@ -1,30 +1,4 @@
 
-#########################################################################
-#
-# Define global variables
-#
-
-globals:
-  - id: total_lifetime_use
-    type: float
-    restore_value: true
-    initial_value: '0.0'
-
-  - id: saved_total_lifetime_use
-    type: float
-    restore_value: true
-    initial_value: '0.0'
-
-#########################################################################
-#
-# Define a save to flash task to ensure global variables persist between reboots
-#
-
-interval:
-  - interval: 5min
-    then:
-      - lambda: |-
-          id(saved_total_lifetime_use).publish_state(id(total_lifetime_use));
 
 #########################################################################
 #
@@ -35,12 +9,5 @@ sensor:
   - platform: duty_time
     id: led_lifetime_use
     name: "LED Lifetime Use"
-    update_interval: 60s
-    on_value:
-      then:
-        - lambda: |-
-            // Save the current lifetime use to a global variable
-            id(total_lifetime_use) += x;
-            id(saved_total_lifetime_use).publish_state(id(total_lifetime_use));
-    internal: true
+    update_interval: 10s
 
