@@ -2,6 +2,7 @@
 #
 # Substitutions
 #
+substitutions:
 
 # Define the type of ethernet controller on the device
 # See: https://esphome.io/components/ethernet.html
