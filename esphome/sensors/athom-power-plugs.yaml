@@ -63,6 +63,7 @@ binary_sensor:
 
 sensor:
 
+  - platform: cse7766
     power:
       name: "Active Power"
       id: active_power
@@ -83,7 +84,6 @@ sensor:
       icon: "mdi:power"
       web_server_sorting_weight: 2
       
-  - platform: cse7766
     current:
       name: "Current"
       id: current
