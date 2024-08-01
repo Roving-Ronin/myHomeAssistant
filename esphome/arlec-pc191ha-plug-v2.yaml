@@ -162,26 +162,6 @@ sensor:
 #   Setting current_resistor to give an accurate Amperage does NOT also give the correct Wattage
 #   See calculator at: https://esphome.io/components/sensor/hlw8012.html
 
-    current:
-      name: "Current"
-      id: current
-      unit_of_measurement: A
-      accuracy_decimals: 2
-      filters:
-        - multiply: ${current_multiply}
-      on_value_range:
-        - above: ${current_limit}
-          then:
-            - switch.turn_off: relay
-
-    voltage:
-      name: Voltage
-      id:   voltage
-      unit_of_measurement: V
-      accuracy_decimals: 1
-      filters:
-        - skip_initial: 2
-
     power:
       name: Active Power
       id: active_power
@@ -190,7 +170,32 @@ sensor:
       filters:
         - multiply: ${watts_factor}
         - skip_initial: 2
-      icon: mdi:power 
+      icon: mdi:power
+      web_server_sorting_weight: 1
+    
+    current:
+      name: "Current"
+      id: current
+      unit_of_measurement: A
+      accuracy_decimals: 2
+      icon: mdi:current-ac      
+      filters:
+        - multiply: ${current_multiply}
+      on_value_range:
+        - above: ${current_limit}
+          then:
+            - switch.turn_off: relay
+      web_server_sorting_weight: 2
+
+    voltage:
+      name: Voltage
+      id:   voltage
+      unit_of_measurement: V
+      accuracy_decimals: 1
+      icon: mdi:sine-wave 
+      filters:
+        - skip_initial: 2
+      web_server_sorting_weight: 3
 
      # Shows the Energy kWh since the device was last booted
     energy:
@@ -211,33 +216,6 @@ sensor:
               id(energy_total_sensor).update();
       internal: true
 
-
-#########################################################################
-
-     # Shows the TOTAL/Lifetime Energy kWh used by the device, may reset to zero upon firmware updates
-  - platform: template
-    name: "Energy Total"
-    id: energy_total_sensor
-    unit_of_measurement: kWh
-    device_class: "energy"
-    state_class: "total_increasing"
-    icon: "mdi:lightning-bolt"
-    accuracy_decimals: 3
-    lambda: |-
-      return id(total_energy);
-    
-     # Shows the Energy kWh for the current day
-#  - platform: total_daily_energy
-#    name: "Energy Total Today"
-#    id: energy_total_today
-#    restore: true
-#    power_id: active_power
-#    unit_of_measurement: kWh
-#    accuracy_decimals: 3
-#    filters:
-#      - multiply: 0.001
-#    icon: mdi:hours-24
-
 #####################################################################
 #
 # Function added by the Dentra Components
@@ -253,24 +231,58 @@ sensor:
       id: total_energy_today
       accuracy_decimals: 3
       icon: mdi:hours-24
+      web_server_sorting_weight: 4
 
      # Dentra Components - Adds Energy Yesterday
     energy_yesterday:
       name: "Energy Yesterday"
       id: total_energy_yesterday
       accuracy_decimals: 3
+      icon: mdi:calendar-today-outline
+      web_server_sorting_weight: 5
 
      # Dentra Components - Adds Energy Week
     energy_week:
       name: "Energy Week"
       id: total_energy_week
       accuracy_decimals: 3
+      icon: mdi:calendar-week
+      web_server_sorting_weight: 6
 
      # Dentra Components - Adds Energy Month
     energy_month:
       name: "Energy Month"
       id: total_energy_month
       accuracy_decimals: 3
+      icon: mdi:calendar-month
+      web_server_sorting_weight: 7
+
+#########################################################################
+
+     # Shows the TOTAL/Lifetime Energy kWh used by the device, may reset to zero upon firmware updates
+  - platform: template
+    name: "Energy Total"
+    id: energy_total_sensor
+    unit_of_measurement: kWh
+    device_class: "energy"
+    state_class: "total_increasing"
+    icon: mdi:lightning-bolt
+    accuracy_decimals: 3
+    lambda: |-
+      return id(total_energy);
+    web_server_sorting_weight: 8
+    
+     # Shows the Energy kWh for the current day
+#  - platform: total_daily_energy
+#    name: "Energy Total Today"
+#    id: energy_total_today
+#    restore: true
+#    power_id: active_power
+#    unit_of_measurement: kWh
+#    accuracy_decimals: 3
+#    filters:
+#      - multiply: 0.001
+#    icon: mdi:hours-24
 
 #########################################################################
 # PC191HA basic switch operation - button, relay and LED
@@ -291,6 +303,7 @@ switch:
     on_turn_off:
       then:
         - light.turn_off: button_led
+    web_server_sorting_weight: 9
 
 light:
   - platform: status_led
@@ -300,3 +313,4 @@ light:
     disabled_by_default: true
     pin:
       number: GPIO26
+    web_server_sorting_weight: 10
