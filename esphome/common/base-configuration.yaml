@@ -62,8 +62,11 @@ logger:
 mdns:
   disabled: false
 
+   # Enable local webserver on ESP Device
 web_server:
+   # TCP Port the webserver operates upon
   port: 80
+   # Webserver version (default is 2).
   version: 3
 
 network:
