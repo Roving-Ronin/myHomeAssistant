@@ -58,7 +58,7 @@ text_sensor:
       name: 'WiFi IP Address'
       icon: mdi:wifi
       entity_category: diagnostic
-    web_server_sorting_weight: 41
+      web_server_sorting_weight: 41
 
    # Creates sensor for tracking the WiFi IP MAC address
     mac_address:
