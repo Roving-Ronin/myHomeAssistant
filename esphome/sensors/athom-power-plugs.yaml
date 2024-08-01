@@ -68,7 +68,7 @@ sensor:
       name: "Current"
       id: current
       unit_of_measurement: A
-      accuracy_decimals: 2      
+      accuracy_decimals: 2
       filters:
         - throttle_average: ${sensor_update_interval}
         - lambda: if (x < 0.060) return 0.0; else return x;   #For the chip will report less than 3w power when no load is connected
@@ -76,6 +76,7 @@ sensor:
         - above: ${current_limit}
           then:
             - switch.turn_off: relay
+      web_server_sorting_weight: 3
 
     voltage:
       name: "Voltage"
@@ -84,6 +85,7 @@ sensor:
       accuracy_decimals: 1            
       filters:
         - throttle_average: ${sensor_update_interval}
+      web_server_sorting_weight: 4
 
     power:
       name: "Active Power"
@@ -93,7 +95,8 @@ sensor:
       filters:
         - throttle_average: ${sensor_update_interval}
         - lambda: if (x < 0.3) return 0.0; else return x;    #For the chip will report less than 3w power when no load is connected
-      icon: mdi:power        
+      icon: mdi:power
+      web_server_sorting_weight: 1
 
     apparent_power:
       name: "Apparent Power"
@@ -101,12 +104,14 @@ sensor:
       accuracy_decimals: 1         
       filters:
         - throttle_average: ${sensor_update_interval}
-      icon: mdi:power        
+      icon: mdi:power
+      web_server_sorting_weight: 2
     
     power_factor:
       name: "Power Factor"
       filters:
         - throttle_average: ${sensor_update_interval}
+      web_server_sorting_weight: 5
 
     energy:
       name: "Energy"
@@ -160,6 +165,7 @@ sensor:
      # Dentra Components - Define the id of the sensor tracking 'Total Energy' used
   - platform: "energy_statistics"
     total: energy_total_sensor
+    web_server_sorting_weight: 10
 
      # Dentra Components - Adds Energy Today. Persistents if restarted, unlike 'total_daily_energy'
     energy_today:
@@ -167,24 +173,28 @@ sensor:
       id: total_energy_today
       accuracy_decimals: 3
       icon: mdi:hours-24
+      web_server_sorting_weight: 6
 
      # Dentra Components - Adds Energy Yesterday
     energy_yesterday:
       name: "Energy Yesterday"
       id: total_energy_yesterday
       accuracy_decimals: 3
+      web_server_sorting_weight: 7
 
      # Dentra Components - Adds Energy Week
     energy_week:
       name: "Energy Week"
       id: total_energy_week
       accuracy_decimals: 3
+      web_server_sorting_weight: 8
 
      # Dentra Components - Adds Energy Month
     energy_month:
       name: "Energy Month"
       id: total_energy_month
       accuracy_decimals: 3
+      web_server_sorting_weight: 9
 
 #########################################################################
 #
@@ -199,6 +209,7 @@ switch:
     id: relay
     restore_mode: ${relay_restore_mode}
     icon: mdi:power-socket-au
+    web_server_sorting_weight: 11
 
 light:
   - platform: status_led
@@ -208,5 +219,6 @@ light:
     pin:
       inverted: true
       number: ${gpo_status_led_pin}
+    web_server_sorting_weight: 12
 
 #########################################################################
