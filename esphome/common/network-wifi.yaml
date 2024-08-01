@@ -30,6 +30,7 @@ sensor:
     name: "WiFi Signal dB"
     update_interval: 150s
     entity_category: "diagnostic"
+    web_server_sorting_weight: 45
     internal: true
 
    # Reports the WiFi signal strength in %
@@ -42,6 +43,7 @@ sensor:
     unit_of_measurement: "%"
     entity_category: "diagnostic"
     device_class: ""
+    web_server_sorting_weight: 44
 
 ##########################################################################
 #
@@ -56,16 +58,19 @@ text_sensor:
       name: 'WiFi IP Address'
       icon: mdi:wifi
       entity_category: diagnostic
+    web_server_sorting_weight: 41
+
+   # Creates sensor for tracking the WiFi IP MAC address
+    mac_address:
+      name: 'WiFi MAC Address'
+      entity_category: diagnostic
+      web_server_sorting_weight: 42
 
    # Defines the WiFi SSID network to connect to
     ssid:
       name: 'WiFi SSID'
       icon: mdi:wifi-strength-2
       entity_category: diagnostic
-
-   # Creates sensor for tracking the WiFi IP MAC address
-    mac_address:
-      name: 'WiFi MAC Address'
-      entity_category: diagnostic
+      web_server_sorting_weight: 43
 
 ##########################################################################
