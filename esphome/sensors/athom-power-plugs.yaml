@@ -71,7 +71,7 @@ sensor:
       filters:
         - throttle_average: ${sensor_update_interval}
         - lambda: if (x < 0.3) return 0.0; else return x;    #For the chip will report less than 3w power when no load is connected
-      icon: mdi:power
+      icon: "mdi:power"
       web_server_sorting_weight: 1
 
     apparent_power:
@@ -80,7 +80,7 @@ sensor:
       accuracy_decimals: 1         
       filters:
         - throttle_average: ${sensor_update_interval}
-      icon: mdi:power
+      icon: "mdi:power"
       web_server_sorting_weight: 2
       
   - platform: cse7766
@@ -89,7 +89,7 @@ sensor:
       id: current
       unit_of_measurement: A
       accuracy_decimals: 2
-      icon: mdi:current-ac
+      icon: "mdi:current-ac"
       filters:
         - throttle_average: ${sensor_update_interval}
         - lambda: if (x < 0.060) return 0.0; else return x;   #For the chip will report less than 3w power when no load is connected
@@ -104,7 +104,7 @@ sensor:
       id:   voltage
       unit_of_measurement: V
       accuracy_decimals: 1
-      icon: mdi:sine-wave
+      icon: "mdi:sine-wave"
       filters:
         - throttle_average: ${sensor_update_interval}
       web_server_sorting_weight: 4
@@ -113,7 +113,7 @@ sensor:
       name: "Power Factor"
       filters:
         - throttle_average: ${sensor_update_interval}
-      icon: mdi:percent-outline
+      icon: "mdi:percent-outline"
       web_server_sorting_weight: 5
 
     energy:
@@ -149,7 +149,7 @@ sensor:
       name: "Energy Today"
       id: total_energy_today
       accuracy_decimals: 3
-      icon: mdi:hours-24
+      icon: "mdi:hours-24"
       web_server_sorting_weight: 6
 
      # Dentra Components - Adds Energy Yesterday
@@ -157,7 +157,7 @@ sensor:
       name: "Energy Yesterday"
       id: total_energy_yesterday
       accuracy_decimals: 3
-      icon: mdi:calendar-today-outline
+      icon: "mdi:calendar-today-outline"
       web_server_sorting_weight: 7
 
      # Dentra Components - Adds Energy Week
@@ -165,7 +165,7 @@ sensor:
       name: "Energy Week"
       id: total_energy_week
       accuracy_decimals: 3
-      icon: mdi:calendar-week
+      icon: "mdi:calendar-week"
       web_server_sorting_weight: 8
 
      # Dentra Components - Adds Energy Month
@@ -173,7 +173,7 @@ sensor:
       name: "Energy Month"
       id: total_energy_month
       accuracy_decimals: 3
-      icon: mdi:calendar-month
+      icon: "mdi:calendar-month"
       web_server_sorting_weight: 9
 
 #########################################################################
@@ -185,7 +185,7 @@ sensor:
     unit_of_measurement: kWh
     device_class: "energy"
     state_class: "total_increasing"
-    icon: mdi:lightning-bolt
+    icon: "mdi:lightning-bolt"
     accuracy_decimals: 3
     lambda: |-
       return id(total_energy);
@@ -200,7 +200,7 @@ sensor:
 #    accuracy_decimals: 3
 #    filters:
 #      - multiply: 0.001
-#    icon: mdi:hours-24      
+#    icon: "mdi:hours-24"
 
 #########################################################################
 #
@@ -214,7 +214,7 @@ switch:
     pin: ${gpo_switch_pin}
     id: relay
     restore_mode: ${relay_restore_mode}
-    icon: mdi:power-socket-au
+    icon: "mdi:power-socket-au"
     web_server_sorting_weight: 11
 
 light:
@@ -225,6 +225,7 @@ light:
     pin:
       inverted: true
       number: ${gpo_status_led_pin}
+    icon: "mdi:lightbulb-outline"
     web_server_sorting_weight: 12
 
 #########################################################################
