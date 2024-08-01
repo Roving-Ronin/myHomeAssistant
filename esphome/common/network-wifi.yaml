@@ -29,6 +29,7 @@ sensor:
     id: wifi_signal_db
     name: "WiFi Signal dB"
     update_interval: 150s
+    icon: mdi:wifi-strength-2
     entity_category: "diagnostic"
     web_server_sorting_weight: 45
     internal: true
@@ -38,6 +39,7 @@ sensor:
     source_id: wifi_signal_db
     name: "WiFi Strength"
     id: wifi_strength
+    icon: mdi:wifi-arrow-up-down
     filters:
       - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
     unit_of_measurement: "%"
@@ -56,13 +58,14 @@ text_sensor:
   - platform: wifi_info
     ip_address:
       name: 'WiFi IP Address'
-      icon: mdi:wifi
+      icon: mdi:ip-network
       entity_category: diagnostic
       web_server_sorting_weight: 41
 
    # Creates sensor for tracking the WiFi IP MAC address
     mac_address:
       name: 'WiFi MAC Address'
+      icon: mdi:network-pos
       entity_category: diagnostic
       web_server_sorting_weight: 42
 
