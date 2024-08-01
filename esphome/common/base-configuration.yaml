@@ -96,6 +96,7 @@ binary_sensor:
     name: "Device Status"
     id: device_status
     entity_category: diagnostic
+    web_server_sorting_weight: 35
 
 ##########################################################################
 #
@@ -121,16 +122,19 @@ button:
   - platform: restart
     name: 'Restart Device'
     entity_category: config
-
-  - platform: factory_reset
-    name: Reset with Default Settings
-    id: Reset
-    entity_category: config
+    web_server_sorting_weight: 25
 
   - platform: safe_mode
     name: "Safe Mode"
     internal: false
     entity_category: config
+    web_server_sorting_weight: 26
+
+  - platform: factory_reset
+    name: Reset with Default Settings
+    id: Reset
+    entity_category: config
+    web_server_sorting_weight: 27
 
 ##########################################################################
 #
@@ -138,43 +142,6 @@ button:
 #
 
 text_sensor:
-
-   # Creates a sensor showing when the device was last restarted
-  - platform: template
-    name: 'Device Last Restart'
-    id: device_last_restart
-    icon: mdi:clock
-    entity_category: diagnostic
-
-   # Creates a sensor of the name of installed project
-  - platform: template
-    name: 'Project Name'
-    id: project_name
-    icon: "mdi:label-outline"
-    entity_category: diagnostic
-    lambda: |-
-      return {"${project_name}"};
-    update_interval: 6h
-
-   # Creates a sensor of the version of installed project
-  - platform: template
-    name: 'Project Version'
-    id: project_version
-    icon: "mdi:label-outline"
-    entity_category: diagnostic
-    lambda: |-
-      return {"${project_version}"};
-    update_interval: 6h
-
-  #  Creates a sensor showing power circuit / phase of the device
-  - platform: template
-    name: 'Power Circuit'
-    id: power_circuit
-    icon: "mdi:electric-switch"
-    entity_category: diagnostic
-    lambda: |-
-      return {"${power_circuit}"};
-    update_interval: 6h
 
    # Creates a sensor of the uptime of the device, in formatted days, hours, minutes and seconds
    # from : https://community.home-assistant.io/t/uptime-sensor-in-hours-or-days/116392/29
@@ -201,6 +168,48 @@ text_sensor:
         return { (String(seconds) +"s").c_str() };
       }
     icon: mdi:clock-start
+    web_server_sorting_weight: 36
+    
+   # Creates a sensor showing when the device was last restarted
+  - platform: template
+    name: 'Device Last Restart'
+    id: device_last_restart
+    icon: mdi:clock
+    entity_category: diagnostic
+    web_server_sorting_weight: 37
+
+  #  Creates a sensor showing power circuit / phase of the device
+  - platform: template
+    name: 'Power Circuit'
+    id: power_circuit
+    icon: "mdi:electric-switch"
+    entity_category: diagnostic
+    lambda: |-
+      return {"${power_circuit}"};
+    update_interval: 6h
+    web_server_sorting_weight: 38
+
+   # Creates a sensor of the name of installed project
+  - platform: template
+    name: 'Project Name'
+    id: project_name
+    icon: "mdi:label-outline"
+    entity_category: diagnostic
+    lambda: |-
+      return {"${project_name}"};
+    update_interval: 6h
+    web_server_sorting_weight: 39
+
+   # Creates a sensor of the version of installed project
+  - platform: template
+    name: 'Project Version'
+    id: project_version
+    icon: "mdi:label-outline"
+    entity_category: diagnostic
+    lambda: |-
+      return {"${project_version}"};
+    update_interval: 6h
+    web_server_sorting_weight: 40
 
    # Updates the system time using SNTP. Upon boot also publishes when the device was started.
 time:
