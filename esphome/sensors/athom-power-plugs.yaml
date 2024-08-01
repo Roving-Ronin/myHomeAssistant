@@ -63,30 +63,6 @@ binary_sensor:
 
 sensor:
 
-  - platform: cse7766
-    current:
-      name: "Current"
-      id: current
-      unit_of_measurement: A
-      accuracy_decimals: 2
-      filters:
-        - throttle_average: ${sensor_update_interval}
-        - lambda: if (x < 0.060) return 0.0; else return x;   #For the chip will report less than 3w power when no load is connected
-      on_value_range:
-        - above: ${current_limit}
-          then:
-            - switch.turn_off: relay
-      web_server_sorting_weight: 3
-
-    voltage:
-      name: "Voltage"
-      id:   voltage
-      unit_of_measurement: V
-      accuracy_decimals: 1            
-      filters:
-        - throttle_average: ${sensor_update_interval}
-      web_server_sorting_weight: 4
-
     power:
       name: "Active Power"
       id: active_power
@@ -106,11 +82,38 @@ sensor:
         - throttle_average: ${sensor_update_interval}
       icon: mdi:power
       web_server_sorting_weight: 2
-    
+      
+  - platform: cse7766
+    current:
+      name: "Current"
+      id: current
+      unit_of_measurement: A
+      accuracy_decimals: 2
+      icon: "mdi:current-ac"
+      filters:
+        - throttle_average: ${sensor_update_interval}
+        - lambda: if (x < 0.060) return 0.0; else return x;   #For the chip will report less than 3w power when no load is connected
+      on_value_range:
+        - above: ${current_limit}
+          then:
+            - switch.turn_off: relay
+      web_server_sorting_weight: 3
+
+    voltage:
+      name: "Voltage"
+      id:   voltage
+      unit_of_measurement: V
+      accuracy_decimals: 1
+      icon: "mdi:sine-wave"
+      filters:
+        - throttle_average: ${sensor_update_interval}
+      web_server_sorting_weight: 4
+
     power_factor:
       name: "Power Factor"
       filters:
         - throttle_average: ${sensor_update_interval}
+      icon: "mdi:mdi:microsoft-powerpoint"
       web_server_sorting_weight: 5
 
     energy:
@@ -132,31 +135,6 @@ sensor:
               id(energy_total_sensor).update();
       internal: true
 
-#########################################################################
-
-    # Shows the TOTAL/Lifetime Energy kWh used by the device, will be reset to zero upon firmware updates though.
-  - platform: template
-    name: "Energy Total"
-    id: energy_total_sensor
-    unit_of_measurement: kWh
-    device_class: "energy"
-    state_class: "total_increasing"
-    icon: "mdi:lightning-bolt"
-    accuracy_decimals: 3
-    lambda: |-
-      return id(total_energy);
-   
-#  - platform: total_daily_energy
-#    name: "Energy Total Today"
-#    id: energy_total_today
-#    restore: true
-#    power_id: active_power
-#    unit_of_measurement: kWh
-#    accuracy_decimals: 3
-#    filters:
-#      - multiply: 0.001
-#    icon: mdi:hours-24      
-
 #####################################################################
 #
 # Function added by the Dentra Components
@@ -165,7 +143,6 @@ sensor:
      # Dentra Components - Define the id of the sensor tracking 'Total Energy' used
   - platform: "energy_statistics"
     total: energy_total_sensor
-      web_server_sorting_weight: 10
     
      # Dentra Components - Adds Energy Today. Persistents if restarted, unlike 'total_daily_energy'
     energy_today:
@@ -180,6 +157,7 @@ sensor:
       name: "Energy Yesterday"
       id: total_energy_yesterday
       accuracy_decimals: 3
+      icon: "mdi:calendar-today-outline"
       web_server_sorting_weight: 7
 
      # Dentra Components - Adds Energy Week
@@ -187,6 +165,7 @@ sensor:
       name: "Energy Week"
       id: total_energy_week
       accuracy_decimals: 3
+      icon: "mdi:calendar-week"
       web_server_sorting_weight: 8
 
      # Dentra Components - Adds Energy Month
@@ -194,7 +173,34 @@ sensor:
       name: "Energy Month"
       id: total_energy_month
       accuracy_decimals: 3
+      icon: "mdi:calendar-month"
       web_server_sorting_weight: 9
+
+#########################################################################
+
+    # Shows the TOTAL/Lifetime Energy kWh used by the device, will be reset to zero upon firmware updates though.
+  - platform: template
+    name: "Energy Total"
+    id: energy_total_sensor
+    unit_of_measurement: kWh
+    device_class: "energy"
+    state_class: "total_increasing"
+    icon: "mdi:lightning-bolt"
+    accuracy_decimals: 3
+    lambda: |-
+      return id(total_energy);
+    web_server_sorting_weight: 10
+   
+#  - platform: total_daily_energy
+#    name: "Energy Total Today"
+#    id: energy_total_today
+#    restore: true
+#    power_id: active_power
+#    unit_of_measurement: kWh
+#    accuracy_decimals: 3
+#    filters:
+#      - multiply: 0.001
+#    icon: mdi:hours-24      
 
 #########################################################################
 #
