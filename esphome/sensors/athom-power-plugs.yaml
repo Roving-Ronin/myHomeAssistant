@@ -165,8 +165,8 @@ sensor:
      # Dentra Components - Define the id of the sensor tracking 'Total Energy' used
   - platform: "energy_statistics"
     total: energy_total_sensor
-    web_server_sorting_weight: 10
-
+      web_server_sorting_weight: 10
+    
      # Dentra Components - Adds Energy Today. Persistents if restarted, unlike 'total_daily_energy'
     energy_today:
       name: "Energy Today"
