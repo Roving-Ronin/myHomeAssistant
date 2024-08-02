@@ -4,14 +4,22 @@
 #
 
 substitutions:
+
+###############################
+# Location/Site Details:
+#
+   # The site location, upon which this device is deployed. Used to populate a Text Sensor with this information.
+  site: ""
    # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   location: ""
    # The phase in the home power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)  
   power_circuit: "TBA"  
-   # Set the update interval for sensors
-  sensor_update_interval: 10s   
-   # Define a domain for this device to use. i.e. iot.home.lan (so device will appear as athom-smart-plug-v2.iot.home.lan in DNS/DHCP logs)
-  dns_domain: ".iot.home.lan"
+   # Asset Tag Details:
+  asset_id: ""
+
+###############################
+# Time Update Settings:
+#
    # Set timezone of the smart plug. Useful if the plug is in a location different to the HA server. Can be entered in unix Country/Area format (i.e. "Australia/Sydney")
   timezone: "Australia/Sydney"
    # Set the duration between the sntp service polling ntp.org servers for an update
@@ -20,13 +28,36 @@ substitutions:
   sntp_server_1: "0.au.pool.ntp.org"
   sntp_server_2: "1.au.pool.ntp.org"
   sntp_server_3: "2.au.pool.ntp.org"
-   # Enables faster network connections, with last connected SSID being connected to and no full scan for SSID being undertaken   
-  wifi_fast_connect: "true"
-   # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
-  log_level: "INFO"
+
+ ###############################
+# Network Settings
+#
    # Enable or disable the use of IPv6 networking on the device
   ipv6_enable: "false"
- 
+
+##########################
+# Device Settings:
+#  
+   # Set the update interval for sensors  
+  sensor_update_interval: 10s   
+   # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
+  log_level: "INFO"
+
+###############################
+# Network Settings - Static IP
+#
+   # Network - Static IP - Address  
+  network_ip: ""
+   # Network - Static IP - Gateway
+  network_gateway: ""
+   # Network - Static IP - Subnet Mask
+  network_subnet: ""
+   # Network - Static IP - DNS Servers
+  dns_server1: ""
+  dns_server2: ""
+   # Define a domain for this device to use. i.e. iot.home.lan (so device will appear as athom-smart-plug-v2.iot.home.lan in DNS/DHCP logs)
+  dns_domain: ".iot.home.lan"
+
 
 #########################################################################
 
