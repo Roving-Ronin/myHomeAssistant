@@ -20,18 +20,7 @@ substitutions:
    # (Optional, Pin Schema): The pin controlling the power/reset status of the Ethernet controller.
   ether_power_pin: "GPIO16"
 
-   # The static IP address the device is to utilise.
-  network_ip: ""
-   # The Gateway (router) to be utilised by the static IP.
-  network_gateway: ""
-   # The subnet mask of the static IP address.
-  network_subnet: "255.255.255.0"
-   # Primary DNS server to be utilised
-  dns_server1: "8.8.8.8"
-   # Secondary DNS server to be utilised
-  dns_server2: "1.1.1.1"
-
-#########################################################################
+########################## End of Substitutions #########################
 #
 # Configuration to add Ethernet network connection to ESP Devices
 #
