@@ -1,5 +1,13 @@
 #########################################################################
 #
+# Substitutions
+#
+substitutions:
+   # Enables faster network connections, with last connected SSID being connected to and no full scan for SSID being undertaken
+  wifi_fast_connect: "true"
+
+########################## End of Substitutions #########################
+#
 # Configuration to add WiFi network connection to ESP Devices
 #
 
@@ -13,6 +21,14 @@ wifi:
   fast_connect: "${wifi_fast_connect}"
    # Define dns domain / suffix to add to hostname
   domain: "${dns_domain}"
+
+ # Define a static IP address (optional)
+#  manual_ip:
+#    static_ip: ${network_ip}
+#    gateway: ${network_gateway}
+#    subnet: ${network_subnet}
+#    dns1: ${dns_server1}
+#    dns2: ${dns_server2}
 
    # Only works for WiFi connected devices 
 captive_portal:
