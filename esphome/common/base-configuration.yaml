@@ -46,20 +46,20 @@ substitutions:
 ###############################
 # Network Settings - Static IP
 #
-   # Network - Static IP - Address  
+   # The static IP address the device is to utilise.
   network_ip: ""
-   # Network - Static IP - Gateway
+   # The Gateway (router) to be utilised by the static IP.
   network_gateway: ""
-   # Network - Static IP - Subnet Mask
-  network_subnet: ""
-   # Network - Static IP - DNS Servers
-  dns_server1: ""
-  dns_server2: ""
+   # The subnet mask of the static IP address.
+  network_subnet: "255.255.255.0"
+   # Primary DNS server to be utilised
+  dns_server1: "8.8.8.8"
+   # Secondary DNS server to be utilised
+  dns_server2: "1.1.1.1"
    # Define a domain for this device to use. i.e. iot.home.lan (so device will appear as athom-smart-plug-v2.iot.home.lan in DNS/DHCP logs)
   dns_domain: ".iot.home.lan"
 
-
-#########################################################################
+########################## End of Substitutions #########################
 
 esphome:
    # Configures these settings to use the substitutions defined below
