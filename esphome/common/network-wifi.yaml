@@ -10,7 +10,6 @@ substitutions:
 #
 # Configuration to add WiFi network connection to ESP Devices
 #
-
 wifi:
   # WiFi credentials
   ssid: !secret wifi_ssid
@@ -35,39 +34,8 @@ captive_portal:
 
 ##########################################################################
 #
-# Sensors - WiFi Specific
-#
-
-sensor:
-
-   # Reports the WiFi signal strength/RSSI in dB
-  - platform: wifi_signal
-    id: wifi_signal_db
-    name: "WiFi Signal dB"
-    update_interval: 150s
-    icon: mdi:wifi-strength-2
-    entity_category: "diagnostic"
-    web_server_sorting_weight: 45
-    internal: true
-
-   # Reports the WiFi signal strength in %
-  - platform: copy
-    source_id: wifi_signal_db
-    name: "WiFi Strength"
-    id: wifi_strength
-    icon: mdi:wifi-arrow-up-down
-    filters:
-      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
-    unit_of_measurement: "%"
-    entity_category: "diagnostic"
-    device_class: ""
-    web_server_sorting_weight: 44
-
-##########################################################################
-#
 # Text Sensors - WiFi Specific
 #
-
 text_sensor:
 
    # Creates sensor for tracking the WiFi IP address
@@ -91,5 +59,34 @@ text_sensor:
       icon: mdi:wifi-strength-2
       entity_category: diagnostic
       web_server_sorting_weight: 43
+
+##########################################################################
+#
+# Sensors - WiFi Specific
+#
+sensor:
+
+   # Reports the WiFi signal strength in %
+  - platform: copy
+    source_id: wifi_signal_db
+    name: "WiFi Strength"
+    id: wifi_strength
+    icon: mdi:wifi-arrow-up-down
+    filters:
+      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
+    unit_of_measurement: "%"
+    entity_category: "diagnostic"
+    device_class: ""
+    web_server_sorting_weight: 44
+
+   # Reports the WiFi signal strength/RSSI in dB
+  - platform: wifi_signal
+    id: wifi_signal_db
+    name: "WiFi Signal dB"
+    update_interval: 150s
+    icon: mdi:wifi-strength-2
+    entity_category: "diagnostic"
+    web_server_sorting_weight: 45
+    internal: true
 
 ##########################################################################
