@@ -36,12 +36,12 @@ ethernet:
   domain: "${dns_domain}"
 
  # Define a static IP address (optional)
-  manual_ip:
-    static_ip: ${network_ip}
-    gateway: ${network_gateway}
-    subnet: ${network_subnet}
-    dns1: ${dns_server1}
-    dns2: ${dns_server2}
+#  manual_ip:
+#    static_ip: ${network_ip}
+#    gateway: ${network_gateway}
+#    subnet: ${network_subnet}
+#    dns1: ${dns_server1}
+#    dns2: ${dns_server2}
 
 ##########################################################################
 #
