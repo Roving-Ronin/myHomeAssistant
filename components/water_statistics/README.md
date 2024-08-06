@@ -31,11 +31,11 @@ sensor:
     lambda: |-
       return {water_statistics->daily_sensor, water_statistics->weekly_sensor, water_statistics->monthly_sensor, water_statistics->quarterly_sensor, water_statistics->yearly_sensor};
     sensors:
-      - name: "Daily Water Usage"
-      - name: "Weekly Water Usage"
-      - name: "Monthly Water Usage"
-      - name: "Quarterly Water Usage"
-      - name: "Yearly Water Usage"
+      - name: "Water Usage - Daily"
+      - name: "Water Usage - Weekly "
+      - name: "Water Usage - Monthly"
+      - name: "Water Usage - Quarterly"
+      - name: "Water Usage - Yearly"
 
 ```
 
