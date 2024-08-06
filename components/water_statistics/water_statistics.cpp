@@ -1,6 +1,6 @@
 #include "esphome.h"
 
-class WaterUsageSensor : public PollingComponent, public Sensor {
+class WaterStatistics : public PollingComponent, public Sensor {
  public:
   Sensor *daily_sensor = new Sensor();
   Sensor *weekly_sensor = new Sensor();
@@ -15,7 +15,7 @@ class WaterUsageSensor : public PollingComponent, public Sensor {
   float quarterly_usage = 0;
   float yearly_usage = 0;
 
-  WaterUsageSensor() : PollingComponent(60000) { }  // Polling every 1 minute
+  WaterStatistics() : PollingComponent(60000) { }  // Polling every 1 minute
 
   void setup() override {
     // Initialize the total water usage from the pulse_meter sensor
