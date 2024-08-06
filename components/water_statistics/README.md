@@ -25,6 +25,7 @@ custom_component:
       water_statistics->monthly_sensor = id(monthly_water_usage);
       water_statistics->quarterly_sensor = id(quarterly_water_usage);
       water_statistics->yearly_sensor = id(yearly_water_usage);
+      water_statistics->quarterly_offset_days = 15;  # Set your offset here
 
 sensor:
   - platform: custom
