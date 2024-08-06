@@ -6,12 +6,15 @@ from esphome import pins
 water_statistics_ns = cg.esphome_ns.namespace('water_statistics')
 WaterStatistics = water_statistics_ns.class_('WaterStatistics', cg.PollingComponent, sensor.Sensor)
 
+CONF_QUARTERLY_OFFSET_DAYS = "quarterly_offset_days"
+
 CONFIG_SCHEMA = sensor.SENSOR_SCHEMA.extend({
     cv.Required("daily"): sensor.sensor_schema(),
     cv.Required("weekly"): sensor.sensor_schema(),
     cv.Required("monthly"): sensor.sensor_schema(),
     cv.Required("quarterly"): sensor.sensor_schema(),
     cv.Required("yearly"): sensor.sensor_schema(),
+    cv.Optional(CONF_QUARTERLY_OFFSET_DAYS, default=1): cv.int_,
 }).extend(cv.polling_component_schema('60s'))
 
 def to_code(config):
@@ -38,3 +41,6 @@ def to_code(config):
     if "yearly" in config:
         sens = yield sensor.new_sensor(config["yearly"])
         cg.add(var.set_yearly_sensor(sens))
+
+    if CONF_QUARTERLY_OFFSET_DAYS in config:
+        cg.add(var.quarterly_offset_days = config[CONF_QUARTERLY_OFFSET_DAYS])
