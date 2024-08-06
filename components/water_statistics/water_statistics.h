@@ -7,6 +7,8 @@ class WaterStatistics : public PollingComponent, public Sensor {
   Sensor *monthly_sensor = new Sensor();
   Sensor *quarterly_sensor = new Sensor();
   Sensor *yearly_sensor = new Sensor();
+  
+  int quarterly_offset_days = 0;
 
   float total_water_usage = 0;
   float daily_usage = 0;
@@ -53,8 +55,8 @@ class WaterStatistics : public PollingComponent, public Sensor {
       monthly_usage = 0;
     }
 
-    // Reset usage at the start of the quarter
-    if (is_start_of_quarter()) {
+    // Reset usage at the start of the quarter with offset
+    if (is_start_of_quarter_with_offset()) {
       quarterly_usage = 0;
     }
 
@@ -86,9 +88,11 @@ class WaterStatistics : public PollingComponent, public Sensor {
     return time.day_of_month == 1 && time.hour == 0 && time.minute == 0;
   }
 
-  bool is_start_of_quarter() {
+  bool is_start_of_quarter_with_offset() {
     auto time = id(homeassistant_time).now();
-    return (time.month == 1 || time.month == 4 || time.month == 7 || time.month == 10) && time.day_of_month == 1 && time.hour == 0 && time.minute == 0;
+    return (time.day_of_month == quarterly_offset_days) && 
+           (time.month == 1 || time.month == 4 || time.month == 7 || time.month == 10) && 
+           time.hour == 0 && time.minute == 0;
   }
 
   bool is_start_of_year() {
