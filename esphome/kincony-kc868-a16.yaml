@@ -132,7 +132,7 @@ button:
     id: button_reset_water_reading
     on_press:
       - pulse_meter.set_total_pulses:
-          id: water_meter_flow_rate
+          id: water_flow_rate
           value: 0
 
 #########################################################################
