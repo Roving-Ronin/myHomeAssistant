@@ -22,7 +22,7 @@ CONF_WATER_MONTH = "water_month"
 
 water_statistics_ns = cg.esphome_ns.namespace("water_statistics")
 
-EnergyStatistics = water_statistics_ns.class_("EnergyStatistics", cg.Component)
+WaterStatistics = water_statistics_ns.class_("WaterStatistics", cg.Component)
 
 CONFIG_SCHEMA = cv.Schema(
     {
