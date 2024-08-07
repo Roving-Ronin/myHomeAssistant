@@ -22,11 +22,11 @@ CONF_WATER_MONTH = "water_month"
 
 water_statistics_ns = cg.esphome_ns.namespace("water_statistics")
 
-EnergyStatistics = water_statistics_ns.class_("EnergyStatistics", cg.Component)
+WaterStatistics = water_statistics_ns.class_("WaterStatistics", cg.Component)
 
 CONFIG_SCHEMA = cv.Schema(
     {
-        cv.GenerateID(): cv.declare_id(EnergyStatistics),
+        cv.GenerateID(): cv.declare_id(WaterStatistics),
         cv.GenerateID(CONF_TIME_ID): cv.use_id(time.RealTimeClock),
         cv.Required(CONF_TOTAL): cv.use_id(sensor.Sensor),
         cv.Optional(CONF_WATER_TODAY): sensor.sensor_schema(
