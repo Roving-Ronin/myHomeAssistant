@@ -8,8 +8,10 @@ from esphome.const import (
     CONF_TOTAL,
     DEVICE_CLASS_WATER,
     STATE_CLASS_TOTAL_INCREASING,
-    UNIT_L,
 )
+
+# Define UNIT_LITERS
+UNIT_LITERS = "L"
 
 CODEOWNERS = ["@dentra"]
 
