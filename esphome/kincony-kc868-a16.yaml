@@ -998,9 +998,9 @@ sensor:
       mode:
         input: true
         pullup: true
-    internal_filter_mode: EDGE     # PULSE
+    internal_filter_mode: PULSE
     internal_filter: 100ms
-    timeout: 1min
+    timeout: 3min
 
 
     #  Uses the above pulse_meter and adds sensor and calculations for tracking current litres
