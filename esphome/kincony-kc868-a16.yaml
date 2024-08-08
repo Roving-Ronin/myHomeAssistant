@@ -1026,21 +1026,21 @@ sensor:
 
 
   #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
-  - platform: template
-    name: "Water Meter - Reading"
-    id: water_meter_reading
-    unit_of_measurement: "L"
-    device_class: water
-    state_class: "total_increasing"
-    icon: "mdi:counter"
-    accuracy_decimals: 2
-    # The number 5251.07 should be replaced with your own gas meters physical reading
-    lambda: |-
-          return (id(water_consumed_total_litres) + 0 );
-    # Set interval that updates are sent to HA instance
-    update_interval: 15s
-    filters:
-      - delta : 0.001
+#  - platform: template
+#    name: "Water Meter - Reading"
+#    id: water_meter_reading
+#    unit_of_measurement: "L"
+#    device_class: water
+#    state_class: "total_increasing"
+#    icon: "mdi:counter"
+#    accuracy_decimals: 2
+#    # The number 5251.07 should be replaced with your own gas meters physical reading
+#    lambda: |-
+#          return (id(water_consumed_total_litres) + 0 );
+#    # Set interval that updates are sent to HA instance
+#    update_interval: 15s
+#    filters:
+#      - delta : 0.001
 
 
 # sensor:
