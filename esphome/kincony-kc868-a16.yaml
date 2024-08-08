@@ -22,7 +22,7 @@ substitutions:
   # Project Name
   project_name: "Kincony.KC868-A16"
   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "1.0.11"
+  project_version: "1.0.12"
   # Restore the relay (GPO switch) upon reboot to state:
   relay_restore_mode: RESTORE_DEFAULT_OFF
   # Disable sensors
@@ -980,7 +980,7 @@ sensor:
       mode:
         input: true
         pullup: true
-    update_interval : 15s
+#    update_interval : 15s
 
 
   - platform: pulse_meter
@@ -998,7 +998,7 @@ sensor:
       mode:
         input: true
         pullup: true
-    internal_filter_mode: PULSE
+    internal_filter_mode: EDGE     # PULSE
     internal_filter: 100ms
     timeout: 1min
 
@@ -1011,7 +1011,7 @@ sensor:
       icon: "mdi:water"
       state_class: "total_increasing"
       device_class: water
-      accuracy_decimals: 0
+      accuracy_decimals: 2
       filters:
 #        - lambda: return (x / 1000.0);   # 1 pulse = 1L.  This gives Kilo Litres
         - delta : 0.001
