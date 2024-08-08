@@ -1011,12 +1011,11 @@ sensor:
       icon: "mdi:water"
       state_class: "total_increasing"
       device_class: water
-      accuracy_decimals: 2
+      accuracy_decimals: 0
       filters:
-#        - lambda: return (x / 2000.0);   # 1 pulse = 0.5L.  This gives Kilo Litres
-        - lambda: return (x / 2.0);   # 1 pulse = 0.5L.   This gives Litres
+#        - lambda: return (x / 1000.0);   # 1 pulse = 1L.  This gives Kilo Litres
+#        - lambda: return (x / 1.0);   # 1 pulse = 0.5L.   This gives Litres
         - delta : 0.001
-#        - multiply: 0.5
     #  Adds the calculation for 'Reading Total' 
       on_value: 
         then:
