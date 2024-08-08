@@ -122,7 +122,7 @@ button:
     id: button_reset_gas_reading
     on_press:
       - pulse_meter.set_total_pulses:
-          id: gas_meter_flow_rate
+          id: gas_flow_rate
           value: 0
 
   #  Reset the total energy entity (Water - Current Reading)
@@ -131,9 +131,9 @@ button:
     entity_category: config
     id: button_reset_water_reading
     on_press:
-      - pulse_meter.set_total_pulses:
-          id: water_flow_rate
-          value: 0
+      - lambda: |-
+          id(water_consumed_litres).state = 0;
+          id(water_consumed_total_litres) = 0;
 
 #########################################################################
 #
@@ -880,8 +880,8 @@ sensor:
   #
 
   - platform: pulse_counter
-    name: "Gas Meter - Pulse Counter"
-    id: pulse_gas_meter
+    name: "Gas - Pulse Counter"
+    id: gas_pulse_counter
     pin:
       number: 32
       allow_other_uses: true
@@ -893,7 +893,7 @@ sensor:
 
   - platform: pulse_meter
     name: 'Gas Meter - Flow Rate'
-    id: "gas_meter_flow_rate"
+    id: "gas_flow_rate"
     unit_of_measurement: "L/min" # "m³/h"
     state_class: measurement
 #    device_class: volume
@@ -914,8 +914,8 @@ sensor:
 #      - multiply: 10.0
     #  Uses the above pulse_meter and adds sensor and calculations for tracking m3
     total:    
-      id: gas_meter_reading_m3
-      name: 'Gas Meter - Reading (m³)'
+      id: gas_consumed_m3
+      name: 'Gas - Consumed (m³)'
       unit_of_measurement: "m³"
       icon: "mdi:counter"
       state_class: "total_increasing"
@@ -929,27 +929,27 @@ sensor:
         then:
           - lambda: |-
               static float previous_gas_m3_value = 0.0;
-              float current_gas_m3_value = id(gas_meter_reading_m3).state;
+              float current_gas_m3_value = id(gas_consumed_m3).state;
               id(gas_total_m3) += current_gas_m3_value - previous_gas_m3_value;
               previous_gas_m3_value = current_gas_m3_value;
 
 
   - platform: template
-    name: "Gas Meter - Reading (MJ)"
-    id: gas_meter_reading_mj
+    name: "Gas - Consumed (MJ)"
+    id: gas_consumed_mj
     unit_of_measurement: "MJ"
     device_class: energy
     state_class: "total_increasing"
     icon: "mdi:counter"
     accuracy_decimals: 3   
     lambda: |-
-      return (id(gas_meter_reading_m3).state * 0.952 * 38.77);
+      return (id(gas_consumed_m3).state * 0.952 * 38.77);
 
 
   #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
   - platform: template
-    name: "Gas Meter - Reading (Since Last Reset)"
-    id: gas_meter_reading_since_last_reset
+    name: "Gas Meter - Reading"
+    id: gas_meter_reading
     unit_of_measurement: "m³"
     device_class: gas
     state_class: "total_increasing"
