@@ -22,7 +22,7 @@ substitutions:
   # Project Name
   project_name: "Kincony.KC868-A16"
   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "1.0.9"
+  project_version: "1.0.10"
   # Restore the relay (GPO switch) upon reboot to state:
   relay_restore_mode: RESTORE_DEFAULT_OFF
   # Disable sensors
@@ -1001,8 +1001,8 @@ sensor:
     internal_filter_mode: PULSE
     internal_filter: 100ms
     timeout: 1min
-    filters:
-      - lambda: return (x / 2.0);       # 1 pulse = 0.5L
+
+
     #  Uses the above pulse_meter and adds sensor and calculations for tracking current litres
     total:
       name: 'Water - Consumed'
@@ -1014,7 +1014,6 @@ sensor:
       accuracy_decimals: 0
       filters:
 #        - lambda: return (x / 1000.0);   # 1 pulse = 1L.  This gives Kilo Litres
-#        - lambda: return (x / 1.0);   # 1 pulse = 0.5L.   This gives Litres
         - delta : 0.001
     #  Adds the calculation for 'Reading Total' 
       on_value: 
@@ -1037,7 +1036,7 @@ sensor:
     accuracy_decimals: 2
     # The number 5251.07 should be replaced with your own gas meters physical reading
     lambda: |-
-          return (id(water_consumed_total_litres) + 0);
+          return (id(water_consumed_total_litres) + 0 );
     # Set interval that updates are sent to HA instance
     update_interval: 15s
     filters:
