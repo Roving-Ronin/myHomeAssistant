@@ -117,13 +117,14 @@ api:
 button:
   #  Reset the total energy entity (Gas - Current Reading)
   - platform: template
-    name: 'Gas Meter - Reset Reading'
+    name: 'Gas - Reset Reading'
     entity_category: config
     id: button_reset_gas_reading
     on_press:
-      - pulse_meter.set_total_pulses:
-          id: gas_flow_rate
-          value: 0
+      - lambda: |-
+          id(gas_total_m3) = 0;
+          id(gas_consumed_mj).state = 0;
+          id(gas_consumed_m3).state = 0;
 
   #  Reset the total energy entity (Water - Current Reading)
   - platform: template
@@ -132,8 +133,8 @@ button:
     id: button_reset_water_reading
     on_press:
       - lambda: |-
-          id(water_consumed_litres).state = 0;
           id(water_consumed_total_litres) = 0;
+          id(water_consumed_litres).state = 0;
 
 #########################################################################
 #
