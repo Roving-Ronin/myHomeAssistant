@@ -980,6 +980,8 @@ sensor:
       mode:
         input: true
         pullup: true
+    filters:
+      - multiply: 5.0  # Convert pulse count to liters
 #    update_interval : 15s
 
 
@@ -991,6 +993,8 @@ sensor:
     device_class: water
     icon: "mdi:pump"
     accuracy_decimals: 2
+    filters:
+      - multiply: 5.0  # Each pulse equals 5 liters
     pin:
       number: 33
       allow_other_uses: true
@@ -1014,6 +1018,7 @@ sensor:
       accuracy_decimals: 2
       filters:
 #        - lambda: return (x / 1000.0);   # 1 pulse = 1L.  This gives Kilo Litres
+        - multiply: 5.0  # Each pulse equals 5 liters
         - delta : 0.001
     #  Adds the calculation for 'Reading Total' 
       on_value: 
