@@ -1007,10 +1007,8 @@ sensor:
     internal_filter_mode: PULSE
     internal_filter: 100ms
     timeout: 3min
-    update_interval : 1s
     filters:
       - multiply: 5.0  # Each pulse equals 5 liters
-      - delta : 0.001
 
 
     #  Uses the above pulse_meter and adds sensor and calculations for tracking current litres
@@ -1033,7 +1031,6 @@ sensor:
       filters:
 #        - lambda: return (x / 200.0);   # 1 pulse = 1L.  This gives Kilo Litres
         - multiply: 5.0  # Each pulse equals 5 liters
-        - delta : 0.001
 
 
   #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
