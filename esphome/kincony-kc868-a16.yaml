@@ -22,7 +22,7 @@ substitutions:
   # Project Name
   project_name: "Kincony.KC868-A16"
   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "1.0.12"
+  project_version: "1.1.0"
   # Restore the relay (GPO switch) upon reboot to state:
   relay_restore_mode: RESTORE_DEFAULT_OFF
   # Disable sensors
@@ -890,14 +890,14 @@ sensor:
       mode:
         input: true
         pullup: true
-    update_interval : 15s
+
 
   - platform: pulse_meter
-    name: 'Gas Meter - Flow Rate'
+    name: 'Gas - Flow Rate'
     id: "gas_flow_rate"
     unit_of_measurement: "L/min" # "m³/h"
     state_class: measurement
-#    device_class: volume
+#    device_class: volume  # Disabled to stop this being recorded in HA
     icon: "mdi:pump"
     accuracy_decimals: 3
     pin:
@@ -910,9 +910,11 @@ sensor:
     internal_filter_mode: PULSE
     internal_filter: 100ms
     timeout: 3min
+    update_interval: 1s
     filters:
-      - lambda: return (x / 0.1);       # 1 pulse = 10L
-#      - multiply: 10.0
+      - multiply: 10.0     # 1 pulse = 10L
+      - delta : 0.001      # Only send updates if reading changes by at least
+
     #  Uses the above pulse_meter and adds sensor and calculations for tracking m3
     total:    
       id: gas_consumed_m3
@@ -922,10 +924,7 @@ sensor:
       state_class: "total_increasing"
       device_class: gas
       accuracy_decimals: 3
-      filters:
-        - lambda: return (x / 100.0);    # 100 pulses = 1,000L = 1m3
-#        - multiply: 0.01
-    #  Adds the calculation for 'Reading Since Reset' 
+    #  Adds the calculation for providing a reading since device last booted / reset
       on_value: 
         then:
           - lambda: |-
@@ -933,6 +932,10 @@ sensor:
               float current_gas_m3_value = id(gas_consumed_m3).state;
               id(gas_total_m3) += current_gas_m3_value - previous_gas_m3_value;
               previous_gas_m3_value = current_gas_m3_value;
+      update_interval: 1s
+      filters:
+        - multiply: 0.01   # 100 pulses = 1,000L = 1m3
+        - delta : 0.001    # Only send updates if reading changes by at least
 
 
   - platform: template
@@ -943,14 +946,19 @@ sensor:
     state_class: "total_increasing"
     icon: "mdi:counter"
     accuracy_decimals: 3   
+    # With EACH QUARTERLY GAS BILL update the Jemena Pressure Factor and Heating Value below.   
+    # Formula - (Gas Consumed x Pressure Factor x Heating Value) = Usage MJ
     lambda: |-
-      return (id(gas_consumed_m3).state * 0.952 * 38.77);
+      return (id(gas_consumed_m3).state * 0.9864 * 37.98);
+    update_interval: 1s
+    filters:
+      - delta : 0.001
 
 
   #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
   - platform: template
-    name: "Gas Meter - Reading"
-    id: gas_meter_reading
+    name: "Gas - Consumed Total"
+    id: gas_consumed_total
     unit_of_measurement: "m³"
     device_class: gas
     state_class: "total_increasing"
@@ -960,7 +968,7 @@ sensor:
     lambda: |-
           return (id(gas_total_m3) + 0);
     # Set interval that updates are sent to HA instance
-    update_interval: 15s
+    update_interval: 1s
     filters:
       - delta : 0.001
 
@@ -982,7 +990,6 @@ sensor:
         pullup: true
     filters:
       - multiply: 5.0  # Convert pulse count to liters
-#    update_interval : 15s
 
 
   - platform: pulse_meter
@@ -993,8 +1000,6 @@ sensor:
     device_class: water
     icon: "mdi:pump"
     accuracy_decimals: 2
-    filters:
-      - multiply: 5.0  # Each pulse equals 5 liters
     pin:
       number: 33
       allow_other_uses: true
@@ -1005,6 +1010,10 @@ sensor:
     internal_filter_mode: PULSE
     internal_filter: 100ms
     timeout: 3min
+    update_interval : 1s
+    filters:
+      - multiply: 5.0  # Each pulse equals 5 liters
+      - delta : 0.001
 
 
     #  Uses the above pulse_meter and adds sensor and calculations for tracking current litres
@@ -1016,10 +1025,6 @@ sensor:
       state_class: "total_increasing"
       device_class: water
       accuracy_decimals: 2
-      filters:
-#        - lambda: return (x / 1000.0);   # 1 pulse = 1L.  This gives Kilo Litres
-        - multiply: 5.0  # Each pulse equals 5 liters
-        - delta : 0.001
     #  Adds the calculation for 'Reading Total' 
       on_value: 
         then:
@@ -1028,6 +1033,10 @@ sensor:
               float current_water_consumed_litres_value = id(water_consumed_litres).state;
               id(water_consumed_total_litres) += current_water_consumed_litres_value - previous_water_consumed_litres_value;
               previous_water_consumed_litres_value = current_water_consumed_litres_value;
+      filters:
+#        - lambda: return (x / 200.0);   # 1 pulse = 1L.  This gives Kilo Litres
+        - multiply: 5.0  # Each pulse equals 5 liters
+        - delta : 0.001
 
 
   #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
@@ -1039,11 +1048,10 @@ sensor:
     state_class: "total_increasing"
     icon: "mdi:counter"
     accuracy_decimals: 2
-    # The number 5251.07 should be replaced with your own gas meters physical reading
     lambda: |-
-          return (id(water_consumed_total_litres) + 0 );
+          return (id(water_consumed_total_litres) );
     # Set interval that updates are sent to HA instance
-    update_interval: 15s
+    update_interval: 1s
     filters:
       - delta : 0.001
 
