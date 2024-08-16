@@ -13,8 +13,8 @@
 # Dentra Components - Adds 'Platform - Energy Statistics'
 
 # https://github.com/dentra/esphome-components/tree/master/components/energy_statistics
-external_components:
 #  - source: github://dentra/esphome-components
+external_components:
   - source: https://github.com/Roving-Ronin/myHomeAssistant/components
 
 #####################################################################
