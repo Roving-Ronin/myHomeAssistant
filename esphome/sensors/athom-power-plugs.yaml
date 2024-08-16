@@ -16,7 +16,7 @@
 #  - source: github://dentra/esphome-components
 external_components:
   - source: github://Roving-Ronin/myHomeAssistant/components@main
-
+    components: [ energy_statistics ]
 
 #####################################################################
 #
