@@ -181,7 +181,7 @@ sensor:
       name: "Energy Year"
       id: total_energy_year
       accuracy_decimals: 3
-      icon: "mdi:calendar-text
+      icon: "mdi:calendar-text"
       web_server_sorting_weight: 10
 
 #########################################################################
