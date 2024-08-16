@@ -6,7 +6,7 @@ Gather statistics for:
 * week
 * month
 
-> You can take a look at sample of usage of water* components in configuartion for `ZMAi-90` water meter based on `TYWE3S`: [zmai90.yaml](../zmai90.yaml)
+> Sample of usage of water* components in configuartion for `Elster V100` (1 imp = 10L) water meter based on Kincony KC868-A16 (ESP32) : [kincony-kc868-a16.yaml](../../esphome/kincony-kc868-a16.yaml). Main section starts at line 972.
 
 ```yaml
 # Example configuration entry
