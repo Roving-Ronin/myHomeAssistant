@@ -158,7 +158,7 @@ sensor:
       name: "Energy Yesterday"
       id: total_energy_yesterday
       accuracy_decimals: 3
-      icon: "mdi:calendar-today-outline"
+      icon: "mdi:calendar-today"
       web_server_sorting_weight: 7
 
      # Dentra Components - Adds Energy Week
@@ -181,7 +181,7 @@ sensor:
       name: "Energy Year"
       id: total_energy_year
       accuracy_decimals: 3
-      icon: "mdi:hours-24"
+      icon: "mdi:calendar-text
       web_server_sorting_weight: 10
 
 #########################################################################
