@@ -1,0 +1,189 @@
+#########################################################################
+#
+# Pacakge to configure the use of a device with a TL-136 / LIQ-136
+# pressure sensors to determinate liquid levels (i.e. water tanks)
+#
+
+#########################################################################
+#
+# Substitutions
+#
+
+substitutions:
+   # TL-136 / LIQ-136 Sensor Variables
+   # Name of the type of tank the sensor is being used to monitor. Omit entering 'Tank'.
+   # i.e. Water (Default), Sewerage, Disinfectant etc.
+  tank_name: "Water"
+   # Tank Inlet Height - Maximum level of water in centimetres (e.g. 241).
+  inlet_height: "241"
+   # Tank Diameter (i.e. distance from one side to the other) in centimeters.
+  tank_diameter: "238"
+   # Tank Radius - For a cylindrical tank. This will be half the diameter, in centimeters.
+  tank_radius: "119"
+   # Tank Level Offset. Add 0.01847cm to total, to correct to 0L when voltage is 0.469V
+  tank_level_offset: "0.01847"
+
+# Note: Default measurements are based upon a TankWorld 10,000L Tall Straight Wall Tank
+# https://www.tankworld.com.au/product/10000l-tall-straight-wall-tank/
+# Tank Capacity: 10,000L     |    Diameter Width: 2380mm
+# Inlet Height:  2410mm      |    Tank Height:    2485mm
+
+########################## End of Substitutions #########################
+#
+# Global Variables - Used to store a STATE, or share across multiple lambdas.
+#
+
+globals:
+  - id: container_diameter
+    type: float
+    restore_value: no
+    initial_value: ${tank_diameter}
+
+  - id: container_radius
+    type: float
+    restore_value: no
+    initial_value: ${tank_radius}
+
+  - id: tank_height
+    type: float
+    restore_value: no
+    initial_value: ${inlet_height}
+
+
+#########################################################################
+#
+# Sensors - Using Analogue to Digital Converter (ADC), mapping voltages
+# to liquid levels and converting to percentages and litres (approx).
+#
+
+sensor:
+
+  - platform: adc
+    pin: ${analog_1}
+    name: "Tank - Voltage"
+    id: "tank_voltage"
+    accuracy_decimals: 3
+    device_class: "voltage"
+    state_class: "measurement"
+    unit_of_measurement: "V"
+    update_interval: 5s
+    attenuation: 12db  #auto
+    filters:
+#     - multiply: 3.3
+    - median: 
+       window_size: 6
+       send_every: 6
+       send_first_at: 6
+#    - calibrate_polynomial:
+#       degree: 2
+#       datapoints:
+#          # Map from SENSOR -> TRUE value
+#         - 4.15867 -> 4.01667
+#         - 3.75700 -> 3.61500
+#         - 3.35533 -> 3.21333
+#         - 2.95367 -> 2.81167
+#         - 2.55200 -> 2.41000
+#         - 2.15033 -> 2.00833
+#         - 1.74867 -> 1.60667
+#         - 1.34700 -> 1.20500
+#         - 0.94533 -> 0.80333
+#         - 0.14200 -> 0.00000
+    internal: true
+
+################################################################################
+#
+# Water Tank - Conversions and metrics from pressure sensor
+# NOTE: You MUST update the calibrate_linear recorded Voltage to Levels in the Tank.
+# eg. 4.01667 -> 241.0 being 4.01667V is the voltage when the tank is at 241.0cm (100%)
+#     then do the same for each 10% down to 0.0000V = 0cm / 0%
+
+  - platform: template
+    name: "Tank - Level"
+    id: "tank_level"
+    icon: 'mdi:water-well'
+    unit_of_measurement: 'cm'
+    lambda: |-
+        return id(tank_voltage).state;
+    update_interval: 1s #the delta filter will ensure it only sends values when something changes. 
+    filters:
+      - calibrate_linear:
+          # Measured value of X volt maps to Y cm. 241.0 (and preceding numbers) are based upon a inlet height of 241cm. i.e. 120.5 = 50% of that etc
+          - 4.01667 -> 241.0   # 100%
+          - 3.61500 -> 216.9   #  90%
+          - 3.21333 -> 192.8   #  80%
+          - 2.81167 -> 168.7   #  70%
+          - 2.41000 -> 144.6   #  60%
+          - 2.00833 -> 120.5   #  50%
+          - 1.60667 -> 96.4    #  40%
+          - 1.20500 -> 72.3    #  30%
+          - 0.80333 -> 48.2    #  20%
+          - 0.40167 -> 24.1    #  10%
+          - 0.00000 -> 0.00    #   0%
+    # From https://www.sensorsone.com/measurement-to-linear-0-5v-converter/?iunit=cm&irdg=0.8452500672&ilo=0.469&ihi=4.016666&ounit=V&olo=0&ohi=5
+      - delta : 0.001                  # Only send the result if the difference with the last sent result is higher than this
+      - offset: ${tank_level_offset}   # Add 0.01847cm to total, to correct to 0L when voltage is 0.469V
+    internal: true
+
+    # Sensor used to publish the 'Tank Level' sensor, but with the prefixed name of the tank (i.e. Water)
+  - platform: template
+    name: "${tank_name} Tank - Level"
+    id: "${tank_name}_tank_level"
+    icon: 'mdi:water-well'
+    unit_of_measurement: 'cm'
+    lambda: |-
+        return id(tank_level).state;
+    update_interval: 1s #the delta filter will ensure it only sends values when something changes. 
+    filters:
+      - delta : 0.001     # Only send the result if the difference with the last sent result is higher than this
+
+################################################################################
+#
+# Water Tank - Percentage Full
+#
+
+  - platform: template
+    name: "${tank_name} Tank - %"
+    id: "${tank_name}_tank_percent"
+    icon: 'mdi:water-percent'
+    unit_of_measurement: '%'
+    update_interval: 1s #the delta filter will ensure it only sends values when something changes.     
+    lambda: |-
+        return id(tank_level).state / id(tank_height) * 100;
+    # divide by max water level height to get a percentage. Inlet height 2410mm / tank height 2485mm. Diameter 2380mm. 10,000L
+    # H 2410mm x D 2380mm = 10,721.6305 L (Full).   2410mm = 23.56kPa / .24bar / 3.42psi / 176.75 mmHg
+    # local gravity = 9.79697g ms2.  1,000L = 979.697kg
+    filters:
+      - delta : 0.1 #only send the result if the difference with the last sent result is higher than this
+
+################################################################################
+#
+# Water Tank - Litres held in the tank
+#
+
+  - platform: template
+    name: "${tank_name} Tank - Litres"
+    id: "${tank_name}_tank_litres"
+    icon: 'mdi:gauge'
+    unit_of_measurement: 'L'
+    lambda: |-
+      return id(tank_level).state / 1000 * 3.14159265359 * id(container_radius) * id(container_radius);
+#
+#      if (id(tank_level).state <= 0) {
+#        return {"Empty"};
+#      }
+#      else {
+#        return id(water_tank_level).state / 100 * 3.14159265359 * 1.19 * 1.19 * 1000.0;
+#      }    # height (meters) times pi times radius (meters) squared times 1000 gives litres. 
+
+    # This works if your water tank is a cylinder shape. Otherwise you have to use different calculations.
+    # 10,000L with diamter of 2.38m = 224.7792431210859cm height
+    #
+    # return id(water_tank_level).state / 100 * 3.14159265359 * 1.19 * 1.19 * 1000.0;
+    update_interval: 1s #the delta filter will ensure it only sends values when something changes. 
+    filters:
+      - delta : 0.001 #only send the result if the difference with the last sent result is higher than this
+
+
+## 655.4 m or 2150.3 feet Location :-34.72 , 149.72
+
+################################################################################
