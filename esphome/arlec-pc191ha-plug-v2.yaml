@@ -80,7 +80,8 @@ network: !remove
 
 # https://github.com/dentra/esphome-components/tree/master/components/energy_statistics
 external_components:
-  - source: github://dentra/esphome-components
+#  - source: github://dentra/esphome-components
+  - source: github://Roving-Ronin/dentra-components@Energy-Statistics-Year
 
 #########################################################################
 #
@@ -257,6 +258,13 @@ sensor:
       icon: mdi:calendar-month
       web_server_sorting_weight: 7
 
+    energy_year:
+      name: "Energy Year"
+      id: total_energy_year
+      accuracy_decimals: 3
+      icon: "mdi:hours-24"
+      web_server_sorting_weight: 8
+
 #########################################################################
 
      # Shows the TOTAL/Lifetime Energy kWh used by the device, may reset to zero upon firmware updates
@@ -270,7 +278,7 @@ sensor:
     accuracy_decimals: 3
     lambda: |-
       return id(total_energy);
-    web_server_sorting_weight: 8
+    web_server_sorting_weight: 9
     
      # Shows the Energy kWh for the current day
 #  - platform: total_daily_energy
@@ -303,7 +311,7 @@ switch:
     on_turn_off:
       then:
         - light.turn_off: button_led
-    web_server_sorting_weight: 9
+    web_server_sorting_weight: 10
 
 light:
   - platform: status_led
@@ -313,4 +321,4 @@ light:
     disabled_by_default: true
     pin:
       number: GPIO26
-    web_server_sorting_weight: 10
+    web_server_sorting_weight: 11
