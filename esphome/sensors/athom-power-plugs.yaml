@@ -14,8 +14,8 @@
 
 # https://github.com/dentra/esphome-components/tree/master/components/energy_statistics
 external_components:
-  - source: github://dentra/esphome-components
-
+#  - source: github://dentra/esphome-components
+  - source: https://github.com/Roving-Ronin/myHomeAssistant/components
 
 #####################################################################
 #
@@ -175,6 +175,13 @@ sensor:
       accuracy_decimals: 3
       icon: "mdi:calendar-month"
       web_server_sorting_weight: 9
+
+    energy_year:
+      name: "Energy Year"
+      id: total_energy_year
+      accuracy_decimals: 3
+      icon: "mdi:hours-24"
+      web_server_sorting_weight: 10
 
 #########################################################################
 
