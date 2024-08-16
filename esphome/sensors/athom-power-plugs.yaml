@@ -197,7 +197,7 @@ sensor:
     accuracy_decimals: 3
     lambda: |-
       return id(total_energy);
-    web_server_sorting_weight: 10
+    web_server_sorting_weight: 11
    
 #  - platform: total_daily_energy
 #    name: "Energy Total Today"
@@ -223,7 +223,7 @@ switch:
     id: relay
     restore_mode: ${relay_restore_mode}
     icon: "mdi:power-socket-au"
-    web_server_sorting_weight: 11
+    web_server_sorting_weight: 12
 
 light:
   - platform: status_led
@@ -234,6 +234,6 @@ light:
       inverted: true
       number: ${gpo_status_led_pin}
     icon: "mdi:lightbulb-outline"
-    web_server_sorting_weight: 12
+    web_server_sorting_weight: 13
 
 #########################################################################
