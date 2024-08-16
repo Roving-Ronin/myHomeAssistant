@@ -32,12 +32,18 @@ template:
         {% else %} {{rate5}}
         {% endif %}
 
+###########################################################################
 #
-# 10 Nov 2023 - Meter Reading x 0.9961 x 38.15 MJ = 38.001215 MJ per m³
-#             - M3 price is MJ rate x 38.001215 MJ in 1m³. 
+# UPDATE M3 PRICE TO REFLECT MJ PRICE CHANGES AND x Pressure Factor x Heating Value
 #
-#  8 Feb 2024 - Meter Reading x 0.9961 x 38.15 MJ = 36.90904 MJ per m³
-#             - M3 price is MJ rate x 36.90904 MJ in 1m³. 
+# 10 Nov 2023 - 1m³ x 0.9961 x 38.15 MJ = 38.001215 MJ per m³
+#             - Per m³ price is MJ rate x 38.001215 MJ in 1m³. 
+#
+#  8 Feb 2024 - 1m³ x 0.9961 x 38.15 MJ = 36.90904 MJ per m³
+#             - Per m³ price is MJ rate x 36.90904 MJ in 1m³. 
+#
+#  9 Aug 2024 - 1m³ x 0.9864 x 37.98 MJ = 37.463472 MJ per m³
+#             - Per m³ price is MJ rate x 37.463472 MJ in 1m³. 
 #
   - sensor:
     - name: "Gas - Price (m³)"
@@ -46,11 +52,11 @@ template:
       device_class: monetary
       state: >
         {## Enter cost per m3 rates below ##}
-        {% set rate1 = 1.3316781632 %}
-        {% set rate2 = 1.1286784432 %}
+        {% set rate1 = 1.35168206976 %}
+        {% set rate2 = 1.14563297376 %}
         {% set rate3 = 1.037144024 %}
-        {% set rate4 = 1.0068786112 %}
-        {% set rate5 = 0.893198768 %}
+        {% set rate4 = 1.02200351616 %}
+        {% set rate5 = 0.9066160224 %}
         {% set gas_consumption = states('sensor.gas_consumed_quarterly_mj') | float %}
         {% if gas_consumption <= 1890 %} {{rate1}}
         {% elif gas_consumption <= 3750 %} {{rate2}}
@@ -66,13 +72,14 @@ template:
 # This reading however is taken as a full number, i.e. 05846314 is read as 5,846,314 instead of 05846.314 m³ 
 # So this template sensor is needed to divide the number by 1,000
 #
+
   - sensor:
-    - name: "Gas Meter - Readout"
-      unique_id: gas_meter_readout
+    - name: "Gas Meter - Reading"
+      unique_id: gas_meter_reading
       unit_of_measurement: "m³"
       device_class: "gas"
       state_class: total_increasing
-      state: "{{ (states('counter.gas_meter') | int / 1000 | round(1)) }}"
+      state: "{{ (states('counter.gas_meter_reading') | int / 1000 | round(1)) }}"
 
 # ---------------------------------------------------------------------------
 # 
@@ -88,7 +95,7 @@ energy_meter:
   gas_consumed_daily_m3:
     unique_id: gas_consumed_daily_m3
     name: "Gas Consumed Daily m³"
-    source: sensor.kc868_1_gas_meter_reading_m3
+    source: sensor.kc868_a16_gas_consumed_m3
     source_type: gas
     cycle: daily
     price_entity: sensor.gas_price_m3
@@ -96,7 +103,7 @@ energy_meter:
 #   Quarterly m3 total only included to allow validation against the retailers m3 reading on their quarterly invoice.
 #  gas_consumed_quarterly_m3:
 #    unique_id: gas_consumed_quarterly_m3
-#    source: sensor.kc868_1_gas_meter_reading_m3
+#    source: sensor.kc868_a16_gas_consumed_m3
 #    source_type: gas
 #    name: Gas Consumed Quarterly m³
 #    cycle: quarterly
@@ -106,7 +113,7 @@ energy_meter:
 #   Quarterly m3 total only included to allow validation against the retailers m3 reading on their quarterly invoice.
 #  gas_consumed_yearly_m3:
 #    unique_id: gas_consumed_yearly_m3
-#    source: sensor.kc868_1_gas_meter_reading_m3
+#    source: sensor.kc868_a16_gas_consumed_m3
 #    source_type: gas
 #    name: Gas Consumed Yearly m³
 #    cycle: yearly
@@ -121,7 +128,7 @@ energy_meter:
   gas_consumed_daily_mj:
     unique_id: gas_consumed_daily_mj 
     name: Gas Consumed Daily mj
-    source: sensor.kc868_1_gas_meter_reading_mj
+    source: sensor.kc868_a16_gas_consumed_mj
     source_type: gas
     cycle: daily
     price_entity: &entity-price sensor.gas_price_mj
@@ -129,7 +136,7 @@ energy_meter:
   gas_consumed_monthly_mj:
     unique_id: gas_consumed_monthly_mj
     name: Gas Consumed Monthly mj
-    source: sensor.kc868_1_gas_meter_reading_mj
+    source: sensor.kc868_a16_gas_consumed_mj
     source_type: gas
     cycle: monthly
     price_entity: *entity-price
@@ -137,7 +144,7 @@ energy_meter:
   gas_consumed_quarterly_mj:
     unique_id: gas_consumed_quarterly_mj
     name: Gas Consumed Quarterly mj
-    source: sensor.kc868_1_gas_meter_reading_mj
+    source: sensor.kc868_a16_gas_consumed_mj
     source_type: gas
     cycle: quarterly
     price_entity: *entity-price
@@ -145,7 +152,7 @@ energy_meter:
   gas_consumed_yearly_mj:
     unique_id: gas_consumed_yearly_mj
     name: Gas Consumed Yearly mj
-    source: sensor.kc868_1_gas_meter_reading_mj
+    source: sensor.kc868_a16_gas_consumed_mj
     source_type: gas
     cycle: yearly
     price_entity: *entity-price
@@ -166,7 +173,7 @@ automation:
 #        entity_id: calendar.gas_meter_reset
 #    condition: []
 #    action:
-#      - service: utility_meter.calibrate
+#      - action: utility_meter.calibrate
 #        data:
 #          value: "0"
 #        target:
