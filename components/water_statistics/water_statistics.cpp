@@ -8,26 +8,26 @@ namespace water_statistics {
 static const char *const TAG = "water_statistics";
 static const char *const GAP = "  ";
 
-void EnergyStatistics::dump_config() {
-  ESP_LOGCONFIG(TAG, "Energy statistics sensors");
+void WaterStatistics::dump_config() {
+  ESP_LOGCONFIG(TAG, "Water statistics sensors");
   if (this->water_today_) {
-    LOG_SENSOR(GAP, "Energy Today", this->water_today_);
+    LOG_SENSOR(GAP, "Water Today", this->water_today_);
   }
   if (this->water_yesterday_) {
-    LOG_SENSOR(GAP, "Energy Yesterday", this->water_yesterday_);
+    LOG_SENSOR(GAP, "Water Yesterday", this->water_yesterday_);
   }
   if (this->water_week_) {
-    LOG_SENSOR(GAP, "Energy Week", this->water_week_);
+    LOG_SENSOR(GAP, "Water Week", this->water_week_);
   }
   if (this->water_month_) {
-    LOG_SENSOR(GAP, "Energy Month", this->water_month_);
+    LOG_SENSOR(GAP, "Water Month", this->water_month_);
   }
   if (this->water_year_) {
-    LOG_SENSOR(GAP, "Energy Year", this->water_year_);
+    LOG_SENSOR(GAP, "Water Year", this->water_year_);
   }
 }
 
-void EnergyStatistics::setup() {
+void WaterStatistics::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
 
   this->pref_ = global_preferences->make_preference<water_data_t>(fnv1_hash(TAG));
@@ -42,7 +42,7 @@ void EnergyStatistics::setup() {
   }
 }
 
-void EnergyStatistics::loop() {
+void WaterStatistics::loop() {
   const auto t = this->time_->now();
   if (!t.is_valid()) {
     // time is not sync yet
@@ -84,7 +84,7 @@ void EnergyStatistics::loop() {
   this->process_(total);
 }
 
-void EnergyStatistics::process_(float total) {
+void WaterStatistics::process_(float total) {
   if (this->water_today_ && !std::isnan(this->water_.start_today)) {
     this->water_today_->publish_state(total - this->water_.start_today);
   }
@@ -108,7 +108,7 @@ void EnergyStatistics::process_(float total) {
   this->save_();
 }
 
-void EnergyStatistics::save_() { this->pref_.save(&(this->water_)); }
+void WaterStatistics::save_() { this->pref_.save(&(this->water_)); }
 
 }  // namespace water_statistics
 }  // namespace esphome
