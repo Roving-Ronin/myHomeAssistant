@@ -22,6 +22,9 @@ void GasStatistics::dump_config() {
   if (this->gas_month_) {
     LOG_SENSOR(GAP, "Gas Month", this->gas_month_);
   }
+  if (this->gas_year_) {
+    LOG_SENSOR(GAP, "Gas Year", this->gas_year_);
+  }
 }
 
 void GasStatistics::setup() {
@@ -70,6 +73,10 @@ void GasStatistics::loop() {
     if (t.day_of_month == 1) {
       this->gas_.start_month = total;
     }
+    // at first day of month we start a new month calculation
+    if (t.day_of_year == 1) {
+      this->gas_.start_year = total;
+    }
   }
 
   this->gas_.current_day_of_year = t.day_of_year;
@@ -94,6 +101,9 @@ void GasStatistics::process_(float total) {
     this->gas_month_->publish_state(total - this->gas_.start_month);
   }
 
+  if (this->gas_year_ && !std::isnan(this->gas_.start_year)) {
+    this->gas_year_->publish_state(total - this->gas_.start_year);
+  }
   this->save_();
 }
 
