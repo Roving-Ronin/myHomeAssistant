@@ -19,6 +19,7 @@ CONF_GAS_TODAY = "gas_today"
 CONF_GAS_YESTERDAY = "gas_yesterday"
 CONF_GAS_WEEK = "gas_week"
 CONF_GAS_MONTH = "gas_month"
+CONF_GAS_YEAR = "gas_year"
 
 gas_statistics_ns = cg.esphome_ns.namespace("gas_statistics")
 
@@ -48,6 +49,12 @@ CONFIG_SCHEMA = cv.Schema(
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_GAS_MONTH): sensor.sensor_schema(
+            unit_of_measurement=UNIT_CUBIC_METER,
+            accuracy_decimals=3,
+            device_class=DEVICE_CLASS_GAS,
+            state_class=STATE_CLASS_TOTAL_INCREASING,
+        ),
+        cv.Optional(CONF_GAS_YEAR): sensor.sensor_schema(
             unit_of_measurement=UNIT_CUBIC_METER,
             accuracy_decimals=3,
             device_class=DEVICE_CLASS_GAS,
@@ -92,3 +99,4 @@ async def to_code(config):
     await setup_sensor(config, CONF_GAS_YESTERDAY, var.set_gas_yesterday)
     await setup_sensor(config, CONF_GAS_WEEK, var.set_gas_week)
     await setup_sensor(config, CONF_GAS_MONTH, var.set_gas_month)
+    await setup_sensor(config, CONF_GAS_YEAR, var.set_gas_year)
