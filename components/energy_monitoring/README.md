@@ -10,7 +10,8 @@ The configuration is very simple. Look at a sample below:
 # Example configuration entry
 ...
 external_components:
-  - source: github://dentra/esphome-components
+  - source: github://roving-ronin/myhomeassistant/components
+    refresh: 0s
 ...
 sensor:
   - platform: "energy_monitoring"
