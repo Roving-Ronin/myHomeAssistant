@@ -6,7 +6,7 @@ Gather statistics for:
 * week
 * month
 
-> You can take a look at sample of usage of Energy* components in configuartion for `ZMAi-90` energy meter based on `TYWE3S`: [zmai90.yaml](../zmai90.yaml)
+> You can take a look at sample of usage of Energy* components in configuartion for Athom Plug devices in the: [athom-power-plugs.yaml](../../esphome/sensors/athom-power-plugs.yaml)
 
 ```yaml
 # Example configuration entry
