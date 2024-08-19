@@ -11,7 +11,7 @@ from esphome.const import (
     UNIT_CUBIC_METER,
 )
 
-CODEOWNERS = ["@dentra"]
+CODEOWNERS = ["@dentra", "@roving-ronin"]
 
 DEPENDENCIES = ["time"]
 
