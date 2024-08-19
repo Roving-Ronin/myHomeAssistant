@@ -5,6 +5,7 @@ Gather statistics for:
 * yesterday
 * week
 * month
+* year
 
 > You can take a look at sample of usage of Energy* components in configuartion for Athom Plug devices in the: [athom-power-plugs.yaml](../../esphome/sensors/athom-power-plugs.yaml)
 
@@ -12,7 +13,8 @@ Gather statistics for:
 # Example configuration entry
 ...
 external_components:
-  - source: github://dentra/esphome-components
+  - source: github://roving-ronin/myhomeassistant/components
+    refresh: 0s
 ...
 sensor:
   - platform: "energy_statistics"
@@ -25,6 +27,8 @@ sensor:
       name: "$name Energy Week"
     energy_month:
       name: "$name Energy Month"
+    energy_year:
+      name: "$name Energy Year"
 ```
 
 ## Configuration variables:
@@ -37,4 +41,6 @@ sensor:
 * **energy_week** (*Optional*, Sensor):
   * Any options from [Sensor](https://esphome.io/components/sensor/index.html#config-sensor).
 * **energy_month** (*Optional*, Sensor):
+  * Any options from [Sensor](https://esphome.io/components/sensor/index.html#config-sensor).
+* **energy_year** (*Optional*, Sensor):
   * Any options from [Sensor](https://esphome.io/components/sensor/index.html#config-sensor).
