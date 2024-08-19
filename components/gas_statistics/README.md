@@ -12,7 +12,8 @@ Gather statistics for:
 # Example configuration entry
 ...
 external_components:
-  - source: github://roving-ronin/myHomeAssistant/components
+  - source: github://roving-ronin/myhomeassistant/components
+    refresh: 0s
 ...
 sensor:
   - platform: "gas_statistics"
@@ -29,6 +30,9 @@ sensor:
     gas_month:
       name: "Gas Consumed Month"
       id: gas_consumed_month
+    gas_year:
+      name: "Gas Consumed Year"
+      id: gas_consumed_year
 ```
 
 ## Configuration variables:
@@ -41,4 +45,6 @@ sensor:
 * **gas_week** (*Optional*, Sensor):
   * Any options from [Sensor](https://esphome.io/components/sensor/index.html#config-sensor).
 * **gas_month** (*Optional*, Sensor):
+  * Any options from [Sensor](https://esphome.io/components/sensor/index.html#config-sensor).
+* **gas_year** (*Optional*, Sensor):
   * Any options from [Sensor](https://esphome.io/components/sensor/index.html#config-sensor).
