@@ -11,7 +11,7 @@ from esphome.const import (
     UNIT_KILOWATT_HOURS,
 )
 
-CODEOWNERS = ["@dentra"]
+CODEOWNERS = ["@dentra", "@roving-ronin"]
 
 DEPENDENCIES = ["time"]
 
