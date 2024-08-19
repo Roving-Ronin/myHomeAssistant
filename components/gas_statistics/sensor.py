@@ -15,18 +15,18 @@ CODEOWNERS = ["@dentra"]
 
 DEPENDENCIES = ["time"]
 
-CONF_ENERGY_TODAY = "energy_today"
-CONF_ENERGY_YESTERDAY = "energy_yesterday"
-CONF_ENERGY_WEEK = "energy_week"
-CONF_ENERGY_MONTH = "energy_month"
+CONF_ENERGY_TODAY = "gas_today"
+CONF_ENERGY_YESTERDAY = "gas_yesterday"
+CONF_ENERGY_WEEK = "gas_week"
+CONF_ENERGY_MONTH = "gas_month"
 
-energy_statistics_ns = cg.esphome_ns.namespace("energy_statistics")
+gas_statistics_ns = cg.esphome_ns.namespace("gas_statistics")
 
-EnergyStatistics = energy_statistics_ns.class_("EnergyStatistics", cg.Component)
+GasStatistics = gas_statistics_ns.class_("GasStatistics", cg.Component)
 
 CONFIG_SCHEMA = cv.Schema(
     {
-        cv.GenerateID(): cv.declare_id(EnergyStatistics),
+        cv.GenerateID(): cv.declare_id(GasStatistics),
         cv.GenerateID(CONF_TIME_ID): cv.use_id(time.RealTimeClock),
         cv.Required(CONF_TOTAL): cv.use_id(sensor.Sensor),
         cv.Optional(CONF_ENERGY_TODAY): sensor.sensor_schema(
@@ -88,7 +88,7 @@ async def to_code(config):
     await setup_input(config, CONF_TOTAL, var.set_total)
 
     # exposed sensors
-    await setup_sensor(config, CONF_ENERGY_TODAY, var.set_energy_today)
-    await setup_sensor(config, CONF_ENERGY_YESTERDAY, var.set_energy_yesterday)
-    await setup_sensor(config, CONF_ENERGY_WEEK, var.set_energy_week)
-    await setup_sensor(config, CONF_ENERGY_MONTH, var.set_energy_month)
+    await setup_sensor(config, CONF_ENERGY_TODAY, var.set_gas_today)
+    await setup_sensor(config, CONF_ENERGY_YESTERDAY, var.set_gas_yesterday)
+    await setup_sensor(config, CONF_ENERGY_WEEK, var.set_gas_week)
+    await setup_sensor(config, CONF_ENERGY_MONTH, var.set_gas_month)
