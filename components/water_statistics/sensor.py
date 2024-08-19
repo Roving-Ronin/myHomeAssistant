@@ -90,7 +90,7 @@ async def to_code(config):
     await setup_input(config, CONF_TIME_ID, var.set_time)
 
     # input sensors
-    await setup_input(config, CONF_POWER, var.set_power)
+    # await setup_input(config, CONF_POWER, var.set_power)
     await setup_input(config, CONF_TOTAL, var.set_total)
 
     # exposed sensors
