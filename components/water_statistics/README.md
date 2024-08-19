@@ -12,7 +12,8 @@ Gather statistics for:
 # Example configuration entry
 ...
 external_components:
-  - source: github://roving-ronin/myHomeAssistant/components
+  - source: github://roving-ronin/myhomeassistant/components
+    refresh: 0s
 ...
 sensor:
   - platform: "water_statistics"
@@ -29,6 +30,9 @@ sensor:
     water_month:
       name: "Water Consumed Month"
       id: water_consumed_month
+    water_year:
+      name: "Water Consumed Year"
+      id: water_consumed_year
 ```
 
 ## Configuration variables:
@@ -41,4 +45,6 @@ sensor:
 * **water_week** (*Optional*, Sensor):
   * Any options from [Sensor](https://esphome.io/components/sensor/index.html#config-sensor).
 * **water_month** (*Optional*, Sensor):
+  * Any options from [Sensor](https://esphome.io/components/sensor/index.html#config-sensor).
+* **water_year** (*Optional*, Sensor):
   * Any options from [Sensor](https://esphome.io/components/sensor/index.html#config-sensor).
