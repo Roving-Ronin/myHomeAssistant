@@ -83,6 +83,7 @@ external_components:
 #  - source: github://dentra/esphome-components
 #  - source: github://Roving-Ronin/dentra-components@Energy-Statistics-Year
   - source: github://roving-ronin/myhomeassistant/components
+    refresh: 1s
 
 #########################################################################
 #
