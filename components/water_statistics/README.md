@@ -5,6 +5,7 @@ Gather statistics for:
 * yesterday
 * week
 * month
+* year
 
 > Sample of usage of water* components in configuartion for `Elster V100` (1 imp = 10L) water meter based on Kincony KC868-A16 (ESP32) : [kincony-kc868-a16.yaml](../../esphome/kincony-kc868-a16.yaml). Main section starts at line 972.
 
@@ -37,7 +38,7 @@ sensor:
 
 ## Configuration variables:
 * **id** (*Optional*, [ID](https://esphome.io/guides/configuration-types.html#config-id)): Manually specify the ID used for code generation.
-* **total** (**Required**, [ID](https://esphome.io/guides/configuration-types.html#config-id)): The ID of the total power sensor.
+* **total** (**Required**, [ID](https://esphome.io/guides/configuration-types.html#config-id)): The ID of the total water (m3) sensor.
 * **water_today** (*Optional*, Sensor):
   * Any options from [Sensor](https://esphome.io/components/sensor/index.html#config-sensor).
 * **water_yesterday** (*Optional*, Sensor):
