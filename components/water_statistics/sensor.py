@@ -7,7 +7,7 @@ from esphome.const import (
     CONF_TOTAL,
     DEVICE_CLASS_WATER,
     STATE_CLASS_TOTAL_INCREASING,
-    UNIT_KILOWATT_HOURS,
+    UNIT_LITRE,
 )
 
 CODEOWNERS = ["@dentra", "@roving-ronin"]
@@ -30,33 +30,33 @@ CONFIG_SCHEMA = cv.Schema(
         cv.GenerateID(CONF_TIME_ID): cv.use_id(time.RealTimeClock),
         cv.Required(CONF_TOTAL): cv.use_id(sensor.Sensor),
         cv.Optional(CONF_WATER_TODAY): sensor.sensor_schema(
-            unit_of_measurement=UNIT_KILOWATT_HOURS,
+            unit_of_measurement=UNIT_LITRE,
             accuracy_decimals=2,
-            device_class=DEVICE_CLASS_ENERGY,
+            device_class=DEVICE_CLASS_WATER,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_WATER_YESTERDAY): sensor.sensor_schema(
-            unit_of_measurement=UNIT_KILOWATT_HOURS,
+            unit_of_measurement=UNIT_LITRE,
             accuracy_decimals=2,
-            device_class=DEVICE_CLASS_ENERGY,
+            device_class=DEVICE_CLASS_WATER,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_WATER_WEEK): sensor.sensor_schema(
-            unit_of_measurement=UNIT_KILOWATT_HOURS,
+            unit_of_measurement=UNIT_LITRE,
             accuracy_decimals=2,
-            device_class=DEVICE_CLASS_ENERGY,
+            device_class=DEVICE_CLASS_WATER,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_WATER_MONTH): sensor.sensor_schema(
-            unit_of_measurement=UNIT_KILOWATT_HOURS,
+            unit_of_measurement=UNIT_LITRE,
             accuracy_decimals=2,
-            device_class=DEVICE_CLASS_ENERGY,
+            device_class=DEVICE_CLASS_WATER,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_WATER_YEAR): sensor.sensor_schema(
-            unit_of_measurement=UNIT_KILOWATT_HOURS,
+            unit_of_measurement=UNIT_LITRE,
             accuracy_decimals=2,
-            device_class=DEVICE_CLASS_ENERGY,
+            device_class=DEVICE_CLASS_WATER,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
     }
