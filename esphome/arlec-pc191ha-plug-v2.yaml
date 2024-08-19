@@ -80,10 +80,8 @@ network: !remove
 
 # https://github.com/dentra/esphome-components/tree/master/components/energy_statistics
 external_components:
-#  - source: github://dentra/esphome-components
-#  - source: github://Roving-Ronin/dentra-components@Energy-Statistics-Year
   - source: github://roving-ronin/myhomeassistant/components
-    refresh: 1s
+    refresh: 5s
 
 #########################################################################
 #
