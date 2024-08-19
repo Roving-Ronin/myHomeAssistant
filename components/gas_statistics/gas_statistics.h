@@ -25,6 +25,7 @@ class GasStatistics : public Component {
   void set_gas_yesterday(Sensor *sensor) { this->gas_yesterday_ = sensor; }
   void set_gas_week(Sensor *sensor) { this->gas_week_ = sensor; }
   void set_gas_month(Sensor *sensor) { this->gas_month_ = sensor; }
+  void set_gas_year(Sensor *sensor) { this->gas_year_ = sensor; }
 
  protected:
   ESPPreferenceObject pref_;
@@ -38,11 +39,14 @@ class GasStatistics : public Component {
   Sensor *gas_yesterday_{nullptr};
   Sensor *gas_week_{nullptr};
   Sensor *gas_month_{nullptr};
+  Sensor *gas_year_{nullptr};
 
   // start day of week configuration
   int gas_week_start_day_{2};
   // start day of month configuration
   int gas_month_start_day_{1};
+  // start day of year configuration
+  int gas_year_start_day_{1};
 
   struct gas_data_t {
     uint16_t current_day_of_year{0};
@@ -50,6 +54,7 @@ class GasStatistics : public Component {
     float start_yesterday{NAN};
     float start_week{NAN};
     float start_month{NAN};
+    float start_year{NAN};
   } gas_;
 
   void process_(float total);
