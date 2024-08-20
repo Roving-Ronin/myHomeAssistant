@@ -7,8 +7,10 @@ from esphome.const import (
     CONF_TOTAL,
     DEVICE_CLASS_WATER,
     STATE_CLASS_TOTAL_INCREASING,
-    UNIT_LITRE,
 )
+
+# Import your custom UNIT_LITRE from const.py
+from .const import UNIT_LITRE
 
 CODEOWNERS = ["@dentra", "@roving-ronin"]
 
