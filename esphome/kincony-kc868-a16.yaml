@@ -22,7 +22,7 @@ substitutions:
   # Project Name
   project_name: "Kincony.KC868-A16"
   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "1.1.0"
+  project_version: "1.2.0"
   # Restore the relay (GPO switch) upon reboot to state:
   relay_restore_mode: RESTORE_DEFAULT_OFF
   # Disable sensors
@@ -85,13 +85,12 @@ packages:
 
 #########################################################################
 #
-# Sun Azimuth and Elevation for Home Address
+# Custom Components to be utilised
 #
 
-sun:
-  latitude: -34.726460°
-  longitude: 149.724503°
-  id: sun_home
+external_components:
+  - source: github://roving-ronin/myhomeassistant/components
+    refresh: 0s
 
 #########################################################################
 #
@@ -765,6 +764,7 @@ sensor:
         # From https://www.sensorsone.com/measurement-to-linear-0-5v-converter/?iunit=cm&irdg=0.8452500672&ilo=0.469&ihi=4.016666&ounit=V&olo=0&ohi=5
       - delta : 0.001     # Only send the result if the difference with the last sent result is higher than this
       - offset: 0.01847   # Add 0.01847cm to total, to correct to 0L when voltage is 0.469V
+    web_server_sorting_weight: '47'
 
 
 ################################################################################
@@ -786,6 +786,7 @@ sensor:
 #    update_interval: 1s #the delta filter will ensure it only sends values when something changes. 
     filters:
       - delta : 0.1 #only send the result if the difference with the last sent result is higher than this
+    web_server_sorting_weight: '45'
 
 ################################################################################
 #
@@ -814,6 +815,7 @@ sensor:
     update_interval: 1s #the delta filter will ensure it only sends values when something changes. 
     filters:
       - delta : 0.001 #only send the result if the difference with the last sent result is higher than this
+    web_server_sorting_weight: '46'
 
 
 ## 655.4 m or 2150.3 feet Location :-34.72653,149.72461
@@ -873,6 +875,7 @@ sensor:
       mode:
         input: true
         pullup: true
+    web_server_sorting_weight: '10'
 
 
   - platform: pulse_meter
@@ -895,7 +898,7 @@ sensor:
     timeout: 3min
     filters:
       - multiply: 10.0     # 1 pulse = 10L. The gas counter 'helper' in Home Assistant must still be set to 'step size' = 10.
-
+    web_server_sorting_weight: '11'
 
     #  Uses the above pulse_meter and adds sensor and calculations for tracking m3
     total:    
@@ -916,7 +919,7 @@ sensor:
               previous_gas_m3_value = current_gas_m3_value;
       filters:
         - multiply: 0.01   # 100 pulses = 1,000L = 1m3
-
+    web_server_sorting_weight: '12'
 
   - platform: template
     name: "Gas - Consumed (MJ)"
@@ -933,7 +936,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-
+    web_server_sorting_weight: '19'
 
   #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
   - platform: template
@@ -951,7 +954,8 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-
+    web_server_sorting_weight: '18'
+    
   ################################################################################
   #
   # GPIO Input 2 - PIN 33
@@ -970,7 +974,7 @@ sensor:
         pullup: true
     filters:
       - multiply: 5.0  # Convert pulse count to liters
-
+    web_server_sorting_weight: '20'
 
   - platform: pulse_meter
     name: "Water - Flow Rate"
@@ -992,7 +996,7 @@ sensor:
     timeout: 3min
     filters:
       - multiply: 5.0  # Each pulse equals 5 liters. The water counter 'helper' in Home Assistant must still be set to 'step size' = 5.
-
+    web_server_sorting_weight: '21'
 
     #  Uses the above pulse_meter and adds sensor and calculations for tracking current litres
     total:
@@ -1014,6 +1018,7 @@ sensor:
       filters:
 #        - lambda: return (x / 200.0);   # 1 pulse = 1L.  This gives Kilo Litres
         - multiply: 5.0  # Each pulse equals 5 liters
+      internal: true
 
 
   #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
@@ -1031,8 +1036,47 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
+    web_server_sorting_weight: '28'
 
 
+  ################################################################################
+  #
+  # Custom Component - Water (Consumption) Statistics
+  #
+  #
+
+# sensor:
+  - platform: "water_statistics"
+    total: water_consumed_total
+
+    water_today:
+      name: "Water - Consumed Today"
+      id: water_consumed_today
+      web_server_sorting_weight: '23'
+    
+    water_yesterday:
+      name: "Water - Consumed Yesterday"
+      id: water_consumed_yesterday
+      web_server_sorting_weight: '24'
+
+    water_week:
+      name: "Water - Consumed Week"
+      id: water_consumed_week
+      web_server_sorting_weight: '25'
+    
+    water_month:
+      name: "Water - Consumed Month"
+      id: water_consumed_month
+      web_server_sorting_weight: '26'
+
+    water_year:
+      name: "Water - Consumed Year"
+      id: water_consumed_year
+      web_server_sorting_weight: '27'
+
+
+  ################################################################################
+  
 # sensor:
   - platform: copy
     source_id: water_tank_voltage
