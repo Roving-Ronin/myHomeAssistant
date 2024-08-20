@@ -9,6 +9,11 @@ from esphome.const import (
     DEVICE_CLASS_ENERGY,
     STATE_CLASS_TOTAL_INCREASING,
     UNIT_KILOWATT_HOURS,
+    ICON_TODAY,
+    ICON_YESTERDAY,
+    ICON_WEEK,
+    ICON_MONTH,
+    ICON_YEAR,
 )
 
 CODEOWNERS = ["@dentra", "@roving-ronin"]
