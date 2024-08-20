@@ -9,6 +9,10 @@ from esphome.const import (
     DEVICE_CLASS_ENERGY,
     STATE_CLASS_TOTAL_INCREASING,
     UNIT_KILOWATT_HOURS,
+)
+
+# Import your custom ICONS from const.py
+from .const import (
     ICON_TODAY,
     ICON_YESTERDAY,
     ICON_WEEK,
