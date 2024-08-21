@@ -928,27 +928,27 @@ sensor:
   - platform: "gas_statistics"
     total: gas_consumed_total
 
-    water_today:
+    gas_today:
       name: "Gas - Consumed Today"
       id: gas_consumed_today
       web_server_sorting_weight: '12'
     
-    water_yesterday:
+    gas_yesterday:
       name: "Gas - Consumed Yesterday"
       id: gas_consumed_yesterday
       web_server_sorting_weight: '13'
 
-    water_week:
+    gas_week:
       name: "Gas - Consumed Week"
       id: gas_consumed_week
       web_server_sorting_weight: '14'
     
-    water_month:
+    gas_month:
       name: "Gas - Consumed Month"
       id: gas_consumed_month
       web_server_sorting_weight: '15'
 
-    water_year:
+    gas_year:
       name: "Gas - Consumed Year"
       id: gas_consumed_year
       web_server_sorting_weight: '16'
