@@ -918,7 +918,44 @@ sensor:
               previous_gas_m3_value = current_gas_m3_value;
       filters:
         - multiply: 0.01   # 100 pulses = 1,000L = 1m3
-    web_server_sorting_weight: '12'
+    web_server_sorting_weight: '11'
+
+  ################################################################################
+  #
+  # Custom Component - Water (Consumption) Statistics
+  #
+
+  - platform: "gas_statistics"
+    total: gas_consumed_total
+
+    water_today:
+      name: "Gas - Consumed Today"
+      id: gas_consumed_today
+      web_server_sorting_weight: '12'
+    
+    water_yesterday:
+      name: "Gas - Consumed Yesterday"
+      id: gas_consumed_yesterday
+      web_server_sorting_weight: '13'
+
+    water_week:
+      name: "Gas - Consumed Week"
+      id: gas_consumed_week
+      web_server_sorting_weight: '14'
+    
+    water_month:
+      name: "Gas - Consumed Month"
+      id: gas_consumed_month
+      web_server_sorting_weight: '15'
+
+    water_year:
+      name: "Gas - Consumed Year"
+      id: gas_consumed_year
+      web_server_sorting_weight: '16'
+
+
+  ################################################################################
+
 
   - platform: template
     name: "Gas - Consumed (MJ)"
@@ -935,7 +972,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-    web_server_sorting_weight: '19'
+    web_server_sorting_weight: '18'
 
   #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
   - platform: template
@@ -953,7 +990,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-    web_server_sorting_weight: '18'
+    web_server_sorting_weight: '17'
     
   ################################################################################
   #
@@ -1141,3 +1178,4 @@ sensor:
 
         # https://www.sensorsone.com/liquid-level-to-pressure-calculator/?lval=241&lunit=centimetres+%28cm%29&lfctr=cm&sg=1&grav=9.79508&punit=kilopascals+%28kPa%29&pfctr=kPa
     internal: true
+
