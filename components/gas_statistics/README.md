@@ -1,4 +1,4 @@
-# Gas Statistics
+# Gas Statistics (m3)
 
 Gather statistics for:
 * today
