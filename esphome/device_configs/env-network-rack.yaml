@@ -1,0 +1,66 @@
+#########################################################################
+#
+#  HARDWARE: ESP32S3 240MHz, 320KB RAM, 8MB Flash
+# 
+ 
+ # Provides substitutions or variables that are then called elsewhere multiple times in the config
+substitutions:
+   # Provides substitutions or variables that are then called elsewhere multiple times in the config
+  name: "env-network-rack"
+   # Default friendly name   
+  friendly_name: "ENV - Network Rack"
+   # Description as appears in ESPHome & top of webserver page
+  device_description: "Phase C / GPO 1 - Environment data (temp / humidity / pressure) of the network rack"
+   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
+  location: "Network Rack"
+   # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
+  power_circuit: "GPO 1"  
+
+
+   # BME 280 / BME680 Sensor
+   #
+   # If a second BME sensor is attached, enable the sensors by setting to "true".
+  enable_bme_2: "false"
+   # Location of BME280/680 Sensor #1. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
+  bme_sensor1_location: ""
+   # Location of BME280/680 Sensor #2. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
+  bme_sensor2_location: ""
+   # Calibrate the outpute of the temperature sensor(s).
+  temperature_1_offset: "-4.5"
+  temperature_2_offset: "0.0"
+   # Calibrate the outpute of the pressure sensor(s).
+  pressure_1_offset: "0.0"
+  pressure_2_offset: "0.0"
+   # Calibrate the outpute of the humidity sensor(s).
+  humidity_1_offset: "0.0"
+  humidity_2_offset: "0.0"
+
+
+  # I2C PINS - Used for BME280 sensor
+  bus_a_sda_pin: "GPIO20"      # Default on ESP32 is SDA = PIN 21. ES32-S3 use 20
+  bus_a_scl_pin: "GPIO21"      # Default on ESP32 is SLC = PIN 22. ES32-S3 use 21
+  bus_a_frequency: "100kHz"    # Optional: 100kHz
+
+  bus_b_sda_pin: "GPIO18"   # 14   # Default on ESP32 is SDA = PIN14 ??. ES32-S3 use ??
+  bus_b_scl_pin: "GPIO19"   # 15   # Default on ESP32 is SLC = PIN15 ??. ES32-S3 use ??  
+  bus_b_frequency: "100kHz"    # Optional: 100kHz
+
+#########################################################################
+
+esphome:
+  name_add_mac_suffix: false
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: arduino
+  flash_size: 8MB
+
+packages:
+  remote_package:
+    url: https://github.com/Roving-Ronin/myHomeAssistant/
+    ref: main 
+    files: [esphome/environmental-monitor.yaml, esphome/boards/esp32-s3.yaml]
+    refresh: 5s # optional
+
+#########################################################################

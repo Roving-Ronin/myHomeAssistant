@@ -1,0 +1,163 @@
+#########################################################################
+#
+# Device configuration for M5Stack ATOM Lite (ESP32)
+#
+
+   # Provides substitutions or variables that are then called elsewhere multiple times in the config
+substitutions:
+   # Default name
+  name: "m5stack-atom-lite"
+   # Default friendly name  
+  friendly_name: "M5Stack Atom Lite - Study"
+   # Description as appears in ESPHome & top of webserver page
+  device_description: "M5Stack Atom Lite - Bluetooth Proxy"
+   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
+  location: "Study"
+   # Project Name
+  project_name: "M5Stack.Atom Lite v1"
+   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
+  project_version: "v1.0.0"
+   # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
+  power_circuit: "TBC"  
+
+#########################################################################
+
+
+esphome:
+  name_add_mac_suffix: false
+
+esp32:
+  board: m5stack-core-esp32
+#  board: esp32dev
+#  framework:
+#    type: arduino
+
+packages:
+  remote_package:
+    url: https://github.com/Roving-Ronin/myHomeAssistant/
+    ref: main 
+    files: [esphome/m5stack-atom-lite.yaml]
+    refresh: 5s # optional
+
+# Modbus TCP Proxy Configuration
+modbus_controller:
+  - id: modbus_controller_1
+    address: 1
+    modbus_id: 1
+    setup_priority: -10
+
+    sensors:
+      - name: "Modbus Dummy Sensor"
+        unit_of_measurement: "V"
+        address: 0
+        register_type: input
+        value_type: U_WORD
+
+text_sensor:
+  - platform: template
+    name: "Upstream Modbus IP"
+    id: upstream_modbus_ip
+    icon: "mdi:ip-network"
+    initial_value: "10.0.0.9"
+
+select:
+  - platform: template
+    name: "Upstream Modbus Port"
+    id: upstream_modbus_port
+    options:
+      - "502"
+      - "6607"
+    initial_option: "502"
+    icon: "mdi:numeric"
+
+number:
+  - platform: template
+    name: "Modbus Proxy Port"
+    id: proxy_listen_port
+    icon: "mdi:numeric"
+    unit_of_measurement: "Port"
+    min_value: 1
+    max_value: 65535
+    step: 1
+    initial_value: 1502
+
+custom_component:
+  - lambda: |-
+      auto modbus_ip = new TextSensor("upstream_modbus_ip");
+      auto modbus_port = new Select("upstream_modbus_port");
+      auto listen_port = new Number("proxy_listen_port");
+      
+      App.register_component(modbus_ip);
+      App.register_component(modbus_port);
+      App.register_component(listen_port);
+
+      // Custom Modbus TCP Proxy logic here
+      auto proxy = new ModbusTCPProxy(modbus_ip, modbus_port, listen_port);
+      return {proxy};
+
+class ModbusTCPProxy : public Component {
+ public:
+  ModbusTCPProxy(TextSensor *ip, Select *upstream_port, Number *listen_port) 
+    : ip_(ip), upstream_port_(upstream_port), listen_port_(listen_port), server(listen_port_->state) {}
+
+  void setup() override {
+    // Initialize the proxy here
+    server.begin();
+    client.setTimeout(10);  // 10ms timeout
+  }
+
+  void loop() override {
+    // Accept new client connections
+    WiFiClient newClient = server.available();
+    if (newClient) {
+      clients.push_back(newClient);
+    }
+
+    // Process each connected client
+    for (auto it = clients.begin(); it != clients.end(); ) {
+      WiFiClient &client = *it;
+      if (!client.connected()) {
+        it = clients.erase(it);
+      } else {
+        if (client.available()) {
+          uint8_t buffer[256];
+          int len = client.read(buffer, sizeof(buffer));
+          if (len > 0) {
+            // Forward request to upstream Modbus device
+            if (forwardToUpstream(buffer, len)) {
+              // Forward response back to client
+              int response_len = readFromUpstream(buffer, sizeof(buffer));
+              if (response_len > 0) {
+                client.write(buffer, response_len);
+              }
+            }
+          }
+        }
+        ++it;
+      }
+    }
+  }
+
+ private:
+  TextSensor *ip_;
+  Select *upstream_port_;
+  Number *listen_port_;
+  WiFiServer server;
+  WiFiClient client;
+  std::vector<WiFiClient> clients;
+
+  bool forwardToUpstream(uint8_t *buffer, int len) {
+    if (!client.connect(ip_->state.c_str(), atoi(upstream_port_->state.c_str()))) {
+      ESP_LOGE("modbus_proxy", "Failed to connect to upstream Modbus device");
+      return false;
+    }
+    client.write(buffer, len);
+    return true;
+  }
+
+  int readFromUpstream(uint8_t *buffer, int max_len) {
+    int len = client.read(buffer, max_len);
+    client.stop();
+    return len;
+  }
+};

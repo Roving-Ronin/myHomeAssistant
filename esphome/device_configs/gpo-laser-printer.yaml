@@ -1,0 +1,35 @@
+# EX RICHARD GPO
+
+substitutions:
+  name: "gpo-laser-printer"
+  friendly_name: "GPO - Laser Printer"
+  device_description: "Phase ? - Arlec PC191HA v2 - Brother MFC-L8600CDW  Printer"
+  # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO1 = Phase C, GPO2 = Phase A, GPO3 = Phase B)  
+  power_circuit: "TBC"
+  #
+  location: "Study"
+   # Restore the relay (GPO switch) upon reboot to state:
+  relay_restore_mode: ALWAYS_ON
+   #  
+  disable_entities: "false"
+  # HLW8012 Power Monitoring Chip
+  # https://community.home-assistant.io/t/esphome-install-does-not-update-firmware/544026/9?u=mahko_mahko
+  #
+  voltage_divider: "761.2979716299478"
+  current_resistor: "0.0011390155662454019"
+  current_multiply: "0.4465570512563014"
+  #
+  watts_factor: "0.97"
+
+
+esphome:
+  name_add_mac_suffix: False
+
+packages:
+  remote_package:
+    url: https://github.com/Roving-Ronin/myHomeAssistant/
+    ref: main 
+    files: [esphome/arlec-pc191ha-plug-v2.yaml]
+    refresh: 5s
+
+#########################################################################

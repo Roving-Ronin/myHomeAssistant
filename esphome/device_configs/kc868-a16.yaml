@@ -1,0 +1,67 @@
+#########################################################################
+#
+# Kincony KC868-A16 Device
+#
+# Provides:
+#    - Environmental monitoring using ESP32-S3 chipset and BME280 sensor(s)
+#      for temperature, humidity, pressure & dew point.
+#    - Gas consumption and meter tracking monitoring
+#    - Water consumption and meter tracking monitoring
+#
+
+   # Provides substitutions or variables that are then called elsewhere multiple times in the config
+substitutions:
+   # Default name
+  name: "kc868-a16"
+   # Default friendly name  
+  friendly_name: "Kincony KC868-A16"
+   # Description as appears in ESPHome & top of webserver page
+  device_description: "Kincony KC868-A16 with 16 I/O and RS485 support"
+   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
+  location: "Monitoring - ESPHome"
+   # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
+  power_circuit: "GPO 2"
+   # Restore the relay (GPO switch) upon reboot to state:
+  relay_restore_mode: RESTORE_DEFAULT_OFF
+
+   # BME 280 / BME680 Sensor
+   #
+   # Location of BME280/680 Sensor #1. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
+  bme_sensor1_location: "Garage - "
+   # Location of BME280/680 Sensor #2. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
+  bme_sensor2_location: ""
+   # Calibrate the outpute of the temperature sensor(s).
+  temperature_1_offset: "0.4"
+  temperature_2_offset: "0.0"
+   # Calibrate the outpute of the pressure sensor(s).
+  pressure_1_offset: "0.0"
+  pressure_2_offset: "0.0"
+   # Calibrate the outpute of the humidity sensor(s).
+  humidity_1_offset: "-8.5"
+  humidity_2_offset: "0.0"
+
+  log_level: "DEBUG"
+
+
+#########################################################################
+packages:
+  remote_package:
+    url: https://github.com/Roving-Ronin/myHomeAssistant/
+    ref: main 
+    files: [esphome/kincony-kc868-a16.yaml]
+    refresh: 0s # optional
+
+esphome:
+  name_add_mac_suffix: false
+
+########################## End of Substitutions #########################
+#
+# Defines the type of ESP chip used on the device. 
+# Must be in the local devices configuration file.
+#
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+  flash_size: 4MB

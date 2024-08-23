@@ -1,0 +1,27 @@
+substitutions:
+  name: "light-front-patio"
+  friendly_name: "Light - Front Patio"
+  device_description: "Aldi Casalux - 8W LED Downlight at Front Door Patio"
+  location: "Front Door"
+  # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
+  power_circuit: "Lights"     
+
+packages:
+#  Aldi_Casalux.Smart_LED_Downlight_RGBW: github://roving-ronin/myHomeAssistant/esphome/aldi-casalux-smart-led-rgbw.yaml
+  remote_package:
+    url: https://github.com/Roving-Ronin/myHomeAssistant/
+    ref: main 
+    files: [esphome/aldi-casalux-smart-led-rgbw.yaml]
+    refresh: 5s # optional
+
+
+esphome:
+  name_add_mac_suffix: false
+
+
+bk72xx:
+  board: generic-bk7231t-qfn32-tuya
+#  board: lsc-lma35-t
+
+binary_sensor:
+   - id: !remove device_status

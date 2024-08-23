@@ -1,0 +1,22 @@
+substitutions:
+  name: gpo-bedroom-master
+  friendly_name: "GPO - Bedroom - Master"
+  device_description: "Athom Plug v3 - Monitoring the power & energy of bedroom powerpoint"  
+  location: "Bedroom - Master"  
+  # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
+  power_circuit: "GPO 2"  
+
+packages:
+  remote_package:
+    url: https://github.com/Roving-Ronin/myHomeAssistant/
+    ref: main 
+    files: [esphome/athom-smart-plug-v3.yaml]
+    refresh: 5s # optional
+
+  # Athom_Technology.Smart_Plug_V3: github://roving-ronin/myhomeassistant/esphome/athom-smart-plug-v3.yaml
+
+
+esphome:
+  name: "${name}"
+  name_add_mac_suffix: false
+

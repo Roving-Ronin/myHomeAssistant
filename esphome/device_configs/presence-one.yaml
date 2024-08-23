@@ -1,0 +1,59 @@
+substitutions:
+  name: presence-one
+  friendly_name: Presence One
+  device_description: "Presence One - PIR, mmWave, Lux & Environmentals"
+  # Abbreviated project name, to avoid wrapping of text on Web / HA.
+  project_name: "Everything.Presence One"
+  # Location of the device in HA defined areas.
+  location: "Study"
+  # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
+  power_circuit: "TBC"   
+  # Define a domain for this device to use. i.e. iot.home.lan (so device will appear as athom-smart-plug-v2.iot.home.lan in DNS/DHCP logs)
+  dns_domain: ".iot.home.lan"
+  # Set timezone of the smart plug. Useful if the plug is in a location different to the HA server. Can be entered in unix Country/Area format (i.e. "Australia/Sydney")
+  timezone: "Australia/Sydney"
+  # Set the duration between the sntp service polling ntp.org servers for an update
+  sntp_update_interval: 6h
+  # Enables faster network connections, with last connected SSID being connected to and no full scan for SSID being undertaken
+  wifi_fast_connect: "true" 
+
+
+packages:
+  remote_package:
+    url: https://github.com/EverythingSmartHome/everything-presence-one
+    ref: main 
+    files: [everything-presence-one.yaml]
+    refresh: 5s # optional
+
+
+# packages:
+#  Everything_Smart_Technology.Everything_Presence_One: github://everythingsmarthome/everything-presence-one/everything-presence-one.yaml@main
+
+ 
+esphome:
+  comment: ${device_description}
+  area: ${location}
+  name_add_mac_suffix: false
+
+api:
+
+ota:
+
+#  Enables the local webserver on the ESP device, upon port 80
+web_server:
+  port: 80
+  version: 3
+
+wifi:
+  # WiFi credentials
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  domain: "${dns_domain}"
+  fast_connect: true
+  ap: {} # This spawns an AP with the device name and mac address with no password.
+
+
+mdns:
+  disabled: false
+
+#########################################################################

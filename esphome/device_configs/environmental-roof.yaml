@@ -1,0 +1,63 @@
+  # Provides substitutions or variables that are then called elsewhere multiple times in the config
+substitutions:
+   # Default name  
+  name: "environ-roof"
+   # Default friendly name   
+  friendly_name: "Environmental - Roof"
+   # Description as appears in ESPHome & top of webserver page
+  device_description: "Environmental Station - Attic & Outside - Temperature & Humidity"
+   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc
+  location: "Attic"
+   # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
+  power_circuit: "HVAC"  
+
+
+   # BME 280 / BME680 Sensor
+   #
+   # Location of BME280/680 Sensor #1. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
+  bme_sensor1_location: "Attic - "
+   # Location of BME280/680 Sensor #2. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
+  bme_sensor2_location: "Outside - "
+   # Calibrate the outpute of the temperature sensor(s).
+  temperature_1_offset: "0.4"
+  temperature_2_offset: "0.0"
+   # Calibrate the outpute of the pressure sensor(s).
+  pressure_1_offset: "0.0"
+  pressure_2_offset: "0.0"
+   # Calibrate the outpute of the humidity sensor(s).
+  humidity_1_offset: "0.0"
+  humidity_2_offset: "0.0"
+
+
+  # I2C PINS - Used for BME280 sensor
+  bus_a_sda_pin: "GPIO21"      # Default on ESP32 is SDA = PIN 21. ES32-S3 use 20
+  bus_a_scl_pin: "GPIO22"      # Default on ESP32 is SLC = PIN 22. ES32-S3 use 21
+  bus_a_frequency: "100kHz"    # Optional: 100kHz
+
+  bus_b_sda_pin: "GPIO14"      # 14   # Yellow wire from sensor.
+  bus_b_scl_pin: "GPIO15"      # 15   # Green wire from sensor.   
+  bus_b_frequency: "100kHz"    # Optional: 100kHz
+
+   # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
+  log_level: "DEBUG"
+
+###############################################################################################  
+
+esphome:
+  name_add_mac_suffix: False
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+  flash_size: 4MB
+
+
+packages:
+  remote_package:
+    url: https://github.com/Roving-Ronin/myHomeAssistant/
+    ref: main 
+    files: [esphome/environmental-monitor.yaml, esphome/sensors/bme280-bus-b.yaml]
+    refresh: 5s # optional
+
+# ======================================================================================

@@ -1,0 +1,147 @@
+#########################################################################
+#
+# Environmental monitoring using ESP32-S3 chipset and BME280 sensor(s)
+# for temperature, humidity, pressure & dew point.
+#
+substitutions:
+
+###############################
+# Device Details:
+#
+   # Default name 
+  name: "tirra-decon-station"
+   # Default friendly name 
+  friendly_name: "Decontamination Station"
+   # Description as appears in ESPHome & top of webserver page
+  device_description: "Potable Water & Environmental Monitor (Temp./Humidity/Pressure)"
+
+###############################
+# Location & Site Details:
+#
+   # The Aviagen site location, upon which this device is deployed. Used to populate a Text Sensor with this information.
+  site: "Tirrannaville"
+   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Front Gate, Decontamination, Shed #XYZ  etc  
+  location: ""
+   # Location geographical height, in meters. Used for calculations in sensors such as BME280/BME680 and Water Tank sensors.
+   # Averages: Tirrannaville (656), Bowral (668), Goulburn (673) and Wagga Wagga (?). Average = 666m.
+  location_height: "656"
+   # The phase in the locations power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C).
+   # Used to populate a Text Sensor with this information, that may be used to loadshed in future, or trace outages to electrical faults.
+  power_circuit: "TBA"
+   # Asset Tag Details:
+  asset_id: ""
+
+##########################
+# Device Settings:
+#  
+   # Set the update interval for sensors (Default is 10s)
+  sensor_update_interval: 10s   
+   # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
+  log_level: "DEBUG"
+
+###############################
+# Network Settings - Static IP
+#
+   # Network - Static IP - Address  
+  network_ip: ""
+   # Network - Static IP - Gateway
+  network_gateway: ""
+   # Network - Static IP - Subnet Mask
+  network_subnet: ""
+   # Network - Static IP - DNS Servers
+  dns_server1: ""
+  dns_server2: ""
+   # Define a domain for this device to use. i.e. iot.home.lan (so device will appear as athom-smart-plug-v2.iot.home.lan in DNS/DHCP logs)
+  dns_domain: ""
+
+###############################
+# BME 280 / BME680 Sensor
+#
+   # Location of BME280/680 Sensor #1. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
+  bme_sensor1_location: ""
+   # Location of BME280/680 Sensor #2. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
+  bme_sensor2_location: ""
+   # Calibrate the outpute of the temperature sensor(s).
+  temperature_1_offset: "0.0"
+  temperature_2_offset: "0.0"
+   # Calibrate the outpute of the pressure sensor(s).
+  pressure_1_offset: "0.0"
+  pressure_2_offset: "0.0"
+   # Calibrate the outpute of the humidity sensor(s).
+  humidity_1_offset: "0.0"
+  humidity_2_offset: "0.0"
+
+###############################
+# TL-136 / LIQ-136 Liquid Pressure Sensor
+#
+   # Name of the type of tank the sensor is being used to monitor. Omit entering 'Tank'.
+   # i.e. Water (Default), Sewerage, Disinfectant etc.
+  tank_name: "Water"
+   # Tank Inlet Height - Maximum level of water in centimetres (e.g. 241).
+  inlet_height: "241"
+   # Tank Diameter (i.e. distance from one side to the other) in centimeters.
+  tank_diameter: "238"
+   # Tank Radius - For a cylindrical tank. This will be half the diameter, in centimeters.
+  tank_radius: "119"
+   # Tank Level Offset. Add 0.01847cm to total, to correct to 0L when voltage is 0.469V
+  tank_level_offset: "0.01847"
+
+# Note: Default measurements are based upon a TankWorld 10,000L Tall Straight Wall Tank
+# https://www.tankworld.com.au/product/10000l-tall-straight-wall-tank/
+# Tank Capacity: 10,000L     |    Diameter Width: 2380mm
+# Inlet Height:  2410mm      |    Tank Height:    2485mm
+
+########################## End of Substitutions #########################
+
+esphome:
+  name_add_mac_suffix: false
+
+#########################################################################
+#
+# Remote Packages to be utilised
+#
+packages:
+  remote_package:
+    url: https://github.com/JAComms/Aviagen/
+    ref: main 
+    files: [esphome/decontamination-station.yaml]
+    refresh: 5s # optional
+
+
+#########################################################################
+#
+# Water Tank - Conversions and metrics from pressure sensor
+# NOTE: You MUST update the calibrate_linear recorded Voltage to Levels in the Tank.
+# eg. 4.01667 -> 241.0 being 4.01667V is the voltage when the tank is at 241.0cm (100%)
+#     then do the same for each 10% down to 0.0000V = 0cm / 0%
+
+#sensor:
+#  
+#  - platform: template
+#    name: "Tank - Level"
+#    id: "tank_level"
+#    icon: 'mdi:water-well'
+#    unit_of_measurement: 'cm'
+#    lambda: |-
+#        return id(tank_voltage).state;
+#    update_interval: 1s #the delta filter will ensure it only sends values when something changes. 
+#    filters:
+#      - calibrate_linear:
+#          # Measured value of X volt maps to Y cm
+#          - 4.01667 -> 241.0   # 100%
+#          - 3.61500 -> 216.9   #  90%
+#          - 3.21333 -> 192.8   #  80%
+#          - 2.81167 -> 168.7   #  70%
+#          - 2.41000 -> 144.6   #  60%
+#          - 2.00833 -> 120.5   #  50%
+#          - 1.60667 -> 96.4    #  40%
+#          - 1.20500 -> 72.3    #  30%
+#          - 0.80333 -> 48.2    #  20%
+#          - 0.40167 -> 24.1    #  10%
+#          - 0.00000 -> 0.00    #   0%
+#    # From https://www.sensorsone.com/measurement-to-linear-0-5v-converter/?iunit=cm&irdg=0.8452500672&ilo=0.469&ihi=4.016666&ounit=V&olo=0&ohi=5
+#      - delta : 0.001                  # Only send the result if the difference with the last sent result is higher than this
+#      - offset: ${tank_level_offset}   # Add 0.01847cm to total, to correct to 0L when voltage is 0.469V
+#    internal: true
+          
+#########################################################################
