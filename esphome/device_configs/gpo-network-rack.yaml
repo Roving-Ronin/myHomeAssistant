@@ -1,0 +1,23 @@
+substitutions:
+  # Device Name
+  name: "gpo-network-rack"
+  # Friendly device name
+  friendly_name: "JAComms - Network Rack"
+  device_description: "Athom Plug v3 - Phase ? / GPO ? - Network Rack (Basement)"
+  # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc
+  location: "Server Room"
+  # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
+  power_circuit: "Phase ?"
+   # Home DNS Domain to suffix to device name
+  dns_domain: "" 
+
+
+esphome:
+  name_add_mac_suffix: false
+
+packages:
+  remote_package:
+    url: https://github.com/Roving-Ronin/myHomeAssistant/
+    ref: main 
+    files: [esphome/athom-smart-plug-v3.yaml]
+    refresh: 5s # optional
