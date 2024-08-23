@@ -1065,7 +1065,7 @@ sensor:
     device_class: water
     state_class: "total_increasing"
     icon: "mdi:counter"
-    accuracy_decimals: 2
+    accuracy_decimals: 0
     lambda: |-
           return (id(water_consumed_total_litres) );
     # Set interval that updates are sent to HA instance
