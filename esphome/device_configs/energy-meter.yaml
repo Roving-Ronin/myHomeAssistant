@@ -1,0 +1,43 @@
+substitutions:
+  name: "energy-meter"
+  # Default friendly name
+  friendly_name: "Energy Meter"
+  # Description as appears in ESPHome & top of webserver page  
+  device_description: "Athom - Energy Meter (BL0906 - 6 channels)"
+  # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc
+  location: "Switchboards"
+  # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
+  power_circuit: "Phase B"  # Which power cicruit is actually powering this device?
+  # Hide, by making 'internal', the individual CT's energy sensors
+  hide_surplus_energy_sensors: "true"
+
+  # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
+  log_level: "DEBUG"
+
+  # Names to describe the usage of each CT sensor. i.e. Lights, GPO1, Grid etc. Used to prefix all the associated sensors.
+  ct_sensor_1_name: "Grid Phase A"  # CT 1
+  ct_sensor_2_name: "Grid Phase B"  # CT 2
+  ct_sensor_3_name: "Grid Phase C"  # CT 3
+  ct_sensor_4_name: "Kitchen"         # CT 4
+  ct_sensor_5_name: "Caravan"         # CT 5
+  ct_sensor_6_name: "Float Charger"   # CT 6
+
+#########################################################################
+
+esphome:
+  name_add_mac_suffix: false
+
+#########################################################################
+#
+# Remote Packages to be utilised
+#
+
+packages:
+  remote_package:
+    url: https://github.com/JAComms/myHomeAssistant/
+    ref: main 
+    files: [esphome/athom-energy-meter-x6.yaml]
+    refresh: 0s # optional
+
+
+#####################################################################
