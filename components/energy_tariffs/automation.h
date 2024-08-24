@@ -15,45 +15,44 @@ using sensor::Sensor;
 class TariffChangeTrigger : public Trigger<Sensor *> {
  public:
   explicit TariffChangeTrigger(EnergyTariffs *parent) {
-    parent->add_on_tariff_callback([this](Sensor *value) { this->trigger(value); });
+    parent->add_on_tariff_callback([this](Sensor *value) { 
+      if (this->is_relevant_day()) {  // Check if the current day is relevant
+        this->trigger(value); 
+      }
+    });
+  }
+
+ protected:
+  // Method to check if the tariff change is relevant for the current day
+  bool is_relevant_day() {
+    // Retrieve the current day of the week from the EnergyTariffs component
+    auto current_day = this->parent_->get_current_day();
+    // Logic to determine if the current day's tariff should trigger this
+    // (You would need to implement this logic based on how tariffs are configured)
+    return true;  // Placeholder, implement actual day-check logic here
   }
 };
 
 class BeforeTariffChangeTrigger : public Trigger<> {
  public:
   explicit BeforeTariffChangeTrigger(EnergyTariffs *parent) {
-    parent->add_on_before_tariff_callback([this] { this->trigger(); });
-  }
-};
-
-/*
-template<typename... Ts> class TariffIsCondition : public Condition<Ts...>, public Parented<EnergyTariffs>{
-public:
-  TariffIsCondition(EnergyStatistics *parent) : Parented(parent) {}
-
-  TEMPLATABLE_VALUE(EnergyTariff *, tariff)
-
-  bool check(Ts... x) override { return this->parent_->get_current_tariff() == this->tariff_.value(x...); }
-
-};
-*/
-
-/*
-template<typename... Ts> class TariffSetAction : public Action<Ts...> {
-public:
-  explicit TariffSetAction(EnergyTariff *tariff) : tariff_(tariff) {}
-
-  TEMPLATABLE_VALUE(float, state)
-
-  void play(Ts... x) override {
-    auto v = this->state_.value(x...);
-    this->tariff_->publish_state(v);
+    parent->add_on_before_tariff_callback([this] { 
+      if (this->is_relevant_day()) {  // Check if the current day is relevant
+        this->trigger(); 
+      }
+    });
   }
 
-protected:
-  EnergyTariff *tariff_;
+ protected:
+  // Method to check if the tariff change is relevant for the current day
+  bool is_relevant_day() {
+    // Retrieve the current day of the week from the EnergyTariffs component
+    auto current_day = this->parent_->get_current_day();
+    // Logic to determine if the current day's tariff should trigger this
+    // (You would need to implement this logic based on how tariffs are configured)
+    return true;  // Placeholder, implement actual day-check logic here
+  }
 };
-*/
 
 }  // namespace energy_tariffs
 }  // namespace esphome
