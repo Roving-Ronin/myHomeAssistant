@@ -98,6 +98,9 @@ def validate_tariffs(config):
     for tariff in tariffs:
         if CONF_TIME in tariff:
             count -= 1
+        if "day" in tariff:
+            day = tariff["day"]
+            # Validate day-specific tariffs
 
     if count == 0:
         raise cv.Invalid(
@@ -125,8 +128,10 @@ TARIFF_SCHEMA = sensor.sensor_schema(
             cv.ensure_list(validate_tariff_time), cv.Length(min=1, max=3)
         ),
         cv.Optional(CONF_SERVICE): cv.valid_name,
+        cv.Optional("day"): cv.one_of("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", upper=True),
     }
 )
+
 
 CONFIG_SCHEMA = cv.All(
     cv.Schema(
@@ -205,10 +210,6 @@ async def to_code(config):
         )
         cg.add(numb.set_parent(var))
         cg.add(var.set_time_offset(numb))
-    # if CONF_TIME_OFFSET in config:
-    #     cg.add(var.set_time_offset(config[CONF_TIME_OFFSET]))
-    # if CONF_TIME_OFFSET_SERVICE in config:
-    #     cg.add(var.set_time_offset_service(config[CONF_TIME_OFFSET_SERVICE]))
 
     # exposed sensors
     for conf in config.get(CONF_TARIFFS, []):
@@ -217,7 +218,13 @@ async def to_code(config):
             parts = tm.split("-")
             t = [time_period(parts[0]), time_period(parts[1])]
             cg.add(sens.add_time(t[0].total_minutes, t[1].total_minutes))
+
+        if "day" in conf:
+            day = conf["day"].upper()
+            cg.add(sens.set_day(day))  # Assuming set_day() is implemented in the C++ class
+
         cg.add(var.add_tariff(sens))
+        
         if CONF_SERVICE in conf:
             cg.add(sens.set_service(conf[CONF_SERVICE]))
 
@@ -228,6 +235,7 @@ async def to_code(config):
     for conf in config.get(CONF_ON_BEFORE_TARIFF, []):
         trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], var)
         await automation.build_automation(trigger, [], conf)
+
 
 
 # @automation.register_action('tariff.set', TariffSetAction,
