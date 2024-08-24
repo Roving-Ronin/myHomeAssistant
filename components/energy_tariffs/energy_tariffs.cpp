@@ -88,15 +88,24 @@ void EnergyTariffs::process_(float total) {
 }
 
 EnergyTariff *EnergyTariffs::get_tariff_(const ESPTime &time) const {
+  std::string current_day = this->get_current_day(time); // Get the current day
+
   EnergyTariff *def{};
   for (auto t : this->tariffs_) {
     if (t->is_default()) {
       def = t;
     } else if (t->time_in_range(time)) {
-      return t;
+      if (t->day_tariffs_.find(current_day) != t->day_tariffs_.end()) {
+        return t;
+      }
     }
   }
   return def;
+}
+
+std::string EnergyTariffs::get_current_day(const ESPTime &time) const {
+  const char *days[] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+  return std::string(days[time.day_of_week]);
 }
 
 void EnergyTariffs::add_on_tariff_callback(std::function<void(Sensor *)> &&callback) {
