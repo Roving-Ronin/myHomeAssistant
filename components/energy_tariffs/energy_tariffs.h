@@ -47,11 +47,11 @@ class EnergyTariffs : public Component {
   ESPPreferenceObject rtc_;
   time::RealTimeClock *time_{};
 
-  // input sensors
+  // Input sensors
   Sensor *total_{};
   number::Number *time_offset_{};
 
-  // exposed sensors
+  // Exposed sensors
   std::vector<EnergyTariff *> tariffs_;
 
   EnergyTariff *current_tariff_{};
@@ -63,7 +63,11 @@ class EnergyTariffs : public Component {
 
   void process_(float total);
 
+  // Method to get the current tariff considering the day of the week
   EnergyTariff *get_tariff_(const ESPTime &time) const;
+
+  // New method to get the current day of the week as a string
+  std::string get_current_day(const ESPTime &time) const;
 };  // class EnergyTariffs
 
 }  // namespace energy_tariffs
