@@ -18,7 +18,7 @@ external_components:
 ...
 sensor:
   - platform: "water_statistics"
-    total: water_consumed_litres
+    total: water_consumed_litres       # The id of the sensor tracking total consumed water (litres)
     water_today:
       name: "Water Consumed Today"
       id: water_consumed_today
