@@ -38,7 +38,7 @@ sensor:
 
 ## Configuration variables:
 * **id** (*Optional*, [ID](https://esphome.io/guides/configuration-types.html#config-id)): Manually specify the ID used for code generation.
-* **total** (**Required**, [ID](https://esphome.io/guides/configuration-types.html#config-id)): The ID of the total water (m3) sensor.
+* **total** (**Required**, [ID](https://esphome.io/guides/configuration-types.html#config-id)): The ID of the total water consumed (litres) sensor.
 * **water_today** (*Optional*, Sensor):
   * Any options from [Sensor](https://esphome.io/components/sensor/index.html#config-sensor).
 * **water_yesterday** (*Optional*, Sensor):
