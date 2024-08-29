@@ -1052,7 +1052,6 @@ sensor:
               id(water_consumed_total_litres) += current_water_consumed_litres_value - previous_water_consumed_litres_value;
               previous_water_consumed_litres_value = current_water_consumed_litres_value;
       filters:
-#        - lambda: return (x / 200.0);   # 1 pulse = 1L.  This gives Kilo Litres
         - multiply: 5.0  # Each pulse equals 5 liters
       internal: true
 
