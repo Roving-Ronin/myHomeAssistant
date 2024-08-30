@@ -5,10 +5,13 @@ from esphome.const import (
     CONF_ID,
     CONF_TIME_ID,
     CONF_TOTAL,
-    DEVICE_CLASS_GAS,
+    DEVICE_CLASS_ENERGY,
     STATE_CLASS_TOTAL_INCREASING,
-    UNIT_CUBIC_METER,
+    UNIT_MEGAJOULE,
 )
+
+# Import your custom UNIT_MEGAJOULE from const.py
+from .const import UNIT_MEGAJOULE
 
 CODEOWNERS = ["@dentra", "@roving-ronin"]
 
@@ -30,33 +33,33 @@ CONFIG_SCHEMA = cv.Schema(
         cv.GenerateID(CONF_TIME_ID): cv.use_id(time.RealTimeClock),
         cv.Required(CONF_TOTAL): cv.use_id(sensor.Sensor),
         cv.Optional(CONF_GAS_TODAY): sensor.sensor_schema(
-            unit_of_measurement=UNIT_CUBIC_METER,
+            unit_of_measurement=UNIT_MEGAJOULE,
             accuracy_decimals=3,
-            device_class=DEVICE_CLASS_GAS,
+            device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_GAS_YESTERDAY): sensor.sensor_schema(
-            unit_of_measurement=UNIT_CUBIC_METER,
+            unit_of_measurement=UNIT_MEGAJOULE,
             accuracy_decimals=3,
-            device_class=DEVICE_CLASS_GAS,
+            device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_GAS_WEEK): sensor.sensor_schema(
-            unit_of_measurement=UNIT_CUBIC_METER,
+            unit_of_measurement=UNIT_MEGAJOULE,
             accuracy_decimals=3,
-            device_class=DEVICE_CLASS_GAS,
+            device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_GAS_MONTH): sensor.sensor_schema(
-            unit_of_measurement=UNIT_CUBIC_METER,
+            unit_of_measurement=UNIT_MEGAJOULE,
             accuracy_decimals=3,
-            device_class=DEVICE_CLASS_GAS,
+            device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_GAS_YEAR): sensor.sensor_schema(
-            unit_of_measurement=UNIT_CUBIC_METER,
+            unit_of_measurement=UNIT_MEGAJOULE,
             accuracy_decimals=3,
-            device_class=DEVICE_CLASS_GAS,
+            device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
     }
