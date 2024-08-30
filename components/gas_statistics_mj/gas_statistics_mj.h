@@ -7,11 +7,11 @@
 #include "esphome/components/time/real_time_clock.h"
 
 namespace esphome {
-namespace gas_statistics {
+namespace gas_statistics_mj {
 
 using sensor::Sensor;
 
-class GasStatistics : public Component {
+class GasStatisticsMJ : public Component {
  public:
   float get_setup_priority() const override { return setup_priority::DATA; }
   void dump_config() override;
@@ -59,7 +59,7 @@ class GasStatistics : public Component {
 
   void process_(float total);
   void save_();
-};  // class GasStatistics
+};  // class GasStatisticsMJ
 
-}  // namespace gas_statistics
+}  // namespace gas_statistics_mj
 }  // namespace esphome
