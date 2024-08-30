@@ -7,7 +7,6 @@ from esphome.const import (
     CONF_TOTAL,
     DEVICE_CLASS_ENERGY,
     STATE_CLASS_TOTAL_INCREASING,
-    UNIT_MEGAJOULE,
 )
 
 # Import your custom UNIT_MEGAJOULE from const.py
