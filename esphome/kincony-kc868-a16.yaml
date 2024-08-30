@@ -191,39 +191,33 @@ globals:
 
 #######################################################################################
 #
-# Text Inputs - Used to configure the values used to convert Gas M3 to MJ
+# Number Inputs - Used to configure the values used to convert Gas M3 to MJ
 #
 
-text_sensor:
+number:
   - platform: template
     name: "Gas - Pressure Factor"
     id: input_gas_pressure_factor
-    on_value:
-      then:
-        - lambda: |-
-            float value = atof(x.c_str());
-            if (value >= 0.9000 && value <= 1.100) {
-              id(gas_pressure_factor) = value;
-              ESP_LOGI("custom", "Gas Pressure Factor set to: %.4f", value);
-            } else {
-              ESP_LOGW("custom", "Invalid Pressure Factor: %.4f", value);
-            }
+    min_value: 0.9
+    max_value: 1.1
+    step: 0.0001
+    unit_of_measurement: ""
+    initial_value: 0.9864
+    optimistic: true
+    mode: box
     icon: "mdi:scale"
     entity_category: config
 
   - platform: template
     name: "Gas - Heating Value"
     id: input_gas_heating_value
-    on_value:
-      then:
-        - lambda: |-
-            float value = atof(x.c_str());
-            if (value >= 34.00 && value <= 52.00) {
-              id(gas_heating_value) = value;
-              ESP_LOGI("custom", "Gas Heating Value set to: %.2f", value);
-            } else {
-              ESP_LOGW("custom", "Invalid Heating Value: %.2f", value);
-            }
+    min_value: 34.0
+    max_value: 52.0
+    step: 0.01
+    unit_of_measurement: ""
+    initial_value: 37.98
+    optimistic: true
+    mode: box
     icon: "mdi:fire"
     entity_category: config
 
@@ -981,7 +975,7 @@ sensor:
               id(gas_total_m3) += delta_m3;
 
               // Calculate MJ using current pressure and heating values
-              float delta_mj = delta_m3 * id(gas_pressure_factor) * id(gas_heating_value);
+              float delta_mj = delta_m3 * id(input_gas_pressure_factor).state * id(input_gas_heating_value).state;
 
               // Update gas total in MJ
               id(gas_total_mj) += delta_mj;
