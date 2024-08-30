@@ -203,6 +203,7 @@ number:
     step: 0.0001
     unit_of_measurement: ""
     initial_value: 0.9864
+    restore_value: True
     optimistic: true
     mode: box
     icon: "mdi:scale"
@@ -216,6 +217,7 @@ number:
     step: 0.01
     unit_of_measurement: ""
     initial_value: 37.98
+    restore_value: True
     optimistic: true
     mode: box
     icon: "mdi:fire"
