@@ -9,6 +9,15 @@ from esphome.const import (
     STATE_CLASS_TOTAL_INCREASING,
 )
 
+# Import your custom ICONS from const.py
+from .const import (
+    ICON_TODAY,
+    ICON_YESTERDAY,
+    ICON_WEEK,
+    ICON_MONTH,
+    ICON_YEAR,
+)
+
 # Import your custom UNIT_MEGAJOULE from const.py
 from .const import UNIT_MEGAJOULE
 
@@ -33,30 +42,35 @@ CONFIG_SCHEMA = cv.Schema(
         cv.Required(CONF_TOTAL): cv.use_id(sensor.Sensor),
         cv.Optional(CONF_GAS_TODAY): sensor.sensor_schema(
             unit_of_measurement=UNIT_MEGAJOULE,
+            icon=ICON_TODAY,
             accuracy_decimals=3,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_GAS_YESTERDAY): sensor.sensor_schema(
             unit_of_measurement=UNIT_MEGAJOULE,
+            icon=ICON_YESTERDAY,
             accuracy_decimals=3,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_GAS_WEEK): sensor.sensor_schema(
             unit_of_measurement=UNIT_MEGAJOULE,
+            icon=ICON_WEEK,
             accuracy_decimals=3,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_GAS_MONTH): sensor.sensor_schema(
             unit_of_measurement=UNIT_MEGAJOULE,
+            icon=ICON_MONTH,
             accuracy_decimals=3,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_GAS_YEAR): sensor.sensor_schema(
             unit_of_measurement=UNIT_MEGAJOULE,
+            icon=ICON_YEAR,
             accuracy_decimals=3,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
