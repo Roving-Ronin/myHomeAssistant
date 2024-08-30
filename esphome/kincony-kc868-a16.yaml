@@ -181,31 +181,39 @@ globals:
 
 #######################################################################################
 #
-# Number Inputs - Used to configure the values used to convert Gas M3 to MJ
+# Text Inputs - Used to configure the values used to convert Gas M3 to MJ
 #
 
-number:
+text_sensor:
   - platform: template
     name: "Gas - Pressure Factor"
     id: input_gas_pressure_factor
-    min_value: 0.9
-    max_value: 1.1
-    step: 0.0001
-    unit_of_measurement: ""
-    initial_value: 0.9864
+    on_value:
+      then:
+        - lambda: |-
+            float value = atof(x.c_str());
+            if (value >= 0.9000 && value <= 1.100) {
+              id(gas_pressure_factor) = value;
+              ESP_LOGI("custom", "Gas Pressure Factor set to: %.4f", value);
+            } else {
+              ESP_LOGW("custom", "Invalid Pressure Factor: %.4f", value);
+            }
     icon: "mdi:scale"
-    optimistic: true  # Enable optimistic mode
     entity_category: config
 
   - platform: template
     name: "Gas - Heating Value"
     id: input_gas_heating_value
-    min_value: 34.0
-    max_value: 52.0
-    step: 0.01
-    unit_of_measurement: ""
-#    unit_of_measurement: "MJ/m³"
-    initial_value: 37.98
+    on_value:
+      then:
+        - lambda: |-
+            float value = atof(x.c_str());
+            if (value >= 34.00 && value <= 52.00) {
+              id(gas_heating_value) = value;
+              ESP_LOGI("custom", "Gas Heating Value set to: %.2f", value);
+            } else {
+              ESP_LOGW("custom", "Invalid Heating Value: %.2f", value);
+            }
     icon: "mdi:fire"
     optimistic: true  # Enable optimistic mode
     entity_category: config
@@ -976,7 +984,7 @@ sensor:
 
   ################################################################################
   #
-  # Custom Component - Water (Consumption) Statistics
+  # Custom Component - Gas m3 (Consumption) Statistics
   #
 
   - platform: "gas_statistics"
@@ -1007,28 +1015,7 @@ sensor:
       id: gas_consumed_year
       web_server_sorting_weight: '16'
 
-
   ################################################################################
-
-
-  - platform: template
-    name: "Gas - Consumed Total (MJ)"
-    id: gas_consumed_total_mj
-    unit_of_measurement: "MJ"
-    device_class: energy
-    state_class: "total_increasing"
-    icon: "mdi:counter"
-    accuracy_decimals: 3   
-    # With EACH QUARTERLY GAS BILL update the Jemena Pressure Factor and Heating Value below.   
-    # Formula - (Gas Consumed x Pressure Factor x Heating Value) = Usage MJ
-    lambda: |-
-       return id(gas_total_mj);
-#      return (id(gas_consumed_m3).state * 0.9864 * 37.98);
-#      return (id(gas_consumed_m3).state * id(pressure_factor_input).state * id(heating_value_input).state);
-    update_interval: 1s
-    filters:
-      - delta : 0.001
-    web_server_sorting_weight: '18'
 
   #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
   - platform: template
@@ -1047,6 +1034,61 @@ sensor:
     filters:
       - delta : 0.001
     web_server_sorting_weight: '17'
+
+
+  ################################################################################
+  #
+  # Custom Component - Gas MJ (Consumption) Statistics
+  #
+
+  - platform: "gas_statistics"
+    total: gas_consumed_total_mj
+
+    gas_today:
+      name: "Gas - Consumed Today (MJ)"
+      id: gas_consumed_today_mj
+      web_server_sorting_weight: '18'
+    
+    gas_yesterday:
+      name: "Gas - Consumed Yesterday (MJ)"
+      id: gas_consumed_yesterday_mj
+      web_server_sorting_weight: '19'
+
+    gas_week:
+      name: "Gas - Consumed Week (MJ)"
+      id: gas_consumed_week_mj
+      web_server_sorting_weight: '20'
+    
+    gas_month:
+      name: "Gas - Consumed Month (MJ)"
+      id: gas_consumed_month_mj
+      web_server_sorting_weight: '21'
+
+    gas_year:
+      name: "Gas - Consumed Year (MJ)"
+      id: gas_consumed_year_mj
+      web_server_sorting_weight: '22'
+
+  ################################################################################
+  
+  - platform: template
+    name: "Gas - Consumed Total (MJ)"
+    id: gas_consumed_total_mj
+    unit_of_measurement: "MJ"
+    device_class: energy
+    state_class: "total_increasing"
+    icon: "mdi:counter"
+    accuracy_decimals: 3   
+    # With EACH QUARTERLY GAS BILL update the Jemena Pressure Factor and Heating Value below.   
+    # Formula - (Gas Consumed x Pressure Factor x Heating Value) = Usage MJ
+    lambda: |-
+       return id(gas_total_mj);
+#      return (id(gas_consumed_m3).state * 0.9864 * 37.98);
+#      return (id(gas_consumed_m3).state * id(pressure_factor_input).state * id(heating_value_input).state);
+    update_interval: 1s
+    filters:
+      - delta : 0.001
+    web_server_sorting_weight: '23'
     
   ################################################################################
   #
@@ -1066,7 +1108,7 @@ sensor:
         pullup: true
     filters:
       - multiply: 5.0  # Convert pulse count to liters
-    web_server_sorting_weight: '20'
+    web_server_sorting_weight: '25'
 
   - platform: pulse_meter
     name: "Water - Flow Rate"
@@ -1088,7 +1130,7 @@ sensor:
     timeout: 3min
     filters:
       - multiply: 5.0  # Each pulse equals 5 liters. The water counter 'helper' in Home Assistant must still be set to 'step size' = 5.
-    web_server_sorting_weight: '21'
+    web_server_sorting_weight: '26'
 
     #  Uses the above pulse_meter and adds sensor and calculations for tracking current litres
     total:
@@ -1127,7 +1169,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-    web_server_sorting_weight: '28'
+    web_server_sorting_weight: '33'
 
 
   ################################################################################
@@ -1143,27 +1185,27 @@ sensor:
     water_today:
       name: "Water - Consumed Today"
       id: water_consumed_today
-      web_server_sorting_weight: '23'
+      web_server_sorting_weight: '28'
     
     water_yesterday:
       name: "Water - Consumed Yesterday"
       id: water_consumed_yesterday
-      web_server_sorting_weight: '24'
+      web_server_sorting_weight: '29'
 
     water_week:
       name: "Water - Consumed Week"
       id: water_consumed_week
-      web_server_sorting_weight: '25'
+      web_server_sorting_weight: '30'
     
     water_month:
       name: "Water - Consumed Month"
       id: water_consumed_month
-      web_server_sorting_weight: '26'
+      web_server_sorting_weight: '31'
 
     water_year:
       name: "Water - Consumed Year"
       id: water_consumed_year
-      web_server_sorting_weight: '27'
+      web_server_sorting_weight: '32'
 
 
   ################################################################################
