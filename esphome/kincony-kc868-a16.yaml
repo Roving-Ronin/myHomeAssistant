@@ -981,7 +981,7 @@ sensor:
               id(gas_total_m3) += delta_m3;
 
               // Calculate MJ using current pressure and heating values
-              float delta_mj = delta_m3 * id(gas_pressure_factor).state * id(gas_heating_value).state;
+              float delta_mj = delta_m3 * id(gas_pressure_factor) * id(gas_heating_value);
 
               // Update gas total in MJ
               id(gas_total_mj) += delta_mj;
