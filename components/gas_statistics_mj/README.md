@@ -17,7 +17,7 @@ external_components:
     refresh: 0s
 ...
 sensor:
-  - platform: "gas_statistics_my"
+  - platform: "gas_statistics_mj"
     total: gas_consumed_mj
     gas_today:
       name: "Gas Consumed Today"
