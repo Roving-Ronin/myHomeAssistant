@@ -4,7 +4,6 @@ from esphome.components import sensor, time
 from esphome.const import (
     CONF_ID,
     CONF_TIME_ID,
-    CONF_POWER,
     CONF_TOTAL,
     DEVICE_CLASS_GAS,
     STATE_CLASS_TOTAL_INCREASING,
@@ -21,13 +20,13 @@ CONF_GAS_WEEK = "gas_week"
 CONF_GAS_MONTH = "gas_month"
 CONF_GAS_YEAR = "gas_year"
 
-gas_statistics_ns = cg.esphome_ns.namespace("gas_statistics")
+gas_statistics_mj_ns = cg.esphome_ns.namespace("gas_statistics_mj")
 
-GasStatistics = gas_statistics_ns.class_("GasStatistics", cg.Component)
+GasStatisticsMJ = gas_statistics_mj_ns.class_("GasStatisticsMJ", cg.Component)
 
 CONFIG_SCHEMA = cv.Schema(
     {
-        cv.GenerateID(): cv.declare_id(GasStatistics),
+        cv.GenerateID(): cv.declare_id(GasStatisticsMJ),
         cv.GenerateID(CONF_TIME_ID): cv.use_id(time.RealTimeClock),
         cv.Required(CONF_TOTAL): cv.use_id(sensor.Sensor),
         cv.Optional(CONF_GAS_TODAY): sensor.sensor_schema(
@@ -90,8 +89,7 @@ async def to_code(config):
 
     await setup_input(config, CONF_TIME_ID, var.set_time)
 
-    # input sensors CHECK JBH
-    await setup_input(config, CONF_POWER, var.set_power)
+    # input sensors
     await setup_input(config, CONF_TOTAL, var.set_total)
 
     # exposed sensors
