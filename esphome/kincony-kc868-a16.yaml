@@ -215,7 +215,6 @@ text_sensor:
               ESP_LOGW("custom", "Invalid Heating Value: %.2f", value);
             }
     icon: "mdi:fire"
-    optimistic: true  # Enable optimistic mode
     entity_category: config
 
 #######################################################################################
