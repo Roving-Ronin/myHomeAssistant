@@ -163,7 +163,7 @@ globals:
     type: float
     restore_value: yes
    # Change initial value to 0 to reset, or enter your actual meter reading to start counting lifetime total from that number 
-    initial_value: "0"
+#    initial_value: "0"
 
   #  Globals for use with pulse meter, to allow storing and setting a base reading for gas meter
   - id: gas_total_m3
