@@ -1,15 +1,15 @@
 #include "esphome/core/log.h"
 #include "esphome/core/hal.h"
-#include "gas_statistics.h"
+#include "gas_statistics_mj.h"
 
 namespace esphome {
-namespace gas_statistics {
+namespace gas_statistics_mj {
 
-static const char *const TAG = "gas_statistics";
+static const char *const TAG = "gas_statistics_mj";
 static const char *const GAP = "  ";
 
-void GasStatistics::dump_config() {
-  ESP_LOGCONFIG(TAG, "Gas statistics sensors");
+void GasStatisticsMJ::dump_config() {
+  ESP_LOGCONFIG(TAG, "Gas statistics MJ sensors");
   if (this->gas_today_) {
     LOG_SENSOR(GAP, "Gas Today", this->gas_today_);
   }
@@ -27,7 +27,7 @@ void GasStatistics::dump_config() {
   }
 }
 
-void GasStatistics::setup() {
+void GasStatisticsMJ::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
 
   this->pref_ = global_preferences->make_preference<gas_data_t>(fnv1_hash(TAG));
@@ -42,21 +42,18 @@ void GasStatistics::setup() {
   }
 }
 
-void GasStatistics::loop() {
+void GasStatisticsMJ::loop() {
   const auto t = this->time_->now();
   if (!t.is_valid()) {
-    // time is not sync yet
     return;
   }
 
   const auto total = this->total_->get_state();
   if (std::isnan(total)) {
-    // total is not published yet
     return;
   }
 
   if (t.day_of_year == this->gas_.current_day_of_year) {
-    // nothing to do
     return;
   }
 
@@ -65,15 +62,12 @@ void GasStatistics::loop() {
   this->gas_.start_today = total;
 
   if (this->gas_.current_day_of_year != 0) {
-    // at specified day of week we start a new week calculation
     if (t.day_of_week == this->gas_week_start_day_) {
       this->gas_.start_week = total;
     }
-    // at first day of month we start a new month calculation
     if (t.day_of_month == 1) {
       this->gas_.start_month = total;
     }
-    // at first day of month we start a new month calculation
     if (t.day_of_year == 1) {
       this->gas_.start_year = total;
     }
@@ -84,7 +78,7 @@ void GasStatistics::loop() {
   this->process_(total);
 }
 
-void GasStatistics::process_(float total) {
+void GasStatisticsMJ::process_(float total) {
   if (this->gas_today_ && !std::isnan(this->gas_.start_today)) {
     this->gas_today_->publish_state(total - this->gas_.start_today);
   }
@@ -107,7 +101,7 @@ void GasStatistics::process_(float total) {
   this->save_();
 }
 
-void GasStatistics::save_() { this->pref_.save(&(this->gas_)); }
+void GasStatisticsMJ::save_() { this->pref_.save(&(this->gas_)); }
 
-}  // namespace gas_statistics
+}  // namespace gas_statistics_mj
 }  // namespace esphome
