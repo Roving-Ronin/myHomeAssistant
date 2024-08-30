@@ -193,6 +193,7 @@ number:
     unit_of_measurement: ""
     initial_value: 0.9864
     icon: "mdi:scale"
+    optimistic: true  # Enable optimistic mode
     entity_category: config
 
   - platform: template
@@ -205,6 +206,7 @@ number:
 #    unit_of_measurement: "MJ/m³"
     initial_value: 37.98
     icon: "mdi:fire"
+    optimistic: true  # Enable optimistic mode
     entity_category: config
 
 #######################################################################################
