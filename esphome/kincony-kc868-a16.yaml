@@ -159,6 +159,16 @@ button:
 
 globals:
 
+  - id: gas_pressure_factor
+    type: float
+    restore_value: true
+#    initial_value: '0.9864'  # Default value for Pressure Factor
+
+  - id: gas_heating_value
+    type: float
+    restore_value: true
+#    initial_value: '37.98'  # Default value for Heating Value
+
   - id: gas_total_mj
     type: float
     restore_value: yes
@@ -971,7 +981,7 @@ sensor:
               id(gas_total_m3) += delta_m3;
 
               // Calculate MJ using current pressure and heating values
-              float delta_mj = delta_m3 * id(input_gas_pressure_factor).state * id(input_gas_heating_value).state;
+              float delta_mj = delta_m3 * id(gas_pressure_factor).state * id(gas_heating_value).state;
 
               // Update gas total in MJ
               id(gas_total_mj) += delta_mj;
