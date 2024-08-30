@@ -1050,7 +1050,7 @@ sensor:
   # Custom Component - Gas MJ (Consumption) Statistics
   #
 
-  - platform: "gas_statistics"
+  - platform: "gas_statistics_mj"
     total: gas_consumed_total_mj
 
     gas_today:
