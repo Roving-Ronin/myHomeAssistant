@@ -180,6 +180,35 @@ globals:
 
 #######################################################################################
 #
+# Number Inputs - Used to configure the values used to convert Gas M3 to MJ
+#
+
+number:
+  - platform: template
+    name: "Gas - Pressure Factor"
+    id: input_gas_pressure_factor
+    min_value: 0.9
+    max_value: 1.1
+    step: 0.0001
+    unit_of_measurement: ""
+    initial_value: 0.9864
+    icon: "mdi:scale"
+    entity_category: config
+
+  - platform: template
+    name: "Gas - Heating Value"
+    id: input_gas_heating_value
+    min_value: 34.0
+    max_value: 52.0
+    step: 0.01
+    unit_of_measurement: ""
+#    unit_of_measurement: "MJ/m³"
+    initial_value: 37.98
+    icon: "mdi:fire"
+    entity_category: config
+
+#######################################################################################
+#
 # RF 433mhz receiver configuration
 #
   
@@ -918,10 +947,25 @@ sensor:
     #  Adds the calculation for providing a reading since device last booted / reset
       on_value: 
         then:
+#          - lambda: |-
+#              static float previous_gas_m3_value = 0.0;
+#              float current_gas_m3_value = id(gas_consumed_m3).state;
+#              id(gas_total_m3) += current_gas_m3_value - previous_gas_m3_value;
+#              previous_gas_m3_value = current_gas_m3_value;
           - lambda: |-
               static float previous_gas_m3_value = 0.0;
               float current_gas_m3_value = id(gas_consumed_m3).state;
-              id(gas_total_m3) += current_gas_m3_value - previous_gas_m3_value;
+              float delta_m3 = current_gas_m3_value - previous_gas_m3_value;
+
+              // Update gas total in m³
+              id(gas_total_m3) += delta_m3;
+
+              // Calculate MJ using current pressure and heating values
+              float delta_mj = delta_m3 * id(input_gas_pressure_factor).state * id(input_gas_heating_value).state;
+
+              // Update gas total in MJ
+              id(gas_total_mj) += delta_mj;
+
               previous_gas_m3_value = current_gas_m3_value;
       filters:
         - multiply: 0.01   # 100 pulses = 1,000L = 1m3
@@ -965,8 +1009,8 @@ sensor:
 
 
   - platform: template
-    name: "Gas - Consumed (MJ)"
-    id: gas_consumed_mj
+    name: "Gas - Consumed Total (MJ)"
+    id: gas_consumed_total_mj
     unit_of_measurement: "MJ"
     device_class: energy
     state_class: "total_increasing"
@@ -975,7 +1019,9 @@ sensor:
     # With EACH QUARTERLY GAS BILL update the Jemena Pressure Factor and Heating Value below.   
     # Formula - (Gas Consumed x Pressure Factor x Heating Value) = Usage MJ
     lambda: |-
-      return (id(gas_consumed_m3).state * 0.9864 * 37.98);
+       return id(gas_total_mj);
+#      return (id(gas_consumed_m3).state * 0.9864 * 37.98);
+#      return (id(gas_consumed_m3).state * id(pressure_factor_input).state * id(heating_value_input).state);
     update_interval: 1s
     filters:
       - delta : 0.001
@@ -983,7 +1029,7 @@ sensor:
 
   #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
   - platform: template
-    name: "Gas - Consumed Total"
+    name: "Gas - Consumed Total (m³)"
     id: gas_consumed_total
     unit_of_measurement: "m³"
     device_class: gas
@@ -992,7 +1038,7 @@ sensor:
     accuracy_decimals: 3
     # The number 5251.07 should be replaced with your own gas meters physical reading
     lambda: |-
-          return (id(gas_total_m3) + 0);
+          return (id(gas_total_m3);
     # Set interval that updates are sent to HA instance
     update_interval: 1s
     filters:
