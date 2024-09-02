@@ -1,6 +1,6 @@
 # Gas Statistics (m3)
 
-Gather statistics for:
+Gather statistics in cubic metres (m3) for:
 * today
 * yesterday
 * week
