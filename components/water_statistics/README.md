@@ -1,6 +1,6 @@
 # Water Statistics
 
-Gather statistics for:
+Gather statistics in litres for:
 * today
 * yesterday
 * week
