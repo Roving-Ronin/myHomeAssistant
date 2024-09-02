@@ -1,0 +1,39 @@
+#########################################################################
+#
+# Substitutions
+#
+substitutions:
+   
+   # Enable logs to DEBUG and determine the ds18b20 address and paste below
+  ds18b20_address: ""
+
+   # ds18b20 Sensor
+   # Location of ds18b20 Sensor. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
+  ds18b20_sensor_location: ""
+   # Calibrate the outpute of the temperature sensor(s).
+  ds18b20_temperature_offset: "0.0"
+
+#########################################################################
+#
+# 1 Wire Connection
+#
+one_wire:
+  - platform: gpio
+    pin: ${one_wire_1}
+
+########################## End of Substitutions #########################
+#
+# Sensors
+#
+sensor:
+
+  - platform: dallas_temp
+    name: "${ds18b20_sensor_location}Temperature"
+#    address: ${ds18b20_address}
+    accuracy_decimals: 1
+    filters:
+      offset: ${ds18b20_temperature_offset}
+    icon: "mdi:temperature-celsius"
+    update_interval: 120s
+
+##########################################################################
