@@ -1,6 +1,6 @@
 # Gas Statistics (MJ)
 
-Gather statistics for:
+Gather statistics in megajoules (MJ) for:
 * today
 * yesterday
 * week
