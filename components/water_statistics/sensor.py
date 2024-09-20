@@ -7,6 +7,7 @@ from esphome.const import (
     CONF_TOTAL,
     DEVICE_CLASS_WATER,
     STATE_CLASS_TOTAL_INCREASING,
+    UNIT_LITRE,
 )
 
 # Import your custom ICONS from const.py
@@ -19,7 +20,7 @@ from .const import (
 )
 
 # Import your custom UNIT_LITRE from const.py
-from .const import UNIT_LITRE
+#from .const import UNIT_LITRE   - No longer needed with ESPHome 2024.9.0 - https://github.com/esphome/esphome/pull/7317/files
 
 CODEOWNERS = ["@dentra", "@roving-ronin"]
 
