@@ -81,7 +81,6 @@ sensor:
     icon: 'mdi:water-thermometer-outline'
     unit_of_measurement: °C
 #    state_class: 'measurement'
-    icon: 'mdi:thermometer-alert'    
     lambda: |-
       return (243.5*(log(id(bme280a_humidity).state/100)+((17.67*id(bme280a_temperature).state)/
       (243.5+id(bme280a_temperature).state)))/(17.67-log(id(bme280a_humidity).state/100)-
