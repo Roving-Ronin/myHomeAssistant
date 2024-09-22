@@ -169,11 +169,10 @@ globals:
     restore_value: true
 #    initial_value: '37.98'  # Default value for Heating Value
 
-  - id: gas_total_mj
-    type: float
-    restore_value: false
-   # Change initial value to 0 to reset, or enter your actual meter reading to start counting lifetime total from that number 
-    initial_value: "1717.675"
+  ####################################################
+  #
+  # GAS METER M3 related GLOBALS
+  #
 
   #  Globals for use with pulse meter, to allow storing and setting a base reading for gas meter
   - id: gas_total_m3
@@ -182,6 +181,82 @@ globals:
    # Change initial value to 0 to reset, or enter your actual meter reading to start counting lifetime total from that number 
     initial_value: "583.69"
 
+  #  Globals for storing the 'Gas_Statistics' water consumed DAILY M3 value
+  - id: global_gas_consumed_today_m3
+    type: float
+    restore_value: yes
+    initial_value: '0.0'
+
+  #  Globals for storing the 'Gas_Statistics' water consumed YESTERDAY M3 value
+  - id: global_gas_consumed_yesterday_m3
+    type: float
+    restore_value: yes
+    initial_value: '0.0'
+
+  #  Globals for storing the 'Gas_Statistics' water consumed WEEK M3 value
+  - id: global_gas_consumed_week_m3
+    type: float
+    restore_value: yes
+    initial_value: '0.0'
+
+  #  Globals for storing the 'Gas_Statistics' water consumed MONTH M3 value
+  - id: global_gas_consumed_month_m3
+    type: float
+    restore_value: yes
+    initial_value: '0.0'
+
+  #  Globals for storing the 'Gas_Statistics' water consumed YEAR M3 value
+  - id: global_gas_consumed_year_m3
+    type: float
+    restore_value: yes
+    initial_value: '0.0'
+
+  ####################################################
+  #
+  # GAS METER MJ related GLOBALS
+  #
+  
+  - id: gas_total_mj
+    type: float
+    restore_value: false
+   # Change initial value to 0 to reset, or enter your actual meter reading to start counting lifetime total from that number 
+    initial_value: "1717.675"
+
+  #  Globals for storing the 'Gas_Statistics' water consumed DAILY MJ value
+  - id: global_gas_consumed_today_mj
+    type: float
+    restore_value: yes
+    initial_value: '0.0'
+
+  #  Globals for storing the 'Gas_Statistics' water consumed YESTERDAY MJ value
+  - id: global_gas_consumed_yesterday_mj
+    type: float
+    restore_value: yes
+    initial_value: '0.0'
+
+  #  Globals for storing the 'Gas_Statistics' water consumed WEEK MJ value
+  - id: global_gas_consumed_week_mj
+    type: float
+    restore_value: yes
+    initial_value: '0.0'
+
+  #  Globals for storing the 'Gas_Statistics' water consumed MONTH MJ value
+  - id: global_gas_consumed_month_mj
+    type: float
+    restore_value: yes
+    initial_value: '0.0'
+
+  #  Globals for storing the 'Gas_Statistics' water consumed YEAR MJ value
+  - id: global_gas_consumed_year_mj
+    type: float
+    restore_value: yes
+    initial_value: '0.0'
+
+  ####################################################
+  #
+  # WATER METER related GLOBALS
+  #
+
   #  Globals for use with pulse meter, to allow storing and setting a base reading for water meter
   - id: water_consumed_total_litres
     type: float
@@ -189,31 +264,35 @@ globals:
    # Change initial value to 0 to reset, or enter your actual meter reading to start counting lifetime total from that number 
     initial_value: "29389"
 
+  #  Globals for storing the 'Water_Statistics' water consumed DAILY value
   - id: global_water_consumed_today
     type: float
     restore_value: yes
     initial_value: '0.0'
 
+  #  Globals for storing the 'Water_Statistics' water consumed YESTERDAY value
   - id: global_water_consumed_yesterday
     type: float
     restore_value: yes
     initial_value: '0.0'
 
+  #  Globals for storing the 'Water_Statistics' water consumed WEEK value
   - id: global_water_consumed_week
     type: float
     restore_value: yes
     initial_value: '0.0'
 
+  #  Globals for storing the 'Water_Statistics' water consumed MONTH value
   - id: global_water_consumed_month
     type: float
     restore_value: yes
     initial_value: '0.0'
 
+  #  Globals for storing the 'Water_Statistics' water consumed YEAR value
   - id: global_water_consumed_year
     type: float
     restore_value: yes
     initial_value: '0.0'
-
 
 #######################################################################################
 #
@@ -1010,7 +1089,7 @@ sensor:
 
               previous_gas_m3_value = current_gas_m3_value;
       filters:
-        - multiply: 0.01   # 100 pulses = 1,000L = 1m3
+        - multiply: 0.001   # 100 pulses = 1,000L = 1m3
     web_server_sorting_weight: '11'
 
   ################################################################################
@@ -1018,33 +1097,127 @@ sensor:
   # Custom Component - Gas m3 (Consumption) Statistics
   #
 
+# sensor:
   - platform: "gas_statistics"
     total: gas_consumed_total
 
     gas_today:
-      name: "Gas - Consumed Today"
-      id: gas_consumed_today
-      web_server_sorting_weight: '12'
+      name: "Gas - Consumed Today m³ (Internal)"
+      id: gas_consumed_today_m3_internal
+      on_value:
+        then:
+          - lambda: |-
+              id(global_gas_consumed_today_m3) = x;
+      internal: true
     
     gas_yesterday:
-      name: "Gas - Consumed Yesterday"
-      id: gas_consumed_yesterday
-      web_server_sorting_weight: '13'
+      name: "Gas - Consumed Yesterday m³ (Internal)"
+      id: gas_consumed_yesterday_m3_internal
+      on_value:
+        then:
+          - lambda: |-
+              id(global_gas_consumed_yesterday_m3) = x;
+      internal: true
 
     gas_week:
-      name: "Gas - Consumed Week"
-      id: gas_consumed_week
-      web_server_sorting_weight: '14'
+      name: "Gas - Consumed Week m³ (Internal)"
+      id: gas_consumed_week_m3_internal
+      on_value:
+        then:
+          - lambda: |-
+              id(global_gas_consumed_week_m3) = x;
+      internal: true
     
     gas_month:
-      name: "Gas - Consumed Month"
-      id: gas_consumed_month
-      web_server_sorting_weight: '15'
+      name: "Gas - Consumed Month m³ (Internal)"
+      id: gas_consumed_month_m3_internal
+      on_value:
+        then:
+          - lambda: |-
+              id(global_gas_consumed_month_m3) = x;
+      internal: true
 
     gas_year:
-      name: "Gas - Consumed Year"
-      id: gas_consumed_year
-      web_server_sorting_weight: '16'
+      name: "Gas - Consumed Year m³ (Internal)"
+      id: gas_consumed_year_m3_internal
+      on_value:
+        then:
+          - lambda: |-
+              id(global_gas_consumed_year_m3) = x;
+      internal: true
+
+  #################
+
+  - platform: template
+    name: "Gas - Consumed Today (m³)"
+    id: gas_consumed_today_m3
+    unit_of_measurement: "m³"
+    state_class: "total_increasing"
+    device_class: gas
+    icon: 'mdi:hours-24'
+    lambda: |-
+      return id(global_gas_consumed_today_m3);
+    update_interval: 1s
+    filters:
+      - delta : 0.001
+    web_server_sorting_weight: '12'
+    
+  - platform: template
+    name: "Gas - Consumed Yesterday (m³)"
+    id: gas_consumed_yesterday_m3
+    unit_of_measurement: "m³"
+    state_class: "total_increasing"
+    device_class: gas
+    icon: 'mdi:calendar-today-outline'
+    lambda: |-
+      return id(global_gas_consumed_yesterday_m3);
+    update_interval: 1s
+    filters:
+      - delta : 0.001
+    web_server_sorting_weight: '13'
+
+  - platform: template
+    name: "Gas - Consumed Week (m³)"
+    id: gas_consumed_week_m3
+    unit_of_measurement: "m³"
+    state_class: "total_increasing"
+    device_class: gas
+    icon: 'mdi:calendar-week'
+    lambda: |-
+      return id(global_gas_consumed_week_m3);
+    update_interval: 1s
+    filters:
+      - delta : 0.001
+    web_server_sorting_weight: '14'
+    
+  - platform: template
+    name: "Gas - Consumed Month (m³)"
+    id: gas_consumed_month_m3
+    unit_of_measurement: "m³"
+    state_class: "total_increasing"
+    device_class: gas
+    icon: 'mdi:calendar'
+    lambda: |-
+      return id(global_gas_consumed_month_m3);
+    update_interval: 1s
+    filters:
+      - delta : 0.001
+    web_server_sorting_weight: '15'
+    
+  - platform: template
+    name: "Gas - Consumed Year (m³)"
+    id: gas_consumed_year_m3
+    unit_of_measurement: "m³"
+    state_class: "total_increasing"
+    device_class: gas
+    icon: 'mdi:calendar-text'
+    lambda: |-
+      return id(global_gas_consumed_year_m3);
+    update_interval: 1s
+    filters:
+      - delta : 0.001
+    web_server_sorting_weight: '16'
+
 
   ################################################################################
 
@@ -1072,36 +1245,129 @@ sensor:
   # Custom Component - Gas MJ (Consumption) Statistics
   #
 
+# sensor:
   - platform: "gas_statistics_mj"
     total: gas_consumed_total_mj
 
     gas_today:
-      name: "Gas - Consumed Today (MJ)"
-      id: gas_consumed_today_mj
-      web_server_sorting_weight: '18'
+      name: "Gas - Consumed Today MJ (Internal)"
+      id: gas_consumed_today_mj_internal
+      on_value:
+        then:
+          - lambda: |-
+              id(global_gas_consumed_today_mj) = x;
+      internal: true
     
     gas_yesterday:
-      name: "Gas - Consumed Yesterday (MJ)"
-      id: gas_consumed_yesterday_mj
-      web_server_sorting_weight: '19'
+      name: "Gas - Consumed Yesterday MJ (Internal)"
+      id: gas_consumed_yesterday_mj_internal
+      on_value:
+        then:
+          - lambda: |-
+              id(global_gas_consumed_yesterday_mj) = x;
+      internal: true
 
     gas_week:
-      name: "Gas - Consumed Week (MJ)"
-      id: gas_consumed_week_mj
-      web_server_sorting_weight: '20'
+      name: "Gas - Consumed Week MJ (Internal)"
+      id: gas_consumed_week_mj_internal
+      on_value:
+        then:
+          - lambda: |-
+              id(global_gas_consumed_week_mj) = x;
+      internal: true
     
     gas_month:
-      name: "Gas - Consumed Month (MJ)"
-      id: gas_consumed_month_mj
-      web_server_sorting_weight: '21'
+      name: "Gas - Consumed Month MJ (Internal)"
+      id: gas_consumed_month_mj_internal
+      on_value:
+        then:
+          - lambda: |-
+              id(global_gas_consumed_month_mj) = x;
+      internal: true
 
     gas_year:
-      name: "Gas - Consumed Year (MJ)"
-      id: gas_consumed_year_mj
-      web_server_sorting_weight: '22'
+      name: "Gas - Consumed Year MJ (Internal)"
+      id: gas_consumed_year_mj_internal
+      on_value:
+        then:
+          - lambda: |-
+              id(global_gas_consumed_year_mj) = x;
+      internal: true
+
+  #################
+
+  - platform: template
+    name: "Gas - Consumed Today (MJ)"
+    id: gas_consumed_today_mj
+    unit_of_measurement: "MJ"
+    device_class: energy
+    state_class: "total_increasing"
+    icon: 'mdi:hours-24'    
+    lambda: |-
+      return id(global_gas_consumed_today_mj);
+    update_interval: 1s
+    filters:
+      - delta : 0.001
+    web_server_sorting_weight: '18'
+    
+  - platform: template
+    name: "Gas - Consumed Yesterday (MJ)"
+    id: gas_consumed_yesterday_mj
+    unit_of_measurement: "MJ"
+    device_class: energy
+    state_class: "total_increasing"
+    icon: 'mdi:calendar-today-outline'
+    lambda: |-
+      return id(global_gas_consumed_yesterday_mj);
+    update_interval: 1s
+    filters:
+      - delta : 0.001
+    web_server_sorting_weight: '19'
+
+  - platform: template
+    name: "Gas - Consumed Week (MJ)"
+    id: gas_consumed_week_mj
+    unit_of_measurement: "MJ"
+    device_class: energy
+    state_class: "total_increasing"
+    icon: 'mdi:calendar-week'
+    lambda: |-
+      return id(global_gas_consumed_week_mj);
+    update_interval: 1s
+    filters:
+      - delta : 0.001
+    web_server_sorting_weight: '20'
+    
+  - platform: template
+    name: "Gas - Consumed Month (MJ)"
+    id: gas_consumed_month_mj
+    unit_of_measurement: "MJ"
+    device_class: energy
+    state_class: "total_increasing"
+    icon: 'mdi:calendar'
+    lambda: |-
+      return id(global_gas_consumed_month_mj);
+    update_interval: 1s
+    filters:
+      - delta : 0.001
+    web_server_sorting_weight: '21'
+    
+  - platform: template
+    name: "Gas - Consumed Year (MJ)"
+    id: gas_consumed_year_mj
+    device_class: energy
+    state_class: "total_increasing"
+    icon: 'mdi:calendar-text'
+    unit_of_measurement: "MJ"
+    lambda: |-
+      return id(global_gas_consumed_year_mj);
+    update_interval: 1s
+    filters:
+      - delta : 0.001
+    web_server_sorting_weight: '22'
 
   ################################################################################
-  
+
   - platform: template
     name: "Gas - Consumed Total (MJ)"
     id: gas_consumed_total_mj
@@ -1110,12 +1376,9 @@ sensor:
     state_class: "total_increasing"
     icon: "mdi:counter"
     accuracy_decimals: 3   
-    # With EACH QUARTERLY GAS BILL update the Jemena Pressure Factor and Heating Value below.   
-    # Formula - (Gas Consumed x Pressure Factor x Heating Value) = Usage MJ
+    # This publishes the GLOBAL  'gas_total_mj' stored value
     lambda: |-
        return id(gas_total_mj);
-#      return (id(gas_consumed_m3).state * 0.9864 * 37.98);
-#      return (id(gas_consumed_m3).state * id(pressure_factor_input).state * id(heating_value_input).state);
     update_interval: 1s
     filters:
       - delta : 0.001
@@ -1199,7 +1462,7 @@ sensor:
     # Set interval that updates are sent to HA instance
     update_interval: 1s
     filters:
-      - delta : 0.001
+      - delta : 0.1
     web_server_sorting_weight: '33'
 
 
@@ -1223,7 +1486,6 @@ sensor:
           - lambda: |-
               id(global_water_consumed_today) = x;
       internal: true
-#      web_server_sorting_weight: '28'
     
     water_yesterday:
       name: "Water - Consumed Yesterday (Internal)"
@@ -1233,7 +1495,6 @@ sensor:
           - lambda: |-
               id(global_water_consumed_yesterday) = x;
       internal: true
-      web_server_sorting_weight: '29'
 
     water_week:
       name: "Water - Consumed Week (Internal)"
@@ -1243,7 +1504,6 @@ sensor:
           - lambda: |-
               id(global_water_consumed_week) = x;
       internal: true
-      web_server_sorting_weight: '30'
     
     water_month:
       name: "Water - Consumed Month (Internal)"
@@ -1253,7 +1513,6 @@ sensor:
           - lambda: |-
               id(global_water_consumed_month) = x;
       internal: true
-      web_server_sorting_weight: '31'
 
     water_year:
       name: "Water - Consumed Year (Internal)"
@@ -1263,50 +1522,78 @@ sensor:
           - lambda: |-
               id(global_water_consumed_year) = x;
       internal: true
-      web_server_sorting_weight: '32'
 
   #################
 
   - platform: template
     name: "Water - Consumed Today"
+    id: water_consumed_today
+    unit_of_measurement: "L"
+    device_class: water
+    state_class: "total_increasing"
+    icon: 'mdi:hours-24'
     lambda: |-
       return id(global_water_consumed_today);
-    icon: 'mdi:hours-24'
-    update_interval: 10s
+    update_interval: 1s
+    filters:
+      - delta : 0.1
     web_server_sorting_weight: '28'
     
   - platform: template
     name: "Water - Consumed Yesterday"
+    id: water_consumed_yesterday
+    unit_of_measurement: "L"
+    device_class: water
+    state_class: "total_increasing"
+    icon: 'mdi:calendar-today-outline'
     lambda: |-
       return id(global_water_consumed_yesterday);
-    icon: 'mdi:calendar-today-outline'
-    update_interval: 10s
+    update_interval: 1s
+    filters:
+      - delta : 0.1
     web_server_sorting_weight: '29'
 
   - platform: template
     name: "Water - Consumed Week"
+    id: water_consumed_week
+    unit_of_measurement: "L"
+    device_class: water
+    state_class: "total_increasing"
+    icon: 'mdi:calendar-week'
     lambda: |-
       return id(global_water_consumed_week);
-    icon: 'mdi:calendar-week'
-    update_interval: 10s
+    update_interval: 1s
+    filters:
+      - delta : 0.1
     web_server_sorting_weight: '30'
     
   - platform: template
     name: "Water - Consumed Month"
+    id: water_consumed_month
+    unit_of_measurement: "L"
+    device_class: water
+    state_class: "total_increasing"
+    icon: 'mdi:calendar'
     lambda: |-
       return id(global_water_consumed_month);
-    icon: 'mdi:calendar'
-    update_interval: 10s
+    update_interval: 1s
+    filters:
+      - delta : 0.1
     web_server_sorting_weight: '31'
     
   - platform: template
     name: "Water - Consumed Year"
+    id: water_consumed_year
+    unit_of_measurement: "L"
+    device_class: water
+    state_class: "total_increasing"
+    icon: 'mdi:calendar-text'
     lambda: |-
       return id(global_water_consumed_year);
-    icon: 'mdi:calendar-text'
-    update_interval: 10s
-    web_server_sorting_weight: '31'
-
+    update_interval: 1s
+    filters:
+      - delta : 0.1
+    web_server_sorting_weight: '32'
 
   ################################################################################
   
@@ -1376,3 +1663,4 @@ sensor:
         # https://www.sensorsone.com/liquid-level-to-pressure-calculator/?lval=241&lunit=centimetres+%28cm%29&lfctr=cm&sg=1&grav=9.79508&punit=kilopascals+%28kPa%29&pfctr=kPa
     internal: true
 
+################################################################################
