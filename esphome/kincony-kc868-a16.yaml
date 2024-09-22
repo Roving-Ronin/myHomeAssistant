@@ -22,7 +22,7 @@ substitutions:
   # Project Name
   project_name: "Kincony.KC868-A16"
   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "1.2.4"
+  project_version: "1.3.0"
   # Restore the relay (GPO switch) upon reboot to state:
   relay_restore_mode: RESTORE_DEFAULT_OFF
   # Disable sensors
@@ -179,37 +179,37 @@ globals:
     type: float
     restore_value: true
    # Change initial value to 0 to reset, or enter your actual meter reading to start counting lifetime total from that number 
-    initial_value: "0.0"
+#    initial_value: "0.0"
 
-  #  Globals for storing the 'Gas_Statistics' water consumed DAILY M3 value
+  #  Globals for storing the 'Gas_Statistics' consumed DAILY M3 value
   - id: global_gas_m3_consumed_today
     type: float
     restore_value: true
-    initial_value: '0.0'
+#    initial_value: '0.0'
 
-  #  Globals for storing the 'Gas_Statistics' water consumed YESTERDAY M3 value
+  #  Globals for storing the 'Gas_Statistics' consumed YESTERDAY M3 value
   - id: global_gas_m3_consumed_yesterday
     type: float
     restore_value: true
-    initial_value: '0.0'
+#    initial_value: '0.0'
 
-  #  Globals for storing the 'Gas_Statistics' water consumed WEEK M3 value
+  #  Globals for storing the 'Gas_Statistics' consumed WEEK M3 value
   - id: global_gas_m3_consumed_week
     type: float
     restore_value: true
-    initial_value: '0.0'
+#    initial_value: '0.0'
 
-  #  Globals for storing the 'Gas_Statistics' water consumed MONTH M3 value
+  #  Globals for storing the 'Gas_Statistics' consumed MONTH M3 value
   - id: global_gas_m3_consumed_month
     type: float
     restore_value: true
-    initial_value: '0.0'
+#    initial_value: '0.0'
 
-  #  Globals for storing the 'Gas_Statistics' water consumed YEAR M3 value
+  #  Globals for storing the 'Gas_Statistics' consumed YEAR M3 value
   - id: global_gas_m3_consumed_year
     type: float
     restore_value: true
-    initial_value: '0.0'
+#    initial_value: '0.0'
 
   ####################################################
   #
@@ -220,37 +220,37 @@ globals:
     type: float
     restore_value: true
    # Change initial value to 0 to reset, or enter your actual meter reading to start counting lifetime total from that number 
-    initial_value: "0.0"
+#    initial_value: "0.0"
 
-  #  Globals for storing the 'Gas_Statistics' water consumed DAILY MJ value
+  #  Globals for storing the 'Gas_Statistics' consumed DAILY MJ value
   - id: global_gas_mj_consumed_today
     type: float
     restore_value: true
-    initial_value: '0.0'
+#    initial_value: '0.0'
 
-  #  Globals for storing the 'Gas_Statistics' water consumed YESTERDAY MJ value
+  #  Globals for storing the 'Gas_Statistics' consumed YESTERDAY MJ value
   - id: global_gas_mj_consumed_yesterday
     type: float
     restore_value: true
-    initial_value: '0.0'
+#    initial_value: '0.0'
 
-  #  Globals for storing the 'Gas_Statistics' water consumed WEEK MJ value
+  #  Globals for storing the 'Gas_Statistics' consumed WEEK MJ value
   - id: global_gas_mj_consumed_week
     type: float
     restore_value: true
-    initial_value: '0.0'
+#    initial_value: '0.0'
 
-  #  Globals for storing the 'Gas_Statistics' water consumed MONTH MJ value
+  #  Globals for storing the 'Gas_Statistics' consumed MONTH MJ value
   - id: global_gas_mj_consumed_month
     type: float
     restore_value: true
-    initial_value: '0.0'
+#    initial_value: '0.0'
 
-  #  Globals for storing the 'Gas_Statistics' water consumed YEAR MJ value
+  #  Globals for storing the 'Gas_Statistics' consumed YEAR MJ value
   - id: global_gas_mj_consumed_year
     type: float
     restore_value: true
-    initial_value: '0.0'
+ #   initial_value: '0.0'
 
   ####################################################
   #
@@ -259,40 +259,40 @@ globals:
 
   #  Globals for use with pulse meter, to allow storing and setting a base reading for water meter
   - id: water_consumed_total_litres
-    type: float
+    type: int
     restore_value: true
    # Change initial value to 0 to reset, or enter your actual meter reading to start counting lifetime total from that number 
-    initial_value: "0"
+#    initial_value: "0"
 
   #  Globals for storing the 'Water_Statistics' water consumed DAILY value
   - id: global_water_consumed_today
     type: int
     restore_value: true
-    initial_value: '0'
+#    initial_value: '0'
 
   #  Globals for storing the 'Water_Statistics' water consumed YESTERDAY value
   - id: global_water_consumed_yesterday
     type: int
     restore_value: true
-    initial_value: '0'
+#    initial_value: '0'
 
   #  Globals for storing the 'Water_Statistics' water consumed WEEK value
   - id: global_water_consumed_week
     type: int
     restore_value: true
-    initial_value: '0'
+#    initial_value: '0'
 
   #  Globals for storing the 'Water_Statistics' water consumed MONTH value
   - id: global_water_consumed_month
     type: int
     restore_value: true
-    initial_value: '0'
+#    initial_value: '0'
 
   #  Globals for storing the 'Water_Statistics' water consumed YEAR value
   - id: global_water_consumed_year
     type: int
     restore_value: true
-    initial_value: '0'
+#    initial_value: '0'
 
 #######################################################################################
 #
