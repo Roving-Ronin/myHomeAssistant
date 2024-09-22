@@ -606,7 +606,6 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 01'
     id: input1
-    object_id: input1
     pin:
       pcf8574: pcf8574_hub_in_1
       number: 0
@@ -618,7 +617,6 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 02'
     id: input2
-    object_id: input2
     pin:
       pcf8574: pcf8574_hub_in_1
       number: 1
@@ -630,7 +628,6 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 03'
     id: input3
-    object_id: input3
     pin:
       pcf8574: pcf8574_hub_in_1
       number: 2
@@ -642,7 +639,6 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 04'
     id: input4
-    object_id: input4
     pin:
       pcf8574: pcf8574_hub_in_1
       number: 3
@@ -654,7 +650,6 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 05'
     id: input5
-    object_id: input5
     pin:
       pcf8574: pcf8574_hub_in_1
       number: 4
@@ -666,7 +661,6 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 06'
     id: input6
-    object_id: input6
     pin:
       pcf8574: pcf8574_hub_in_1
       number: 5
@@ -678,7 +672,6 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 07'
     id: input7
-    object_id: input7
     pin:
       pcf8574: pcf8574_hub_in_1
       number: 6
@@ -690,7 +683,6 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 08'
     id: input8
-    object_id: input8
     pin:
       pcf8574: pcf8574_hub_in_1
       number: 7
@@ -702,7 +694,6 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 09'
     id: input9
-    object_id: input9
     pin:
       pcf8574: pcf8574_hub_in_2
       number: 0
@@ -714,7 +705,6 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 10'
     id: input10
-    object_id: input10
     pin:
       pcf8574: pcf8574_hub_in_2
       number: 1
@@ -726,7 +716,6 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 11'
     id: input11
-    object_id: input11
     pin:
       pcf8574: pcf8574_hub_in_2
       number: 2
@@ -738,7 +727,6 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 12'
     id: input12
-    object_id: input12
     pin:
       pcf8574: pcf8574_hub_in_2
       number: 3
@@ -750,7 +738,6 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 13'
     id: input13
-    object_id: input13
     pin:
       pcf8574: pcf8574_hub_in_2
       number: 4
@@ -762,7 +749,6 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 14'
     id: input14
-    object_id: input14
     pin:
       pcf8574: pcf8574_hub_in_2
       number: 5
@@ -774,7 +760,6 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 15'
     id: input15
-    object_id: input15
     pin:
       pcf8574: pcf8574_hub_in_2
       number: 6
@@ -786,7 +771,6 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 16'
     id: input16
-    object_id: input16
     pin:
       pcf8574: pcf8574_hub_in_2
       number: 7
