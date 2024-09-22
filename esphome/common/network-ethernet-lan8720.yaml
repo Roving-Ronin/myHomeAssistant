@@ -55,9 +55,9 @@ ethernet:
 text_sensor:
   - platform: ethernet_info
     ip_address:
-      name: ESP IP Address
+      name: Network IP
       address_0:
-        name: ESP IP Address
+        name: Network IP
 #      address_1:
 #        name: ESP IP Address 1
 #      address_2:
@@ -67,8 +67,8 @@ text_sensor:
 #      address_4:
 #        name: ESP IP Address 4
     dns_address:
-      name: ESP DNS Address
+      name: Network DNS Servers
     mac_address:
-      name: ESP MAC Address
+      name: MAC Address
 
 ##########################################################################
