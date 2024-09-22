@@ -77,8 +77,8 @@ dashboard_import:
 
 packages:
   base-config:     !include common/base-configuration.yaml
-  wifi-config:     !include common/network-wifi.yaml
-#  ethernet-config: !include common/network-ethernet-lan8720.yaml
+#  wifi-config:     !include common/network-wifi.yaml
+  ethernet-config: !include common/network-ethernet-lan8720.yaml
   bme280-sensors:  !include sensors/bme280-bus-a.yaml
 
 # ADD GAS AND WATER SENSORS
