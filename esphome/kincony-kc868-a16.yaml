@@ -1165,9 +1165,8 @@ sensor:
   #################
 
   - platform: template
-    name: "Gas - m³ Consumed Today"
+    name: "Gas - m3 Consumed Today"
     id: gas_m3_consumed_today
-    object_id: gas_m3_consumed_today
     unit_of_measurement: "m³"
     state_class: "total_increasing"
     device_class: gas
@@ -1180,9 +1179,8 @@ sensor:
     web_server_sorting_weight: 12
     
   - platform: template
-    name: "Gas - m³ Consumed Yesterday"
+    name: "Gas - m3 Consumed Yesterday"
     id: gas_m3_consumed_yesterday
-    object_id: gas_m3_consumed_yesterday
     unit_of_measurement: "m³"
     state_class: "total_increasing"
     device_class: gas
@@ -1195,9 +1193,8 @@ sensor:
     web_server_sorting_weight: 13
 
   - platform: template
-    name: "Gas - m³ Consumed Week"
+    name: "Gas - m3 Consumed Week"
     id: gas_m3_consumed_week
-    object_id: gas_m3_consumed_week
     unit_of_measurement: "m³"
     state_class: "total_increasing"
     device_class: gas
@@ -1210,9 +1207,8 @@ sensor:
     web_server_sorting_weight: 14
     
   - platform: template
-    name: "Gas - m³ Consumed Month"
+    name: "Gas - m3 Consumed Month"
     id: gas_m3_consumed_month
-    object_id: gas_m3_consumed_month
     unit_of_measurement: "m³"
     state_class: "total_increasing"
     device_class: gas
@@ -1225,9 +1221,8 @@ sensor:
     web_server_sorting_weight: 15
     
   - platform: template
-    name: "Gas - m³ Consumed Year"
+    name: "Gas - m3 Consumed Year"
     id: gas_m3_consumed_year
-    object_id: gas_m3_consumed_year
     unit_of_measurement: "m³"
     state_class: "total_increasing"
     device_class: gas
@@ -1244,7 +1239,7 @@ sensor:
 
   #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
   - platform: template
-    name: "Gas - m³ Consumed Total"
+    name: "Gas - m3 Consumed Total"
     id: gas_m3_consumed_total
     object_id: gas_m3_consumed_total
     unit_of_measurement: "m³"
