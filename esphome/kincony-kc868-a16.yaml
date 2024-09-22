@@ -173,21 +173,21 @@ globals:
     type: float
     restore_value: yes
    # Change initial value to 0 to reset, or enter your actual meter reading to start counting lifetime total from that number 
-#    initial_value: "0"
+    initial_value: "1717.3"
 
   #  Globals for use with pulse meter, to allow storing and setting a base reading for gas meter
   - id: gas_total_m3
     type: float
     restore_value: yes
    # Change initial value to 0 to reset, or enter your actual meter reading to start counting lifetime total from that number 
-#    initial_value: "0"
+    initial_value: "583.68"
 
   #  Globals for use with pulse meter, to allow storing and setting a base reading for water meter
   - id: water_consumed_total_litres
     type: float
     restore_value: yes
    # Change initial value to 0 to reset, or enter your actual meter reading to start counting lifetime total from that number 
-#    initial_value: "0"
+    initial_value: "29384"
 
 #######################################################################################
 #
