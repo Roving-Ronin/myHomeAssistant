@@ -134,7 +134,7 @@ button:
     on_press:
       - lambda: |-
           id(water_town_consumed_total_litres) = 0;
-          id(water_meter_consumed_litres).state = 0;
+          id(water_town_consumed_litres).state = 0;
 
 #########################################################################
 #
