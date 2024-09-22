@@ -22,7 +22,7 @@ substitutions:
   # Project Name
   project_name: "Kincony.KC868-A16"
   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "1.2.3"
+  project_version: "1.2.4"
   # Restore the relay (GPO switch) upon reboot to state:
   relay_restore_mode: RESTORE_DEFAULT_OFF
   # Disable sensors
@@ -177,9 +177,9 @@ globals:
   #  Globals for use with pulse meter, to allow storing and setting a base reading for gas meter
   - id: gas_total_m3
     type: float
-    restore_value: false
+    restore_value: true
    # Change initial value to 0 to reset, or enter your actual meter reading to start counting lifetime total from that number 
-    initial_value: "583.69"
+    initial_value: "0.0"
 
   #  Globals for storing the 'Gas_Statistics' water consumed DAILY M3 value
   - id: global_gas_m3_consumed_today
@@ -218,9 +218,9 @@ globals:
   
   - id: gas_total_mj
     type: float
-    restore_value: false
+    restore_value: true
    # Change initial value to 0 to reset, or enter your actual meter reading to start counting lifetime total from that number 
-    initial_value: "1717.675"
+    initial_value: "0.0"
 
   #  Globals for storing the 'Gas_Statistics' water consumed DAILY MJ value
   - id: global_gas_mj_consumed_today
@@ -260,9 +260,9 @@ globals:
   #  Globals for use with pulse meter, to allow storing and setting a base reading for water meter
   - id: water_consumed_total_litres
     type: float
-    restore_value: false
+    restore_value: true
    # Change initial value to 0 to reset, or enter your actual meter reading to start counting lifetime total from that number 
-    initial_value: "29389"
+    initial_value: "0"
 
   #  Globals for storing the 'Water_Statistics' water consumed DAILY value
   - id: global_water_consumed_today
