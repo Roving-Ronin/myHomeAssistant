@@ -1271,6 +1271,7 @@ sensor:
     name: "Water - Consumed Today"
     lambda: |-
       return id(global_water_consumed_today);
+    icon: 'mdi:hours-24'
     update_interval: 10s
     web_server_sorting_weight: '28'
     
@@ -1278,6 +1279,7 @@ sensor:
     name: "Water - Consumed Yesterday"
     lambda: |-
       return id(global_water_consumed_yesterday);
+    icon: 'mdi:calendar-today-outline'
     update_interval: 10s
     web_server_sorting_weight: '29'
 
@@ -1285,6 +1287,7 @@ sensor:
     name: "Water - Consumed Week"
     lambda: |-
       return id(global_water_consumed_week);
+    icon: 'mdi:calendar-week'
     update_interval: 10s
     web_server_sorting_weight: '30'
     
@@ -1292,6 +1295,7 @@ sensor:
     name: "Water - Consumed Month"
     lambda: |-
       return id(global_water_consumed_month);
+    icon: 'mdi:calendar'
     update_interval: 10s
     web_server_sorting_weight: '31'
     
@@ -1299,6 +1303,7 @@ sensor:
     name: "Water - Consumed Year"
     lambda: |-
       return id(global_water_consumed_year);
+    icon: 'mdi:calendar-text'
     update_interval: 10s
     web_server_sorting_weight: '31'
 
