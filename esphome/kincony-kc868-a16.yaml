@@ -184,31 +184,31 @@ globals:
   #  Globals for storing the 'Gas_Statistics' water consumed DAILY M3 value
   - id: global_gas_consumed_today_m3
     type: float
-    restore_value: yes
+    restore_value: true
     initial_value: '0.0'
 
   #  Globals for storing the 'Gas_Statistics' water consumed YESTERDAY M3 value
   - id: global_gas_consumed_yesterday_m3
     type: float
-    restore_value: yes
+    restore_value: true
     initial_value: '0.0'
 
   #  Globals for storing the 'Gas_Statistics' water consumed WEEK M3 value
   - id: global_gas_consumed_week_m3
     type: float
-    restore_value: yes
+    restore_value: true
     initial_value: '0.0'
 
   #  Globals for storing the 'Gas_Statistics' water consumed MONTH M3 value
   - id: global_gas_consumed_month_m3
     type: float
-    restore_value: yes
+    restore_value: true
     initial_value: '0.0'
 
   #  Globals for storing the 'Gas_Statistics' water consumed YEAR M3 value
   - id: global_gas_consumed_year_m3
     type: float
-    restore_value: yes
+    restore_value: true
     initial_value: '0.0'
 
   ####################################################
@@ -225,31 +225,31 @@ globals:
   #  Globals for storing the 'Gas_Statistics' water consumed DAILY MJ value
   - id: global_gas_consumed_today_mj
     type: float
-    restore_value: yes
+    restore_value: true
     initial_value: '0.0'
 
   #  Globals for storing the 'Gas_Statistics' water consumed YESTERDAY MJ value
   - id: global_gas_consumed_yesterday_mj
     type: float
-    restore_value: yes
+    restore_value: true
     initial_value: '0.0'
 
   #  Globals for storing the 'Gas_Statistics' water consumed WEEK MJ value
   - id: global_gas_consumed_week_mj
     type: float
-    restore_value: yes
+    restore_value: true
     initial_value: '0.0'
 
   #  Globals for storing the 'Gas_Statistics' water consumed MONTH MJ value
   - id: global_gas_consumed_month_mj
     type: float
-    restore_value: yes
+    restore_value: true
     initial_value: '0.0'
 
   #  Globals for storing the 'Gas_Statistics' water consumed YEAR MJ value
   - id: global_gas_consumed_year_mj
     type: float
-    restore_value: yes
+    restore_value: true
     initial_value: '0.0'
 
   ####################################################
@@ -267,31 +267,31 @@ globals:
   #  Globals for storing the 'Water_Statistics' water consumed DAILY value
   - id: global_water_consumed_today
     type: float
-    restore_value: yes
+    restore_value: true
     initial_value: '0.0'
 
   #  Globals for storing the 'Water_Statistics' water consumed YESTERDAY value
   - id: global_water_consumed_yesterday
     type: float
-    restore_value: yes
+    restore_value: true
     initial_value: '0.0'
 
   #  Globals for storing the 'Water_Statistics' water consumed WEEK value
   - id: global_water_consumed_week
     type: float
-    restore_value: yes
+    restore_value: true
     initial_value: '0.0'
 
   #  Globals for storing the 'Water_Statistics' water consumed MONTH value
   - id: global_water_consumed_month
     type: float
-    restore_value: yes
+    restore_value: true
     initial_value: '0.0'
 
   #  Globals for storing the 'Water_Statistics' water consumed YEAR value
   - id: global_water_consumed_year
     type: float
-    restore_value: yes
+    restore_value: true
     initial_value: '0.0'
 
 #######################################################################################
@@ -1032,7 +1032,7 @@ sensor:
       mode:
         input: true
         pullup: true
-    web_server_sorting_weight: '10'
+    web_server_sorting_weight: 9
 
 
   - platform: pulse_meter
@@ -1055,6 +1055,7 @@ sensor:
     timeout: 3min
     filters:
       - multiply: 10.0     # 1 pulse = 10L. The gas counter 'helper' in Home Assistant must still be set to 'step size' = 10.
+    web_server_sorting_weight: 10
 
     #  Uses the above pulse_meter and adds sensor and calculations for tracking m3
     total:    
@@ -1090,7 +1091,7 @@ sensor:
               previous_gas_m3_value = current_gas_m3_value;
       filters:
         - multiply: 0.001   # 100 pulses = 1,000L = 1m3
-    web_server_sorting_weight: '11'
+    web_server_sorting_weight: 11
 
   ################################################################################
   #
@@ -1160,7 +1161,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-    web_server_sorting_weight: '12'
+    web_server_sorting_weight: 12
     
   - platform: template
     name: "Gas - Consumed Yesterday (m³)"
@@ -1174,7 +1175,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-    web_server_sorting_weight: '13'
+    web_server_sorting_weight: 13
 
   - platform: template
     name: "Gas - Consumed Week (m³)"
@@ -1188,7 +1189,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-    web_server_sorting_weight: '14'
+    web_server_sorting_weight: 14
     
   - platform: template
     name: "Gas - Consumed Month (m³)"
@@ -1202,7 +1203,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-    web_server_sorting_weight: '15'
+    web_server_sorting_weight: 15
     
   - platform: template
     name: "Gas - Consumed Year (m³)"
@@ -1216,7 +1217,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-    web_server_sorting_weight: '16'
+    web_server_sorting_weight: 16
 
 
   ################################################################################
@@ -1237,7 +1238,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-    web_server_sorting_weight: '17'
+    web_server_sorting_weight: 17
 
 
   ################################################################################
@@ -1308,7 +1309,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-    web_server_sorting_weight: '18'
+    web_server_sorting_weight: 18
     
   - platform: template
     name: "Gas - Consumed Yesterday (MJ)"
@@ -1322,7 +1323,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-    web_server_sorting_weight: '19'
+    web_server_sorting_weight: 19
 
   - platform: template
     name: "Gas - Consumed Week (MJ)"
@@ -1336,7 +1337,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-    web_server_sorting_weight: '20'
+    web_server_sorting_weight: 20
     
   - platform: template
     name: "Gas - Consumed Month (MJ)"
@@ -1350,7 +1351,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-    web_server_sorting_weight: '21'
+    web_server_sorting_weight: 21
     
   - platform: template
     name: "Gas - Consumed Year (MJ)"
@@ -1364,7 +1365,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-    web_server_sorting_weight: '22'
+    web_server_sorting_weight: 22
 
   ################################################################################
 
@@ -1382,7 +1383,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-    web_server_sorting_weight: '23'
+    web_server_sorting_weight: 23
     
   ################################################################################
   #
@@ -1402,7 +1403,7 @@ sensor:
         pullup: true
     filters:
       - multiply: 5.0  # Convert pulse count to liters
-    web_server_sorting_weight: '25'
+    web_server_sorting_weight: 25
 
   - platform: pulse_meter
     name: "Water - Flow Rate"
@@ -1424,7 +1425,7 @@ sensor:
     timeout: 3min
     filters:
       - multiply: 5.0  # Each pulse equals 5 liters. The water counter 'helper' in Home Assistant must still be set to 'step size' = 5.
-    web_server_sorting_weight: '26'
+    web_server_sorting_weight: 26
 
     #  Uses the above pulse_meter and adds sensor and calculations for tracking current litres
     total:
@@ -1463,7 +1464,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.1
-    web_server_sorting_weight: '33'
+    web_server_sorting_weight: 33
 
 
   ################################################################################
@@ -1537,7 +1538,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.1
-    web_server_sorting_weight: '28'
+    web_server_sorting_weight: 28
     
   - platform: template
     name: "Water - Consumed Yesterday"
@@ -1551,7 +1552,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.1
-    web_server_sorting_weight: '29'
+    web_server_sorting_weight: 29
 
   - platform: template
     name: "Water - Consumed Week"
@@ -1565,7 +1566,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.1
-    web_server_sorting_weight: '30'
+    web_server_sorting_weight: 30
     
   - platform: template
     name: "Water - Consumed Month"
@@ -1579,7 +1580,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.1
-    web_server_sorting_weight: '31'
+    web_server_sorting_weight: 31
     
   - platform: template
     name: "Water - Consumed Year"
@@ -1593,7 +1594,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.1
-    web_server_sorting_weight: '32'
+    web_server_sorting_weight: 32
 
   ################################################################################
   
