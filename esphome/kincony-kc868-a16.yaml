@@ -189,6 +189,32 @@ globals:
    # Change initial value to 0 to reset, or enter your actual meter reading to start counting lifetime total from that number 
     initial_value: "29389"
 
+  - id: global_water_consumed_today
+    type: float
+    restore_value: yes
+    initial_value: '0.0'
+
+  - id: global_water_consumed_yesterday
+    type: float
+    restore_value: yes
+    initial_value: '0.0'
+
+  - id: global_water_consumed_week
+    type: float
+    restore_value: yes
+    initial_value: '0.0'
+
+  - id: global_water_consumed_month
+    type: float
+    restore_value: yes
+    initial_value: '0.0'
+
+  - id: global_water_consumed_year
+    type: float
+    restore_value: yes
+    initial_value: '0.0'
+
+
 #######################################################################################
 #
 # Number Inputs - Used to configure the values used to convert Gas M3 to MJ
@@ -1180,7 +1206,9 @@ sensor:
   ################################################################################
   #
   # Custom Component - Water (Consumption) Statistics
-  #
+  #   These update the globals values, that persist between reboots and reflashing
+  #   and set to 'internal: true' to hide them, whilst the following template sensors
+  #   then publish the current value of the stored globals.
   #
 
 # sensor:
@@ -1188,29 +1216,91 @@ sensor:
     total: water_consumed_total
 
     water_today:
-      name: "Water - Consumed Today"
-      id: water_consumed_today
-      web_server_sorting_weight: '28'
+      name: "Water - Consumed Today (Internal)"
+      id: water_consumed_today_internal
+      on_value:
+        then:
+          - lambda: |-
+              id(global_water_consumed_today) = x;
+      internal: true
+#      web_server_sorting_weight: '28'
     
     water_yesterday:
-      name: "Water - Consumed Yesterday"
-      id: water_consumed_yesterday
+      name: "Water - Consumed Yesterday (Internal)"
+      id: water_consumed_yesterday_internal
+      on_value:
+        then:
+          - lambda: |-
+              id(global_water_consumed_yesterday) = x;
+      internal: true
       web_server_sorting_weight: '29'
 
     water_week:
-      name: "Water - Consumed Week"
-      id: water_consumed_week
+      name: "Water - Consumed Week (Internal)"
+      id: water_consumed_week_internal
+      on_value:
+        then:
+          - lambda: |-
+              id(global_water_consumed_week) = x;
+      internal: true
       web_server_sorting_weight: '30'
     
     water_month:
-      name: "Water - Consumed Month"
-      id: water_consumed_month
+      name: "Water - Consumed Month (Internal)"
+      id: water_consumed_month_internal
+      on_value:
+        then:
+          - lambda: |-
+              id(global_water_consumed_month) = x;
+      internal: true
       web_server_sorting_weight: '31'
 
     water_year:
-      name: "Water - Consumed Year"
-      id: water_consumed_year
+      name: "Water - Consumed Year (Internal)"
+      id: water_consumed_year_internal
+      on_value:
+        then:
+          - lambda: |-
+              id(global_water_consumed_year) = x;
+      internal: true
       web_server_sorting_weight: '32'
+
+  #################
+
+  - platform: template
+    name: "Water - Consumed Today"
+    lambda: |-
+      return id(global_water_consumed_today);
+    update_interval: 10s
+    web_server_sorting_weight: '28'
+    
+  - platform: template
+    name: "Water - Consumed Yesterday"
+    lambda: |-
+      return id(global_water_consumed_yesterday);
+    update_interval: 10s
+    web_server_sorting_weight: '29'
+
+  - platform: template
+    name: "Water - Consumed Week"
+    lambda: |-
+      return id(global_water_consumed_week);
+    update_interval: 10s
+    web_server_sorting_weight: '30'
+    
+  - platform: template
+    name: "Water - Consumed Month"
+    lambda: |-
+      return id(global_water_consumed_month);
+    update_interval: 10s
+    web_server_sorting_weight: '31'
+    
+  - platform: template
+    name: "Water - Consumed Year"
+    lambda: |-
+      return id(global_water_consumed_year);
+    update_interval: 10s
+    web_server_sorting_weight: '31'
 
 
   ################################################################################
