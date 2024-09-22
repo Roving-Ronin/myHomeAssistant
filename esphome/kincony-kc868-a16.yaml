@@ -1058,7 +1058,6 @@ sensor:
   - platform: pulse_meter
     name: 'Gas - Flow Rate'
     id: gas_flow_rate
-    object_id: gas_flow_rate
     unit_of_measurement: "L/min" # "m³/h"
     state_class: measurement
 #    device_class: volume  # Disabled to stop this being recorded in HA
@@ -1081,7 +1080,6 @@ sensor:
     #  Uses the above pulse_meter and adds sensor and calculations for tracking m3
     total:    
       id: gas_consumed_m3
-      object_id: gas_consumed_m3
       name: 'Gas - Consumed (m³)'
       unit_of_measurement: "m³"
       icon: "mdi:counter"
