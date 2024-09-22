@@ -379,7 +379,6 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 01'
     id: sensor_relay_1
-    object_id: sensor_relay_1
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_1
@@ -392,7 +391,6 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 02'
     id: sensor_relay_2
-    object_id: sensor_relay_2
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_1
@@ -405,7 +403,6 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 03'
     id: sensor_relay_3
-    object_id: sensor_relay_3
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_1
@@ -418,7 +415,6 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 04'
     id: sensor_relay_4
-    object_id: sensor_relay_4
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_1
@@ -431,7 +427,6 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 05'
     id: sensor_relay_5
-    object_id: sensor_relay_5
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_1
@@ -444,7 +439,6 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 06'
     id: sensor_relay_6
-    object_id: sensor_relay_6
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_1
@@ -457,7 +451,6 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 07'
     id: sensor_relay_7
-    object_id: sensor_relay_7
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_1
@@ -470,7 +463,6 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 08'
     id: sensor_relay_8
-    object_id: sensor_relay_8
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_1
@@ -483,7 +475,6 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 09'
     id: sensor_relay_9
-    object_id: sensor_relay_9
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_2
@@ -496,7 +487,6 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 10'
     id: sensor_relay_10
-    object_id: sensor_relay_10
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_2
@@ -509,7 +499,6 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 11'
     id: sensor_relay_11
-    object_id: sensor_relay_11
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_2
@@ -522,7 +511,6 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 12'
     id: sensor_relay_12
-    object_id: sensor_relay_12
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_2
@@ -535,7 +523,6 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 13'
     id: sensor_relay_13
-    object_id: sensor_relay_13
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_2
@@ -548,7 +535,6 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 14'
     id: sensor_relay_14
-    object_id: sensor_relay_14
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_2
@@ -561,7 +547,6 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 15'
     id: sensor_relay_15
-    object_id: sensor_relay_15
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_2
@@ -574,7 +559,6 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 16'
     id: sensor_relay_16
-    object_id: sensor_relay_16
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_2
