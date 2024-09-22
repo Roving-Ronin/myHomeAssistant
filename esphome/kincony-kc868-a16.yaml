@@ -1045,7 +1045,6 @@ sensor:
   - platform: pulse_counter
     name: "Gas - Pulse Counter"
     id: gas_pulse_counter
-    object_id: gas_pulse_counter
     pin:
       number: 32
       allow_other_uses: true
