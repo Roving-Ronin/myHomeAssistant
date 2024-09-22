@@ -952,7 +952,6 @@ sensor:
   - platform: template
     name: "Water Tank - %"
     id: water_tank_percent
-    object_id: water_tank_percent
     icon: 'mdi:water-well'
     unit_of_measurement: '%'
     update_interval: 1s #the delta filter will ensure it only sends values when something changes.     
@@ -974,7 +973,6 @@ sensor:
   - platform: template
     name: "Water Tank - Litres"
     id: water_tank_litres
-    object_id: water_tank_litres
     icon: 'mdi:water-well'
     unit_of_measurement: 'L'
     lambda: |-
