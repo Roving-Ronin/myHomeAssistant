@@ -22,7 +22,7 @@ substitutions:
   # Project Name
   project_name: "Kincony.KC868-A16"
   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "1.3.0"
+  project_version: "1.3.1"
   # Restore the relay (GPO switch) upon reboot to state:
   relay_restore_mode: RESTORE_DEFAULT_OFF
   # Disable sensors
@@ -1144,8 +1144,8 @@ sensor:
   #################
 
   - platform: template
-    name: "Gas - m³ Consumed Today"
     id: gas_m3_consumed_today
+    name: "Gas - m³ Consumed Today"
     unit_of_measurement: "m³"
     state_class: "total_increasing"
     device_class: gas
@@ -1158,8 +1158,8 @@ sensor:
     web_server_sorting_weight: 12
     
   - platform: template
-    name: "Gas - m³ Consumed Yesterday"
     id: gas_m3_consumed_yesterday
+    name: "Gas - m³ Consumed Yesterday"
     unit_of_measurement: "m³"
     state_class: "total_increasing"
     device_class: gas
@@ -1172,8 +1172,8 @@ sensor:
     web_server_sorting_weight: 13
 
   - platform: template
-    name: "Gas - m³ Consumed Week"
     id: gas_m3_consumed_week
+    name: "Gas - m³ Consumed Week"
     unit_of_measurement: "m³"
     state_class: "total_increasing"
     device_class: gas
@@ -1186,8 +1186,8 @@ sensor:
     web_server_sorting_weight: 14
     
   - platform: template
-    name: "Gas - m³ Consumed Month"
     id: gas_m3_consumed_month
+    name: "Gas - m³ Consumed Month"
     unit_of_measurement: "m³"
     state_class: "total_increasing"
     device_class: gas
@@ -1200,8 +1200,8 @@ sensor:
     web_server_sorting_weight: 15
     
   - platform: template
-    name: "Gas - m³ Consumed Year"
     id: gas_m3_consumed_year
+    name: "Gas - m³ Consumed Year"
     unit_of_measurement: "m³"
     state_class: "total_increasing"
     device_class: gas
