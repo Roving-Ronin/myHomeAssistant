@@ -9,6 +9,8 @@ substitutions:
 # Supported chipsets are: LAN8720, RTL8201, DP83848, IP101, JL1101
 #                         KSZ8081, KSZ8081RNA & W5500 (SPI)
 
+# Configuration for Kincony KC868-A16 - https://www.kincony.com/forum/showthread.php?tid=1628
+
    # Configuration entries for RMII chips
   ether_type: "LAN8720"
    # The MDC pin of the board. Usually this is GPIO23.
@@ -16,9 +18,11 @@ substitutions:
    # The MDIO pin of the board. Usually this is GPIO18.
   ether_mdio_pin: "GPIO18"
    # (Optional, string): The clock mode of the data lines. See your board’s datasheet for more details.
-  ether_clock_mode: "GPIO0_IN"
+  ether_clock_mode: "GPIO17_OUT" #"GPIO0_IN"
+   # Ethernet Physical Address
+  ether_phy_add: "0"
    # (Optional, Pin Schema): The pin controlling the power/reset status of the Ethernet controller.
-  ether_power_pin: "GPIO16"
+#  ether_power_pin: "GPIO16"
 
 ########################## End of Substitutions #########################
 #
@@ -31,8 +35,8 @@ ethernet:
   mdc_pin: ${ether_mdc_pin}
   mdio_pin: ${ether_mdio_pin}
   clk_mode: ${ether_clock_mode}
-  phy_addr: 1
-  power_pin: ${ether_power_pin}
+  phy_addr: ${ether_phy_add}
+#  power_pin: ${ether_power_pin}
   domain: "${dns_domain}"
 
  # Define a static IP address (optional)
