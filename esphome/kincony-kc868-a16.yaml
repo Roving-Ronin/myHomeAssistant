@@ -303,7 +303,6 @@ number:
   - platform: template
     name: "Gas - Pressure Factor"
     id: input_gas_pressure_factor
-    object_id: gas_pressure_factor
     min_value: 0.9
     max_value: 1.1
     step: 0.0001
@@ -318,7 +317,6 @@ number:
   - platform: template
     name: "Gas - Heating Value"
     id: input_gas_heating_value
-    object_id: gas_heating_value
     min_value: 34.0
     max_value: 52.0
     step: 0.01
