@@ -1062,7 +1062,7 @@ sensor:
     #  Uses the above pulse_meter and adds sensor and calculations for tracking m3
     total:    
       id: gas_consumed_m3
-      name: 'Gas - Consumed (m³)'
+      name: 'Gas - Consumed (m3)'
       unit_of_measurement: "m³"
       icon: "mdi:counter"
       state_class: "total_increasing"
@@ -1088,7 +1088,7 @@ sensor:
               previous_gas_m3_value = current_gas_m3_value;
       filters:
         - multiply: 0.001   # 100 pulses = 1,000L = 1m3
-      internal: true
+      internal: false
 
   ################################################################################
   #
@@ -1442,7 +1442,7 @@ sensor:
               previous_water_town_consumed_litres_value = current_water_town_consumed_litres_value;
       filters:
         - multiply: 5.0  # Each pulse equals 5 liters
-      internal: true
+      internal: false
 
 
   #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
