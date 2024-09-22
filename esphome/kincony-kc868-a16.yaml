@@ -1086,7 +1086,6 @@ sensor:
               previous_gas_m3_value = current_gas_m3_value;
       filters:
         - multiply: 0.001   # 100 pulses = 1,000L = 1m3
-    web_server_sorting_weight: 11
 
   ################################################################################
   #
