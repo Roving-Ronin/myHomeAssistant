@@ -119,6 +119,7 @@ button:
     name: 'Gas - Reset Reading'
     entity_category: config
     id: button_reset_gas_reading
+    icon: 'mdi:alert'
     on_press:
       - lambda: |-
           id(gas_total_mj) = 0;
@@ -131,6 +132,7 @@ button:
     name: 'Water Meter - Reset Reading'
     entity_category: config
     id: button_reset_water_reading
+    icon: 'mdi:alert'
     on_press:
       - lambda: |-
           id(water_town_consumed_total_litres) = 0;
