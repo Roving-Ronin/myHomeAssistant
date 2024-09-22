@@ -58,6 +58,7 @@ sensor:
    # BME280 Sensor in I2C Port - Absolute Humidity
   - platform: absolute_humidity
     name: "${bme_sensor1_location}Humidity (Absolute)"
+    id: bme280a_humidity_absolute
     icon: 'mdi:water-percent'
     temperature: bme280a_temperature
     humidity: bme280a_humidity
@@ -76,6 +77,7 @@ sensor:
    # BME280 Sensor in I2C Port - Dew Point
   - platform: template
     name: "${bme_sensor1_location}Dew Point"
+    id: bme280a_dew_point
     icon: 'mdi:water-thermometer-outline'
     unit_of_measurement: °C
 #    state_class: 'measurement'
@@ -90,6 +92,7 @@ sensor:
    # Note: This is based on 655m for Goulburn North, NSW. Australia. Update for a different location.
   - platform: template
     name: "${bme_sensor1_location}Equivalent Sea Level Pressure"
+    id: bme280a_sea_level_pressure
     icon: 'mdi:waves-arrow-up'
     unit_of_measurement: 'hPa'
 #    state_class: 'measurement'
