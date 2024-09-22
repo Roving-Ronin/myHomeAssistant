@@ -905,7 +905,6 @@ sensor:
   - platform: template
     name: "Water Tank - Level"
     id: water_tank_level
-    object_id: water_tank_level
     icon: 'mdi:water-well'
     unit_of_measurement: 'cm'
     lambda: |-
