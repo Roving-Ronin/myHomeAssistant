@@ -123,7 +123,7 @@ button:
       - lambda: |-
           id(gas_total_mj) = 0;
           id(gas_total_m3) = 0;
-          id(gas_consumed_total_mj).state = 0;
+          id(gas_mj_consumed_total).state = 0;
           id(gas_consumed_m3).state = 0;
 
   #  Reset the total energy entity (Water - Current Reading)
@@ -182,31 +182,31 @@ globals:
     initial_value: "583.69"
 
   #  Globals for storing the 'Gas_Statistics' water consumed DAILY M3 value
-  - id: global_gas_consumed_today_m3
+  - id: global_gas_m3_consumed_today
     type: float
     restore_value: true
     initial_value: '0.0'
 
   #  Globals for storing the 'Gas_Statistics' water consumed YESTERDAY M3 value
-  - id: global_gas_consumed_yesterday_m3
+  - id: global_gas_m3_consumed_yesterday
     type: float
     restore_value: true
     initial_value: '0.0'
 
   #  Globals for storing the 'Gas_Statistics' water consumed WEEK M3 value
-  - id: global_gas_consumed_week_m3
+  - id: global_gas_m3_consumed_week
     type: float
     restore_value: true
     initial_value: '0.0'
 
   #  Globals for storing the 'Gas_Statistics' water consumed MONTH M3 value
-  - id: global_gas_consumed_month_m3
+  - id: global_gas_m3_consumed_month
     type: float
     restore_value: true
     initial_value: '0.0'
 
   #  Globals for storing the 'Gas_Statistics' water consumed YEAR M3 value
-  - id: global_gas_consumed_year_m3
+  - id: global_gas_m3_consumed_year
     type: float
     restore_value: true
     initial_value: '0.0'
@@ -223,31 +223,31 @@ globals:
     initial_value: "1717.675"
 
   #  Globals for storing the 'Gas_Statistics' water consumed DAILY MJ value
-  - id: global_gas_consumed_today_mj
+  - id: global_gas_mj_consumed_today
     type: float
     restore_value: true
     initial_value: '0.0'
 
   #  Globals for storing the 'Gas_Statistics' water consumed YESTERDAY MJ value
-  - id: global_gas_consumed_yesterday_mj
+  - id: global_gas_mj_consumed_yesterday
     type: float
     restore_value: true
     initial_value: '0.0'
 
   #  Globals for storing the 'Gas_Statistics' water consumed WEEK MJ value
-  - id: global_gas_consumed_week_mj
+  - id: global_gas_mj_consumed_week
     type: float
     restore_value: true
     initial_value: '0.0'
 
   #  Globals for storing the 'Gas_Statistics' water consumed MONTH MJ value
-  - id: global_gas_consumed_month_mj
+  - id: global_gas_mj_consumed_month
     type: float
     restore_value: true
     initial_value: '0.0'
 
   #  Globals for storing the 'Gas_Statistics' water consumed YEAR MJ value
-  - id: global_gas_consumed_year_mj
+  - id: global_gas_mj_consumed_year
     type: float
     restore_value: true
     initial_value: '0.0'
@@ -268,31 +268,31 @@ globals:
   - id: global_water_consumed_today
     type: float
     restore_value: true
-    initial_value: '0.0'
+    initial_value: '0'
 
   #  Globals for storing the 'Water_Statistics' water consumed YESTERDAY value
   - id: global_water_consumed_yesterday
     type: float
     restore_value: true
-    initial_value: '0.0'
+    initial_value: '0'
 
   #  Globals for storing the 'Water_Statistics' water consumed WEEK value
   - id: global_water_consumed_week
     type: float
     restore_value: true
-    initial_value: '0.0'
+    initial_value: '0'
 
   #  Globals for storing the 'Water_Statistics' water consumed MONTH value
   - id: global_water_consumed_month
     type: float
     restore_value: true
-    initial_value: '0.0'
+    initial_value: '0'
 
   #  Globals for storing the 'Water_Statistics' water consumed YEAR value
   - id: global_water_consumed_year
     type: float
     restore_value: true
-    initial_value: '0.0'
+    initial_value: '0'
 
 #######################################################################################
 #
@@ -1069,11 +1069,6 @@ sensor:
     #  Adds the calculation for providing a reading since device last booted / reset
       on_value: 
         then:
-#          - lambda: |-
-#              static float previous_gas_m3_value = 0.0;
-#              float current_gas_m3_value = id(gas_consumed_m3).state;
-#              id(gas_total_m3) += current_gas_m3_value - previous_gas_m3_value;
-#              previous_gas_m3_value = current_gas_m3_value;
           - lambda: |-
               static float previous_gas_m3_value = 0.0;
               float current_gas_m3_value = id(gas_consumed_m3).state;
@@ -1100,120 +1095,120 @@ sensor:
 
 # sensor:
   - platform: "gas_statistics"
-    total: gas_consumed_total
+    total: gas_m3_consumed_total
 
     gas_today:
-      name: "Gas - Consumed Today m³ (Internal)"
-      id: gas_consumed_today_m3_internal
+      name: "Gas - m³ Consumed Today (Internal)"
+      id: gas_m3_consumed_today_internal
       on_value:
         then:
           - lambda: |-
-              id(global_gas_consumed_today_m3) = x;
+              id(global_gas_m3_consumed_today) = x;
       internal: true
     
     gas_yesterday:
-      name: "Gas - Consumed Yesterday m³ (Internal)"
-      id: gas_consumed_yesterday_m3_internal
+      name: "Gas - m³ Consumed Yesterday (Internal)"
+      id: gas_m3_consumed_yesterday_internal
       on_value:
         then:
           - lambda: |-
-              id(global_gas_consumed_yesterday_m3) = x;
+              id(global_gas_m3_consumed_yesterday) = x;
       internal: true
 
     gas_week:
-      name: "Gas - Consumed Week m³ (Internal)"
-      id: gas_consumed_week_m3_internal
+      name: "Gas - m³ Consumed Week (Internal)"
+      id: gas_m3_consumed_week_internal
       on_value:
         then:
           - lambda: |-
-              id(global_gas_consumed_week_m3) = x;
+              id(global_gas_m3_consumed_week) = x;
       internal: true
     
     gas_month:
-      name: "Gas - Consumed Month m³ (Internal)"
-      id: gas_consumed_month_m3_internal
+      name: "Gas - m³ Consumed Month (Internal)"
+      id: gas_m3_consumed_month_internal
       on_value:
         then:
           - lambda: |-
-              id(global_gas_consumed_month_m3) = x;
+              id(global_gas_m3_consumed_month) = x;
       internal: true
 
     gas_year:
-      name: "Gas - Consumed Year m³ (Internal)"
-      id: gas_consumed_year_m3_internal
+      name: "Gas - m³ Consumed Year (Internal)"
+      id: gas_m3_consumed_year_internal
       on_value:
         then:
           - lambda: |-
-              id(global_gas_consumed_year_m3) = x;
+              id(global_gas_m3_consumed_year) = x;
       internal: true
 
   #################
 
   - platform: template
-    name: "Gas - Consumed Today (m³)"
-    id: gas_consumed_today_m3
+    name: "Gas - m³ Consumed Today"
+    id: gas_m3_consumed_today
     unit_of_measurement: "m³"
     state_class: "total_increasing"
     device_class: gas
     icon: 'mdi:hours-24'
     lambda: |-
-      return id(global_gas_consumed_today_m3);
+      return id(global_gas_m3_consumed_today);
     update_interval: 1s
     filters:
       - delta : 0.001
     web_server_sorting_weight: 12
     
   - platform: template
-    name: "Gas - Consumed Yesterday (m³)"
-    id: gas_consumed_yesterday_m3
+    name: "Gas - m³ Consumed Yesterday"
+    id: gas_m3_consumed_yesterday
     unit_of_measurement: "m³"
     state_class: "total_increasing"
     device_class: gas
     icon: 'mdi:calendar-today-outline'
     lambda: |-
-      return id(global_gas_consumed_yesterday_m3);
+      return id(global_gas_m3_consumed_yesterday);
     update_interval: 1s
     filters:
       - delta : 0.001
     web_server_sorting_weight: 13
 
   - platform: template
-    name: "Gas - Consumed Week (m³)"
-    id: gas_consumed_week_m3
+    name: "Gas - m³ Consumed Week"
+    id: gas_m3_consumed_week
     unit_of_measurement: "m³"
     state_class: "total_increasing"
     device_class: gas
     icon: 'mdi:calendar-week'
     lambda: |-
-      return id(global_gas_consumed_week_m3);
+      return id(global_gas_m3_consumed_week);
     update_interval: 1s
     filters:
       - delta : 0.001
     web_server_sorting_weight: 14
     
   - platform: template
-    name: "Gas - Consumed Month (m³)"
-    id: gas_consumed_month_m3
+    name: "Gas - m³ Consumed Month"
+    id: gas_m3_consumed_month
     unit_of_measurement: "m³"
     state_class: "total_increasing"
     device_class: gas
     icon: 'mdi:calendar'
     lambda: |-
-      return id(global_gas_consumed_month_m3);
+      return id(global_gas_m3_consumed_month);
     update_interval: 1s
     filters:
       - delta : 0.001
     web_server_sorting_weight: 15
     
   - platform: template
-    name: "Gas - Consumed Year (m³)"
-    id: gas_consumed_year_m3
+    name: "Gas - m³ Consumed Year"
+    id: gas_m3_consumed_year
     unit_of_measurement: "m³"
     state_class: "total_increasing"
     device_class: gas
     icon: 'mdi:calendar-text'
     lambda: |-
-      return id(global_gas_consumed_year_m3);
+      return id(global_gas_m3_consumed_year);
     update_interval: 1s
     filters:
       - delta : 0.001
@@ -1224,8 +1219,8 @@ sensor:
 
   #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
   - platform: template
-    name: "Gas - Consumed Total (m³)"
-    id: gas_consumed_total
+    name: "Gas - m³ Consumed Total"
+    id: gas_m3_consumed_total
     unit_of_measurement: "m³"
     device_class: gas
     state_class: "total_increasing"
@@ -1248,120 +1243,120 @@ sensor:
 
 # sensor:
   - platform: "gas_statistics_mj"
-    total: gas_consumed_total_mj
+    total: gas_mj_consumed_total
 
     gas_today:
-      name: "Gas - Consumed Today MJ (Internal)"
-      id: gas_consumed_today_mj_internal
+      name: "Gas - MJ Consumed Today (Internal)"
+      id: gas_mj_consumed_today_internal
       on_value:
         then:
           - lambda: |-
-              id(global_gas_consumed_today_mj) = x;
+              id(global_gas_mj_consumed_today) = x;
       internal: true
     
     gas_yesterday:
-      name: "Gas - Consumed Yesterday MJ (Internal)"
-      id: gas_consumed_yesterday_mj_internal
+      name: "Gas - MJ Consumed Yesterday (Internal)"
+      id: gas_mj_consumed_yesterday_internal
       on_value:
         then:
           - lambda: |-
-              id(global_gas_consumed_yesterday_mj) = x;
+              id(global_gas_mj_consumed_yesterday) = x;
       internal: true
 
     gas_week:
-      name: "Gas - Consumed Week MJ (Internal)"
-      id: gas_consumed_week_mj_internal
+      name: "Gas - MJ Consumed Week (Internal)"
+      id: gas_mj_consumed_week_internal
       on_value:
         then:
           - lambda: |-
-              id(global_gas_consumed_week_mj) = x;
+              id(global_gas_mj_consumed_week) = x;
       internal: true
     
     gas_month:
-      name: "Gas - Consumed Month MJ (Internal)"
-      id: gas_consumed_month_mj_internal
+      name: "Gas - MJ Consumed Month (Internal)"
+      id: gas_mj_consumed_month_internal
       on_value:
         then:
           - lambda: |-
-              id(global_gas_consumed_month_mj) = x;
+              id(global_gas_mj_consumed_month) = x;
       internal: true
 
     gas_year:
-      name: "Gas - Consumed Year MJ (Internal)"
-      id: gas_consumed_year_mj_internal
+      name: "Gas - MJ Consumed Year (Internal)"
+      id: gas_mj_consumed_year_internal
       on_value:
         then:
           - lambda: |-
-              id(global_gas_consumed_year_mj) = x;
+              id(global_gas_mj_consumed_year) = x;
       internal: true
 
   #################
 
   - platform: template
-    name: "Gas - Consumed Today (MJ)"
-    id: gas_consumed_today_mj
+    name: "Gas - MJ Consumed Today"
+    id: gas_mj_consumed_today
     unit_of_measurement: "MJ"
     device_class: energy
     state_class: "total_increasing"
     icon: 'mdi:hours-24'    
     lambda: |-
-      return id(global_gas_consumed_today_mj);
+      return id(global_gas_mj_consumed_today);
     update_interval: 1s
     filters:
       - delta : 0.001
     web_server_sorting_weight: 18
     
   - platform: template
-    name: "Gas - Consumed Yesterday (MJ)"
-    id: gas_consumed_yesterday_mj
+    name: "Gas - MJ Consumed Yesterday"
+    id: gas_mj_consumed_yesterday
     unit_of_measurement: "MJ"
     device_class: energy
     state_class: "total_increasing"
     icon: 'mdi:calendar-today-outline'
     lambda: |-
-      return id(global_gas_consumed_yesterday_mj);
+      return id(global_gas_mj_consumed_yesterday);
     update_interval: 1s
     filters:
       - delta : 0.001
     web_server_sorting_weight: 19
 
   - platform: template
-    name: "Gas - Consumed Week (MJ)"
-    id: gas_consumed_week_mj
+    name: "Gas - MJ Consumed Week"
+    id: gas_mj_consumed_week
     unit_of_measurement: "MJ"
     device_class: energy
     state_class: "total_increasing"
     icon: 'mdi:calendar-week'
     lambda: |-
-      return id(global_gas_consumed_week_mj);
+      return id(global_gas_mj_consumed_week);
     update_interval: 1s
     filters:
       - delta : 0.001
     web_server_sorting_weight: 20
     
   - platform: template
-    name: "Gas - Consumed Month (MJ)"
-    id: gas_consumed_month_mj
+    name: "Gas - MJ Consumed Month"
+    id: gas_mj_consumed_month
     unit_of_measurement: "MJ"
     device_class: energy
     state_class: "total_increasing"
     icon: 'mdi:calendar'
     lambda: |-
-      return id(global_gas_consumed_month_mj);
+      return id(global_gas_mj_consumed_month);
     update_interval: 1s
     filters:
       - delta : 0.001
     web_server_sorting_weight: 21
     
   - platform: template
-    name: "Gas - Consumed Year (MJ)"
-    id: gas_consumed_year_mj
+    name: "Gas - MJ Consumed Year"
+    id: gas_mj_consumed_year
     device_class: energy
     state_class: "total_increasing"
     icon: 'mdi:calendar-text'
     unit_of_measurement: "MJ"
     lambda: |-
-      return id(global_gas_consumed_year_mj);
+      return id(global_gas_mj_consumed_year);
     update_interval: 1s
     filters:
       - delta : 0.001
@@ -1370,8 +1365,8 @@ sensor:
   ################################################################################
 
   - platform: template
-    name: "Gas - Consumed Total (MJ)"
-    id: gas_consumed_total_mj
+    name: "Gas - MJ Consumed Total"
+    id: gas_mj_consumed_total
     unit_of_measurement: "MJ"
     device_class: energy
     state_class: "total_increasing"
