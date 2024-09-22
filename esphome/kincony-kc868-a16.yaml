@@ -266,31 +266,31 @@ globals:
 
   #  Globals for storing the 'Water_Statistics' water consumed DAILY value
   - id: global_water_consumed_today
-    type: float
+    type: int
     restore_value: true
     initial_value: '0'
 
   #  Globals for storing the 'Water_Statistics' water consumed YESTERDAY value
   - id: global_water_consumed_yesterday
-    type: float
+    type: int
     restore_value: true
     initial_value: '0'
 
   #  Globals for storing the 'Water_Statistics' water consumed WEEK value
   - id: global_water_consumed_week
-    type: float
+    type: int
     restore_value: true
     initial_value: '0'
 
   #  Globals for storing the 'Water_Statistics' water consumed MONTH value
   - id: global_water_consumed_month
-    type: float
+    type: int
     restore_value: true
     initial_value: '0'
 
   #  Globals for storing the 'Water_Statistics' water consumed YEAR value
   - id: global_water_consumed_year
-    type: float
+    type: int
     restore_value: true
     initial_value: '0'
 
