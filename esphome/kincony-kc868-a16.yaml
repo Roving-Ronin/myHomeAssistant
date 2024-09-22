@@ -869,7 +869,6 @@ sensor:
     pin: 35
     name: 'Water Tank - Voltage'
     id: water_tank_voltage
-    object_id: water_tank_voltage
     accuracy_decimals: 3
     device_class: "voltage"
     state_class: "measurement"
