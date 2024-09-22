@@ -119,6 +119,7 @@ button:
     name: 'Gas - Reset Reading'
     entity_category: config
     id: button_reset_gas_reading
+    object_id: gas_reset_reading
     on_press:
       - lambda: |-
           id(gas_total_mj) = 0;
@@ -131,10 +132,11 @@ button:
     name: 'Water Meter - Reset Reading'
     entity_category: config
     id: button_reset_water_reading
+    object_id: water_meter_reset_reading
     on_press:
       - lambda: |-
-          id(water_consumed_total_litres) = 0;
-          id(water_consumed_litres).state = 0;
+          id(water_town_consumed_total_litres) = 0;
+          id(water_meter_consumed_litres).state = 0;
 
 #########################################################################
 #
@@ -258,38 +260,38 @@ globals:
   #
 
   #  Globals for use with pulse meter, to allow storing and setting a base reading for water meter
-  - id: water_consumed_total_litres
+  - id: water_town_consumed_total_litres
     type: int
     restore_value: true
    # Change initial value to 0 to reset, or enter your actual meter reading to start counting lifetime total from that number 
 #    initial_value: "0"
 
   #  Globals for storing the 'Water_Statistics' water consumed DAILY value
-  - id: global_water_consumed_today
+  - id: global_water_town_consumed_today
     type: int
     restore_value: true
 #    initial_value: '0'
 
   #  Globals for storing the 'Water_Statistics' water consumed YESTERDAY value
-  - id: global_water_consumed_yesterday
+  - id: global_water_town_consumed_yesterday
     type: int
     restore_value: true
 #    initial_value: '0'
 
   #  Globals for storing the 'Water_Statistics' water consumed WEEK value
-  - id: global_water_consumed_week
+  - id: global_water_town_consumed_week
     type: int
     restore_value: true
 #    initial_value: '0'
 
   #  Globals for storing the 'Water_Statistics' water consumed MONTH value
-  - id: global_water_consumed_month
+  - id: global_water_town_consumed_month
     type: int
     restore_value: true
 #    initial_value: '0'
 
   #  Globals for storing the 'Water_Statistics' water consumed YEAR value
-  - id: global_water_consumed_year
+  - id: global_water_town_consumed_year
     type: int
     restore_value: true
 #    initial_value: '0'
@@ -303,6 +305,7 @@ number:
   - platform: template
     name: "Gas - Pressure Factor"
     id: input_gas_pressure_factor
+    object_id: gas_pressure_factor
     min_value: 0.9
     max_value: 1.1
     step: 0.0001
@@ -317,6 +320,7 @@ number:
   - platform: template
     name: "Gas - Heating Value"
     id: input_gas_heating_value
+    object_id: gas_heating_value
     min_value: 34.0
     max_value: 52.0
     step: 0.01
@@ -379,6 +383,7 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 01'
     id: sensor_relay_1
+    object_id: sensor_relay_1
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_1
@@ -391,6 +396,7 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 02'
     id: sensor_relay_2
+    object_id: sensor_relay_2
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_1
@@ -403,6 +409,7 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 03'
     id: sensor_relay_3
+    object_id: sensor_relay_3
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_1
@@ -415,6 +422,7 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 04'
     id: sensor_relay_4
+    object_id: sensor_relay_4
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_1
@@ -427,6 +435,7 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 05'
     id: sensor_relay_5
+    object_id: sensor_relay_5
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_1
@@ -439,6 +448,7 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 06'
     id: sensor_relay_6
+    object_id: sensor_relay_6
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_1
@@ -451,6 +461,7 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 07'
     id: sensor_relay_7
+    object_id: sensor_relay_7
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_1
@@ -463,6 +474,7 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 08'
     id: sensor_relay_8
+    object_id: sensor_relay_8
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_1
@@ -475,6 +487,7 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 09'
     id: sensor_relay_9
+    object_id: sensor_relay_9
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_2
@@ -487,6 +500,7 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 10'
     id: sensor_relay_10
+    object_id: sensor_relay_10
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_2
@@ -499,6 +513,7 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 11'
     id: sensor_relay_11
+    object_id: sensor_relay_11
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_2
@@ -511,6 +526,7 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 12'
     id: sensor_relay_12
+    object_id: sensor_relay_12
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_2
@@ -523,6 +539,7 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 13'
     id: sensor_relay_13
+    object_id: sensor_relay_13
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_2
@@ -535,6 +552,7 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 14'
     id: sensor_relay_14
+    object_id: sensor_relay_14
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_2
@@ -547,6 +565,7 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 15'
     id: sensor_relay_15
+    object_id: sensor_relay_15
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_2
@@ -559,6 +578,7 @@ switch:
   - platform: gpio
     name: 'Ouput Relay 16'
     id: sensor_relay_16
+    object_id: sensor_relay_16
     restore_mode: ${relay_restore_mode}
     pin:
       pcf8574: pcf8574_hub_out_2
@@ -586,6 +606,7 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 01'
     id: input1
+    object_id: input1
     pin:
       pcf8574: pcf8574_hub_in_1
       number: 0
@@ -597,6 +618,7 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 02'
     id: input2
+    object_id: input2
     pin:
       pcf8574: pcf8574_hub_in_1
       number: 1
@@ -608,6 +630,7 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 03'
     id: input3
+    object_id: input3
     pin:
       pcf8574: pcf8574_hub_in_1
       number: 2
@@ -619,6 +642,7 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 04'
     id: input4
+    object_id: input4
     pin:
       pcf8574: pcf8574_hub_in_1
       number: 3
@@ -630,6 +654,7 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 05'
     id: input5
+    object_id: input5
     pin:
       pcf8574: pcf8574_hub_in_1
       number: 4
@@ -641,6 +666,7 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 06'
     id: input6
+    object_id: input6
     pin:
       pcf8574: pcf8574_hub_in_1
       number: 5
@@ -652,6 +678,7 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 07'
     id: input7
+    object_id: input7
     pin:
       pcf8574: pcf8574_hub_in_1
       number: 6
@@ -663,6 +690,7 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 08'
     id: input8
+    object_id: input8
     pin:
       pcf8574: pcf8574_hub_in_1
       number: 7
@@ -674,6 +702,7 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 09'
     id: input9
+    object_id: input9
     pin:
       pcf8574: pcf8574_hub_in_2
       number: 0
@@ -685,6 +714,7 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 10'
     id: input10
+    object_id: input10
     pin:
       pcf8574: pcf8574_hub_in_2
       number: 1
@@ -696,6 +726,7 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 11'
     id: input11
+    object_id: input11
     pin:
       pcf8574: pcf8574_hub_in_2
       number: 2
@@ -707,6 +738,7 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 12'
     id: input12
+    object_id: input12
     pin:
       pcf8574: pcf8574_hub_in_2
       number: 3
@@ -718,6 +750,7 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 13'
     id: input13
+    object_id: input13
     pin:
       pcf8574: pcf8574_hub_in_2
       number: 4
@@ -729,6 +762,7 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 14'
     id: input14
+    object_id: input14
     pin:
       pcf8574: pcf8574_hub_in_2
       number: 5
@@ -740,6 +774,7 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 15'
     id: input15
+    object_id: input15
     pin:
       pcf8574: pcf8574_hub_in_2
       number: 6
@@ -751,6 +786,7 @@ binary_sensor:
   - platform: gpio
     name: 'Digital Input 16'
     id: input16
+    object_id: input16
     pin:
       pcf8574: pcf8574_hub_in_2
       number: 7
@@ -849,6 +885,7 @@ sensor:
     pin: 35
     name: 'Water Tank - Voltage'
     id: water_tank_voltage
+    object_id: water_tank_voltage
     accuracy_decimals: 3
     device_class: "voltage"
     state_class: "measurement"
@@ -885,6 +922,7 @@ sensor:
   - platform: template
     name: "Water Tank - Level"
     id: water_tank_level
+    object_id: water_tank_level
     icon: 'mdi:water-well'
     unit_of_measurement: 'cm'
     lambda: |-
@@ -932,6 +970,7 @@ sensor:
   - platform: template
     name: "Water Tank - %"
     id: water_tank_percent
+    object_id: water_tank_percent
     icon: 'mdi:water-well'
     unit_of_measurement: '%'
     update_interval: 1s #the delta filter will ensure it only sends values when something changes.     
@@ -953,6 +992,7 @@ sensor:
   - platform: template
     name: "Water Tank - Litres"
     id: water_tank_litres
+    object_id: water_tank_litres
     icon: 'mdi:water-well'
     unit_of_measurement: 'L'
     lambda: |-
@@ -1025,6 +1065,7 @@ sensor:
   - platform: pulse_counter
     name: "Gas - Pulse Counter"
     id: gas_pulse_counter
+    object_id: gas_pulse_counter
     pin:
       number: 32
       allow_other_uses: true
@@ -1037,7 +1078,8 @@ sensor:
 
   - platform: pulse_meter
     name: 'Gas - Flow Rate'
-    id: "gas_flow_rate"
+    id: gas_flow_rate
+    object_id: gas_flow_rate
     unit_of_measurement: "L/min" # "m³/h"
     state_class: measurement
 #    device_class: volume  # Disabled to stop this being recorded in HA
@@ -1060,6 +1102,7 @@ sensor:
     #  Uses the above pulse_meter and adds sensor and calculations for tracking m3
     total:    
       id: gas_consumed_m3
+      object_id: gas_consumed_m3
       name: 'Gas - Consumed (m³)'
       unit_of_measurement: "m³"
       icon: "mdi:counter"
@@ -1145,8 +1188,9 @@ sensor:
   #################
 
   - platform: template
-    id: gas_m3_consumed_today
     name: "Gas - m³ Consumed Today"
+    id: gas_m3_consumed_today
+    object_id: gas_m3_consumed_today
     unit_of_measurement: "m³"
     state_class: "total_increasing"
     device_class: gas
@@ -1159,8 +1203,9 @@ sensor:
     web_server_sorting_weight: 12
     
   - platform: template
-    id: gas_m3_consumed_yesterday
     name: "Gas - m³ Consumed Yesterday"
+    id: gas_m3_consumed_yesterday
+    object_id: gas_m3_consumed_yesterday
     unit_of_measurement: "m³"
     state_class: "total_increasing"
     device_class: gas
@@ -1173,8 +1218,9 @@ sensor:
     web_server_sorting_weight: 13
 
   - platform: template
-    id: gas_m3_consumed_week
     name: "Gas - m³ Consumed Week"
+    id: gas_m3_consumed_week
+    object_id: gas_m3_consumed_week
     unit_of_measurement: "m³"
     state_class: "total_increasing"
     device_class: gas
@@ -1187,8 +1233,9 @@ sensor:
     web_server_sorting_weight: 14
     
   - platform: template
-    id: gas_m3_consumed_month
     name: "Gas - m³ Consumed Month"
+    id: gas_m3_consumed_month
+    object_id: gas_m3_consumed_month
     unit_of_measurement: "m³"
     state_class: "total_increasing"
     device_class: gas
@@ -1201,8 +1248,9 @@ sensor:
     web_server_sorting_weight: 15
     
   - platform: template
-    id: gas_m3_consumed_year
     name: "Gas - m³ Consumed Year"
+    id: gas_m3_consumed_year
+    object_id: gas_m3_consumed_year
     unit_of_measurement: "m³"
     state_class: "total_increasing"
     device_class: gas
@@ -1221,6 +1269,7 @@ sensor:
   - platform: template
     name: "Gas - m³ Consumed Total"
     id: gas_m3_consumed_total
+    object_id: gas_m3_consumed_total
     unit_of_measurement: "m³"
     device_class: gas
     state_class: "total_increasing"
@@ -1295,6 +1344,7 @@ sensor:
   - platform: template
     name: "Gas - MJ Consumed Today"
     id: gas_mj_consumed_today
+    object_id: gas_mj_consumed_today
     unit_of_measurement: "MJ"
     device_class: energy
     state_class: "total_increasing"
@@ -1309,6 +1359,7 @@ sensor:
   - platform: template
     name: "Gas - MJ Consumed Yesterday"
     id: gas_mj_consumed_yesterday
+    object_id: gas_mj_consumed_yesterday
     unit_of_measurement: "MJ"
     device_class: energy
     state_class: "total_increasing"
@@ -1323,6 +1374,7 @@ sensor:
   - platform: template
     name: "Gas - MJ Consumed Week"
     id: gas_mj_consumed_week
+    object_id: gas_mj_consumed_week
     unit_of_measurement: "MJ"
     device_class: energy
     state_class: "total_increasing"
@@ -1337,6 +1389,7 @@ sensor:
   - platform: template
     name: "Gas - MJ Consumed Month"
     id: gas_mj_consumed_month
+    object_id: gas_mj_consumed_month
     unit_of_measurement: "MJ"
     device_class: energy
     state_class: "total_increasing"
@@ -1351,6 +1404,7 @@ sensor:
   - platform: template
     name: "Gas - MJ Consumed Year"
     id: gas_mj_consumed_year
+    object_id: gas_mj_consumed_year
     device_class: energy
     state_class: "total_increasing"
     icon: 'mdi:calendar-text'
@@ -1367,6 +1421,7 @@ sensor:
   - platform: template
     name: "Gas - MJ Consumed Total"
     id: gas_mj_consumed_total
+    object_id: gas_mj_consumed_total
     unit_of_measurement: "MJ"
     device_class: energy
     state_class: "total_increasing"
@@ -1387,8 +1442,9 @@ sensor:
   #
 
   - platform: pulse_counter
-    name: "Water - Pulse Counter"
-    id: water_pulse_counter
+    name: "Water Meter - Pulse Counter"
+    id: water_meter_pulse_counter
+    object_id: water_meter_pulse_counter
     pin:
       number: 33
       allow_other_uses: true
@@ -1401,8 +1457,9 @@ sensor:
     web_server_sorting_weight: 25
 
   - platform: pulse_meter
-    name: "Water - Flow Rate"
-    id: water_flow_rate
+    name: "Water Meter - Flow Rate"
+    id: water_meter_flow_rate
+    object_id: water_meter_flow_rate
     unit_of_measurement: "L/min"
     state_class: measurement
     device_class: water
@@ -1424,8 +1481,9 @@ sensor:
 
     #  Uses the above pulse_meter and adds sensor and calculations for tracking current litres
     total:
-      name: 'Water - Consumed'
-      id: water_consumed_litres
+      name: 'Water Town - Consumed'
+      id: water_town_consumed_litres
+      object_id: water_town_consumed_litres
       unit_of_measurement: "L"
       icon: "mdi:water"
       state_class: "total_increasing"
@@ -1435,10 +1493,10 @@ sensor:
       on_value: 
         then:
           - lambda: |-
-              static float previous_water_consumed_litres_value = 0.0;
-              float current_water_consumed_litres_value = id(water_consumed_litres).state;
-              id(water_consumed_total_litres) += current_water_consumed_litres_value - previous_water_consumed_litres_value;
-              previous_water_consumed_litres_value = current_water_consumed_litres_value;
+              static float previous_water_town_consumed_litres_value = 0.0;
+              float current_water_town_consumed_litres_value = id(water_town_consumed_litres).state;
+              id(water_town_consumed_total_litres) += current_water_town_consumed_litres_value - previous_water_town_consumed_litres_value;
+              previous_water_town_consumed_litres_value = current_water_town_consumed_litres_value;
       filters:
         - multiply: 5.0  # Each pulse equals 5 liters
       internal: true
@@ -1446,15 +1504,16 @@ sensor:
 
   #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
   - platform: template
-    name: "Water - Consumed Total"
-    id: water_consumed_total
+    name: "Water Town - Consumed Total"
+    id: water_town_consumed_total
+    object_id: water_town_consumed_total
     unit_of_measurement: "L"
     device_class: water
     state_class: "total_increasing"
     icon: "mdi:counter"
     accuracy_decimals: 0
     lambda: |-
-          return (id(water_consumed_total_litres) );
+          return (id(water_town_consumed_total_litres) );
     # Set interval that updates are sent to HA instance
     update_interval: 1s
     filters:
@@ -1472,120 +1531,125 @@ sensor:
 
 # sensor:
   - platform: "water_statistics"
-    total: water_consumed_total
+    total: water_town_consumed_total
 
     water_today:
-      name: "Water - Consumed Today (Internal)"
-      id: water_consumed_today_internal
+      name: "Water Town - Consumed Today (Internal)"
+      id: water_town_consumed_today_internal
       on_value:
         then:
           - lambda: |-
-              id(global_water_consumed_today) = x;
+              id(global_water_town_consumed_today) = x;
       internal: true
     
     water_yesterday:
-      name: "Water - Consumed Yesterday (Internal)"
-      id: water_consumed_yesterday_internal
+      name: "Water Town - Consumed Yesterday (Internal)"
+      id: water_town_consumed_yesterday_internal
       on_value:
         then:
           - lambda: |-
-              id(global_water_consumed_yesterday) = x;
+              id(global_water_town_consumed_yesterday) = x;
       internal: true
 
     water_week:
-      name: "Water - Consumed Week (Internal)"
-      id: water_consumed_week_internal
+      name: "Water Town - Consumed Week (Internal)"
+      id: water_town_consumed_week_internal
       on_value:
         then:
           - lambda: |-
-              id(global_water_consumed_week) = x;
+              id(global_water_town_consumed_week) = x;
       internal: true
     
     water_month:
-      name: "Water - Consumed Month (Internal)"
-      id: water_consumed_month_internal
+      name: "Water Town - Consumed Month (Internal)"
+      id: water_town_consumed_month_internal
       on_value:
         then:
           - lambda: |-
-              id(global_water_consumed_month) = x;
+              id(global_water_town_consumed_month) = x;
       internal: true
 
     water_year:
-      name: "Water - Consumed Year (Internal)"
-      id: water_consumed_year_internal
+      name: "Water Town - Consumed Year (Internal)"
+      id: water_town_consumed_year_internal
       on_value:
         then:
           - lambda: |-
-              id(global_water_consumed_year) = x;
+              id(global_water_town_consumed_year) = x;
       internal: true
 
   #################
 
   - platform: template
-    name: "Water - Consumed Today"
-    id: water_consumed_today
+    name: "Water Town - Consumed Today"
+    id: water_town_consumed_today
+    object_id: water_town_consumed_today
     unit_of_measurement: "L"
     device_class: water
     state_class: "total_increasing"
     icon: 'mdi:hours-24'
     lambda: |-
-      return id(global_water_consumed_today);
+      return id(global_water_town_consumed_today);
     update_interval: 1s
     filters:
       - delta : 0.1
     web_server_sorting_weight: 28
     
   - platform: template
-    name: "Water - Consumed Yesterday"
-    id: water_consumed_yesterday
+    name: "Water Town - Consumed Yesterday"
+    id: water_town_consumed_yesterday
+    object_id: water_town_consumed_yesterday
     unit_of_measurement: "L"
     device_class: water
     state_class: "total_increasing"
     icon: 'mdi:calendar-today-outline'
     lambda: |-
-      return id(global_water_consumed_yesterday);
+      return id(global_water_town_consumed_yesterday);
     update_interval: 1s
     filters:
       - delta : 0.1
     web_server_sorting_weight: 29
 
   - platform: template
-    name: "Water - Consumed Week"
-    id: water_consumed_week
+    name: "Water Town - Consumed Week"
+    id: water_town_consumed_week
+    object_id: water_town_consumed_week
     unit_of_measurement: "L"
     device_class: water
     state_class: "total_increasing"
     icon: 'mdi:calendar-week'
     lambda: |-
-      return id(global_water_consumed_week);
+      return id(global_water_town_consumed_week);
     update_interval: 1s
     filters:
       - delta : 0.1
     web_server_sorting_weight: 30
     
   - platform: template
-    name: "Water - Consumed Month"
-    id: water_consumed_month
+    name: "Water Town - Consumed Month"
+    id: water_town_consumed_month
+    object_id: water_town_consumed_month
     unit_of_measurement: "L"
     device_class: water
     state_class: "total_increasing"
     icon: 'mdi:calendar'
     lambda: |-
-      return id(global_water_consumed_month);
+      return id(global_water_town_consumed_month);
     update_interval: 1s
     filters:
       - delta : 0.1
     web_server_sorting_weight: 31
     
   - platform: template
-    name: "Water - Consumed Year"
-    id: water_consumed_year
+    name: "Water Town - Consumed Year"
+    id: water_town_consumed_year
+    object_id: water_town_consumed_year
     unit_of_measurement: "L"
     device_class: water
     state_class: "total_increasing"
     icon: 'mdi:calendar-text'
     lambda: |-
-      return id(global_water_consumed_year);
+      return id(global_water_town_consumed_year);
     update_interval: 1s
     filters:
       - delta : 0.1
@@ -1598,6 +1662,7 @@ sensor:
     source_id: water_tank_voltage
     name: 'Water Tank - Pressure (kPa)'
     id: water_tank_pressure_bar
+    object_id: water_tank_pressure_bar
     accuracy_decimals: 2
     device_class: pressure
     state_class: "measurement"
@@ -1630,6 +1695,7 @@ sensor:
     source_id: water_tank_voltage
     name: 'Water Tank - Pressure (psi)'
     id: water_tank_pressure_psi
+    object_id: water_tank_pressure_psi
     accuracy_decimals: 2
     device_class: pressure
     state_class: "measurement"
