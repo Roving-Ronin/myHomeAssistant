@@ -1430,7 +1430,6 @@ sensor:
       icon: "mdi:water"
       state_class: "total_increasing"
       device_class: water
-      accuracy_decimals: 2
     #  Adds the calculation for 'Reading Total' 
       on_value: 
         then:
@@ -1528,6 +1527,7 @@ sensor:
     device_class: water
     state_class: "total_increasing"
     icon: 'mdi:hours-24'
+    accuracy_decimals: 0
     lambda: |-
       return id(global_water_town_consumed_today);
     update_interval: 1s
@@ -1542,6 +1542,7 @@ sensor:
     device_class: water
     state_class: "total_increasing"
     icon: 'mdi:calendar-today-outline'
+    accuracy_decimals: 0
     lambda: |-
       return id(global_water_town_consumed_yesterday);
     update_interval: 1s
@@ -1556,6 +1557,7 @@ sensor:
     device_class: water
     state_class: "total_increasing"
     icon: 'mdi:calendar-week'
+    accuracy_decimals: 0
     lambda: |-
       return id(global_water_town_consumed_week);
     update_interval: 1s
@@ -1570,6 +1572,7 @@ sensor:
     device_class: water
     state_class: "total_increasing"
     icon: 'mdi:calendar'
+    accuracy_decimals: 0
     lambda: |-
       return id(global_water_town_consumed_month);
     update_interval: 1s
@@ -1584,6 +1587,7 @@ sensor:
     device_class: water
     state_class: "total_increasing"
     icon: 'mdi:calendar-text'
+    accuracy_decimals: 0
     lambda: |-
       return id(global_water_town_consumed_year);
     update_interval: 1s
