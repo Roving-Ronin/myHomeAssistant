@@ -1153,6 +1153,7 @@ sensor:
     state_class: "total_increasing"
     device_class: gas
     icon: 'mdi:hours-24'
+    accuracy_decimals: 3
     lambda: |-
       return id(global_gas_m3_consumed_today);
     update_interval: 1s
@@ -1167,6 +1168,7 @@ sensor:
     state_class: "total_increasing"
     device_class: gas
     icon: 'mdi:calendar-today-outline'
+    accuracy_decimals: 3
     lambda: |-
       return id(global_gas_m3_consumed_yesterday);
     update_interval: 1s
@@ -1181,6 +1183,7 @@ sensor:
     state_class: "total_increasing"
     device_class: gas
     icon: 'mdi:calendar-week'
+    accuracy_decimals: 3
     lambda: |-
       return id(global_gas_m3_consumed_week);
     update_interval: 1s
@@ -1195,6 +1198,7 @@ sensor:
     state_class: "total_increasing"
     device_class: gas
     icon: 'mdi:calendar'
+    accuracy_decimals: 3
     lambda: |-
       return id(global_gas_m3_consumed_month);
     update_interval: 1s
@@ -1209,6 +1213,7 @@ sensor:
     state_class: "total_increasing"
     device_class: gas
     icon: 'mdi:calendar-text'
+    accuracy_decimals: 3
     lambda: |-
       return id(global_gas_m3_consumed_year);
     update_interval: 1s
@@ -1301,6 +1306,7 @@ sensor:
     device_class: energy
     state_class: "total_increasing"
     icon: 'mdi:hours-24'    
+    accuracy_decimals: 3
     lambda: |-
       return id(global_gas_mj_consumed_today);
     update_interval: 1s
@@ -1315,6 +1321,7 @@ sensor:
     device_class: energy
     state_class: "total_increasing"
     icon: 'mdi:calendar-today-outline'
+    accuracy_decimals: 3
     lambda: |-
       return id(global_gas_mj_consumed_yesterday);
     update_interval: 1s
@@ -1329,6 +1336,7 @@ sensor:
     device_class: energy
     state_class: "total_increasing"
     icon: 'mdi:calendar-week'
+    accuracy_decimals: 3
     lambda: |-
       return id(global_gas_mj_consumed_week);
     update_interval: 1s
@@ -1343,6 +1351,7 @@ sensor:
     device_class: energy
     state_class: "total_increasing"
     icon: 'mdi:calendar'
+    accuracy_decimals: 3
     lambda: |-
       return id(global_gas_mj_consumed_month);
     update_interval: 1s
@@ -1353,10 +1362,11 @@ sensor:
   - platform: template
     name: "Gas - MJ Consumed Year"
     id: gas_mj_consumed_year
+    unit_of_measurement: "MJ"
     device_class: energy
     state_class: "total_increasing"
     icon: 'mdi:calendar-text'
-    unit_of_measurement: "MJ"
+    accuracy_decimals: 3
     lambda: |-
       return id(global_gas_mj_consumed_year);
     update_interval: 1s
