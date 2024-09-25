@@ -28,6 +28,31 @@ globals:
     restore_value: yes
     initial_value: '0.0' 
 
+  - id: restore_mode
+    type: int
+    restore_value: yes
+    initial_value: "3"
+
+
+#####################################################################
+#
+# Select - To allow setting power on state from the GUI
+#
+
+select:
+  - platform: template
+    name: "Power On State"
+    id: "power_mode"
+    optimistic: true
+    options:
+      - Always Off
+      - Always On
+      - Restore Power Off State
+    on_value:
+      then:
+        - lambda: |-
+            id(restore_mode)=i+1;
+            
 #####################################################################
 #
 # Binary Sensors
@@ -41,6 +66,7 @@ binary_sensor:
       number: ${power_button_pin}
       mode: INPUT_PULLUP
       inverted: true
+    id: power_button
     name: "Power Button"
     disabled_by_default: true
     on_multi_click:
