@@ -54,7 +54,7 @@ globals:
   - id: restore_mode
     type: int
     restore_value: yes
-    initial_value: "3"
+    initial_value: "1"
 
 
 #####################################################################
