@@ -11,19 +11,19 @@ static const char *const GAP = "  ";
 void GasStatisticsMJ::dump_config() {
   ESP_LOGCONFIG(TAG, "Gas statistics MJ sensors");
   if (this->gas_today_) {
-    LOG_SENSOR(GAP, "Gas Today", this->gas_today_);
+    LOG_SENSOR(GAP, "Gas Today (MJ)", this->gas_today_);
   }
   if (this->gas_yesterday_) {
-    LOG_SENSOR(GAP, "Gas Yesterday", this->gas_yesterday_);
+    LOG_SENSOR(GAP, "Gas Yesterday (MJ)", this->gas_yesterday_);
   }
   if (this->gas_week_) {
-    LOG_SENSOR(GAP, "Gas Week", this->gas_week_);
+    LOG_SENSOR(GAP, "Gas Week (MJ)", this->gas_week_);
   }
   if (this->gas_month_) {
-    LOG_SENSOR(GAP, "Gas Month", this->gas_month_);
+    LOG_SENSOR(GAP, "Gas Month (MJ)", this->gas_month_);
   }
   if (this->gas_year_) {
-    LOG_SENSOR(GAP, "Gas Year", this->gas_year_);
+    LOG_SENSOR(GAP, "Gas Year (MJ)", this->gas_year_);
   }
 }
 
