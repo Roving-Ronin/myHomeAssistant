@@ -37,7 +37,7 @@ esphome:
 # https://github.com/dentra/esphome-components/tree/master/components/energy_statistics
 
 external_components:
-  - source: github://roving-ronin/myhomeassistant/components@main
+  - source: github://roving-ronin/myhomeassistant/components@globals
     refresh: 5s
 
 #####################################################################
