@@ -25,6 +25,13 @@ void EnergyStatistics::dump_config() {
   if (this->energy_year_) {
     LOG_SENSOR(GAP, "Energy Year", this->energy_year_);
   }
+
+  // Add logs for the loaded values
+  ESP_LOGCONFIG(TAG, "Restored Energy Today: %.3f", this->energy_.energy_today);
+  ESP_LOGCONFIG(TAG, "Restored Energy Yesterday: %.3f", this->energy_.energy_yesterday);
+  ESP_LOGCONFIG(TAG, "Restored Energy Week: %.3f", this->energy_.energy_week);
+  ESP_LOGCONFIG(TAG, "Restored Energy Month: %.3f", this->energy_.energy_month);
+  ESP_LOGCONFIG(TAG, "Restored Energy Year: %.3f", this->energy_.energy_year);
 }
 
 void EnergyStatistics::setup() {
