@@ -35,12 +35,31 @@ void EnergyStatistics::setup() {
   energy_data_t loaded{};
   if (this->pref_.load(&loaded)) {
     this->energy_ = loaded;
+
+    // Load the sensor values from preferences if available
+    if (this->energy_today_ && !std::isnan(this->energy_.energy_today)) {
+      this->energy_today_->publish_state(this->energy_.energy_today);
+    }
+    if (this->energy_yesterday_ && !std::isnan(this->energy_.energy_yesterday)) {
+      this->energy_yesterday_->publish_state(this->energy_.energy_yesterday);
+    }
+    if (this->energy_week_ && !std::isnan(this->energy_.energy_week)) {
+      this->energy_week_->publish_state(this->energy_.energy_week);
+    }
+    if (this->energy_month_ && !std::isnan(this->energy_.energy_month)) {
+      this->energy_month_->publish_state(this->energy_.energy_month);
+    }
+    if (this->energy_year_ && !std::isnan(this->energy_.energy_year)) {
+      this->energy_year_->publish_state(this->energy_.energy_year);
+    }
+
     auto total = this->total_->get_state();
     if (!std::isnan(total)) {
       this->process_(total);
     }
   }
 }
+
 
 void EnergyStatistics::loop() {
   const auto t = this->time_->now();
@@ -86,25 +105,31 @@ void EnergyStatistics::loop() {
 
 void EnergyStatistics::process_(float total) {
   if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
-    this->energy_today_->publish_state(total - this->energy_.start_today);
+    this->energy_.energy_today = total - this->energy_.start_today;
+    this->energy_today_->publish_state(this->energy_.energy_today);
   }
 
   if (this->energy_yesterday_ && !std::isnan(this->energy_.start_yesterday)) {
-    this->energy_yesterday_->publish_state(this->energy_.start_today - this->energy_.start_yesterday);
+    this->energy_.energy_yesterday = this->energy_.start_today - this->energy_.start_yesterday;
+    this->energy_yesterday_->publish_state(this->energy_.energy_yesterday);
   }
 
   if (this->energy_week_ && !std::isnan(this->energy_.start_week)) {
-    this->energy_week_->publish_state(total - this->energy_.start_week);
+    this->energy_.energy_week = total - this->energy_.start_week;
+    this->energy_week_->publish_state(this->energy_.energy_week);
   }
 
   if (this->energy_month_ && !std::isnan(this->energy_.start_month)) {
-    this->energy_month_->publish_state(total - this->energy_.start_month);
+    this->energy_.energy_month = total - this->energy_.start_month;
+    this->energy_month_->publish_state(this->energy_.energy_month);
   }
 
   if (this->energy_year_ && !std::isnan(this->energy_.start_year)) {
-    this->energy_year_->publish_state(total - this->energy_.start_year);
+    this->energy_.energy_year = total - this->energy_.start_year;
+    this->energy_year_->publish_state(this->energy_.energy_year);
   }
-  
+
+  // Save the updated values to preferences
   this->save_();
 }
 
