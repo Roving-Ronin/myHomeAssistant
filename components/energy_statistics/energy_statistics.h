@@ -55,6 +55,13 @@ class EnergyStatistics : public Component {
     float start_week{NAN};
     float start_month{NAN};
     float start_year{NAN};
+
+  // Add fields to store sensor values in globals
+    float energy_today{NAN};
+    float energy_yesterday{NAN};
+    float energy_week{NAN};
+    float energy_month{NAN};
+    float energy_year{NAN};
   } energy_;
 
   void process_(float total);
