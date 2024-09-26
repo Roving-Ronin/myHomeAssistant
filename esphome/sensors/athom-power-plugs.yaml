@@ -67,7 +67,7 @@ select:
     name: "Power On State"
     id: "power_mode"
     optimistic: true
-    icon: "mdi:electricswitch"
+    icon: "mdi:electric-switch"
     options:
       - Always Off
       - Always On
