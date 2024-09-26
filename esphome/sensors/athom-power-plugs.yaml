@@ -51,31 +51,6 @@ globals:
     restore_value: yes
     initial_value: '0.0' 
 
-  - id: total_energy_today
-    type: float
-    restore_value: yes
-    initial_value: '0.0'
-
-  - id: total_energy_yesterday
-    type: float
-    restore_value: yes
-    initial_value: '0.0'
-
-  - id: total_energy_week
-    type: float
-    restore_value: yes
-    initial_value: '0.0' 
-
-  - id: total_energy_month
-    type: float
-    restore_value: yes
-    initial_value: '0.0' 
-
-  - id: total_energy_year
-    type: float
-    restore_value: yes
-    initial_value: '0.0' 
-
   - id: restore_mode
     type: int
     restore_value: yes
@@ -225,8 +200,6 @@ sensor:
       id: total_energy_today_sensor
       accuracy_decimals: 3
       icon: "mdi:hours-24"
-      lambda: |-
-        return id(total_energy_today);
       web_server_sorting_weight: 6
 
      # Dentra Components - Adds Energy Yesterday
@@ -235,8 +208,6 @@ sensor:
       id: total_energy_yesterday_sensor
       accuracy_decimals: 3
       icon: "mdi:calendar-today"
-      lambda: |-
-        return id(total_energy_yesterday);
       web_server_sorting_weight: 7
 
      # Dentra Components - Adds Energy Week
@@ -245,8 +216,6 @@ sensor:
       id: total_energy_week_sensor
       accuracy_decimals: 3
       icon: "mdi:calendar-week"
-      lambda: |-
-        return id(total_energy_week);
       web_server_sorting_weight: 8
 
      # Dentra Components - Adds Energy Month
@@ -255,8 +224,6 @@ sensor:
       id: total_energy_month_sensor
       accuracy_decimals: 3
       icon: "mdi:calendar-month"
-      lambda: |-
-        return id(total_energy_month);
       web_server_sorting_weight: 9
 
     energy_year:
@@ -264,8 +231,6 @@ sensor:
       id: total_energy_year_sensor
       accuracy_decimals: 3
       icon: "mdi:calendar-text"
-      lambda: |-
-        return id(total_energy_year);
       web_server_sorting_weight: 10
 
 #########################################################################
