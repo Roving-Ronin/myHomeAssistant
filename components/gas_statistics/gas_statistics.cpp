@@ -25,6 +25,13 @@ void GasStatistics::dump_config() {
   if (this->gas_year_) {
     LOG_SENSOR(GAP, "Gas Year", this->gas_year_);
   }
+
+  // Log restored values for debugging
+  ESP_LOGCONFIG(TAG, "Restored Gas Today: %.3f", this->gas_.gas_today);
+  ESP_LOGCONFIG(TAG, "Restored Gas Yesterday: %.3f", this->gas_.gas_yesterday);
+  ESP_LOGCONFIG(TAG, "Restored Gas Week: %.3f", this->gas_.gas_week);
+  ESP_LOGCONFIG(TAG, "Restored Gas Month: %.3f", this->gas_.gas_month);
+  ESP_LOGCONFIG(TAG, "Restored Gas Year: %.3f", this->gas_.gas_year);
 }
 
 void GasStatistics::setup() {
@@ -35,6 +42,24 @@ void GasStatistics::setup() {
   gas_data_t loaded{};
   if (this->pref_.load(&loaded)) {
     this->gas_ = loaded;
+
+    // Restore sensor values from preferences
+    if (this->gas_today_ && !std::isnan(this->gas_.gas_today)) {
+      this->gas_today_->publish_state(this->gas_.gas_today);
+    }
+    if (this->gas_yesterday_ && !std::isnan(this->gas_.gas_yesterday)) {
+      this->gas_yesterday_->publish_state(this->gas_.gas_yesterday);
+    }
+    if (this->gas_week_ && !std::isnan(this->gas_.gas_week)) {
+      this->gas_week_->publish_state(this->gas_.gas_week);
+    }
+    if (this->gas_month_ && !std::isnan(this->gas_.gas_month)) {
+      this->gas_month_->publish_state(this->gas_.gas_month);
+    }
+    if (this->gas_year_ && !std::isnan(this->gas_.gas_year)) {
+      this->gas_year_->publish_state(this->gas_.gas_year);
+    }
+
     auto total = this->total_->get_state();
     if (!std::isnan(total)) {
       this->process_(total);
@@ -45,7 +70,7 @@ void GasStatistics::setup() {
 void GasStatistics::loop() {
   const auto t = this->time_->now();
   if (!t.is_valid()) {
-    // time is not sync yet
+    // time is not synced yet
     return;
   }
 
@@ -65,15 +90,15 @@ void GasStatistics::loop() {
   this->gas_.start_today = total;
 
   if (this->gas_.current_day_of_year != 0) {
-    // at specified day of week we start a new week calculation
+    // start new week calculation
     if (t.day_of_week == this->gas_week_start_day_) {
       this->gas_.start_week = total;
     }
-    // at first day of month we start a new month calculation
+    // start new month calculation
     if (t.day_of_month == 1) {
       this->gas_.start_month = total;
     }
-    // at first day of month we start a new month calculation
+    // start new year calculation
     if (t.day_of_year == 1) {
       this->gas_.start_year = total;
     }
@@ -86,28 +111,36 @@ void GasStatistics::loop() {
 
 void GasStatistics::process_(float total) {
   if (this->gas_today_ && !std::isnan(this->gas_.start_today)) {
-    this->gas_today_->publish_state(total - this->gas_.start_today);
+    this->gas_.gas_today = total - this->gas_.start_today;
+    this->gas_today_->publish_state(this->gas_.gas_today);
   }
 
   if (this->gas_yesterday_ && !std::isnan(this->gas_.start_yesterday)) {
-    this->gas_yesterday_->publish_state(this->gas_.start_today - this->gas_.start_yesterday);
+    this->gas_.gas_yesterday = this->gas_.start_today - this->gas_.start_yesterday;
+    this->gas_yesterday_->publish_state(this->gas_.gas_yesterday);
   }
 
   if (this->gas_week_ && !std::isnan(this->gas_.start_week)) {
-    this->gas_week_->publish_state(total - this->gas_.start_week);
+    this->gas_.gas_week = total - this->gas_.start_week;
+    this->gas_week_->publish_state(this->gas_.gas_week);
   }
 
   if (this->gas_month_ && !std::isnan(this->gas_.start_month)) {
-    this->gas_month_->publish_state(total - this->gas_.start_month);
+    this->gas_.gas_month = total - this->gas_.start_month;
+    this->gas_month_->publish_state(this->gas_.gas_month);
   }
 
   if (this->gas_year_ && !std::isnan(this->gas_.start_year)) {
-    this->gas_year_->publish_state(total - this->gas_.start_year);
+    this->gas_.gas_year = total - this->gas_.start_year;
+    this->gas_year_->publish_state(this->gas_.gas_year);
   }
+
   this->save_();
 }
 
-void GasStatistics::save_() { this->pref_.save(&(this->gas_)); }
+void GasStatistics::save_() { 
+  this->pref_.save(&(this->gas_)); 
+}
 
 }  // namespace gas_statistics
 }  // namespace esphome
