@@ -162,12 +162,6 @@ void EnergyStatistics::process_(float total) {
 }
 
 
-void EnergyStatistics::save_() { 
-  // Save the current energy statistics to preferences
-  this->pref_.save(&(this->energy_)); 
-}
-
-
 void EnergyStatistics::on_reset_called() {
   this->reset();
 }
@@ -209,6 +203,7 @@ void EnergyStatistics::reset() {
   this->save_();
 }
 
+// Save the current energy statistics to preferences
 void EnergyStatistics::save_() { this->pref_.save(&(this->energy_)); }
 
 }  // namespace energy_statistics
