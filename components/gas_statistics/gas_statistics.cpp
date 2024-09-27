@@ -32,7 +32,11 @@ void GasStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Restored Gas Week: %.3f", this->gas_.gas_week);
   ESP_LOGCONFIG(TAG, "Restored Gas Month: %.3f", this->gas_.gas_month);
   ESP_LOGCONFIG(TAG, "Restored Gas Year: %.3f", this->gas_.gas_year);
+
+  // Expose the reset service
+  register_service(&GasStatistics::on_reset_called, "reset_gas_statistics");
 }
+
 
 void GasStatistics::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
@@ -66,6 +70,7 @@ void GasStatistics::setup() {
     }
   }
 }
+
 
 void GasStatistics::loop() {
   const auto t = this->time_->now();
@@ -108,6 +113,7 @@ void GasStatistics::loop() {
 
   this->process_(total);
 }
+
 
 void GasStatistics::process_(float total) {
   // Gas Today
@@ -155,10 +161,17 @@ void GasStatistics::process_(float total) {
   this->save_();
 }
 
+
 void GasStatistics::save_() { 
   // Save the current gas statistics to preferences
   this->pref_.save(&(this->gas_)); 
 }
+
+
+void GasStatistics::on_reset_called() {
+  this->reset();
+}
+
 
 void GasStatistics::reset() {
   ESP_LOGI(TAG, "Resetting all gas statistics to zero.");
