@@ -155,5 +155,10 @@ void GasStatistics::process_(float total) {
   this->save_();
 }
 
+void GasStatistics::save_() { 
+  // Save the current gas statistics to preferences
+  this->pref_.save(&(this->gas_)); 
+}
+
 }  // namespace gas_statistics
 }  // namespace esphome
