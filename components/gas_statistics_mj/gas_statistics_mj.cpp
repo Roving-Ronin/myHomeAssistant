@@ -117,4 +117,30 @@ void GasStatisticsMJ::process_(float total) {
 
   if (this->gas_yesterday_ && !std::isnan(this->gas_.start_yesterday)) {
     this->gas_.gas_yesterday = this->gas_.start_today - this->gas_.start_yesterday;
-    this->gas_yesterday_->publish_state(this->gas
+    this->gas_yesterday_->publish_state(this->gas_.gas_yesterday);
+  }
+
+  if (this->gas_week_ && !std::isnan(this->gas_.start_week)) {
+    this->gas_.gas_week = total - this->gas_.start_week;
+    this->gas_week_->publish_state(this->gas_.gas_week);
+  }
+
+  if (this->gas_month_ && !std::isnan(this->gas_.start_month)) {
+    this->gas_.gas_month = total - this->gas_.start_month;
+    this->gas_month_->publish_state(this->gas_.gas_month);
+  }
+
+  if (this->gas_year_ && !std::isnan(this->gas_.start_year)) {
+    this->gas_.gas_year = total - this->gas_.start_year;
+    this->gas_year_->publish_state(this->gas_.gas_year);
+  }
+
+  this->save_();
+}
+
+void GasStatisticsMJ::save_() { 
+  this->pref_.save(&(this->gas_)); 
+}
+
+}  // namespace gas_statistics_mj
+}  // namespace esphome
