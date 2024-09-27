@@ -155,6 +155,42 @@ void GasStatisticsMJ::process_(float total) {
   this->save_();
 }
 
+void GasStatisticsMJ::reset() {
+  ESP_LOGI(TAG, "Resetting all gas statistics to zero.");
+
+  // Reset all start points to zero
+  this->gas_.start_today = 0.0f;
+  this->gas_.start_yesterday = 0.0f;
+  this->gas_.start_week = 0.0f;
+  this->gas_.start_month = 0.0f;
+  this->gas_.start_year = 0.0f;
+
+  // Reset all sensor values to zero
+  if (this->gas_today_) {
+    this->gas_.gas_today = 0.0f;
+    this->gas_today_->publish_state(0.0f);
+  }
+  if (this->gas_yesterday_) {
+    this->gas_.gas_yesterday = 0.0f;
+    this->gas_yesterday_->publish_state(0.0f);
+  }
+  if (this->gas_week_) {
+    this->gas_.gas_week = 0.0f;
+    this->gas_week_->publish_state(0.0f);
+  }
+  if (this->gas_month_) {
+    this->gas_.gas_month = 0.0f;
+    this->gas_month_->publish_state(0.0f);
+  }
+  if (this->gas_year_) {
+    this->gas_.gas_year = 0.0f;
+    this->gas_year_->publish_state(0.0f);
+  }
+
+  // Save the reset values to preferences
+  this->save_();
+}
+
 void GasStatisticsMJ::save_() { 
   // Save the current gas statistics to preferences
   this->pref_.save(&(this->gas_)); 
