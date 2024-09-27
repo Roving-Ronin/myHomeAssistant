@@ -1208,7 +1208,7 @@ sensor:
       web_server_sorting_weight: '31'
 
     water_year:
-      name: "Town Water - used Year"
+      name: "Town Water - Used Year"
       id: town_water_used_year
       web_server_sorting_weight: '32'
 
