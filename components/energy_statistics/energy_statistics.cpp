@@ -1,6 +1,5 @@
 #include "esphome/core/log.h"
 #include "esphome/core/hal.h"
-#include "esphome/api/api.h"
 #include "energy_statistics.h"
 
 namespace esphome {
@@ -35,7 +34,7 @@ void EnergyStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Restored Energy Year: %.3f", this->energy_.energy_year);
 
   // Register the reset service
-  this->add_custom_service("reset_energy_statistics", [this]() { this->on_reset_called(); });
+  this->register_service("reset_energy_statistics", [this]() { this->on_reset_called(); });
 }
 
 
