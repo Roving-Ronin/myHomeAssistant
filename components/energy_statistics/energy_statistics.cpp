@@ -151,6 +151,42 @@ void EnergyStatistics::process_(float total) {
   this->save_();
 }
 
+void EnergyStatistics::reset() {
+  ESP_LOGI(TAG, "Resetting all energy statistics to zero.");
+
+  // Reset all start points to zero
+  this->energy_.start_today = 0.0f;
+  this->energy_.start_yesterday = 0.0f;
+  this->energy_.start_week = 0.0f;
+  this->energy_.start_month = 0.0f;
+  this->energy_.start_year = 0.0f;
+
+  // Reset all sensor values to zero
+  if (this->energy_today_) {
+    this->energy_.energy_today = 0.0f;
+    this->energy_today_->publish_state(0.0f);
+  }
+  if (this->energy_yesterday_) {
+    this->energy_.energy_yesterday = 0.0f;
+    this->energy_yesterday_->publish_state(0.0f);
+  }
+  if (this->energy_week_) {
+    this->energy_.energy_week = 0.0f;
+    this->energy_week_->publish_state(0.0f);
+  }
+  if (this->energy_month_) {
+    this->energy_.energy_month = 0.0f;
+    this->energy_month_->publish_state(0.0f);
+  }
+  if (this->energy_year_) {
+    this->energy_.energy_year = 0.0f;
+    this->energy_year_->publish_state(0.0f);
+  }
+
+  // Save the reset values to preferences
+  this->save_();
+}
+
 void EnergyStatistics::save_() { this->pref_.save(&(this->energy_)); }
 
 }  // namespace energy_statistics
