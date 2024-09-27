@@ -32,6 +32,7 @@ sensor:
     temperature:
       name: "${bme_sensor2_location}Temperature"
       id: bme280b_temperature
+      icon: 'mdi:thermometer'
       accuracy_decimals: 1
       filters:
         - offset: ${temperature_2_offset}
@@ -47,6 +48,7 @@ sensor:
     pressure:
       name: "${bme_sensor2_location}Pressure"
       id: bme280b_pressure
+      icon: 'phu:air-presure'
       accuracy_decimals: 1
       filters:
         - offset: ${pressure_2_offset}
@@ -62,6 +64,7 @@ sensor:
     humidity:
       name: "${bme_sensor2_location}Humidity (Relative)"
       id: bme280b_humidity
+      icon: 'mdi:water-percent'
       accuracy_decimals: 1
       filters:
         - offset: ${humidity_2_offset}
@@ -76,6 +79,8 @@ sensor:
    # BME280 Sensor in I2C Port - Absolute Humidity
   - platform: absolute_humidity
     name: "${bme_sensor2_location}Humidity (Absolute)"
+    id: bme280b_humidity_absolute
+    icon: 'mdi:water-percent'    
     temperature: bme280b_temperature
     humidity: bme280b_humidity
     equation: Wobus   # Wobus (Default), optional Tetens or Buck
@@ -83,6 +88,8 @@ sensor:
    # BME280 Sensor in I2C Port - Dew Point
   - platform: template
     name: "${bme_sensor2_location}Dew Point"
+    id: bme280b_dew_point
+    icon: 'mdi:water-thermometer-outline'
     unit_of_measurement: °C
     icon: 'mdi:thermometer-alert'    
     lambda: |-
@@ -94,6 +101,8 @@ sensor:
    # Note: This is based on 655m for Goulburn North, NSW. Australia. Update for a different location.
   - platform: template
     name: "${bme_sensor2_location}Equivalent Sea Level Pressure"
+    id: bme280b_sea_level_pressure
+    icon: 'mdi:waves-arrow-up'
     unit_of_measurement: 'hPa'    
     lambda: |-
       const float STANDARD_ALTITUDE = 656; // in meters, see note
