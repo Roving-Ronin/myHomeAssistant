@@ -1188,28 +1188,28 @@ sensor:
     total: town_water_used_total
 
     water_today:
-      name: "Water - Used Today"
-      id: water_used_today
+      name: "Town Water - Used Today"
+      id: town_water_used_today
       web_server_sorting_weight: '28'
     
     water_yesterday:
-      name: "Water - Used Yesterday"
-      id: water_used_yesterday
+      name: "TownWater - Used Yesterday"
+      id: town_water_used_yesterday
       web_server_sorting_weight: '29'
 
     water_week:
-      name: "Water - Used Week"
-      id: water_used_week
+      name: "Town Water - Used Week"
+      id: town_water_used_week
       web_server_sorting_weight: '30'
     
     water_month:
-      name: "Water - Used Month"
-      id: water_used_month
+      name: "Town Water - Used Month"
+      id: town_water_used_month
       web_server_sorting_weight: '31'
 
     water_year:
-      name: "Water - used Year"
-      id: water_used_year
+      name: "Town Water - used Year"
+      id: town_water_used_year
       web_server_sorting_weight: '32'
 
 
