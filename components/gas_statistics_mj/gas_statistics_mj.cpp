@@ -156,7 +156,6 @@ void GasStatisticsMJ::process_(float total) {
   this->save_();
 }
 
-
 void GasStatisticsMJ::save_() { this->pref_.save(&(this->gas_)); 
 }
 
