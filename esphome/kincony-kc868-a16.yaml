@@ -183,7 +183,7 @@ globals:
 #    initial_value: "0.000"
 
   #  Globals for use with pulse meter, to allow storing and setting a base reading for water meter
-  - id: water_used_total_litres
+  - id: town_water_used_total_litres
     type: float
     restore_value: yes
    # Change initial value to 0 to reset, or enter your actual meter reading to start counting lifetime total from that number 
