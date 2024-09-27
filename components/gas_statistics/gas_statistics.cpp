@@ -209,5 +209,7 @@ void GasStatistics::reset() {
   this->save_();
 }
 
+void GasStatistics::save_() { this->pref_.save(&(this->energy_)); }
+
 }  // namespace gas_statistics
 }  // namespace esphome
