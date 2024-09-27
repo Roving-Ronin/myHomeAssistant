@@ -163,8 +163,8 @@ void EnergyStatistics::process_(float total) {
 
 
 void EnergyStatistics::save_() { 
-  // Save the current gas statistics to preferences
-  this->pref_.save(&(this->gas_)); 
+  // Save the current energy statistics to preferences
+  this->pref_.save(&(this->energy_)); 
 }
 
 
