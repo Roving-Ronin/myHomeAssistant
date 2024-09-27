@@ -151,6 +151,42 @@ void WaterStatistics::process_(float total) {
   this->save_();
 }
 
+void WaterStatistics::reset() {
+  ESP_LOGI(TAG, "Resetting all water statistics to zero.");
+
+  // Reset all start points to zero
+  this->water_.start_today = 0.0f;
+  this->water_.start_yesterday = 0.0f;
+  this->water_.start_week = 0.0f;
+  this->water_.start_month = 0.0f;
+  this->water_.start_year = 0.0f;
+
+  // Reset all sensor values to zero
+  if (this->water_today_) {
+    this->water_.water_today = 0.0f;
+    this->water_today_->publish_state(0.0f);
+  }
+  if (this->water_yesterday_) {
+    this->water_.water_yesterday = 0.0f;
+    this->water_yesterday_->publish_state(0.0f);
+  }
+  if (this->water_week_) {
+    this->water_.water_week = 0.0f;
+    this->water_week_->publish_state(0.0f);
+  }
+  if (this->water_month_) {
+    this->water_.water_month = 0.0f;
+    this->water_month_->publish_state(0.0f);
+  }
+  if (this->water_year_) {
+    this->water_.water_year = 0.0f;
+    this->water_year_->publish_state(0.0f);
+  }
+
+  // Save the reset values to preferences
+  this->save_();
+}
+
 void WaterStatistics::save_() { this->pref_.save(&(this->water_)); }
 
 }  // namespace water_statistics
