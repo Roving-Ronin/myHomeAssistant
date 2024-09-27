@@ -55,13 +55,6 @@ class WaterStatistics : public Component {
     float start_week{NAN};
     float start_month{NAN};
     float start_year{NAN};
-
-  // Add fields to store sensor values in globals
-    float water_today{NAN};
-    float water_yesterday{NAN};
-    float water_week{NAN};
-    float water_month{NAN};
-    float water_year{NAN};
   } water_;
 
   void process_(float total);
