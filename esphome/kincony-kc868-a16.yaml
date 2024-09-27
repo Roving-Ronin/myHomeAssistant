@@ -202,7 +202,6 @@ number:
     max_value: 1.1
     step: 0.0001
     unit_of_measurement: ""
-    accuracy_decimals: 4
     initial_value: 0.9864
     restore_value: True
     optimistic: true
@@ -217,7 +216,6 @@ number:
     max_value: 52.0
     step: 0.01
     unit_of_measurement: ""
-    accuracy_decimals: 2
     initial_value: 37.98
     restore_value: True
     optimistic: true
