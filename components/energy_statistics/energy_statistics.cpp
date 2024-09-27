@@ -116,6 +116,7 @@ void EnergyStatistics::loop() {
 
 
 void EnergyStatistics::process_(float total) {
+  // Energy Today
   if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
     this->energy_.energy_today = total - this->energy_.start_today;
     this->energy_today_->publish_state(this->energy_.energy_today);
@@ -124,6 +125,7 @@ void EnergyStatistics::process_(float total) {
     this->energy_today_->publish_state(0.0);
   }
 
+  // Energy Yesterday
   if (this->energy_yesterday_ && !std::isnan(this->energy_.start_yesterday)) {
     this->energy_.energy_yesterday = this->energy_.start_today - this->energy_.start_yesterday;
     this->energy_yesterday_->publish_state(this->energy_.energy_yesterday);
@@ -131,6 +133,7 @@ void EnergyStatistics::process_(float total) {
     this->energy_yesterday_->publish_state(0.0);
   }
 
+  // Energy Week
   if (this->energy_week_ && !std::isnan(this->energy_.start_week)) {
     this->energy_.energy_week = total - this->energy_.start_week;
     this->energy_week_->publish_state(this->energy_.energy_week);
@@ -138,6 +141,7 @@ void EnergyStatistics::process_(float total) {
     this->energy_week_->publish_state(0.0);
   }
 
+  // Energy Month
   if (this->energy_month_ && !std::isnan(this->energy_.start_month)) {
     this->energy_.energy_month = total - this->energy_.start_month;
     this->energy_month_->publish_state(this->energy_.energy_month);
@@ -145,6 +149,7 @@ void EnergyStatistics::process_(float total) {
     this->energy_month_->publish_state(0.0);
   }
 
+  // Energy Year
   if (this->energy_year_ && !std::isnan(this->energy_.start_year)) {
     this->energy_.energy_year = total - this->energy_.start_year;
     this->energy_year_->publish_state(this->energy_.energy_year);
@@ -154,6 +159,12 @@ void EnergyStatistics::process_(float total) {
 
   // Save the updated values to preferences
   this->save_();
+}
+
+
+void EnergyStatistics::save_() { 
+  // Save the current gas statistics to preferences
+  this->pref_.save(&(this->gas_)); 
 }
 
 
