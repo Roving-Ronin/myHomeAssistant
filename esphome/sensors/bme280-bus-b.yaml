@@ -91,7 +91,6 @@ sensor:
     id: bme280b_dew_point
     icon: 'mdi:water-thermometer-outline'
     unit_of_measurement: °C
-    icon: 'mdi:thermometer-alert'    
     lambda: |-
       return (243.5*(log(id(bme280b_humidity).state/100)+((17.67*id(bme280b_temperature).state)/
       (243.5+id(bme280b_temperature).state)))/(17.67-log(id(bme280b_humidity).state/100)-
