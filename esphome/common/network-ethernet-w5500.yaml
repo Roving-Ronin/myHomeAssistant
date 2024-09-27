@@ -57,9 +57,10 @@ ethernet:
 text_sensor:
   - platform: ethernet_info
     ip_address:
-      name: Device IP
+      name: Network IP
       address_0:
-        name: Device IP 0
+        name: Network IP
+        icon: mdi:ip-network
 #      address_1:
 #        name: ESP IP Address 1
 #      address_2:
@@ -69,8 +70,10 @@ text_sensor:
 #      address_4:
 #        name: ESP IP Address 4
     dns_address:
-      name: Device DNS Server
+      name: Network DNS Servers
+      icon: mdi:dns
     mac_address:
-      name: Device MAC Address
+      name: MAC Address
+      icon: mdi:network-pos
 
 ##########################################################################
