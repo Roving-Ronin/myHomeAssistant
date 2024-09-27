@@ -11,6 +11,7 @@ light:
     num_leds: 1
     name: "Onboard RGB LED"
     id: onboard_led
+    icon: 'mdi:led-on'
     effects:
       - strobe:
       - addressable_rainbow:
