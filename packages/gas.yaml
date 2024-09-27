@@ -10,6 +10,8 @@
 #
 #  Version: 1.2 - Updated to use the energy_meter integration's, new source_type: gas
 #
+#  Version: 1.3 - Updated to use the gas_statistics (m3) and gas_statistics_mj (MegaJoules) custom components and changed from using 'Consumed' to 'Used' in names.
+#
 
 template: 
   - sensor:
@@ -72,7 +74,6 @@ template:
 # This reading however is taken as a full number, i.e. 05846314 is read as 5,846,314 instead of 05846.314 m³ 
 # So this template sensor is needed to divide the number by 1,000
 #
-
   - sensor:
     - name: "Gas Meter - Reading"
       unique_id: gas_meter_reading
@@ -92,30 +93,30 @@ energy_meter:
 #  Note this reading is in 'corrected' m3, after correction factor applied.
 #  This is to get an m3 amount, to then use to apply a price too, to get provide a cost on Energy Dashboard
 #
-  gas_consumed_daily_m3:
-    unique_id: gas_consumed_daily_m3
-    name: "Gas Consumed Daily m³"
-    source: sensor.kc868_a16_gas_consumed_m3
+  gas_used_daily_m3:
+    unique_id: gas_used_daily_m3
+    name: "Gas Used Daily m³"
+    source: sensor.kc868_a16_gas_used_total
     source_type: gas
     cycle: daily
     price_entity: sensor.gas_price_m3
 
 #   Quarterly m3 total only included to allow validation against the retailers m3 reading on their quarterly invoice.
-#  gas_consumed_quarterly_m3:
-#    unique_id: gas_consumed_quarterly_m3
-#    source: sensor.kc868_a16_gas_consumed_m3
+#  gas_used_quarterly_m3:
+#    unique_id: gas_used_quarterly_m3
+#    source: sensor.kc868_a16_gas_used_total
 #    source_type: gas
-#    name: Gas Consumed Quarterly m³
+#    name: "Gas used Quarterly m³"
 #    cycle: quarterly
 #    offset:
 #      days: 11
 
 #   Quarterly m3 total only included to allow validation against the retailers m3 reading on their quarterly invoice.
-#  gas_consumed_yearly_m3:
-#    unique_id: gas_consumed_yearly_m3
-#    source: sensor.kc868_a16_gas_consumed_m3
+#  gas_used_yearly_m3:
+#    unique_id: gas_used_yearly_m3
+#    source: sensor.kc868_a16_gas_used_total
 #    source_type: gas
-#    name: Gas Consumed Yearly m³
+#    name: "Gas Used Yearly m³"
 #    cycle: yearly
 
 # ---------------------------------------------------------------------------
@@ -125,41 +126,41 @@ energy_meter:
 #  Note this reading is in 'corrected' m3, after correction factor applied.
 #  This is to get an m3 amount, to then use to apply a price too, to get provide a cost on Energy Dashboard
 
-  gas_consumed_daily_mj:
-    unique_id: gas_consumed_daily_mj 
-    name: Gas Consumed Daily mj
-    source: sensor.kc868_a16_gas_consumed_mj
+  gas_used_daily_mj:
+    unique_id: gas_used_daily_mj 
+    name: "Gas Used Daily mj"
+    source: sensor.kc868_a16_gas_used_total_mj
     source_type: gas
     cycle: daily
     price_entity: &entity-price sensor.gas_price_mj
 
-  gas_consumed_monthly_mj:
-    unique_id: gas_consumed_monthly_mj
-    name: Gas Consumed Monthly mj
-    source: sensor.kc868_a16_gas_consumed_mj
+  gas_used_monthly_mj:
+    unique_id: gas_used_monthly_mj
+    name: "Gas Used Monthly mj"
+    source: sensor.kc868_a16_gas_used_total_mj
     source_type: gas
     cycle: monthly
     price_entity: *entity-price
 
-  gas_consumed_quarterly_mj:
-    unique_id: gas_consumed_quarterly_mj
-    name: Gas Consumed Quarterly mj
-    source: sensor.kc868_a16_gas_consumed_mj
+  gas_used_quarterly_mj:
+    unique_id: gas_used_quarterly_mj
+    name: "Gas Used Quarterly mj"
+    source: sensor.kc868_a16_gas_used_total_mj
     source_type: gas
     cycle: quarterly
     price_entity: *entity-price
 
-  gas_consumed_yearly_mj:
-    unique_id: gas_consumed_yearly_mj
-    name: Gas Consumed Yearly mj
-    source: sensor.kc868_a16_gas_consumed_mj
+  gas_used_yearly_mj:
+    unique_id: gas_used_yearly_mj
+    name: "Gas Used Yearly mj"
+    source: sensor.kc868_a16_gas_used_total_mj
     source_type: gas
     cycle: yearly
     price_entity: *entity-price
 
 # ---------------------------------------------------------------------------
 #
-# Automation to monitor (quarterly mj reading) and switch tarrifs as they hit mj consumed thresholds for the quarter.
+# Automation to monitor (quarterly mj reading) and switch tarrifs as they hit mj used thresholds for the quarter.
 #
 
 automation:
@@ -178,6 +179,6 @@ automation:
 #          value: "0"
 #        target:
 #          entity_id:
-#            - sensor.gas_consumed_quarterly_mj
-#            - sensor.gas_consumed_quarterly_mj_cost
+#            - sensor.gas_used_quarterly_mj
+#            - sensor.gas_used_quarterly_mj_cost
 #    mode: single
