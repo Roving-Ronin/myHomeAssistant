@@ -111,6 +111,7 @@ void WaterStatistics::loop() {
 }
 
 void WaterStatistics::process_(float total) {
+  // Water Today
   if (this->water_today_ && !std::isnan(this->water_.start_today)) {
     this->water_.water_today = total - this->water_.start_today;
     this->water_today_->publish_state(this->water_.water_today);
@@ -119,6 +120,7 @@ void WaterStatistics::process_(float total) {
     this->water_today_->publish_state(0.0);
   }
 
+  // Water Yesterday
   if (this->water_yesterday_ && !std::isnan(this->water_.start_yesterday)) {
     this->water_.water_yesterday = this->water_.start_today - this->water_.start_yesterday;
     this->water_yesterday_->publish_state(this->water_.water_yesterday);
@@ -126,6 +128,7 @@ void WaterStatistics::process_(float total) {
     this->water_yesterday_->publish_state(0.0);
   }
 
+  // Water Week
   if (this->water_week_ && !std::isnan(this->water_.start_week)) {
     this->water_.water_week = total - this->water_.start_week;
     this->water_week_->publish_state(this->water_.water_week);
@@ -133,6 +136,7 @@ void WaterStatistics::process_(float total) {
     this->water_week_->publish_state(0.0);
   }
 
+  // Water Month
   if (this->water_month_ && !std::isnan(this->water_.start_month)) {
     this->water_.water_month = total - this->water_.start_month;
     this->water_month_->publish_state(this->water_.water_month);
@@ -140,6 +144,7 @@ void WaterStatistics::process_(float total) {
     this->water_month_->publish_state(0.0);
   }
 
+  // Water Year
   if (this->water_year_ && !std::isnan(this->water_.start_year)) {
     this->water_.water_year = total - this->water_.start_year;
     this->water_year_->publish_state(this->water_.water_year);
@@ -148,11 +153,11 @@ void WaterStatistics::process_(float total) {
   }
 
   // Save the updated values to preferences
-  
   this->save_();
 }
 
-void WaterStatistics::save_() { this->pref_.save(&(this->water_)); }
+void WaterStatistics::save_() { this->pref_.save(&(this->energy_)); 
+}
 
 }  // namespace water_statistics
 }  // namespace esphome
