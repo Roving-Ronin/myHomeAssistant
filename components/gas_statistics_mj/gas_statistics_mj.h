@@ -2,7 +2,6 @@
 
 #include "esphome/core/component.h"
 #include "esphome/core/preferences.h"
-
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/time/real_time_clock.h"
 
@@ -45,16 +44,23 @@ class GasStatisticsMJ : public Component {
   int gas_week_start_day_{2};
   // start day of month configuration
   int gas_month_start_day_{1};
-  // start day of year configuration
   int gas_year_start_day_{1};
 
-  struct gas_data_t {
-    uint16_t current_day_of_year{0};
-    float start_today{NAN};
-    float start_yesterday{NAN};
-    float start_week{NAN};
-    float start_month{NAN};
-    float start_year{NAN};
+  // Structure for storing gas statistics in MJ
+  struct gas_data_mj_t {
+    uint16_t current_day_of_year{0};    // Track the current day of year
+    float start_today{NAN};             // MJ usage at the start of today
+    float start_yesterday{NAN};         // MJ usage at the start of yesterday
+    float start_week{NAN};              // MJ usage at the start of the current week
+    float start_month{NAN};             // MJ usage at the start of the current month
+    float start_year{NAN};              // MJ usage at the start of the current year
+
+    // Store MJ sensor values
+    float gas_today{NAN};               // Stored MJ usage today
+    float gas_yesterday{NAN};           // Stored MJ usage yesterday
+    float gas_week{NAN};                // Stored MJ usage this week
+    float gas_month{NAN};               // Stored MJ usage this month
+    float gas_year{NAN};                // Stored MJ usage this year
   } gas_;
 
   void process_(float total);
