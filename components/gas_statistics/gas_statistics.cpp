@@ -32,11 +32,7 @@ void GasStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Restored Gas Week: %.3f", this->gas_.gas_week);
   ESP_LOGCONFIG(TAG, "Restored Gas Month: %.3f", this->gas_.gas_month);
   ESP_LOGCONFIG(TAG, "Restored Gas Year: %.3f", this->gas_.gas_year);
-
-  // Expose the reset service
-  register_service(&GasStatistics::on_reset_called, "reset_gas_statistics");
 }
-
 
 void GasStatistics::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
@@ -70,7 +66,6 @@ void GasStatistics::setup() {
     }
   }
 }
-
 
 void GasStatistics::loop() {
   const auto t = this->time_->now();
@@ -113,7 +108,6 @@ void GasStatistics::loop() {
 
   this->process_(total);
 }
-
 
 void GasStatistics::process_(float total) {
   // Gas Today
@@ -160,56 +154,6 @@ void GasStatistics::process_(float total) {
   // Save values to preferences
   this->save_();
 }
-
-
-void GasStatistics::save_() { 
-  // Save the current gas statistics to preferences
-  this->pref_.save(&(this->gas_)); 
-}
-
-
-void GasStatistics::on_reset_called() {
-  this->reset();
-}
-
-
-void GasStatistics::reset() {
-  ESP_LOGI(TAG, "Resetting all gas statistics to zero.");
-
-  // Reset all start points to zero
-  this->gas_.start_today = 0.0f;
-  this->gas_.start_yesterday = 0.0f;
-  this->gas_.start_week = 0.0f;
-  this->gas_.start_month = 0.0f;
-  this->gas_.start_year = 0.0f;
-
-  // Reset all sensor values to zero
-  if (this->gas_today_) {
-    this->gas_.gas_today = 0.0f;
-    this->gas_today_->publish_state(0.0f);
-  }
-  if (this->gas_yesterday_) {
-    this->gas_.gas_yesterday = 0.0f;
-    this->gas_yesterday_->publish_state(0.0f);
-  }
-  if (this->gas_week_) {
-    this->gas_.gas_week = 0.0f;
-    this->gas_week_->publish_state(0.0f);
-  }
-  if (this->gas_month_) {
-    this->gas_.gas_month = 0.0f;
-    this->gas_month_->publish_state(0.0f);
-  }
-  if (this->gas_year_) {
-    this->gas_.gas_year = 0.0f;
-    this->gas_year_->publish_state(0.0f);
-  }
-
-  // Save the reset values to preferences
-  this->save_();
-}
-
-void GasStatistics::save_() { this->pref_.save(&(this->energy_)); }
 
 }  // namespace gas_statistics
 }  // namespace esphome
