@@ -34,7 +34,7 @@ void EnergyStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Restored Energy Year: %.3f", this->energy_.energy_year);
 
   // Register the reset service
-  this->add_custom_service("reset_energy_statistics", [this]() { this->on_reset_called(); });
+  this->register_service("reset_energy_statistics", [this]() { this->on_reset_called(); });
 }
 
 
