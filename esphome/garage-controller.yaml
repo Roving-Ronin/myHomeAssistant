@@ -219,6 +219,7 @@ switch:
     name: "Garage Door - Virtual Lock"
     id: virtual_lock
     optimistic: true
+    icon: 'mdi:lock'
     restore_mode: ALWAYS_ON
 
 #########################################################################
@@ -228,6 +229,7 @@ text_sensor:
   - platform: template
     name: "Parking State"
     id: parking_state
+    icon: 'mdi:parking'
     lambda: |-
       if (id(garage_door_open_sensor).state && id(parked_car_sensor).state <= 0.75) {
         return {"Door Open | Vehicle Parked"};
@@ -250,6 +252,7 @@ text_sensor:
   - platform: template
     name: "Parking Space"
     id: parking_space
+    icon: 'mdi:car'
     lambda: |-
       if (id(parked_car_sensor).state <= 0.99) {
         // car is in the garage
@@ -269,6 +272,7 @@ cover:
     name: Garage Door
     id: garage_door
     device_class: garage
+    icon: 'mdi:garage-variant'
     optimistic: false
     has_position: true
     assumed_state: false
