@@ -38,7 +38,7 @@ esphome:
 
 external_components:
   - source: github://roving-ronin/myhomeassistant/components@main
-    refresh: 5s
+    refresh: 0s
 
 #####################################################################
 #
