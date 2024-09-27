@@ -67,6 +67,7 @@ void GasStatisticsMJ::setup() {
   }
 }
 
+
 void GasStatisticsMJ::loop() {
   const auto t = this->time_->now();
   if (!t.is_valid()) {
@@ -90,15 +91,15 @@ void GasStatisticsMJ::loop() {
   this->gas_.start_today = total;
 
   if (this->gas_.current_day_of_year != 0) {
-    // start new week calculation
+    // at specified day of week we start a new week calculation
     if (t.day_of_week == this->gas_week_start_day_) {
       this->gas_.start_week = total;
     }
-    // start new month calculation
+    // at first day of month we start a new month calculation
     if (t.day_of_month == 1) {
       this->gas_.start_month = total;
     }
-    // start new year calculation
+    // at first day of year we start a new year calculation
     if (t.day_of_year == 1) {
       this->gas_.start_year = total;
     }
@@ -151,13 +152,12 @@ void GasStatisticsMJ::process_(float total) {
     this->gas_year_->publish_state(0.0);
   }
 
-  // Save values to preferences
+  // Save the updated values to preferences
   this->save_();
 }
 
 
-void GasStatisticsMJ::save_() { 
-  this->pref_.save(&(this->gas_)); 
+void GasStatisticsMJ::save_() { this->pref_.save(&(this->gas_)); 
 }
 
 }  // namespace gas_statistics_mj
