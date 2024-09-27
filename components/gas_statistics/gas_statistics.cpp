@@ -1,159 +1,71 @@
-#include "esphome/core/log.h"
-#include "esphome/core/hal.h"
-#include "gas_statistics.h"
+#pragma once
+
+#include "esphome/core/component.h"
+#include "esphome/core/preferences.h"
+#include "esphome/components/sensor/sensor.h"
+#include "esphome/components/time/real_time_clock.h"
 
 namespace esphome {
 namespace gas_statistics {
 
-static const char *const TAG = "gas_statistics";
-static const char *const GAP = "  ";
+using sensor::Sensor;
 
-void GasStatistics::dump_config() {
-  ESP_LOGCONFIG(TAG, "Gas statistics sensors");
-  if (this->gas_today_) {
-    LOG_SENSOR(GAP, "Gas Today", this->gas_today_);
-  }
-  if (this->gas_yesterday_) {
-    LOG_SENSOR(GAP, "Gas Yesterday", this->gas_yesterday_);
-  }
-  if (this->gas_week_) {
-    LOG_SENSOR(GAP, "Gas Week", this->gas_week_);
-  }
-  if (this->gas_month_) {
-    LOG_SENSOR(GAP, "Gas Month", this->gas_month_);
-  }
-  if (this->gas_year_) {
-    LOG_SENSOR(GAP, "Gas Year", this->gas_year_);
-  }
+class GasStatistics : public Component {
+ public:
+  float get_setup_priority() const override { return setup_priority::DATA; }
+  void dump_config() override;
+  void setup() override;
+  void loop() override;
 
-  // Log restored values for debugging
-  ESP_LOGCONFIG(TAG, "Restored Gas Today: %.3f", this->gas_.gas_today);
-  ESP_LOGCONFIG(TAG, "Restored Gas Yesterday: %.3f", this->gas_.gas_yesterday);
-  ESP_LOGCONFIG(TAG, "Restored Gas Week: %.3f", this->gas_.gas_week);
-  ESP_LOGCONFIG(TAG, "Restored Gas Month: %.3f", this->gas_.gas_month);
-  ESP_LOGCONFIG(TAG, "Restored Gas Year: %.3f", this->gas_.gas_year);
-}
+  void set_time(time::RealTimeClock *time) { this->time_ = time; }
+  void set_total(Sensor *sensor) { this->total_ = sensor; }
 
-void GasStatistics::setup() {
-  this->total_->add_on_state_callback([this](float state) { this->process_(state); });
+  void set_gas_today(Sensor *sensor) { this->gas_today_ = sensor; }
+  void set_gas_yesterday(Sensor *sensor) { this->gas_yesterday_ = sensor; }
+  void set_gas_week(Sensor *sensor) { this->gas_week_ = sensor; }
+  void set_gas_month(Sensor *sensor) { this->gas_month_ = sensor; }
+  void set_gas_year(Sensor *sensor) { this->gas_year_ = sensor; }
 
-  this->pref_ = global_preferences->make_preference<gas_data_t>(fnv1_hash(TAG));
+ protected:
+  ESPPreferenceObject pref_;
+  time::RealTimeClock *time_;
 
-  gas_data_t loaded{};
-  if (this->pref_.load(&loaded)) {
-    this->gas_ = loaded;
+  // input sensors
+  Sensor *total_{nullptr};
 
-    // Restore sensor values from preferences
-    if (this->gas_today_ && !std::isnan(this->gas_.gas_today)) {
-      this->gas_today_->publish_state(this->gas_.gas_today);
-    }
-    if (this->gas_yesterday_ && !std::isnan(this->gas_.gas_yesterday)) {
-      this->gas_yesterday_->publish_state(this->gas_.gas_yesterday);
-    }
-    if (this->gas_week_ && !std::isnan(this->gas_.gas_week)) {
-      this->gas_week_->publish_state(this->gas_.gas_week);
-    }
-    if (this->gas_month_ && !std::isnan(this->gas_.gas_month)) {
-      this->gas_month_->publish_state(this->gas_.gas_month);
-    }
-    if (this->gas_year_ && !std::isnan(this->gas_.gas_year)) {
-      this->gas_year_->publish_state(this->gas_.gas_year);
-    }
+  // exposed sensors
+  Sensor *gas_today_{nullptr};
+  Sensor *gas_yesterday_{nullptr};
+  Sensor *gas_week_{nullptr};
+  Sensor *gas_month_{nullptr};
+  Sensor *gas_year_{nullptr};
 
-    auto total = this->total_->get_state();
-    if (!std::isnan(total)) {
-      this->process_(total);
-    }
-  }
-}
+  // start day of week configuration
+  int gas_week_start_day_{2};
+  // start day of month configuration
+  int gas_month_start_day_{1};
+  int gas_year_start_day_{1};
 
-void GasStatistics::loop() {
-  const auto t = this->time_->now();
-  if (!t.is_valid()) {
-    // time is not synced yet
-    return;
-  }
+  // Structure for storing gas statistics and sensor values
+  struct gas_data_t {
+    uint16_t current_day_of_year{0};    // Track the current day of year
+    float start_today{NAN};             // Gas usage at the start of today
+    float start_yesterday{NAN};         // Gas usage at the start of yesterday
+    float start_week{NAN};              // Gas usage at the start of the current week
+    float start_month{NAN};             // Gas usage at the start of the current month
+    float start_year{NAN};              // Gas usage at the start of the current year
 
-  const auto total = this->total_->get_state();
-  if (std::isnan(total)) {
-    // total is not published yet
-    return;
-  }
+    // Add fields to store gas sensor values for persistence
+    float gas_today{NAN};               // Stored gas usage today
+    float gas_yesterday{NAN};           // Stored gas usage yesterday
+    float gas_week{NAN};                // Stored gas usage this week
+    float gas_month{NAN};               // Stored gas usage this month
+    float gas_year{NAN};                // Stored gas usage this year
+  } gas_;
 
-  if (t.day_of_year == this->gas_.current_day_of_year) {
-    // nothing to do
-    return;
-  }
-
-  this->gas_.start_yesterday = this->gas_.start_today;
-
-  this->gas_.start_today = total;
-
-  if (this->gas_.current_day_of_year != 0) {
-    // start new week calculation
-    if (t.day_of_week == this->gas_week_start_day_) {
-      this->gas_.start_week = total;
-    }
-    // start new month calculation
-    if (t.day_of_month == 1) {
-      this->gas_.start_month = total;
-    }
-    // start new year calculation
-    if (t.day_of_year == 1) {
-      this->gas_.start_year = total;
-    }
-  }
-
-  this->gas_.current_day_of_year = t.day_of_year;
-
-  this->process_(total);
-}
-
-void GasStatistics::process_(float total) {
-  // Gas Today
-  if (this->gas_today_ && !std::isnan(this->gas_.start_today)) {
-    this->gas_.gas_today = total - this->gas_.start_today;
-    this->gas_today_->publish_state(this->gas_.gas_today);
-  } else if (this->gas_today_) {
-    // Show 0 instead of NA if no valid data
-    this->gas_today_->publish_state(0.0);
-  }
-
-  // Gas Yesterday
-  if (this->gas_yesterday_ && !std::isnan(this->gas_.start_yesterday)) {
-    this->gas_.gas_yesterday = this->gas_.start_today - this->gas_.start_yesterday;
-    this->gas_yesterday_->publish_state(this->gas_.gas_yesterday);
-  } else if (this->gas_yesterday_) {
-    this->gas_yesterday_->publish_state(0.0);
-  }
-
-  // Gas Week
-  if (this->gas_week_ && !std::isnan(this->gas_.start_week)) {
-    this->gas_.gas_week = total - this->gas_.start_week;
-    this->gas_week_->publish_state(this->gas_.gas_week);
-  } else if (this->gas_week_) {
-    this->gas_week_->publish_state(0.0);
-  }
-
-  // Gas Month
-  if (this->gas_month_ && !std::isnan(this->gas_.start_month)) {
-    this->gas_.gas_month = total - this->gas_.start_month;
-    this->gas_month_->publish_state(this->gas_.gas_month);
-  } else if (this->gas_month_) {
-    this->gas_month_->publish_state(0.0);
-  }
-
-  // Gas Year
-  if (this->gas_year_ && !std::isnan(this->gas_.start_year)) {
-    this->gas_.gas_year = total - this->gas_.start_year;
-    this->gas_year_->publish_state(this->gas_.gas_year);
-  } else if (this->gas_year_) {
-    this->gas_year_->publish_state(0.0);
-  }
-
-  // Save values to preferences
-  this->save_();
-}
+  void process_(float total);
+  void save_();
+};  // class GasStatistics
 
 }  // namespace gas_statistics
 }  // namespace esphome
