@@ -100,7 +100,6 @@ template:
         unit_of_measurement: "L"
         state: "{{ states('counter.water_meter_reading') }}"
 
-
 ####################################################
 #
 # utility_meter:
@@ -111,7 +110,7 @@ energy_meter:
   water_consumed_daily:
     name: Water - Consumed Daily
     unique_id: water_consumed_daily
-    source: sensor.kc868_a16_water_consumed
+    source: sensor.kc868_a16_town_water_used_today
     source_type: water
     cycle: daily
     price_entity: &entity-price sensor.water_cost_per_litre
@@ -120,7 +119,7 @@ energy_meter:
   water_consumed_monthly:
     name: Water - Consumed Monthly
     unique_id: water_consumed_monthly
-    source: sensor.kc868_a16_water_consumed
+    source: sensor.kc868_a16_town_water_used_today
     source_type: water
     cycle: monthly
     price_entity: *entity-price
@@ -129,7 +128,7 @@ energy_meter:
   water_consumed_quarterly:
     name: Water - Consumed Quarterly
     unique_id: water_consumed_quarterly
-    source: sensor.kc868_a16_water_consumed
+    source: sensor.kc868_a16_town_water_used_today
     source_type: water
     cycle: quarterly
     offset: 18
@@ -138,7 +137,7 @@ energy_meter:
   water_consumed_yearly:
     name: Water - Consumed Yearly
     unique_id: water_consumed_yearly
-    source: sensor.kc868_a16_water_consumed
+    source: sensor.kc868_a16_town_water_used_today
     source_type: water
     cycle: yearly
     price_entity: *entity-price
