@@ -54,24 +54,30 @@ ethernet:
 
 text_sensor:
   - platform: ethernet_info
+  
     ip_address:
-      name: Network IP
-      address_0:
-        name: Network IP
-        icon: mdi:ip-network
+      name: Device IP
+      icon: "mdi:ip-network"
+      web_server_sorting_weight: 48
+#      address_0:
+#        name: Device IP 0
 #      address_1:
-#        name: ESP IP Address 1
+#        name: Device IP Address 1
 #      address_2:
-#        name: ESP IP Address 2
+#        name: Device IP Address 2
 #      address_3:
-#        name: ESP IP Address 3
+#        name: Device IP Address 3
 #      address_4:
-#        name: ESP IP Address 4
-    dns_address:
-      name: Network DNS Servers
-      icon: mdi:dns
+#        name: Device IP Address 4
+
     mac_address:
       name: MAC Address
-      icon: mdi:network-pos
+      icon: "mdi:network-pos"
+      web_server_sorting_weight: 49
+
+    dns_address:
+      name: DNS Servers
+      icon: "mdi:check-network-outline"
+      web_server_sorting_weight: 50
 
 ##########################################################################
