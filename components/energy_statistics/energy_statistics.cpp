@@ -32,7 +32,11 @@ void EnergyStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Restored Energy Week: %.3f", this->energy_.energy_week);
   ESP_LOGCONFIG(TAG, "Restored Energy Month: %.3f", this->energy_.energy_month);
   ESP_LOGCONFIG(TAG, "Restored Energy Year: %.3f", this->energy_.energy_year);
+
+  // Expose the reset service
+  register_service(&EnergyStatistics::on_reset_called, "reset_energy_statistics");
 }
+
 
 void EnergyStatistics::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
@@ -110,6 +114,7 @@ void EnergyStatistics::loop() {
   this->process_(total);
 }
 
+
 void EnergyStatistics::process_(float total) {
   if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
     this->energy_.energy_today = total - this->energy_.start_today;
@@ -150,6 +155,12 @@ void EnergyStatistics::process_(float total) {
   // Save the updated values to preferences
   this->save_();
 }
+
+
+void EnergyStatistics::on_reset_called() {
+  this->reset();
+}
+
 
 void EnergyStatistics::reset() {
   ESP_LOGI(TAG, "Resetting all energy statistics to zero.");
