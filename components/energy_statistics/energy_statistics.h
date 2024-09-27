@@ -2,6 +2,7 @@
 
 #include "esphome/core/component.h"
 #include "esphome/core/preferences.h"
+#include "esphome/core/component_service.h"  // Include the necessary header for register_service
 
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/time/real_time_clock.h"
@@ -11,7 +12,7 @@ namespace energy_statistics {
 
 using sensor::Sensor;
 
-class EnergyStatistics : public Component {
+class EnergyStatistics : public Component, public ComponentService {  // Inherit from ComponentService
  public:
   // Set up priority to ensure this component is set up early
   float get_setup_priority() const override { return setup_priority::DATA; }
