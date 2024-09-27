@@ -58,6 +58,7 @@ text_sensor:
       name: Network IP
       address_0:
         name: Network IP
+        icon: mdi:ip-network
 #      address_1:
 #        name: ESP IP Address 1
 #      address_2:
@@ -68,7 +69,9 @@ text_sensor:
 #        name: ESP IP Address 4
     dns_address:
       name: Network DNS Servers
+      icon: mdi:dns
     mac_address:
       name: MAC Address
+      icon: mdi:network-pos
 
 ##########################################################################
