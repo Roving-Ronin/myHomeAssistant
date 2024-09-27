@@ -110,36 +110,49 @@ void GasStatistics::loop() {
 }
 
 void GasStatistics::process_(float total) {
+  // Gas Today
   if (this->gas_today_ && !std::isnan(this->gas_.start_today)) {
     this->gas_.gas_today = total - this->gas_.start_today;
     this->gas_today_->publish_state(this->gas_.gas_today);
+  } else if (this->gas_today_) {
+    // Show 0 instead of NA if no valid data
+    this->gas_today_->publish_state(0.0);
   }
 
+  // Gas Yesterday
   if (this->gas_yesterday_ && !std::isnan(this->gas_.start_yesterday)) {
     this->gas_.gas_yesterday = this->gas_.start_today - this->gas_.start_yesterday;
     this->gas_yesterday_->publish_state(this->gas_.gas_yesterday);
+  } else if (this->gas_yesterday_) {
+    this->gas_yesterday_->publish_state(0.0);
   }
 
+  // Gas Week
   if (this->gas_week_ && !std::isnan(this->gas_.start_week)) {
     this->gas_.gas_week = total - this->gas_.start_week;
     this->gas_week_->publish_state(this->gas_.gas_week);
+  } else if (this->gas_week_) {
+    this->gas_week_->publish_state(0.0);
   }
 
+  // Gas Month
   if (this->gas_month_ && !std::isnan(this->gas_.start_month)) {
     this->gas_.gas_month = total - this->gas_.start_month;
     this->gas_month_->publish_state(this->gas_.gas_month);
+  } else if (this->gas_month_) {
+    this->gas_month_->publish_state(0.0);
   }
 
+  // Gas Year
   if (this->gas_year_ && !std::isnan(this->gas_.start_year)) {
     this->gas_.gas_year = total - this->gas_.start_year;
     this->gas_year_->publish_state(this->gas_.gas_year);
+  } else if (this->gas_year_) {
+    this->gas_year_->publish_state(0.0);
   }
 
+  // Save values to preferences
   this->save_();
-}
-
-void GasStatistics::save_() { 
-  this->pref_.save(&(this->gas_)); 
 }
 
 }  // namespace gas_statistics
