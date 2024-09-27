@@ -32,16 +32,7 @@ void EnergyStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Restored Energy Week: %.3f", this->energy_.energy_week);
   ESP_LOGCONFIG(TAG, "Restored Energy Month: %.3f", this->energy_.energy_month);
   ESP_LOGCONFIG(TAG, "Restored Energy Year: %.3f", this->energy_.energy_year);
-
-  // Register the reset service
-  this->register_service("reset_energy_statistics", [this]() { this->on_reset_called(); });
 }
-
-
-void EnergyStatistics::on_reset_called() {
-  this->reset();
-}
-
 
 void EnergyStatistics::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
@@ -119,9 +110,7 @@ void EnergyStatistics::loop() {
   this->process_(total);
 }
 
-
 void EnergyStatistics::process_(float total) {
-  // Energy Today
   if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
     this->energy_.energy_today = total - this->energy_.start_today;
     this->energy_today_->publish_state(this->energy_.energy_today);
@@ -130,7 +119,6 @@ void EnergyStatistics::process_(float total) {
     this->energy_today_->publish_state(0.0);
   }
 
-  // Energy Yesterday
   if (this->energy_yesterday_ && !std::isnan(this->energy_.start_yesterday)) {
     this->energy_.energy_yesterday = this->energy_.start_today - this->energy_.start_yesterday;
     this->energy_yesterday_->publish_state(this->energy_.energy_yesterday);
@@ -138,7 +126,6 @@ void EnergyStatistics::process_(float total) {
     this->energy_yesterday_->publish_state(0.0);
   }
 
-  // Energy Week
   if (this->energy_week_ && !std::isnan(this->energy_.start_week)) {
     this->energy_.energy_week = total - this->energy_.start_week;
     this->energy_week_->publish_state(this->energy_.energy_week);
@@ -146,7 +133,6 @@ void EnergyStatistics::process_(float total) {
     this->energy_week_->publish_state(0.0);
   }
 
-  // Energy Month
   if (this->energy_month_ && !std::isnan(this->energy_.start_month)) {
     this->energy_.energy_month = total - this->energy_.start_month;
     this->energy_month_->publish_state(this->energy_.energy_month);
@@ -154,7 +140,6 @@ void EnergyStatistics::process_(float total) {
     this->energy_month_->publish_state(0.0);
   }
 
-  // Energy Year
   if (this->energy_year_ && !std::isnan(this->energy_.start_year)) {
     this->energy_.energy_year = total - this->energy_.start_year;
     this->energy_year_->publish_state(this->energy_.energy_year);
@@ -166,48 +151,7 @@ void EnergyStatistics::process_(float total) {
   this->save_();
 }
 
-
-void EnergyStatistics::reset() {
-  ESP_LOGI(TAG, "Resetting all energy statistics to zero.");
-
-  // Reset all start points to zero
-  this->energy_.start_today = 0.0f;
-  this->energy_.start_yesterday = 0.0f;
-  this->energy_.start_week = 0.0f;
-  this->energy_.start_month = 0.0f;
-  this->energy_.start_year = 0.0f;
-
-  // Reset all sensor values to zero
-  if (this->energy_today_) {
-    this->energy_.energy_today = 0.0f;
-    this->energy_today_->publish_state(0.0f);
-  }
-  if (this->energy_yesterday_) {
-    this->energy_.energy_yesterday = 0.0f;
-    this->energy_yesterday_->publish_state(0.0f);
-  }
-  if (this->energy_week_) {
-    this->energy_.energy_week = 0.0f;
-    this->energy_week_->publish_state(0.0f);
-  }
-  if (this->energy_month_) {
-    this->energy_.energy_month = 0.0f;
-    this->energy_month_->publish_state(0.0f);
-  }
-  if (this->energy_year_) {
-    this->energy_.energy_year = 0.0f;
-    this->energy_year_->publish_state(0.0f);
-  }
-
-  // Save the reset values to preferences
-  this->save_();
-}
-
-
-void EnergyStatistics::save_() { 
-  // Save the current energy statistics to preferences
-  this->pref_.save(&(this->energy_));
-}
+void EnergyStatistics::save_() { this->pref_.save(&(this->energy_)); }
 
 }  // namespace energy_statistics
 }  // namespace esphome
