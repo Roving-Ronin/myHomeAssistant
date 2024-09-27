@@ -129,21 +129,21 @@ void EnergyStatistics::process_(float total) {
   if (this->energy_week_ && !std::isnan(this->energy_.start_week)) {
     this->energy_.energy_week = total - this->energy_.start_week;
     this->energy_week_->publish_state(this->energy_.energy_week);
-  } else if (this->gas_week_) {
+  } else if (this->energy_week_) {
     this->energy_week_->publish_state(0.0);
   }
 
   if (this->energy_month_ && !std::isnan(this->energy_.start_month)) {
     this->energy_.energy_month = total - this->energy_.start_month;
     this->energy_month_->publish_state(this->energy_.energy_month);
-  } else if (this->gas_month_) {
+  } else if (this->energy_month_) {
     this->energy_month_->publish_state(0.0);
   }
 
   if (this->energy_year_ && !std::isnan(this->energy_.start_year)) {
     this->energy_.energy_year = total - this->energy_.start_year;
     this->energy_year_->publish_state(this->energy_.energy_year);
-  } else if (this->gas_year_) {
+  } else if (this->energy_year_) {
     this->energy_year_->publish_state(0.0);
   }
 
