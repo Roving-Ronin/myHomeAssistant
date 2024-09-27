@@ -156,7 +156,7 @@ void WaterStatistics::process_(float total) {
   this->save_();
 }
 
-void WaterStatistics::save_() { this->pref_.save(&(this->energy_)); 
+void WaterStatistics::save_() { this->pref_.save(&(this->water_)); 
 }
 
 }  // namespace water_statistics
