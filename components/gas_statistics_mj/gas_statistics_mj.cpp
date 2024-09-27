@@ -32,7 +32,11 @@ void GasStatisticsMJ::dump_config() {
   ESP_LOGCONFIG(TAG, "Restored Gas Week (MJ): %.3f", this->gas_.gas_week);
   ESP_LOGCONFIG(TAG, "Restored Gas Month (MJ): %.3f", this->gas_.gas_month);
   ESP_LOGCONFIG(TAG, "Restored Gas Year (MJ): %.3f", this->gas_.gas_year);
+
+  // Expose the reset service
+  register_service(&GasStatisticsMJ::on_reset_called, "reset_gas_statistics_mj");
 }
+
 
 void GasStatisticsMJ::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
@@ -154,6 +158,12 @@ void GasStatisticsMJ::process_(float total) {
   // Save values to preferences
   this->save_();
 }
+
+
+void GasStatisticsMJ::on_reset_called() {
+  this->reset();
+}
+
 
 void GasStatisticsMJ::reset() {
   ESP_LOGI(TAG, "Resetting all gas statistics to zero.");
