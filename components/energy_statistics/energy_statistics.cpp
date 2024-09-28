@@ -125,6 +125,7 @@ void EnergyStatistics::process_(float total) {
     this->energy_.energy_yesterday = this->energy_.start_today - this->energy_.start_yesterday;
     this->energy_yesterday_->publish_state(this->energy_.energy_yesterday);
   } else if (this->energy_yesterday_) {
+    // Show 0 instead of NA if no valid data
     this->energy_yesterday_->publish_state(0.0);
   }
 
@@ -133,6 +134,7 @@ void EnergyStatistics::process_(float total) {
     this->energy_.energy_week = total - this->energy_.start_week;
     this->energy_week_->publish_state(this->energy_.energy_week);
   } else if (this->energy_week_) {
+    // Show 0 instead of NA if no valid data
     this->energy_week_->publish_state(0.0);
   }
 
@@ -141,6 +143,7 @@ void EnergyStatistics::process_(float total) {
     this->energy_.energy_month = total - this->energy_.start_month;
     this->energy_month_->publish_state(this->energy_.energy_month);
   } else if (this->energy_month_) {
+    // Show 0 instead of NA if no valid data
     this->energy_month_->publish_state(0.0);
   }
 
@@ -149,6 +152,7 @@ void EnergyStatistics::process_(float total) {
     this->energy_.energy_year = total - this->energy_.start_year;
     this->energy_year_->publish_state(this->energy_.energy_year);
   } else if (this->energy_year_) {
+    // Show 0 instead of NA if no valid data
     this->energy_year_->publish_state(0.0);
   }
 
@@ -177,8 +181,11 @@ void EnergyStatistics::reset_statistics() {
 }
 
 
-void EnergyStatistics::save_() { this->pref_.save(&(this->energy_)); 
+void EnergyStatistics::save_() {
+  this->pref_.save(&(this->energy_)); // Save the statistics to flash
+  ESP_LOGI(TAG, "Energy Statistics - Values saved to flash memory."); // Log message indicating save action
 }
+
 
 }  // namespace energy_statistics
 }  // namespace esphome
