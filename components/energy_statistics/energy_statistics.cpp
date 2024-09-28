@@ -165,8 +165,21 @@ void EnergyStatistics::reset_statistics() {
 }
 
 
+//void EnergyStatistics::save_() {
+//  this->pref_.save(&this->energy_); // Pass pointer to energy_
+//}
+
 void EnergyStatistics::save_() {
-  this->pref_.save(&this->energy_); // Pass pointer to energy_
+  static uint32_t last_save_time_ = 0;
+  const uint32_t save_interval_ = 60 * 1000; // Save every second
+
+  uint32_t current_time = millis();
+
+  if (current_time - last_save_time_ >= save_interval_) {
+    this->pref_.save(&(this->energy_)); // Save pointer to energy_
+    last_save_time_ = current_time;
+    ESP_LOGI(TAG, "Energy Statistics saved to flash memory.");
+  }
 }
 
 
