@@ -175,9 +175,9 @@ void EnergyStatistics::save_() {
   if ((current_time - last_save_time_) >= save_interval_ || last_save_time_ == 0) {
     // Save energy statistics to flash
     if (this->pref_.save(&(this->energy_))) {
-      ESP_LOGI(TAG, "Energy Statistics saved to flash memory.");
+      ESP_LOGI(TAG, "Energy Statistics - Successfully saved to flash memory.");
     } else {
-      ESP_LOGW(TAG, "Failed to save Energy Statistics to flash memory.");
+      ESP_LOGW(TAG, "Energy Statistics - Failed to save to flash memory.");
     }
 
     // Update the last save time
