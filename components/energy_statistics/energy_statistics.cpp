@@ -65,34 +65,24 @@ void EnergyStatistics::setup() {
   }
 }
 
-
 void EnergyStatistics::loop() {
-  static uint32_t last_minute_check = 0;
-  const uint32_t check_interval = 60 * 1000; // 1 minute
-  uint32_t current_time = millis();
-
-  if (current_time - last_minute_check >= check_interval || last_minute_check == 0) {
-    const auto total = this->total_->get_state();
-    if (!std::isnan(total)) {
-      this->process_(total);  // Force process and save every minute
-    }
-    last_minute_check = current_time;
-  }
-
   const auto t = this->time_->now();
   if (!t.is_valid()) {
-    ESP_LOGD(TAG, "Time is not valid.");
     return;
   }
 
-  // Keep the day check for daily updates
+  // Declare and initialize total here
+  const auto total = this->total_->get_state();
+  if (std::isnan(total)) {
+    return; // Exit if total is NaN
+  }
+
+  // Check if the day has changed
   if (t.day_of_year == this->energy_.current_day_of_year) {
-    ESP_LOGD(TAG, "Day of year has not changed, no daily processing required.");
-    return;
+    return; // No processing required if the day hasn't changed
   }
 
-  // Perform daily updates
-  this->energy_.start_yesterday = this->energy_.start_today;
+  // Store current total into today's start
   this->energy_.start_today = total;
 
   if (this->energy_.current_day_of_year != 0) {
@@ -108,10 +98,9 @@ void EnergyStatistics::loop() {
   }
 
   this->energy_.current_day_of_year = t.day_of_year;
-  ESP_LOGD(TAG, "Calling process_() from loop after day change.");
+
   this->process_(total);
 }
-
 
 void EnergyStatistics::process_(float total) {
   ESP_LOGD(TAG, "Entered process_() function.");
@@ -179,7 +168,6 @@ void EnergyStatistics::save_() {
     last_save_time_ = current_time;
   }
 }
-
 
 void EnergyStatistics::reset_statistics() {
   ESP_LOGI(TAG, "Resetting Energy Statistics to 0.0");
