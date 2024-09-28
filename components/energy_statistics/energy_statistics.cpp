@@ -157,8 +157,8 @@ void EnergyStatistics::process_(float total) {
 }
 
 
-// Allow reset of statistics to ZERO.
 void EnergyStatistics::reset_statistics() {
+  // API reset of statistics to ZERO.
   this->energy_.energy_today = 0.0;
   this->energy_.energy_yesterday = 0.0;
   this->energy_.energy_week = 0.0;
