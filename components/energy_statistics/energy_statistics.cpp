@@ -34,6 +34,8 @@ void EnergyStatistics::dump_config() {
 }
 
 void EnergyStatistics::setup() {
+  ESP_LOGI(TAG, "Setup called.");
+  
   this->pref_ = global_preferences->make_preference<energy_data_t>(fnv1_hash(TAG));
 
   energy_data_t loaded{};
@@ -66,6 +68,7 @@ void EnergyStatistics::setup() {
 }
 
 void EnergyStatistics::loop() {
+  ESP_LOGI(TAG, "Loop called.");
   const auto t = this->time_->now();
   if (!t.is_valid()) {
     return;
@@ -73,6 +76,7 @@ void EnergyStatistics::loop() {
 
   // Declare and initialize total here
   const auto total = this->total_->get_state();
+  ESP_LOGI(TAG, "Total state: %.3f", total);
   if (std::isnan(total)) {
     return; // Exit if total is NaN
   }
@@ -103,7 +107,7 @@ void EnergyStatistics::loop() {
 }
 
 void EnergyStatistics::process_(float total) {
-  ESP_LOGD(TAG, "Entered process_() function.");
+  ESP_LOGI(TAG, "Entered process_() function.");
 
   if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
     this->energy_.energy_today = total - this->energy_.start_today;
@@ -140,7 +144,7 @@ void EnergyStatistics::process_(float total) {
     this->energy_year_->publish_state(0.0);
   }
 
-  ESP_LOGD(TAG, "Calling save_() from process_().");
+  ESP_LOGI(TAG, "Calling save_() from process_().");
   this->save_();
 }
 
@@ -151,7 +155,7 @@ void EnergyStatistics::save_() {
   uint32_t current_time = millis();
 
   // Add log at the start of the function to see if it's entered
-  ESP_LOGD(TAG, "Entered save_() method to check if save is needed.");
+  ESP_LOGI(TAG, "Entered save_() method to check if save is needed.");
 
   // Ensure proper time comparison, including millis() wrap-around handling
   if ((current_time - last_save_time_) >= save_interval_ || last_save_time_ == 0) {
@@ -161,7 +165,7 @@ void EnergyStatistics::save_() {
     if (this->pref_.save(&(this->energy_))) {
       ESP_LOGI(TAG, "Energy Statistics - Successfully saved to flash memory.");
     } else {
-      ESP_LOGW(TAG, "Energy Statistics - Failed to save to flash memory.");
+      ESP_LOGI(TAG, "Energy Statistics - Failed to save to flash memory.");
     }
 
     // Update the last save time
