@@ -65,8 +65,19 @@ void EnergyStatistics::setup() {
   }
 }
 
+
 void EnergyStatistics::loop() {
-  ESP_LOGD(TAG, "EnergyStatistics::loop() running...");
+  static uint32_t last_minute_check = 0;
+  const uint32_t check_interval = 60 * 1000; // 1 minute
+  uint32_t current_time = millis();
+
+  if (current_time - last_minute_check >= check_interval || last_minute_check == 0) {
+    const auto total = this->total_->get_state();
+    if (!std::isnan(total)) {
+      this->process_(total);  // Force process and save every minute
+    }
+    last_minute_check = current_time;
+  }
 
   const auto t = this->time_->now();
   if (!t.is_valid()) {
@@ -74,18 +85,13 @@ void EnergyStatistics::loop() {
     return;
   }
 
-  const auto total = this->total_->get_state();
-  if (std::isnan(total)) {
-    ESP_LOGD(TAG, "Total state is NaN.");
-    return;
-  }
-
+  // Keep the day check for daily updates
   if (t.day_of_year == this->energy_.current_day_of_year) {
-    ESP_LOGD(TAG, "Day of year has not changed, no processing required.");
+    ESP_LOGD(TAG, "Day of year has not changed, no daily processing required.");
     return;
   }
 
-  // Update start times
+  // Perform daily updates
   this->energy_.start_yesterday = this->energy_.start_today;
   this->energy_.start_today = total;
 
@@ -102,9 +108,7 @@ void EnergyStatistics::loop() {
   }
 
   this->energy_.current_day_of_year = t.day_of_year;
-
-  // Call process_
-  ESP_LOGD(TAG, "Calling process_() from loop.");
+  ESP_LOGD(TAG, "Calling process_() from loop after day change.");
   this->process_(total);
 }
 
