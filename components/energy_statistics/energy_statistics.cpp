@@ -148,12 +148,12 @@ void EnergyStatistics::save_() {
 
   uint32_t current_time = millis();
 
-  // Log the current time and difference between current and last save time
-  ESP_LOGD(TAG, "current_time: %u, last_save_time_: %u, difference: %u", current_time, last_save_time_, current_time - last_save_time_);
+  // Add log at the start of the function to see if it's entered
+  ESP_LOGD(TAG, "Entered save_() method to check if save is needed.");
 
   // Ensure proper time comparison, including millis() wrap-around handling
   if ((current_time - last_save_time_) >= save_interval_ || last_save_time_ == 0) {
-    ESP_LOGD(TAG, "Attempting to save energy statistics to flash memory.");
+    ESP_LOGI(TAG, "Attempting to save energy statistics to flash memory.");
 
     // Save energy statistics to flash
     if (this->pref_.save(&(this->energy_))) {
@@ -166,6 +166,7 @@ void EnergyStatistics::save_() {
     last_save_time_ = current_time;
   }
 }
+
 
 void EnergyStatistics::reset_statistics() {
   ESP_LOGI(TAG, "Resetting Energy Statistics to 0.0");
