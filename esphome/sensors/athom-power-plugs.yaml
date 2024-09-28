@@ -40,6 +40,36 @@ external_components:
   - source: github://roving-ronin/myhomeassistant/components@main
     refresh: 0s
 
+#########################################################################
+#
+# Enable Home Assistant API
+#
+
+api:
+  # Define service that calls the 'button:' defined below to reset the energy readings
+  services:
+    - service: reset_total_energy
+      then:
+        - button.press:
+            id: button_reset_energy_reading
+
+#########################################################################
+#
+# Button - Function to allow resetting energy readings to ZERO
+#
+
+button:
+  #  Reset the total energy entity (Gas - Current Reading)
+  - platform: template
+    name: 'Reset Readings - Energy'
+    entity_category: config
+    id: button_reset_energy_reading
+    on_press:
+      - lambda: |-
+          // Reset the gas statistics, as stored by the custom components
+          id(energy_statistics).reset_statistics();
+
+
 #####################################################################
 #
 # Used to store the Total kWh used (lifetime) between reboots
