@@ -156,6 +156,26 @@ void EnergyStatistics::process_(float total) {
   this->save_();
 }
 
+
+// Allow reset of statistics to ZERO.
+void EnergyStatistics::reset_statistics() {
+  this->energy_.energy_today = 0.0;
+  this->energy_.energy_yesterday = 0.0;
+  this->energy_.energy_week = 0.0;
+  this->energy_.energy_month = 0.0;
+  this->energy_.energy_year = 0.0;
+
+  if (this->energy_today_) this->energy_today_->publish_state(0.0);
+  if (this->energy_yesterday_) this->energy_yesterday_->publish_state(0.0);
+  if (this->energy_week_) this->energy_week_->publish_state(0.0);
+  if (this->energy_month_) this->energy_month_->publish_state(0.0);
+  if (this->energy_year_) this->energy_year_->publish_state(0.0);
+
+  // Save the reset values to preferences
+  this->save_();
+}
+
+
 void EnergyStatistics::save_() { this->pref_.save(&(this->energy_)); 
 }
 
