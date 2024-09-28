@@ -76,12 +76,6 @@ void EnergyStatistics::loop() {
     return;
   }
 
-  // Remove this section if you do not need to prevent sensor updates
-  if (this->prevent_sensor_update_) {
-    this->prevent_sensor_update_ = false;  // Reset after your condition
-    return;
-  }
-
   if (t.day_of_year == this->energy_.current_day_of_year) {
     return;
   }
@@ -107,6 +101,8 @@ void EnergyStatistics::loop() {
 }
 
 void EnergyStatistics::process_(float total) {
+  ESP_LOGD(TAG, "Entered process_() function.");
+
   if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
     this->energy_.energy_today = total - this->energy_.start_today;
     this->energy_today_->publish_state(this->energy_.energy_today);
@@ -142,7 +138,33 @@ void EnergyStatistics::process_(float total) {
     this->energy_year_->publish_state(0.0);
   }
 
+  ESP_LOGD(TAG, "Calling save_() from process_().");
   this->save_();
+}
+
+void EnergyStatistics::save_() {
+  static uint32_t last_save_time_ = 0;
+  const uint32_t save_interval_ = 60 * 1000; // Save every 60 seconds (1 minute)
+
+  uint32_t current_time = millis();
+
+  // Log the current time and difference between current and last save time
+  ESP_LOGD(TAG, "current_time: %u, last_save_time_: %u, difference: %u", current_time, last_save_time_, current_time - last_save_time_);
+
+  // Ensure proper time comparison, including millis() wrap-around handling
+  if ((current_time - last_save_time_) >= save_interval_ || last_save_time_ == 0) {
+    ESP_LOGD(TAG, "Attempting to save energy statistics to flash memory.");
+
+    // Save energy statistics to flash
+    if (this->pref_.save(&(this->energy_))) {
+      ESP_LOGI(TAG, "Energy Statistics - Successfully saved to flash memory.");
+    } else {
+      ESP_LOGW(TAG, "Energy Statistics - Failed to save to flash memory.");
+    }
+
+    // Update the last save time
+    last_save_time_ = current_time;
+  }
 }
 
 void EnergyStatistics::reset_statistics() {
@@ -159,35 +181,7 @@ void EnergyStatistics::reset_statistics() {
   if (this->energy_week_) this->energy_week_->publish_state(0.0);
   if (this->energy_month_) this->energy_month_->publish_state(0.0);
   if (this->energy_year_) this->energy_year_->publish_state(0.0);
-
-  this->save_();
-  this->is_resetting_ = false;  // Clear flag after reset
 }
-
-
-void EnergyStatistics::save_() {
-  ESP_LOGW(TAG, "save_() function called."); // Ensure function is called
-  
-  static uint32_t last_save_time_ = 0;
-  const uint32_t save_interval_ = 15 * 1000; // Save every 60 seconds (1 minute)
-
-  uint32_t current_time = millis();
-
-  // Ensure proper time comparison, including millis() wrap-around handling
-  ESP_LOGD(TAG, "Attempting to save energy statistics to flash memory...");
-  if ((current_time - last_save_time_) >= save_interval_ || last_save_time_ == 0) {
-    // Save energy statistics to flash
-    if (this->pref_.save(&(this->energy_))) {
-      ESP_LOGI(TAG, "Energy Statistics - Successfully saved to flash memory.");
-    } else {
-      ESP_LOGW(TAG, "Energy Statistics - Failed to save to flash memory.");
-    }
-
-    // Update the last save time
-    last_save_time_ = current_time;
-  }
-}
-
 
 }  // namespace energy_statistics
 }  // namespace esphome
