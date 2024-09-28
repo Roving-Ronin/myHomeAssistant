@@ -76,6 +76,7 @@ void EnergyStatistics::loop() {
     return;
   }
 
+  // Remove this section if you do not need to prevent sensor updates
   if (this->prevent_sensor_update_) {
     this->prevent_sensor_update_ = false;  // Reset after your condition
     return;
@@ -146,7 +147,6 @@ void EnergyStatistics::process_(float total) {
 
 void EnergyStatistics::reset_statistics() {
   ESP_LOGI(TAG, "Resetting Energy Statistics to 0.0");
-  this->is_resetting_ = true;  // Set flag to prevent restoring values
 
   this->energy_.energy_today = 0.0;
   this->energy_.energy_yesterday = 0.0;
@@ -165,7 +165,7 @@ void EnergyStatistics::reset_statistics() {
 }
 
 void EnergyStatistics::save_() {
-  this->pref_.store(this->energy_);
+  this->pref_.save(this->energy_); // Changed from store() to save()
 }
 
 }  // namespace energy_statistics
