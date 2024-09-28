@@ -121,8 +121,13 @@ button:
     id: button_reset_gas_reading
     on_press:
       - lambda: |-
+          // Reset the total gas readings (m3 and MJ)
           id(gas_total_mj) = 0;
           id(gas_total_m3) = 0;
+
+          // Reset the gas statistics, as stored by the custom components
+          id(gas_statistics).reset_statistics();
+          id(gas_statisticsmj).reset_statistics();
 #          id(gas_used_total_mj).state = 0;
 #          id(gas_used_m3).state = 0;
 
@@ -133,8 +138,12 @@ button:
     id: button_reset_water_reading
     on_press:
       - lambda: |-
+          // Reset the total water reading
           id(town_water_used_total_litres) = 0;
           id(town_water_used_litres).state = 0;
+
+          // Reset the gas statistics, as stored by the custom components
+          id(water_statistics).reset_statistics();
 
 #########################################################################
 #
