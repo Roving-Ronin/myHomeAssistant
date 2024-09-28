@@ -165,7 +165,7 @@ void EnergyStatistics::reset_statistics() {
 }
 
 void EnergyStatistics::save_() {
-  this->pref_.save(this->energy_); // Changed from store() to save()
+  this->pref_.save(&this->energy_); // Save to flash memory
   ESP_LOGd(TAG, "Energy Statistics - Values saved to flash memory."); // Log message indicating save action
 }
 
