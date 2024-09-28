@@ -51,7 +51,7 @@ api:
     - service: reset_total_energy
       then:
         - button.press:
-            id: button_reset_energy_reading
+            id: button_reset_energy_statistics
 
 #########################################################################
 #
@@ -61,8 +61,8 @@ api:
 button:
   #  Reset the total energy entity (Gas - Current Reading)
   - platform: template
-    name: 'Reset Readings - Energy'
-    id: button_reset_energy_reading
+    name: 'Reset - Energy Statistics'
+    id: button_reset_energy_statistics
     entity_category: config
     icon: 'mdi:trash-can-outline'
     on_press:
