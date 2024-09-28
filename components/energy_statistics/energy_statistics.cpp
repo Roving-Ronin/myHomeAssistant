@@ -166,7 +166,7 @@ void EnergyStatistics::reset_statistics() {
 
 void EnergyStatistics::save_() {
   this->pref_.save(&this->energy_); // Save to flash memory
-  ESP_LOGd(TAG, "Energy Statistics - Values saved to flash memory."); // Log message indicating save action
+  ESP_LOGD(TAG, "Energy Statistics - Values saved to flash memory."); // Log message indicating save action
 }
 
 }  // namespace energy_statistics
