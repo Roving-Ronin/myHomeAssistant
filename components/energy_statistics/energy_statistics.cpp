@@ -193,7 +193,7 @@ bool prevent_sensor_update_ = false;
 
 void EnergyStatistics::save_() {
   this->pref_.save(&(this->energy_)); // Save the statistics to flash
-  ESP_LOGI(TAG, "Energy Statistics - Values saved to flash memory."); // Log message indicating save action
+  ESP_LOGd(TAG, "Energy Statistics - Values saved to flash memory."); // Log message indicating save action
 }
 
 
