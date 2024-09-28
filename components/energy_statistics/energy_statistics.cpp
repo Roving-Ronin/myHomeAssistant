@@ -166,12 +166,15 @@ void EnergyStatistics::reset_statistics() {
 
 
 void EnergyStatistics::save_() {
+  ESP_LOGW(TAG, "save_() function called."); // Ensure function is called
+  
   static uint32_t last_save_time_ = 0;
-  const uint32_t save_interval_ = 60 * 1000; // Save every 60 seconds (1 minute)
+  const uint32_t save_interval_ = 15 * 1000; // Save every 60 seconds (1 minute)
 
   uint32_t current_time = millis();
 
   // Ensure proper time comparison, including millis() wrap-around handling
+  ESP_LOGD(TAG, "Attempting to save energy statistics to flash memory...");
   if ((current_time - last_save_time_) >= save_interval_ || last_save_time_ == 0) {
     // Save energy statistics to flash
     if (this->pref_.save(&(this->energy_))) {
