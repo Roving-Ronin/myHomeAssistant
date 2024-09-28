@@ -165,20 +165,23 @@ void EnergyStatistics::reset_statistics() {
 }
 
 
-//void EnergyStatistics::save_() {
-//  this->pref_.save(&this->energy_); // Pass pointer to energy_
-//}
-
 void EnergyStatistics::save_() {
   static uint32_t last_save_time_ = 0;
-  const uint32_t save_interval_ = 60 * 1000; // Save every second
+  const uint32_t save_interval_ = 60 * 1000; // Save every 60 seconds (1 minute)
 
   uint32_t current_time = millis();
 
-  if (current_time - last_save_time_ >= save_interval_) {
-    this->pref_.save(&(this->energy_)); // Save pointer to energy_
+  // Ensure proper time comparison, including millis() wrap-around handling
+  if ((current_time - last_save_time_) >= save_interval_ || last_save_time_ == 0) {
+    // Save energy statistics to flash
+    if (this->pref_.save(&(this->energy_))) {
+      ESP_LOGI(TAG, "Energy Statistics saved to flash memory.");
+    } else {
+      ESP_LOGW(TAG, "Failed to save Energy Statistics to flash memory.");
+    }
+
+    // Update the last save time
     last_save_time_ = current_time;
-    ESP_LOGI(TAG, "Energy Statistics saved to flash memory.");
   }
 }
 
