@@ -18,6 +18,8 @@ class EnergyStatistics : public Component {
   void setup() override;
   void loop() override;
 
+  void reset_statistics();
+
   void set_time(time::RealTimeClock *time) { this->time_ = time; }
   void set_total(Sensor *sensor) { this->total_ = sensor; }
 
@@ -27,8 +29,6 @@ class EnergyStatistics : public Component {
   void set_energy_month(Sensor *sensor) { this->energy_month_ = sensor; }
   void set_energy_year(Sensor *sensor) { this->energy_year_ = sensor; }
 
-  // Declare the reset_statistics method to allow resetting energy statistics to 0
-  void reset_statistics();
 
  protected:
   ESPPreferenceObject pref_;
