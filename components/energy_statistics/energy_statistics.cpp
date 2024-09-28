@@ -164,9 +164,11 @@ void EnergyStatistics::reset_statistics() {
   this->is_resetting_ = false;  // Clear flag after reset
 }
 
+
 void EnergyStatistics::save_() {
-  this->pref_.save(this->energy_); // Changed from store() to save()
+  this->pref_.save(&this->energy_); // Pass pointer to energy_
 }
+
 
 }  // namespace energy_statistics
 }  // namespace esphome
