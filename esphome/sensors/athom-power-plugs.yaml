@@ -67,7 +67,7 @@ button:
     on_press:
       - lambda: |-
           // Reset the energy statistics, as stored by the custom components
-          id(my_energy_statistics).reset_statistics();
+          id(energy_statistics_component).reset_statistics();
 
 
 #####################################################################
@@ -222,7 +222,7 @@ sensor:
 
      # Dentra Components - Define the id of the sensor tracking 'Total Energy' used
   - platform: "energy_statistics"
-    id: my_energy_statistics
+    id: energy_statistics_component
     total: energy_total_sensor
     
      # Dentra Components - Adds Energy Today. Persistents if restarted, unlike 'total_daily_energy'
