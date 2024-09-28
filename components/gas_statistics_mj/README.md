@@ -18,19 +18,25 @@ external_components:
 ...
 sensor:
   - platform: "gas_statistics_mj"
+    id: gas_statistics_mj_component
     total: gas_consumed_mj
+
     gas_today:
       name: "Gas Consumed Today"
       id: gas_consumed_today_mj
+
     gas_yesterday:
       name: "Gas Consumed Yesterday"
       id: gas_consumed_yesterday_mj
+
     gas_week:
       name: "Gas Consumed Week"
       id: gas_consumed_week_mj
+
     gas_month:
       name: "Gas Consumed Month"
       id: gas_consumed_month_mj
+
     gas_year:
       name: "Gas Consumed Year"
       id: gas_consumed_year_mj
