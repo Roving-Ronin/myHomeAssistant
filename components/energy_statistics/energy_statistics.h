@@ -29,7 +29,6 @@ class EnergyStatistics : public Component {
   void set_energy_month(Sensor *sensor) { this->energy_month_ = sensor; }
   void set_energy_year(Sensor *sensor) { this->energy_year_ = sensor; }
 
-
  protected:
   ESPPreferenceObject pref_;
   time::RealTimeClock *time_;
@@ -43,6 +42,9 @@ class EnergyStatistics : public Component {
   Sensor *energy_week_{nullptr};
   Sensor *energy_month_{nullptr};
   Sensor *energy_year_{nullptr};
+
+  // Resetting stored readings state flag
+  bool is_resetting_{false};
 
   // start day of week configuration
   int energy_week_start_day_{2};
@@ -69,10 +71,6 @@ class EnergyStatistics : public Component {
 
   void process_(float total);
   void save_();
-
-  // Added to allow the conditional saving to flash, if the readings have just been reset to zero.
-  bool prevent_sensor_update_ = false;
-
 };  // class EnergyStatistics
 
 }  // namespace energy_statistics
