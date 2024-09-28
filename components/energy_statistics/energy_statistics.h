@@ -43,8 +43,11 @@ class EnergyStatistics : public Component {
   Sensor *energy_month_{nullptr};
   Sensor *energy_year_{nullptr};
 
-  // Resetting stored readings state flag
+  // Resetting state flag
   bool is_resetting_{false};
+
+  // To prevent sensor updates
+  bool prevent_sensor_update_{false}; // Add this line if you want to keep this functionality
 
   // start day of week configuration
   int energy_week_start_day_{2};
