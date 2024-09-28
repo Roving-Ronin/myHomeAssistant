@@ -29,6 +29,7 @@ class EnergyStatistics : public Component {
   void set_energy_month(Sensor *sensor) { this->energy_month_ = sensor; }
   void set_energy_year(Sensor *sensor) { this->energy_year_ = sensor; }
 
+
  protected:
   ESPPreferenceObject pref_;
   time::RealTimeClock *time_;
@@ -58,16 +59,13 @@ class EnergyStatistics : public Component {
     float start_month{NAN};
     float start_year{NAN};
 
-  // Add fields to store sensor values in globals
+    // Add fields to store sensor values in globals
     float energy_today{NAN};
     float energy_yesterday{NAN};
     float energy_week{NAN};
     float energy_month{NAN};
     float energy_year{NAN};
   } energy_;
-
-  // Added to allow the conditional saving to flash, if the readings have just been reset to zero.
-  bool prevent_sensor_update_ = false;
 
   void process_(float total);
   void save_();
