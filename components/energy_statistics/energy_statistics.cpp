@@ -67,7 +67,6 @@ void EnergyStatistics::setup() {
   }
 }
 
-
 void EnergyStatistics::loop() {
   const auto t = this->time_->now();
   if (!t.is_valid()) {
@@ -152,10 +151,9 @@ void EnergyStatistics::process_(float total) {
     this->energy_year_->publish_state(0.0);
   }
 
-  // Save the updated values to preferences
-  this->save_();
+  // Save the updated values to preferences every minute
+  this->save_if_needed();
 }
-
 
 void EnergyStatistics::reset_statistics() {
   ESP_LOGI(TAG, "Resetting Energy Statistics to 0.0"); // Log message at the info level
@@ -177,12 +175,19 @@ void EnergyStatistics::reset_statistics() {
   this->save_();
 }
 
-
 void EnergyStatistics::save_() {
-  this->pref_.save(&(this->energy_)); // Save the statistics to flash
-  ESP_LOGI(TAG, "Energy Statistics saved to ESP flash."); // Log message indicating save action
-}
+  static uint32_t last_save_time_ = 0; // Variable to store the last save time
+  const uint32_t save_interval_ = 60 * 1000; // Save every 60 seconds
 
+  uint32_t current_time = millis(); // Get the current time in milliseconds
+
+  // Check if enough time has passed since the last save
+  if (current_time - last_save_time_ >= save_interval_) {
+    this->pref_.save(&(this->energy_)); // Save the statistics to flash
+    last_save_time_ = current_time; // Update the last save time
+    ESP_LOGI(TAG, "Energy Statistics saved to ESP flash."); // Log message indicating save action
+  }
+}
 
 }  // namespace energy_statistics
 }  // namespace esphome
