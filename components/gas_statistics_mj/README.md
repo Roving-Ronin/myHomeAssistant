@@ -9,6 +9,8 @@ Gather statistics in megajoules (MJ) for:
 
 > Sample of usage of gas* components in configuartion for `NAME OF METER/MODEL` (1 imp = 10L) gas meter based on Kincony KC868-A16 (ESP32) : [kincony-kc868-a16.yaml](../../esphome/kincony-kc868-a16.yaml). Main section starts at line 972.
 
+Note: To reduce wear on the ESP devices flash memory, so as to increase the devices lifespan, the readings are only written to flash every 60 seconds.
+
 ```yaml
 # Example configuration entry
 ...
