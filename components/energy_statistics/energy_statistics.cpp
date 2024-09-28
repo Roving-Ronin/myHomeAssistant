@@ -152,7 +152,7 @@ void EnergyStatistics::process_(float total) {
   }
 
   // Save the updated values to preferences every minute
-  this->save_if_needed();
+  this->save_();
 }
 
 void EnergyStatistics::reset_statistics() {
