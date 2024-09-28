@@ -9,6 +9,8 @@ Gather statistics for:
 
 > You can take a look at sample of usage of Energy* components in configuartion for Athom Plug devices in the: [athom-power-plugs.yaml](../../esphome/sensors/athom-power-plugs.yaml)
 
+Note: To reduce wear on the ESP devices flash memory, so as to increase the devices lifespan, the readings are only written to flash every 60 seconds.
+
 ```yaml
 # Example configuration entry
 ...
