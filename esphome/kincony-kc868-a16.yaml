@@ -123,8 +123,6 @@ button:
       - lambda: |-
           id(gas_total_mj) = 0;
           id(gas_total_m3) = 0;
-          id(gas_used_total) = 0;
-          id(gas_used_total_mj) = 0;
 #          id(gas_used_total_mj).state = 0;
 #          id(gas_used_m3).state = 0;
 
