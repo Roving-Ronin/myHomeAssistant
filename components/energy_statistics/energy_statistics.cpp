@@ -75,6 +75,12 @@ void EnergyStatistics::loop() {
     return;
   }
 
+  // Reset the prevent update flag after a certain condition
+  if (this->prevent_sensor_update_) {
+    this->prevent_sensor_update_ = false; // Reset after your condition
+    return; // Skip the rest of the loop for now
+  }
+  
   const auto total = this->total_->get_state();
   if (std::isnan(total)) {
     // total is not published yet
@@ -178,8 +184,12 @@ void EnergyStatistics::reset_statistics() {
 
   // Save the reset values to preferences
   this->save_();
+  // Prevent sensor callbacks from overwriting reset values for a short time
+  this->prevent_sensor_update_ = true;  // New flag to prevent updates
 }
 
+// Add this flag to the header file
+bool prevent_sensor_update_ = false;
 
 void EnergyStatistics::save_() {
   this->pref_.save(&(this->energy_)); // Save the statistics to flash
