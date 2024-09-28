@@ -157,8 +157,10 @@ void EnergyStatistics::process_(float total) {
 }
 
 
-// Allow reset of statistics to ZERO.
 void EnergyStatistics::reset_statistics() {
+  ESP_LOGI(TAG, "Resetting Energy Statistics to 0.0"); // Log message at the info level
+
+  // API reset of statistics to ZERO.
   this->energy_.energy_today = 0.0;
   this->energy_.energy_yesterday = 0.0;
   this->energy_.energy_week = 0.0;
@@ -176,8 +178,11 @@ void EnergyStatistics::reset_statistics() {
 }
 
 
-void EnergyStatistics::save_() { this->pref_.save(&(this->energy_)); 
+void EnergyStatistics::save_() {
+  this->pref_.save(&(this->energy_)); // Save the statistics to flash
+  ESP_LOGI(TAG, "Energy Statistics saved to ESP flash."); // Log message indicating save action
 }
 
+
 }  // namespace energy_statistics
-}  // namespace esphome
+}  // namespace esphome"
