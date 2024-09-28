@@ -18,15 +18,21 @@ external_components:
 ...
 sensor:
   - platform: "energy_statistics"
+    id: energy_statistics_component
     total: total
+
     energy_today:
       name: "$name Energy Today"
+
     energy_yesterday:
       name: "$name Energy Yesterday"
+
     energy_week:
       name: "$name Energy Week"
+
     energy_month:
       name: "$name Energy Month"
+
     energy_year:
       name: "$name Energy Year"
 ```
