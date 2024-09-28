@@ -66,20 +66,26 @@ void EnergyStatistics::setup() {
 }
 
 void EnergyStatistics::loop() {
+  ESP_LOGD(TAG, "EnergyStatistics::loop() running...");
+
   const auto t = this->time_->now();
   if (!t.is_valid()) {
+    ESP_LOGD(TAG, "Time is not valid.");
     return;
   }
 
   const auto total = this->total_->get_state();
   if (std::isnan(total)) {
+    ESP_LOGD(TAG, "Total state is NaN.");
     return;
   }
 
   if (t.day_of_year == this->energy_.current_day_of_year) {
+    ESP_LOGD(TAG, "Day of year has not changed, no processing required.");
     return;
   }
 
+  // Update start times
   this->energy_.start_yesterday = this->energy_.start_today;
   this->energy_.start_today = total;
 
@@ -97,8 +103,11 @@ void EnergyStatistics::loop() {
 
   this->energy_.current_day_of_year = t.day_of_year;
 
+  // Call process_
+  ESP_LOGD(TAG, "Calling process_() from loop.");
   this->process_(total);
 }
+
 
 void EnergyStatistics::process_(float total) {
   ESP_LOGD(TAG, "Entered process_() function.");
