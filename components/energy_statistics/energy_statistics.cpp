@@ -70,14 +70,16 @@ void EnergyStatistics::setup() {
 void EnergyStatistics::loop() {
   ESP_LOGI(TAG, "Loop called.");
   const auto t = this->time_->now();
+  ESP_LOGD(TAG, "Current time valid: %d", t.is_valid()); // Check if time is valid
   if (!t.is_valid()) {
     return;
   }
 
   // Declare and initialize total here
   const auto total = this->total_->get_state();
-  ESP_LOGI(TAG, "Total state: %.3f", total);
+  ESP_LOGD(TAG, "Total state: %.3f", total);
   if (std::isnan(total)) {
+    ESP_LOGD(TAG, "Total is NaN, exiting loop.");
     return; // Exit if total is NaN
   }
 
