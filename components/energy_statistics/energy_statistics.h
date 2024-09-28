@@ -18,6 +18,8 @@ class EnergyStatistics : public Component {
   void setup() override;
   void loop() override;
 
+  void reset_statistics();
+
   void set_time(time::RealTimeClock *time) { this->time_ = time; }
   void set_total(Sensor *sensor) { this->total_ = sensor; }
 
@@ -63,6 +65,9 @@ class EnergyStatistics : public Component {
     float energy_month{NAN};
     float energy_year{NAN};
   } energy_;
+
+  // Added to allow the conditional saving to flash, if the readings have just been reset to zero.
+  bool prevent_sensor_update_ = false;
 
   void process_(float total);
   void save_();
