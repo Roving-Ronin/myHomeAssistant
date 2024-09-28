@@ -123,8 +123,10 @@ button:
       - lambda: |-
           id(gas_total_mj) = 0;
           id(gas_total_m3) = 0;
-          id(gas_used_total_mj).state = 0;
-          id(gas_used_m3).state = 0;
+          id(gas_used_total) = 0;
+          id(gas_used_total_mj) = 0;
+#          id(gas_used_total_mj).state = 0;
+#          id(gas_used_m3).state = 0;
 
   #  Reset the total energy entity (Water - Current Reading)
   - platform: template
@@ -963,11 +965,6 @@ sensor:
     #  Adds the calculation for providing a reading since device last booted / reset
       on_value: 
         then:
-#          - lambda: |-
-#              static float previous_gas_m3_value = 0.0;
-#              float current_gas_m3_value = id(gas_used_m3).state;
-#              id(gas_total_m3) += current_gas_m3_value - previous_gas_m3_value;
-#              previous_gas_m3_value = current_gas_m3_value;
           - lambda: |-
               static float previous_gas_m3_value = 0.0;
               float current_gas_m3_value = id(gas_used_m3).state;
@@ -985,6 +982,7 @@ sensor:
               previous_gas_m3_value = current_gas_m3_value;
       filters:
         - multiply: 0.01   # 100 pulses = 1,000L = 1m3
+    internal: true
     web_server_sorting_weight: '11'
 
   ################################################################################
