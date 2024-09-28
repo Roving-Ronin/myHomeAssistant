@@ -34,12 +34,10 @@ void EnergyStatistics::dump_config() {
 }
 
 void EnergyStatistics::setup() {
-  this->total_->add_on_state_callback([this](float state) { this->process_(state); });
-
   this->pref_ = global_preferences->make_preference<energy_data_t>(fnv1_hash(TAG));
 
   energy_data_t loaded{};
-  if (this->pref_.load(&loaded)) {
+  if (this->pref_.load(&loaded) && !this->is_resetting_) {
     this->energy_ = loaded;
 
     if (this->energy_today_ && !std::isnan(this->energy_.energy_today)) {
@@ -62,6 +60,8 @@ void EnergyStatistics::setup() {
     if (!std::isnan(total)) {
       this->process_(total);
     }
+  } else {
+    reset_statistics(); // Ensure reset if resetting
   }
 }
 
@@ -146,6 +146,7 @@ void EnergyStatistics::process_(float total) {
 
 void EnergyStatistics::reset_statistics() {
   ESP_LOGI(TAG, "Resetting Energy Statistics to 0.0");
+  this->is_resetting_ = true;  // Set flag to prevent restoring values
 
   this->energy_.energy_today = 0.0;
   this->energy_.energy_yesterday = 0.0;
@@ -159,22 +160,12 @@ void EnergyStatistics::reset_statistics() {
   if (this->energy_month_) this->energy_month_->publish_state(0.0);
   if (this->energy_year_) this->energy_year_->publish_state(0.0);
 
-  this->prevent_sensor_update_ = true;  // Prevent sensor update right after reset
-
   this->save_();
+  this->is_resetting_ = false;  // Clear flag after reset
 }
 
 void EnergyStatistics::save_() {
-  static uint32_t last_save_time_ = 0;
-  const uint32_t save_interval_ = 60 * 1000;
-
-  uint32_t current_time = millis();
-
-  if (current_time - last_save_time_ >= save_interval_) {
-    this->pref_.save(&(this->energy_));
-    last_save_time_ = current_time;
-    ESP_LOGI(TAG, "Energy Statistics saved to ESP flash.");
-  }
+  this->pref_.store(this->energy_);
 }
 
 }  // namespace energy_statistics
