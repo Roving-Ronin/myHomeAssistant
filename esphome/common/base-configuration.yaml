@@ -161,7 +161,7 @@ button:
     web_server_sorting_weight: 26
 
   - platform: factory_reset
-    name: Reset with Default Settings
+    name: Reset - Factory Default
     id: Reset
     entity_category: config
     web_server_sorting_weight: 27
