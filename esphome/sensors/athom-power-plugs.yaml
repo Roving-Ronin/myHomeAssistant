@@ -66,7 +66,7 @@ button:
     id: button_reset_energy_reading
     on_press:
       - lambda: |-
-          // Reset the gas statistics, as stored by the custom components
+          // Reset the energy statistics, as stored by the custom components
           id(energy_statistics).reset_statistics();
 
 
