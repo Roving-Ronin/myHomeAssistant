@@ -67,6 +67,9 @@ class EnergyStatistics : public Component {
     float energy_year{NAN};
   } energy_;
 
+  // Added to allow the conditional saving to flash, if the readings have just been reset to zero.
+  bool prevent_sensor_update_ = false;
+
   void process_(float total);
   void save_();
 };  // class EnergyStatistics
