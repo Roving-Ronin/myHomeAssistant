@@ -40,6 +40,10 @@ external_components:
   - source: github://roving-ronin/myhomeassistant/components@main
     refresh: 0s
 
+custom_component:
+  - platform: energy_statistics
+    id: energy_statistics 
+
 #########################################################################
 #
 # Enable Home Assistant API
