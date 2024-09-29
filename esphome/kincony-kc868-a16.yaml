@@ -89,7 +89,7 @@ packages:
 #
 
 external_components:
-  - source: github://roving-ronin/myhomeassistant/components@reset
+  - source: github://roving-ronin/myhomeassistant/components@main
     refresh: 0s
 
 #########################################################################
@@ -103,22 +103,23 @@ api:
     - service: reset_total_energy
       then:
         - button.press:
-            id: button_reset_gas_reading
+            id: button_reset_gas_statistics
 
   # Define service that calls the 'button:' defined below to reset the Water - Current Reading'
     - service: reset_total_energy
       then:
         - button.press:
-            id: button_reset_water_reading
+            id: button_reset_water_statistics
 
 #########################################################################
 
 button:
   #  Reset the total energy entity (Gas - Current Reading)
   - platform: template
-    name: 'Reset Readings - Gas'
+    name: 'Reset - Gas Statistics'
     entity_category: config
-    id: button_reset_gas_reading
+    icon: 'mdi:trash-can-outline'
+    id: button_reset_gas_statistics
     on_press:
       - lambda: |-
           // Reset the total gas readings (m3 and MJ)
@@ -133,9 +134,10 @@ button:
 
   #  Reset the total energy entity (Water - Current Reading)
   - platform: template
-    name: 'Reset Readings - Water'
+    name: 'Reset - Water Statistics'
     entity_category: config
-    id: button_reset_water_reading
+    icon: 'mdi:trash-can-outline'
+    id: button_reset_water_statistics
     on_press:
       - lambda: |-
           // Reset the total water reading
