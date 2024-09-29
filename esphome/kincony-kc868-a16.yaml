@@ -973,6 +973,7 @@ sensor:
       state_class: "total_increasing"
       device_class: gas
       accuracy_decimals: 3
+      internal: true
     #  Adds the calculation for providing a reading since device last booted / reset
       on_value: 
         then:
@@ -993,8 +994,7 @@ sensor:
               previous_gas_m3_value = current_gas_m3_value;
       filters:
         - multiply: 0.01   # 100 pulses = 1,000L = 1m3
-    internal: true
-    web_server_sorting_weight: '11'
+#    web_server_sorting_weight: '11'
 
   ################################################################################
   #
