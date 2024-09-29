@@ -25,11 +25,6 @@ esphome:
                 break;
             }
 
-            // Optionally, you can also update the select state here
-            if (id(restore_mode) >= 1 && id(restore_mode) <= 3) {
-              id(power_mode).select(index);
-            }
-
 
 #####################################################################
 #
@@ -109,7 +104,20 @@ select:
     on_value:
       then:
         - lambda: |-
-            id(restore_mode)=i+1;
+            // Update restore_mode based on the selected index
+            id(restore_mode) = i + 1;
+            
+            // Execute the action based on the selected state
+            switch (id(restore_mode)) {
+              case 1:
+                id(relay).turn_off();
+                break;
+              case 2:
+                id(relay).turn_on();
+                break;
+              default:
+                break;
+            }
             
 #####################################################################
 #
