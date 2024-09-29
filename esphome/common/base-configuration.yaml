@@ -139,7 +139,6 @@ sensor:
   - platform: uptime
     name: "Uptime Seconds"
     id: uptime_seconds
-    update_interval: 10s
     entity_category: diagnostic
     internal: True
 
@@ -197,7 +196,7 @@ text_sensor:
       } else {
         return { (String(seconds) +"s").c_str() };
       }
-    update_interval: 10s
+    update_interval: ${sensor_update_interval}
     icon: mdi:clock-start
     web_server_sorting_weight: 36
     
