@@ -142,7 +142,13 @@ void EnergyStatistics::process_(float total) {
     this->energy_year_->publish_state(0.0);
   }
 
-  this->save_();
+//  this->save_();
+  // Only save if save interval has passed
+  uint32_t now = millis();
+  if (now - last_save_time_ >= save_interval_ * 1000) {
+    this->save_();
+    last_save_time_ = now;  // Update the last save time
+  }
 }
 
 void EnergyStatistics::reset_statistics() {
