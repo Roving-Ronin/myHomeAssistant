@@ -9,8 +9,6 @@ Gather statistics for:
 
 > You can take a look at sample of usage of Energy* components in configuartion for Athom Plug devices in the: [athom-power-plugs.yaml](../../esphome/sensors/athom-power-plugs.yaml)
 
-Note: To reduce wear on the ESP devices flash memory, so as to increase the devices lifespan, the readings are only written to flash every 60 seconds. To change this edit the value of "uint32_t save_interval_{300};" in energy_statistics.h
-
 ```yaml
 # Example configuration entry
 ...
@@ -52,3 +50,5 @@ sensor:
   * Any options from [Sensor](https://esphome.io/components/sensor/index.html#config-sensor).
 * **energy_year** (*Optional*, Sensor):
   * Any options from [Sensor](https://esphome.io/components/sensor/index.html#config-sensor).
+
+Note: To reduce wear on the ESP devices flash memory, so as to increase the devices lifespan, the readings are only written to flash every 60 seconds. To change this edit the value of "uint32_t save_interval_{300};" in energy_statistics.h
