@@ -157,6 +157,26 @@ globals:
     restore_value: yes
     initial_value: "1"    # Default to "Always On"
 
+#####################################################################
+#
+# Select - To allow setting power on state from the GUI
+#
+
+select:
+  - platform: template
+    name: "Power On State"
+    id: "power_mode"
+    optimistic: true
+    icon: "mdi:electric-switch"
+    options:
+      - Always On
+      - Always Off
+      - Restore Power Off State
+    on_value:
+      then:
+        - lambda: |-
+            id(restore_mode)=i+1;
+
 #########################################################################
 #
 # PC191HA basic switch operation - button, relay and LED
