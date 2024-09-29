@@ -17,11 +17,11 @@ substitutions:
    # Project Name
   project_name: "Arlec.Smart Plug (PC191HA v2)"
    # Project Version
-  project_version: "1.1.2"
+  project_version: "1.2.0"
    # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
   power_circuit: "TBC"  
    # Restore the relay (GPO switch) upon reboot to state:
-  relay_restore_mode: RESTORE_DEFAULT_ON
+  relay_restore_mode: RESTORE_DEFAULT_ON   # RESTORE_DEFAULT_ON
    # Set the update interval for sensors
   sensor_update_interval: 10s
 
@@ -39,6 +39,34 @@ substitutions:
   change_mode_every: "3"
 
 ########################## End of Substitutions #########################
+#
+# On Boot script to set dedault 'Power Mode' to "ALWAYS ON"
+#
+esphome:
+  on_boot:
+    - priority: 600
+      then:
+        - select.set_index:
+            id: power_mode
+            index: !lambda |-
+                    return id(restore_mode)-1;
+        - lambda: |-
+              switch(id(restore_mode))
+              {
+              case 1:{
+                      id(relay).turn_on();
+                      break;
+                            }
+              case 2:{
+                      id(relay).turn_off();
+                      break;
+                            }
+              default:{
+                      break;
+                            }
+              }
+
+#########################################################################
 #
 # Defines the bk72xx chip that is a cheaper alternative to an ESP828x
 #
@@ -80,8 +108,38 @@ network: !remove
 
 # https://github.com/dentra/esphome-components/tree/master/components/energy_statistics
 external_components:
-  - source: github://roving-ronin/myhomeassistant/components
-    refresh: 5s
+  - source: github://roving-ronin/myhomeassistant/components@main
+    refresh: 0s
+
+#########################################################################
+#
+# Enable Home Assistant API
+#
+
+api:
+  # Define service that calls the 'button:' defined below to reset the energy readings
+  services:
+    - service: reset_total_energy
+      then:
+        - button.press:
+            id: button_reset_energy_statistics
+
+#########################################################################
+#
+# Button - Function to allow resetting energy readings to ZERO
+#
+
+button:
+  #  Reset the total energy entity (Gas - Current Reading)
+  - platform: template
+    name: 'Reset - Energy Statistics'
+    id: button_reset_energy_statistics
+    entity_category: config
+    icon: 'mdi:trash-can-outline'
+    on_press:
+      - lambda: |-
+          // Reset the energy statistics, as stored by the custom components
+          id(energy_statistics_component).reset_statistics();
 
 #########################################################################
 #
@@ -97,7 +155,7 @@ globals:
   - id: restore_mode
     type: int
     restore_value: yes
-    initial_value: "3"
+    initial_value: "1"    # Default to "Always On"
 
 #########################################################################
 #
@@ -224,6 +282,7 @@ sensor:
 
      # Dentra Components - Define the id of the sensor tracking 'Total Energy' used
   - platform: "energy_statistics"
+    id: energy_statistics_component
     total: energy_total_sensor
 
      # Dentra Components - Adds Energy Today. Persistents if restarted, unlike 'total_daily_energy'
