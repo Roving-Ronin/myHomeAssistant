@@ -115,43 +115,62 @@ void EnergyStatistics::loop() {
 
 
 void EnergyStatistics::process_(float total) {
+  // Update energy today only if the value has changed
   if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
-    this->energy_.energy_today = total - this->energy_.start_today;
-    this->energy_today_->publish_state(this->energy_.energy_today);
-  } else if (this->energy_today_) {
+    float new_energy_today = total - this->energy_.start_today;
+    if (this->energy_today_->get_state() != new_energy_today) {
+      this->energy_.energy_today = new_energy_today;
+      this->energy_today_->publish_state(this->energy_.energy_today);
+    }
+  } else if (this->energy_today_ && this->energy_today_->get_state() != 0.0) {
     this->energy_today_->publish_state(0.0);
   }
 
+  // Update energy yesterday only if the value has changed
   if (this->energy_yesterday_ && !std::isnan(this->energy_.start_yesterday)) {
-    this->energy_.energy_yesterday = this->energy_.start_today - this->energy_.start_yesterday;
-    this->energy_yesterday_->publish_state(this->energy_.energy_yesterday);
-  } else if (this->energy_yesterday_) {
+    float new_energy_yesterday = this->energy_.start_today - this->energy_.start_yesterday;
+    if (this->energy_yesterday_->get_state() != new_energy_yesterday) {
+      this->energy_.energy_yesterday = new_energy_yesterday;
+      this->energy_yesterday_->publish_state(this->energy_.energy_yesterday);
+    }
+  } else if (this->energy_yesterday_ && this->energy_yesterday_->get_state() != 0.0) {
     this->energy_yesterday_->publish_state(0.0);
   }
 
+  // Update energy week only if the value has changed
   if (this->energy_week_ && !std::isnan(this->energy_.start_week)) {
-    this->energy_.energy_week = total - this->energy_.start_week;
-    this->energy_week_->publish_state(this->energy_.energy_week);
-  } else if (this->energy_week_) {
+    float new_energy_week = total - this->energy_.start_week;
+    if (this->energy_week_->get_state() != new_energy_week) {
+      this->energy_.energy_week = new_energy_week;
+      this->energy_week_->publish_state(this->energy_.energy_week);
+    }
+  } else if (this->energy_week_ && this->energy_week_->get_state() != 0.0) {
     this->energy_week_->publish_state(0.0);
   }
 
+  // Update energy month only if the value has changed
   if (this->energy_month_ && !std::isnan(this->energy_.start_month)) {
-    this->energy_.energy_month = total - this->energy_.start_month;
-    this->energy_month_->publish_state(this->energy_.energy_month);
-  } else if (this->energy_month_) {
+    float new_energy_month = total - this->energy_.start_month;
+    if (this->energy_month_->get_state() != new_energy_month) {
+      this->energy_.energy_month = new_energy_month;
+      this->energy_month_->publish_state(this->energy_.energy_month);
+    }
+  } else if (this->energy_month_ && this->energy_month_->get_state() != 0.0) {
     this->energy_month_->publish_state(0.0);
   }
 
+  // Update energy year only if the value has changed
   if (this->energy_year_ && !std::isnan(this->energy_.start_year)) {
-    this->energy_.energy_year = total - this->energy_.start_year;
-    this->energy_year_->publish_state(this->energy_.energy_year);
-  } else if (this->energy_year_) {
+    float new_energy_year = total - this->energy_.start_year;
+    if (this->energy_year_->get_state() != new_energy_year) {
+      this->energy_.energy_year = new_energy_year;
+      this->energy_year_->publish_state(this->energy_.energy_year);
+    }
+  } else if (this->energy_year_ && this->energy_year_->get_state() != 0.0) {
     this->energy_year_->publish_state(0.0);
   }
 
-//  this->save_();
-  // Only save if save interval has passed
+  // Only save to flash if necessary
   uint32_t now = millis();
   if (now - last_save_time_ >= save_interval_ * 1000) {
     this->save_();
