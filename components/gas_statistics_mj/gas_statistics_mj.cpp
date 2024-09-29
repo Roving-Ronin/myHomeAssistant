@@ -34,9 +34,9 @@ void GasStatisticsMJ::dump_config() {
 }
 
 void GasStatisticsMJ::setup() {
-  this->pref_ = global_preferences->make_preference<gas_data_t>(fnv1_hash(TAG));
+  this->pref_ = global_preferences->make_preference<gas_data_mj_t>(fnv1_hash(TAG));
 
-  gas_data_t loaded{};
+  gas_data_mj_t loaded{};
   if (this->pref_.load(&loaded) && !this->is_resetting_) {
     this->gas_ = loaded;
 
