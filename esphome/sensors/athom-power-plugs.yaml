@@ -8,25 +8,29 @@ esphome:
   on_boot:
     - priority: 600
       then:
-        - select.set_index:
-            id: power_mode
-            index: !lambda |-
-                    return id(restore_mode)-1;
         - lambda: |-
-              switch(id(restore_mode))
-              {
+            // Check if restore_mode is not set (e.g., after a factory reset)
+            if (id(restore_mode) == 0) {
+              id(restore_mode) = 2;  // Set to "Always On" if no previous state
+            }
+            // Set the power_mode based on the restore_mode
+            id(power_mode).set_value(id(restore_mode) - 1);
+
+        # Now execute the action based on the restore_mode
+        - lambda: |-
+            switch(id(restore_mode)) {
               case 1:{
-                      id(relay).turn_off();
-                      break;
-                            }
-              case 2:{
-                      id(relay).turn_on();
-                      break;
-                            }
-              default:{
-                      break;
-                            }
+                id(relay).turn_off();
+                break;
               }
+              case 2:{
+                id(relay).turn_on();
+                break;
+              }
+              default:{
+                break;
+              }
+            }
 
 #####################################################################
 #
