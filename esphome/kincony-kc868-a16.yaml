@@ -126,8 +126,8 @@ button:
           id(gas_total_m3) = 0;
 
           // Reset the gas statistics, as stored by the custom components
-          id(gas_statistics).reset_statistics();
-          id(gas_statisticsmj).reset_statistics();
+          id(gas_statistics_component).reset_statistics();
+          id(gas_statistics_mj_component).reset_statistics();
 #          id(gas_used_total_mj).state = 0;
 #          id(gas_used_m3).state = 0;
 
@@ -143,7 +143,7 @@ button:
           id(town_water_used_litres).state = 0;
 
           // Reset the gas statistics, as stored by the custom components
-          id(water_statistics).reset_statistics();
+          id(town_water_statistics_component).reset_statistics();
 
 #########################################################################
 #
@@ -998,6 +998,7 @@ sensor:
   #
 
   - platform: "gas_statistics"
+    id: gas_statistics_component
     total: gas_used_total
 
     gas_today:
@@ -1052,6 +1053,7 @@ sensor:
   #
 
   - platform: "gas_statistics_mj"
+    id: gas_statistics_mj_component
     total: gas_used_total_mj
 
     gas_today:
@@ -1190,6 +1192,7 @@ sensor:
 
 # sensor:
   - platform: "water_statistics"
+    id: town_water_statistics_component
     total: town_water_used_total
 
     water_today:
