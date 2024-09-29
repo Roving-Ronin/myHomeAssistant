@@ -219,7 +219,8 @@ number:
     mode: box
     icon: "mdi:scale"
     entity_category: config
-
+    web_server_sorting_weight: 23
+    
   - platform: template
     name: "Gas - Heating Value"
     id: input_gas_heating_value
@@ -233,6 +234,7 @@ number:
     mode: box
     icon: "mdi:fire"
     entity_category: config
+    web_server_sorting_weight: 24
 
 #######################################################################################
 #
