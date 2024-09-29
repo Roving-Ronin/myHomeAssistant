@@ -16,11 +16,11 @@ esphome:
               switch(id(restore_mode))
               {
               case 1:{
-                      id(relay).turn_off();
+                      id(relay).turn_on();
                       break;
                             }
               case 2:{
-                      id(relay).turn_on();
+                      id(relay).turn_off();
                       break;
                             }
               default:{
@@ -85,7 +85,7 @@ globals:
   - id: restore_mode
     type: int
     restore_value: yes
-    initial_value: "2"    # Default to "Always On"
+    initial_value: "1"    # Default to "Always On"
 
 
 #####################################################################
@@ -100,8 +100,8 @@ select:
     optimistic: true
     icon: "mdi:electric-switch"
     options:
-      - Always Off
       - Always On
+      - Always Off
       - Restore Power Off State
     on_value:
       then:
