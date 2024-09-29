@@ -13,14 +13,8 @@ esphome:
             if (id(restore_mode) == 0) {
               id(restore_mode) = 2;  // Set to "Always On" if no previous state
             }
-            // Set the power_mode select entity based on restore_mode
-            int index = id(restore_mode) - 1;  // Convert to zero-based index
-            if (index >= 0 && index < 3) {  // Ensure index is within valid range
-              id(power_mode).set_index(index);  // Use set_index() for select component
-            }
-
-            // Now execute the action based on the restore_mode
-            switch(id(restore_mode)) {
+            // Execute the action based on the restore_mode
+            switch (id(restore_mode)) {
               case 1:
                 id(relay).turn_off();
                 break;
@@ -31,6 +25,10 @@ esphome:
                 break;
             }
 
+            // Optionally, you can also update the select state here
+            if (id(restore_mode) >= 1 && id(restore_mode) <= 3) {
+              id(power_mode).select(index);
+            }
 
 
 #####################################################################
