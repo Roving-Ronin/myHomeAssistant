@@ -1099,8 +1099,6 @@ sensor:
     # Formula - (Gas Used x Pressure Factor x Heating Value) = Usage MJ
     lambda: |-
        return id(gas_total_mj);
-#      return (id(gas_used_m3).state * 0.9864 * 37.98);
-#      return (id(gas_used_m3).state * id(pressure_factor_input).state * id(heating_value_input).state);
     update_interval: 1s
     filters:
       - delta : 0.001
