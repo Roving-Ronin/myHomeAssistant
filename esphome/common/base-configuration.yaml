@@ -197,6 +197,7 @@ text_sensor:
       } else {
         return { (String(seconds) +"s").c_str() };
       }
+    update_interval: 10s
     icon: mdi:clock-start
     web_server_sorting_weight: 36
     
