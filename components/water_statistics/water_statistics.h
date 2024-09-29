@@ -18,6 +18,8 @@ class WaterStatistics : public Component {
   void setup() override;
   void loop() override;
 
+  void reset_statistics();
+
   void set_time(time::RealTimeClock *time) { this->time_ = time; }
   void set_total(Sensor *sensor) { this->total_ = sensor; }
 
@@ -27,7 +29,10 @@ class WaterStatistics : public Component {
   void set_water_month(Sensor *sensor) { this->water_month_ = sensor; }
   void set_water_year(Sensor *sensor) { this->water_year_ = sensor; }
 
- protected:
+protected:
+  uint32_t save_interval_{300}; // Save every 5min (adjust as needed, based on seconds)
+  uint32_t last_save_time_{0};   // Timestamp of the last save
+
   ESPPreferenceObject pref_;
   time::RealTimeClock *time_;
 
@@ -40,6 +45,12 @@ class WaterStatistics : public Component {
   Sensor *water_week_{nullptr};
   Sensor *water_month_{nullptr};
   Sensor *water_year_{nullptr};
+
+  // Resetting state flag
+  bool is_resetting_{false};
+
+  // To prevent sensor updates
+  bool prevent_sensor_update_{false}; // Add this line if you want to keep this functionality
 
   // start day of week configuration
   int water_week_start_day_{2};
@@ -56,7 +67,7 @@ class WaterStatistics : public Component {
     float start_month{NAN};
     float start_year{NAN};
 
-  // Add fields to store sensor values in globals
+    // Add fields to store sensor values in globals
     float water_today{NAN};
     float water_yesterday{NAN};
     float water_week{NAN};
