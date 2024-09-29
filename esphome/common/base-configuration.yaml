@@ -140,6 +140,7 @@ sensor:
     name: "Uptime Seconds"
     id: uptime_seconds
     entity_category: diagnostic
+    update_interval: 1s
     internal: True
 
 ##########################################################################
