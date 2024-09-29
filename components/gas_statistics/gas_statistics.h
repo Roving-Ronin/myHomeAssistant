@@ -18,6 +18,8 @@ class GasStatistics : public Component {
   void setup() override;
   void loop() override;
 
+  void reset_statistics();
+
   void set_time(time::RealTimeClock *time) { this->time_ = time; }
   void set_total(Sensor *sensor) { this->total_ = sensor; }
 
@@ -27,7 +29,10 @@ class GasStatistics : public Component {
   void set_gas_month(Sensor *sensor) { this->gas_month_ = sensor; }
   void set_gas_year(Sensor *sensor) { this->gas_year_ = sensor; }
 
- protected:
+protected:
+  uint32_t save_interval_{300}; // Save every 5min (adjust as needed, based on seconds)
+  uint32_t last_save_time_{0};   // Timestamp of the last save
+
   ESPPreferenceObject pref_;
   time::RealTimeClock *time_;
 
@@ -41,27 +46,33 @@ class GasStatistics : public Component {
   Sensor *gas_month_{nullptr};
   Sensor *gas_year_{nullptr};
 
+  // Resetting state flag
+  bool is_resetting_{false};
+
+  // To prevent sensor updates
+  bool prevent_sensor_update_{false}; // Add this line if you want to keep this functionality
+
   // start day of week configuration
   int gas_week_start_day_{2};
   // start day of month configuration
   int gas_month_start_day_{1};
+  // start day of year configuration
   int gas_year_start_day_{1};
 
-  // Structure for storing gas statistics and sensor values
   struct gas_data_t {
-    uint16_t current_day_of_year{0};    // Track the current day of year
-    float start_today{NAN};             // Gas usage at the start of today
-    float start_yesterday{NAN};         // Gas usage at the start of yesterday
-    float start_week{NAN};              // Gas usage at the start of the current week
-    float start_month{NAN};             // Gas usage at the start of the current month
-    float start_year{NAN};              // Gas usage at the start of the current year
+    uint16_t current_day_of_year{0};
+    float start_today{NAN};
+    float start_yesterday{NAN};
+    float start_week{NAN};
+    float start_month{NAN};
+    float start_year{NAN};
 
-    // Add fields to store gas sensor values for persistence
-    float gas_today{NAN};               // Stored gas usage today
-    float gas_yesterday{NAN};           // Stored gas usage yesterday
-    float gas_week{NAN};                // Stored gas usage this week
-    float gas_month{NAN};               // Stored gas usage this month
-    float gas_year{NAN};                // Stored gas usage this year
+    // Add fields to store sensor values in globals
+    float gas_today{NAN};
+    float gas_yesterday{NAN};
+    float gas_week{NAN};
+    float gas_month{NAN};
+    float gas_year{NAN};
   } gas_;
 
   void process_(float total);
