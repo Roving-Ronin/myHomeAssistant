@@ -14,18 +14,24 @@ using sensor::Sensor;
 class EnergyStatistics : public Component {
  public:
   float get_setup_priority() const override { return setup_priority::DATA; }
+  // ESPHome function override to set up the component
   void dump_config() override;
   void setup() override;
   void loop() override;
 
+  // Function to reset statistics
   void reset_statistics();
 
+// Setters to bind sensors and time components
   void set_time(time::RealTimeClock *time) { this->time_ = time; }
   void set_total(Sensor *sensor) { this->total_ = sensor; }
+
+  // Setter for the save_frequency, called from YAML configuration
   void set_save_frequency(const std::string &save_frequency) { 
     this->save_interval_ = parse_save_frequency(save_frequency); 
   }
 
+  // Setter for the statistic sensors
   void set_energy_today(Sensor *sensor) { this->energy_today_ = sensor; }
   void set_energy_yesterday(Sensor *sensor) { this->energy_yesterday_ = sensor; }
   void set_energy_week(Sensor *sensor) { this->energy_week_ = sensor; }
@@ -40,10 +46,10 @@ protected:
   ESPPreferenceObject pref_;
   time::RealTimeClock *time_;
 
-  // input sensors
+  // Input sensor
   Sensor *total_{nullptr};
 
-  // exposed sensors
+  // Exposed sensors
   Sensor *energy_today_{nullptr};
   Sensor *energy_yesterday_{nullptr};
   Sensor *energy_week_{nullptr};
