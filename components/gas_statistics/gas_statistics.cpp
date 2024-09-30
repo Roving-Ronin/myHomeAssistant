@@ -12,28 +12,28 @@ static const char *const GAP = "  ";
 static const uint32_t WARNING_LOG_INTERVAL = 60000;  // 60 seconds
 
 void GasStatistics::dump_config() {
-  ESP_LOGCONFIG(TAG, "Gas statistics sensors");
+  ESP_LOGCONFIG(TAG, "Gas Statistics (m³) - Sensors");
   if (this->gas_today_) {
-    LOG_SENSOR(GAP, "Gas Today", this->gas_today_);
+    LOG_SENSOR(GAP, "Gas (m³) Today", this->gas_today_);
   }
   if (this->gas_yesterday_) {
-    LOG_SENSOR(GAP, "Gas Yesterday", this->gas_yesterday_);
+    LOG_SENSOR(GAP, "Gas (m³) Yesterday", this->gas_yesterday_);
   }
   if (this->gas_week_) {
-    LOG_SENSOR(GAP, "Gas Week", this->gas_week_);
+    LOG_SENSOR(GAP, "Gas (m³) Week", this->gas_week_);
   }
   if (this->gas_month_) {
-    LOG_SENSOR(GAP, "Gas Month", this->gas_month_);
+    LOG_SENSOR(GAP, "Gas (m³) Month", this->gas_month_);
   }
   if (this->gas_year_) {
-    LOG_SENSOR(GAP, "Gas Year", this->gas_year_);
+    LOG_SENSOR(GAP, "Gas (m³) Year", this->gas_year_);
   }
 
-  ESP_LOGCONFIG(TAG, "Restored Gas Today: %.3f", this->gas_.gas_today);
-  ESP_LOGCONFIG(TAG, "Restored Gas Yesterday: %.3f", this->gas_.gas_yesterday);
-  ESP_LOGCONFIG(TAG, "Restored Gas Week: %.3f", this->gas_.gas_week);
-  ESP_LOGCONFIG(TAG, "Restored Gas Month: %.3f", this->gas_.gas_month);
-  ESP_LOGCONFIG(TAG, "Restored Gas Year: %.3f", this->gas_.gas_year);
+  ESP_LOGCONFIG(TAG, "Restored Gas Today (m³): %.3f", this->gas_.gas_today);
+  ESP_LOGCONFIG(TAG, "Restored Gas Yesterday (m³): %.3f", this->gas_.gas_yesterday);
+  ESP_LOGCONFIG(TAG, "Restored Gas Week (m³): %.3f", this->gas_.gas_week);
+  ESP_LOGCONFIG(TAG, "Restored Gas Month (m³): %.3f", this->gas_.gas_month);
+  ESP_LOGCONFIG(TAG, "Restored Gas Year (m³): %.3f", this->gas_.gas_year);
 }
 
 void GasStatistics::setup() {
@@ -125,7 +125,7 @@ void GasStatistics::process_(float total) {
     if (std::isnan(total) || total == 0.0) {
       // Only log the warning once per minute
       if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
-        ESP_LOGW(TAG, "Skipping Gas sensor reading update, waiting for valid sensor reading.");
+        ESP_LOGW(TAG, "Gas Statistics (m³) - Skipping sensor reading update, waiting for valid sensor reading.");
         this->last_warning_time_ = now;  // Update the last warning log time
       }
       return;
@@ -139,14 +139,14 @@ void GasStatistics::process_(float total) {
     this->gas_.start_year = total;
 
     this->waiting_for_sensor_read_ = false;  // Disable the wait flag
-    ESP_LOGI(TAG, "Valid Gas sensor reading obtained: %.3f", total);
+    ESP_LOGI(TAG, "Gas Statistics (m³) - Valid sensor reading obtained: %.3f", total);
   }
   
   // Ensure total is greater than or equal to start points
   if (total < this->gas_.start_today || std::isnan(this->gas_.start_today)) {
     // Only log the warning once per minute
     if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
-      ESP_LOGW(TAG, "Total is less than start point or invalid. Skipping.");
+      ESP_LOGW(TAG, "Gas Statistics (m³) - 'Total Gas' sensor total is less than start point or invalid. Skipping.");
       this->last_warning_time_ = now;  // Update the last warning log time
     }
     return;
@@ -216,8 +216,8 @@ void GasStatistics::process_(float total) {
 
 
 void GasStatistics::reset_statistics() {
-  uint32_t now = millis();         // Get the current time
-  ESP_LOGI(TAG, "Resetting Gas Statistics to 0.0");
+  uint32_t now = millis();        // Get the current time
+  ESP_LOGI(TAG, "Gas Statistics (m³) - Resetting values to 0.0");
 
   // Reset gas values to 0.0
   this->gas_.gas_today = 0.0;
@@ -228,7 +228,7 @@ void GasStatistics::reset_statistics() {
 
   // Get the current total value
   const auto total = this->total_->get_state();
- 
+  
   if (!std::isnan(total) && total != 0.0) {
     // Use the current total value as the new start points
     this->gas_.start_today = total;
@@ -236,12 +236,12 @@ void GasStatistics::reset_statistics() {
     this->gas_.start_week = total;
     this->gas_.start_month = total;
     this->gas_.start_year = total;
-    ESP_LOGI(TAG, "Start points for Gas Statistics set after reset: %.3f", total);
+    ESP_LOGI(TAG, "Gas Statistics (m³) - Start points set after reset: %.3f", total);
   } else {
     // If total is not valid, flag to wait for a valid reading
     this->waiting_for_sensor_read_ = true;
     if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
-      ESP_LOGW(TAG, "Total for Gas Statistics is invalid, waiting for valid sensor reading.");
+      ESP_LOGW(TAG, "Gas Statistics (m³) - Total is invalid, waiting for valid sensor reading.");
       this->last_warning_time_ = now;  // Update the last warning log time
     }
   }
@@ -260,7 +260,7 @@ void GasStatistics::reset_statistics() {
 
 void GasStatistics::save_() {
   this->pref_.save(&this->gas_); // Save to flash memory
-  ESP_LOGD(TAG, "Gas Statistics - Values saved to flash memory."); // Log message indicating save action
+  ESP_LOGD(TAG, "Gas Statistics (m³) - Values saved to flash memory (NVS)."); // Log message indicating save action
 }
 
 }  // namespace gas_statistics
