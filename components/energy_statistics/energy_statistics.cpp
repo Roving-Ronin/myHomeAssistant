@@ -1,6 +1,6 @@
 #include "esphome/core/log.h"
 #include "esphome/core/hal.h"
-#include "esphome/core/schema.h"
+
 #include "energy_statistics.h"
 
 namespace esphome {
