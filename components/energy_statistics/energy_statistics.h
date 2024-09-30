@@ -2,7 +2,6 @@
 
 #include "esphome/core/component.h"
 #include "esphome/core/preferences.h"
-
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/time/real_time_clock.h"
 
@@ -19,6 +18,11 @@ class EnergyStatistics : public Component {
   void loop() override;
 
   void reset_statistics();
+
+  // Add option for save (to flash memory) frequency
+  void set_save_frequency(uint32_t save_frequency_in_seconds) {
+    this->save_interval_ = save_frequency_in_seconds;
+  }
 
   void set_time(time::RealTimeClock *time) { this->time_ = time; }
   void set_total(Sensor *sensor) { this->total_ = sensor; }
@@ -48,8 +52,7 @@ protected:
 
   // Resetting state flag
   bool is_resetting_{false};
-
-  // To prevent sensor updates
+  // To prevent sensor updates, whilst resetting
   bool prevent_sensor_update_{false}; // Add this line if you want to keep this functionality
 
   // start day of week configuration
