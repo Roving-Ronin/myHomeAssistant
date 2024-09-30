@@ -12,7 +12,7 @@ static const char *const GAP = "  ";
 static const uint32_t WARNING_LOG_INTERVAL = 60000;  // 60 seconds
 
 void GasStatisticsMJ::dump_config() {
-  ESP_LOGCONFIG(TAG, "Gas Statistics (MJ) - Statistics sensors");
+  ESP_LOGCONFIG(TAG, "Gas Statistics (MJ) - Sensors");
   if (this->gas_today_) {
     LOG_SENSOR(GAP, "Gas (MJ) Today", this->gas_today_);
   }
