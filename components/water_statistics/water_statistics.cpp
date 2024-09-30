@@ -143,7 +143,6 @@ void WaterStatistics::process_(float total) {
   }
   
   // Ensure total is greater than or equal to start points
-  // Ensure total is greater than or equal to start points
   if (total < this->water_.start_today || std::isnan(this->water_.start_today)) {
     // Only log the warning once per minute
     if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
@@ -241,13 +240,9 @@ void WaterStatistics::reset_statistics() {
   } else {
     // If total is not valid, flag to wait for a valid reading
     this->waiting_for_sensor_read_ = true;
-    ESP_LOGW(TAG, "Total for Water Statistics is invalid, waiting for valid sensor reading.");
-    // Throttle warning log messages for invalid total
-    uint32_t now = millis();
-    if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
-      this->waiting_for_sensor_read_ = true;
-      ESP_LOGW(TAG, "Total for Water Statistics is invalid, waiting for valid sensor reading.");
-      this->last_warning_time_ = now;  // Update the last warning log time
+      if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
+        ESP_LOGW(TAG, "Total for Water Statistics is invalid, waiting for valid sensor reading.");
+        this->last_warning_time_ = now;  // Update the last warning log time
     }
   }
     
