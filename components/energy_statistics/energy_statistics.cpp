@@ -11,11 +11,11 @@ static const char *const GAP = "  ";
 
 // Time between warning log messages being repeated (in milliseconds)
 static const uint32_t WARNING_LOG_INTERVAL = 60000;  // 60 seconds
+
 // Define the configuration schema for the component
 const auto EnergyStatistics::CONFIG_SCHEMA = sensor::SENSOR_SCHEMA.extend(
   Schema::Field<Schema::String>("save_frequency", "5m")  // Accepts a string save_frequency (default is 5m)
 );
-
 
 void EnergyStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Energy statistics sensors");
@@ -43,7 +43,8 @@ void EnergyStatistics::dump_config() {
 }
 
 void EnergyStatistics::setup() {
-  std::string save_frequency_value = this->config_->get<std::string>("save_frequency", "5m");  // Default to 5 minutes if not specified
+  // Fetch the save frequency from the YAML configuration, default to "5m"
+  std::string save_frequency_value = this->config_->get<std::string>("save_frequency", "5m");
   set_save_frequency(save_frequency_value);  // Set save frequency from the YAML configuration
 
   // Load preferences and energy data
@@ -74,7 +75,7 @@ void EnergyStatistics::setup() {
       this->process_(total);
     }
   } else {
-    reset_statistics(); // Ensure reset if resetting
+    reset_statistics();  // Ensure reset if resetting
   }
 }
 
@@ -128,7 +129,7 @@ void EnergyStatistics::loop() {
 
 
 void EnergyStatistics::process_(float total) {
-  uint32_t now = millis();        // Get the current time
+  uint32_t now = millis();  // Get the current time
 
   // If we're waiting for the sensor to update, skip calculation until valid
   if (this->waiting_for_sensor_read_) {
@@ -151,7 +152,7 @@ void EnergyStatistics::process_(float total) {
     this->waiting_for_sensor_read_ = false;  // Disable the wait flag
     ESP_LOGI(TAG, "Valid Energy sensor reading obtained: %.3f", total);
   }
-  
+
   // Ensure total is greater than or equal to start points
   if (total < this->energy_.start_today || std::isnan(this->energy_.start_today)) {
     // Only log the warning once per minute
@@ -161,7 +162,7 @@ void EnergyStatistics::process_(float total) {
     }
     return;
   }
-  
+
   // Update energy today only if the value has changed
   if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
     float new_energy_today = total - this->energy_.start_today;
@@ -224,9 +225,8 @@ void EnergyStatistics::process_(float total) {
   }
 }
 
-
 void EnergyStatistics::reset_statistics() {
-  uint32_t now = millis();         // Get the current time
+  uint32_t now = millis();  // Get the current time
   ESP_LOGI(TAG, "Resetting Energy Statistics to 0.0");
 
   // Reset energy values to 0.0
@@ -238,7 +238,7 @@ void EnergyStatistics::reset_statistics() {
 
   // Get the current total value
   const auto total = this->total_->get_state();
- 
+
   if (!std::isnan(total) && total != 0.0) {
     // Use the current total value as the new start points
     this->energy_.start_today = total;
@@ -267,10 +267,9 @@ void EnergyStatistics::reset_statistics() {
   this->save_();
 }
 
-
 void EnergyStatistics::save_() {
-  this->pref_.save(&this->energy_); // Save to flash memory
-  ESP_LOGD(TAG, "Energy Statistics - Values saved to flash memory."); // Log message indicating save action
+  this->pref_.save(&this->energy_);  // Save to flash memory
+  ESP_LOGD(TAG, "Energy Statistics - Values saved to flash memory.");  // Log message indicating save action
 }
 
 }  // namespace energy_statistics
