@@ -12,7 +12,7 @@ static const char *const GAP = "  ";
 static const uint32_t WARNING_LOG_INTERVAL = 60000;  // 60 seconds
 
 void WaterStatistics::dump_config() {
-  ESP_LOGCONFIG(TAG, "Water statistics sensors");
+  ESP_LOGCONFIG(TAG, "Water Statistics - Sensors");
   if (this->water_today_) {
     LOG_SENSOR(GAP, "Water Today", this->water_today_);
   }
@@ -125,7 +125,7 @@ void WaterStatistics::process_(float total) {
     if (std::isnan(total) || total == 0.0) {
       // Only log the warning once per minute
       if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
-        ESP_LOGW(TAG, "Skipping Water sensor reading update, waiting for valid sensor reading.");
+        ESP_LOGW(TAG, "Water Statistics - Skipping sensor reading update, waiting for valid sensor reading.");
         this->last_warning_time_ = now;  // Update the last warning log time
       }
       return;
@@ -139,14 +139,14 @@ void WaterStatistics::process_(float total) {
     this->water_.start_year = total;
 
     this->waiting_for_sensor_read_ = false;  // Disable the wait flag
-    ESP_LOGI(TAG, "Valid Water sensor reading obtained: %.3f", total);
+    ESP_LOGI(TAG, "Water Statistics - Valid sensor reading obtained: %.3f", total);
   }
   
   // Ensure total is greater than or equal to start points
   if (total < this->water_.start_today || std::isnan(this->water_.start_today)) {
     // Only log the warning once per minute
     if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
-      ESP_LOGW(TAG, "Total is less than start point or invalid. Skipping.");
+      ESP_LOGW(TAG, "Water Statistics - 'Total Water' sensor total is less than start point or invalid. Skipping.");
       this->last_warning_time_ = now;  // Update the last warning log time
     }
     return;
@@ -217,7 +217,7 @@ void WaterStatistics::process_(float total) {
 
 void WaterStatistics::reset_statistics() {
   uint32_t now = millis();        // Get the current time
-  ESP_LOGI(TAG, "Resetting Water Statistics to 0.0");
+  ESP_LOGI(TAG, "Water Statistics - Resetting values to 0.0");
 
   // Reset water values to 0.0
   this->water_.water_today = 0.0;
@@ -236,12 +236,12 @@ void WaterStatistics::reset_statistics() {
     this->water_.start_week = total;
     this->water_.start_month = total;
     this->water_.start_year = total;
-    ESP_LOGI(TAG, "Start points for Water Statistics set after reset: %.3f", total);
+    ESP_LOGI(TAG, "Water Statistics - Start points set after reset: %.3f", total);
   } else {
     // If total is not valid, flag to wait for a valid reading
     this->waiting_for_sensor_read_ = true;
     if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
-      ESP_LOGW(TAG, "Total for Water Statistics is invalid, waiting for valid sensor reading.");
+      ESP_LOGW(TAG, "Water Statistics - Total is invalid, waiting for valid sensor reading.");
       this->last_warning_time_ = now;  // Update the last warning log time
     }
   }
@@ -260,7 +260,7 @@ void WaterStatistics::reset_statistics() {
 
 void WaterStatistics::save_() {
   this->pref_.save(&this->water_); // Save to flash memory
-  ESP_LOGD(TAG, "Water Statistics - Values saved to flash memory."); // Log message indicating save action
+  ESP_LOGD(TAG, "Water Statistics - Values saved to flash memory (NVS)."); // Log message indicating save action
 }
 
 }  // namespace water_statistics
