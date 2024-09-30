@@ -37,12 +37,16 @@ void EnergyStatistics::dump_config() {
 }
 
 void EnergyStatistics::setup() {
+  std::string save_frequency_value = "5m";      // Statistics frequency to be saved to flash memory. Default is 5 minutes.
+  set_save_frequency(save_frequency_value);     // Set save frequency from the YAML configuration
+
+  // Load preferences and energy data
   this->pref_ = global_preferences->make_preference<energy_data_t>(fnv1_hash(TAG));
 
   energy_data_t loaded{};
   if (this->pref_.load(&loaded) && !this->is_resetting_) {
     this->energy_ = loaded;
-
+    // Publish existing states if available
     if (this->energy_today_ && !std::isnan(this->energy_.energy_today)) {
       this->energy_today_->publish_state(this->energy_.energy_today);
     }
