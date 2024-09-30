@@ -10,6 +10,8 @@ static const char *const GAP = "  ";
 
 void EnergyStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Energy statistics sensors");
+  ESP_LOGCONFIG(TAG, "Save Frequency: %d seconds", this->save_interval_);
+  
   if (this->energy_today_) {
     LOG_SENSOR(GAP, "Energy Today", this->energy_today_);
   }
@@ -82,6 +84,20 @@ void EnergyStatistics::loop() {
     return;
   }
 
+// Function to convert the save_frequency (of readings to flash memory) string (e.g., "5m", "2h") into seconds
+uint32_t parse_save_frequency(const std::string &str) {
+  if (str.back() == 's') {
+    return std::stoi(str.substr(0, str.size() - 1));  // seconds
+  } else if (str.back() == 'm') {
+    return std::stoi(str.substr(0, str.size() - 1)) * 60;  // minutes to seconds
+  } else if (str.back() == 'h') {
+    return std::stoi(str.substr(0, str.size() - 1)) * 3600;  // hours to seconds
+  } else {
+    ESP_LOGW(TAG, "Invalid save frequency format. Defaulting to 5 minutes.");
+    return 300;  // Default to 5 minutes if invalid
+  }
+}
+  
   // Check if a new day has started
   if (t.day_of_year != this->energy_.current_day_of_year) {
     // Update start points for new day, week, month, year
