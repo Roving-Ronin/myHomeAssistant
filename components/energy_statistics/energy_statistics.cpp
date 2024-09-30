@@ -84,20 +84,6 @@ void EnergyStatistics::loop() {
     return;
   }
 
-// Function to convert the save_frequency (of readings to flash memory) string (e.g., "5m", "2h") into seconds
-uint32_t parse_save_frequency(const std::string &str) {
-  if (str.back() == 's') {
-    return std::stoi(str.substr(0, str.size() - 1));  // seconds
-  } else if (str.back() == 'm') {
-    return std::stoi(str.substr(0, str.size() - 1)) * 60;  // minutes to seconds
-  } else if (str.back() == 'h') {
-    return std::stoi(str.substr(0, str.size() - 1)) * 3600;  // hours to seconds
-  } else {
-    ESP_LOGW(TAG, "Invalid save frequency format. Defaulting to 5 minutes.");
-    return 300;  // Default to 5 minutes if invalid
-  }
-}
-  
   // Check if a new day has started
   if (t.day_of_year != this->energy_.current_day_of_year) {
     // Update start points for new day, week, month, year
@@ -229,6 +215,19 @@ void EnergyStatistics::reset_statistics() {
 void EnergyStatistics::save_() {
   this->pref_.save(&this->energy_); // Save to flash memory
   ESP_LOGD(TAG, "Energy Statistics - Values saved to flash memory."); // Log message indicating save action
+}
+
+uint32_t EnergyStatistics::parse_save_frequency(const std::string &str) {
+  if (str.back() == 's') {
+    return std::stoi(str.substr(0, str.size() - 1));  // seconds
+  } else if (str.back() == 'm') {
+    return std::stoi(str.substr(0, str.size() - 1)) * 60;  // minutes to seconds
+  } else if (str.back() == 'h') {
+    return std::stoi(str.substr(0, str.size() - 1)) * 3600;  // hours to seconds
+  } else {
+    ESP_LOGW(TAG, "Invalid save frequency format. Defaulting to 5 minutes.");
+    return 300;  // Default to 5 minutes if invalid
+  }
 }
 
 }  // namespace energy_statistics
