@@ -8,6 +8,9 @@ namespace water_statistics {
 static const char *const TAG = "water_statistics";
 static const char *const GAP = "  ";
 
+// Time between warning log messages being repeated (in milliseconds)
+static const uint32_t WARNING_LOG_INTERVAL = 60000;  // 60 seconds
+
 void WaterStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Water statistics sensors");
   if (this->water_today_) {
