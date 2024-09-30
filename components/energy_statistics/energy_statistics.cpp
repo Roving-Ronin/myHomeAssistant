@@ -7,32 +7,28 @@ namespace esphome {
 namespace energy_statistics {
 
 static const char *const TAG = "energy_statistics";
-static const char *const GAP = "  ";
-
-// Time between warning log messages being repeated (in milliseconds)
-static const uint32_t WARNING_LOG_INTERVAL = 60000;  // 60 seconds
 
 // Define the configuration schema for the component
 const auto EnergyStatistics::CONFIG_SCHEMA = sensor::SENSOR_SCHEMA.extend(
-  Schema::Field<Schema::String>("save_frequency", "5m")  // Accepts a string save_frequency (default is 5m)
+  Schema::Field<Schema::String>("save_frequency", "5m", "Save Frequency (default 5 minutes)")
 );
 
 void EnergyStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Energy statistics sensors");
   if (this->energy_today_) {
-    LOG_SENSOR(GAP, "Energy Today", this->energy_today_);
+    LOG_SENSOR("  ", "Energy Today", this->energy_today_);
   }
   if (this->energy_yesterday_) {
-    LOG_SENSOR(GAP, "Energy Yesterday", this->energy_yesterday_);
+    LOG_SENSOR("  ", "Energy Yesterday", this->energy_yesterday_);
   }
   if (this->energy_week_) {
-    LOG_SENSOR(GAP, "Energy Week", this->energy_week_);
+    LOG_SENSOR("  ", "Energy Week", this->energy_week_);
   }
   if (this->energy_month_) {
-    LOG_SENSOR(GAP, "Energy Month", this->energy_month_);
+    LOG_SENSOR("  ", "Energy Month", this->energy_month_);
   }
   if (this->energy_year_) {
-    LOG_SENSOR(GAP, "Energy Year", this->energy_year_);
+    LOG_SENSOR("  ", "Energy Year", this->energy_year_);
   }
 
   ESP_LOGCONFIG(TAG, "Restored Energy Today: %.3f", this->energy_.energy_today);
@@ -43,7 +39,7 @@ void EnergyStatistics::dump_config() {
 }
 
 void EnergyStatistics::setup() {
-  // Fetch the save frequency from the YAML configuration, default to "5m"
+  // Fetch the save frequency from the YAML configuration
   std::string save_frequency_value = this->config_->get<std::string>("save_frequency", "5m");
   set_save_frequency(save_frequency_value);  // Set save frequency from the YAML configuration
 
@@ -126,7 +122,6 @@ void EnergyStatistics::loop() {
     last_save_time_ = now;
   }
 }
-
 
 void EnergyStatistics::process_(float total) {
   uint32_t now = millis();  // Get the current time
