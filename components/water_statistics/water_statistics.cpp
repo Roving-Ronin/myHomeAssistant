@@ -115,6 +115,27 @@ void WaterStatistics::loop() {
 
 
 void WaterStatistics::process_(float total) {
+// ADD FOR PAUSE POST RESET -----------------
+  
+  // If we're waiting for the sensor to update, skip calculation until valid
+  if (this->waiting_for_sensor_read_) {
+    if (std::isnan(total) || total == 0.0) {
+      ESP_LOGW(TAG, "Skipping update, waiting for valid sensor reading.");
+      return;
+    }
+
+    // Once we have a valid reading, set the start values
+    this->water_.start_today = total;
+    this->water_.start_yesterday = total;
+    this->water_.start_week = total;
+    this->water_.start_month = total;
+    this->water_.start_year = total;
+
+    this->waiting_for_sensor_read_ = false;  // Disable the wait flag
+  }
+
+  // ADD FOR PAUSE POST RESET -----------------
+  
   // Update water today only if the value has changed
   if (this->water_today_ && !std::isnan(this->water_.start_today)) {
     float new_water_today = total - this->water_.start_today;
@@ -189,25 +210,38 @@ void WaterStatistics::reset_statistics() {
   this->water_.water_month = 0.0;
   this->water_.water_year = 0.0;
 
+  // ADD FOR PAUSE POST RESET -----------------
+  // Do not set start points until we get a valid sensor reading
+  this->waiting_for_sensor_read_ = true;  // Flag to wait for valid reading
+}
+
+void WaterStatistics::save_() {
+  this->pref_.save(&this->water_);  // Save to flash memory
+  ESP_LOGD(TAG, "Water Statistics - Values saved to flash memory.");  // Log message indicating save action
+}
+// ADD FOR PAUSE POST RESET -----------------
+
+
+
   // Reset start points for water calculations
-  const auto total = this->total_->get_state();
-  this->water_.start_today = total;
-  this->water_.start_yesterday = total;
-  this->water_.start_week = total;
-  this->water_.start_month = total;
-  this->water_.start_year = total;
+//  const auto total = this->total_->get_state();
+//  this->water_.start_today = total;
+//  this->water_.start_yesterday = total;
+//  this->water_.start_week = total;
+//  this->water_.start_month = total;
+//  this->water_.start_year = total;
 
   // Publish the reset values to sensors
-  if (this->water_today_) this->water_today_->publish_state(0.0);
-  if (this->water_yesterday_) this->water_yesterday_->publish_state(0.0);
-  if (this->water_week_) this->water_week_->publish_state(0.0);
-  if (this->water_month_) this->water_month_->publish_state(0.0);
-  if (this->water_year_) this->water_year_->publish_state(0.0);
+//  if (this->water_today_) this->water_today_->publish_state(0.0);
+//  if (this->water_yesterday_) this->water_yesterday_->publish_state(0.0);
+//  if (this->water_week_) this->water_week_->publish_state(0.0);
+//  if (this->water_month_) this->water_month_->publish_state(0.0);
+//  if (this->water_year_) this->water_year_->publish_state(0.0);
 
   // Save reset state to flash memory
-  this->save_();
-  this->is_resetting_ = false;  // Clear flag after reset
-}
+//  this->save_();
+//  this->is_resetting_ = false;  // Clear flag after reset
+//}
 
 
 void WaterStatistics::save_() {
