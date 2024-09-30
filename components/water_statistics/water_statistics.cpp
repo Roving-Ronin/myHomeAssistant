@@ -120,7 +120,7 @@ void WaterStatistics::process_(float total) {
   // If we're waiting for the sensor to update, skip calculation until valid
   if (this->waiting_for_sensor_read_) {
     if (std::isnan(total) || total == 0.0) {
-      ESP_LOGW(TAG, "Skipping update, waiting for valid sensor reading.");
+      ESP_LOGW(TAG, "Skipping Water sensor rading update, waiting for valid sensor reading.");
       return;
     }
 
@@ -213,11 +213,6 @@ void WaterStatistics::reset_statistics() {
   // ADD FOR PAUSE POST RESET -----------------
   // Do not set start points until we get a valid sensor reading
   this->waiting_for_sensor_read_ = true;  // Flag to wait for valid reading
-}
-
-void WaterStatistics::save_() {
-  this->pref_.save(&this->water_);  // Save to flash memory
-  ESP_LOGD(TAG, "Water Statistics - Values saved to flash memory.");  // Log message indicating save action
 }
 // ADD FOR PAUSE POST RESET -----------------
 
