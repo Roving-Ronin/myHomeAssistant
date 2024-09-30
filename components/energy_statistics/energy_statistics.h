@@ -21,7 +21,7 @@ class EnergyStatistics : public Component {
 
   // Add option for save (to flash memory) frequency
   void set_save_frequency(uint32_t save_frequency_in_seconds) {
-    this->save_interval_ = save_frequency_in_seconds;
+    this->save_interval_ = this->parse_save_frequency(frequency_str);
   }
 
   void set_time(time::RealTimeClock *time) { this->time_ = time; }
