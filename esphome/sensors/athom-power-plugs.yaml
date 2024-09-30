@@ -224,7 +224,7 @@ sensor:
      # Dentra Components - Define the id of the sensor tracking 'Total Energy' used
   - platform: "energy_statistics"
     id: energy_statistics_component
-    save_frequency: '5m'
+    save_frequency: 5m
     total: energy_total_sensor
     
      # Dentra Components - Adds Energy Today. Persistents if restarted, unlike 'total_daily_energy'
