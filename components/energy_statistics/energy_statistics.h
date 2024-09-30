@@ -22,6 +22,9 @@ class EnergyStatistics : public Component {
 
   void set_time(time::RealTimeClock *time) { this->time_ = time; }
   void set_total(Sensor *sensor) { this->total_ = sensor; }
+  void set_save_frequency(const std::string &save_frequency) { 
+    this->save_interval_ = parse_save_frequency(save_frequency); 
+  }
 
   void set_energy_today(Sensor *sensor) { this->energy_today_ = sensor; }
   void set_energy_yesterday(Sensor *sensor) { this->energy_yesterday_ = sensor; }
@@ -47,19 +50,13 @@ protected:
   Sensor *energy_month_{nullptr};
   Sensor *energy_year_{nullptr};
 
-  // Resetting state flag
-  bool is_resetting_{false};
-  // To prevent sensor updates
-  bool prevent_sensor_update_{false};
-  // Flag to wait for a valid sensor reading after reset
-  bool waiting_for_sensor_read_{false};
+  bool is_resetting_{false};              // Resetting state flag
+  bool prevent_sensor_update_{false};     // To prevent sensor updates
+  bool waiting_for_sensor_read_{false};   // Flag to wait for a valid sensor reading after reset
 
-  // start day of week configuration
-  int energy_week_start_day_{2};
-  // start day of month configuration
-  int energy_month_start_day_{1};
-  // start day of year configuration
-  int energy_year_start_day_{1};
+  int energy_week_start_day_{2};          // start day of week configuration
+  int energy_month_start_day_{1};         // start day of month configuration
+  int energy_year_start_day_{1};          // start day of year configuration
 
   struct energy_data_t {
     uint16_t current_day_of_year{0};
@@ -79,6 +76,33 @@ protected:
 
   void process_(float total);
   void save_();
+
+  // Helper to convert user-supplied save_frequency into seconds
+uint32_t parse_save_frequency(const std::string &frequency) {
+  // Extract the time unit (last character)
+  char unit = frequency.back();
+  // Remove the unit to get the numeric part
+  std::string numeric_part = frequency.substr(0, frequency.size() - 1);
+  
+  // Convert the numeric part to an unsigned long
+  uint32_t value = std::stoul(numeric_part);
+
+  // Convert based on the unit (seconds, minutes, hours, days)
+  switch (unit) {
+    case 's':  // seconds
+      return value;
+    case 'm':  // minutes
+      return value * 60;        // 1 minute = 60 seconds
+    case 'h':  // hours
+      return value * 3600;      // 1 hour = 3600 seconds
+    case 'd':  // days
+      return value * 86400;     // 1 day = 86400 seconds
+    default:
+      ESP_LOGW(TAG, "Invalid save_frequency unit. Using default of 5 minutes.");
+      return 300;  // Default to 5 minutes (300 seconds) if invalid unit
+  }
+}
+
 };  // class EnergyStatistics
 
 }  // namespace energy_statistics
