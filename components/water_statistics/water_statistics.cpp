@@ -217,26 +217,25 @@ void WaterStatistics::reset_statistics() {
 // ADD FOR PAUSE POST RESET -----------------
 
 
-
   // Reset start points for water calculations
-//  const auto total = this->total_->get_state();
-//  this->water_.start_today = total;
-//  this->water_.start_yesterday = total;
-//  this->water_.start_week = total;
-//  this->water_.start_month = total;
-//  this->water_.start_year = total;
+  const auto total = this->total_->get_state();
+  this->water_.start_today = total;
+  this->water_.start_yesterday = total;
+  this->water_.start_week = total;
+  this->water_.start_month = total;
+  this->water_.start_year = total;
 
   // Publish the reset values to sensors
-//  if (this->water_today_) this->water_today_->publish_state(0.0);
-//  if (this->water_yesterday_) this->water_yesterday_->publish_state(0.0);
-//  if (this->water_week_) this->water_week_->publish_state(0.0);
-//  if (this->water_month_) this->water_month_->publish_state(0.0);
-//  if (this->water_year_) this->water_year_->publish_state(0.0);
+  if (this->water_today_) this->water_today_->publish_state(0.0);
+  if (this->water_yesterday_) this->water_yesterday_->publish_state(0.0);
+  if (this->water_week_) this->water_week_->publish_state(0.0);
+  if (this->water_month_) this->water_month_->publish_state(0.0);
+  if (this->water_year_) this->water_year_->publish_state(0.0);
 
   // Save reset state to flash memory
-//  this->save_();
-//  this->is_resetting_ = false;  // Clear flag after reset
-//}
+  this->save_();
+  this->is_resetting_ = false;  // Clear flag after reset
+}
 
 
 void WaterStatistics::save_() {
