@@ -3,7 +3,6 @@
 #include "esphome/core/component.h"
 #include "esphome/core/preferences.h"
 #include "esphome/core/schema.h"
-
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/time/real_time_clock.h"
 
@@ -15,6 +14,7 @@ using sensor::Sensor;
 class EnergyStatistics : public Component {
  public:
   float get_setup_priority() const override { return setup_priority::DATA; }
+
   // ESPHome function override to set up the component
   void dump_config() override;
   void setup() override;
@@ -23,13 +23,13 @@ class EnergyStatistics : public Component {
   // Function to reset statistics
   void reset_statistics();
 
-// Setters to bind sensors and time components
+  // Setters to bind sensors and time components
   void set_time(time::RealTimeClock *time) { this->time_ = time; }
   void set_total(Sensor *sensor) { this->total_ = sensor; }
 
   // Setter for the save_frequency, called from YAML configuration
-  void set_save_frequency(const std::string &save_frequency) { 
-    this->save_interval_ = parse_save_frequency(save_frequency); 
+  void set_save_frequency(const std::string &save_frequency) {
+    this->save_interval_ = parse_save_frequency(save_frequency);
   }
 
   // Setter for the statistic sensors
@@ -88,32 +88,26 @@ protected:
   void save_();
 
   // Helper to convert user-supplied save_frequency into seconds
-uint32_t parse_save_frequency(const std::string &frequency) {
-  // Extract the time unit (last character)
-  char unit = frequency.back();
-  // Remove the unit to get the numeric part
-  std::string numeric_part = frequency.substr(0, frequency.size() - 1);
-  
-  // Convert the numeric part to an unsigned long
-  uint32_t value = std::stoul(numeric_part);
+  uint32_t parse_save_frequency(const std::string &frequency) {
+    char unit = frequency.back();
+    std::string numeric_part = frequency.substr(0, frequency.size() - 1);
+    uint32_t value = std::stoul(numeric_part);
 
-  // Convert based on the unit (seconds, minutes, hours, days)
-  switch (unit) {
-    case 's':  // seconds
-      return value;
-    case 'm':  // minutes
-      return value * 60;        // 1 minute = 60 seconds
-    case 'h':  // hours
-      return value * 3600;      // 1 hour = 3600 seconds
-    case 'd':  // days
-      return value * 86400;     // 1 day = 86400 seconds
-    default:
-      ESP_LOGW(TAG, "Invalid save_frequency unit. Using default of 5 minutes.");
-      return 300;  // Default to 5 minutes (300 seconds) if invalid unit
+    switch (unit) {
+      case 's':  // seconds
+        return value;
+      case 'm':  // minutes
+        return value * 60;        // 1 minute = 60 seconds
+      case 'h':  // hours
+        return value * 3600;      // 1 hour = 3600 seconds
+      case 'd':  // days
+        return value * 86400;     // 1 day = 86400 seconds
+      default:
+        ESP_LOGW(TAG, "Invalid save_frequency unit. Using default of 5 minutes.");
+        return 300;  // Default to 5 minutes (300 seconds) if invalid unit
+    }
   }
-}
-
-};  // class EnergyStatistics
+};
 
 }  // namespace energy_statistics
 }  // namespace esphome
