@@ -118,11 +118,8 @@ void WaterStatistics::loop() {
 
 
 void WaterStatistics::process_(float total) {
-// ADD FOR PAUSE POST RESET -----------------
-  const auto t = this->time_->now();
-  if (!t.is_valid()) {
-    return;
-  }
+  // Get the current time
+  uint32_t now = millis();
 
   // If we're waiting for the sensor to update, skip calculation until valid
   if (this->waiting_for_sensor_read_) {
