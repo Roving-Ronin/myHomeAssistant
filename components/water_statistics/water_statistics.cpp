@@ -208,7 +208,6 @@ void WaterStatistics::process_(float total) {
   }
 
   // Only save to flash if necessary
-  uint32_t now = millis();
   if (now - last_save_time_ >= save_interval_ * 1000) {
     this->save_();
     last_save_time_ = now;  // Update the last save time
