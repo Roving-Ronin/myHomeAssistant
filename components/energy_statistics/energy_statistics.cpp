@@ -217,6 +217,12 @@ void EnergyStatistics::save_() {
   ESP_LOGD(TAG, "Energy Statistics - Values saved to flash memory."); // Log message indicating save action
 }
 
+
+void EnergyStatistics::set_save_frequency(const std::string &str) {
+  this->save_interval_ = parse_save_frequency(str);  // Set save frequency from YAML
+}
+
+
 uint32_t EnergyStatistics::parse_save_frequency(const std::string &str) {
   if (str.back() == 's') {
     return std::stoi(str.substr(0, str.size() - 1));  // seconds
