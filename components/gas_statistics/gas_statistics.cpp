@@ -8,6 +8,9 @@ namespace gas_statistics {
 static const char *const TAG = "gas_statistics";
 static const char *const GAP = "  ";
 
+// Time between warning log messages being repeated (in milliseconds)
+static const uint32_t WARNING_LOG_INTERVAL = 60000;  // 60 seconds
+
 void GasStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Gas statistics sensors");
   if (this->gas_today_) {
@@ -115,6 +118,40 @@ void GasStatistics::loop() {
 
 
 void GasStatistics::process_(float total) {
+  uint32_t now = millis();        // Get the current time
+
+  // If we're waiting for the sensor to update, skip calculation until valid
+  if (this->waiting_for_sensor_read_) {
+    if (std::isnan(total) || total == 0.0) {
+      // Only log the warning once per minute
+      if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
+        ESP_LOGW(TAG, "Skipping Gas sensor reading update, waiting for valid sensor reading.");
+        this->last_warning_time_ = now;  // Update the last warning log time
+      }
+      return;
+    }
+
+    // Once we have a valid reading, set the start values
+    this->gas_.start_today = total;
+    this->gas_.start_yesterday = total;
+    this->gas_.start_week = total;
+    this->gas_.start_month = total;
+    this->gas_.start_year = total;
+
+    this->waiting_for_sensor_read_ = false;  // Disable the wait flag
+    ESP_LOGI(TAG, "Valid Gas sensor reading obtained: %.3f", total);
+  }
+  
+  // Ensure total is greater than or equal to start points
+  if (total < this->gas_.start_today || std::isnan(this->gas_.start_today)) {
+    // Only log the warning once per minute
+    if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
+      ESP_LOGW(TAG, "Total is less than start point or invalid. Skipping.");
+      this->last_warning_time_ = now;  // Update the last warning log time
+    }
+    return;
+  }
+  
   // Update gas today only if the value has changed
   if (this->gas_today_ && !std::isnan(this->gas_.start_today)) {
     float new_gas_today = total - this->gas_.start_today;
@@ -171,7 +208,6 @@ void GasStatistics::process_(float total) {
   }
 
   // Only save to flash if necessary
-  uint32_t now = millis();
   if (now - last_save_time_ >= save_interval_ * 1000) {
     this->save_();
     last_save_time_ = now;  // Update the last save time
@@ -189,14 +225,29 @@ void GasStatistics::reset_statistics() {
   this->gas_.gas_month = 0.0;
   this->gas_.gas_year = 0.0;
 
-  // Reset start points for gas calculations
+  // Get the current total value
   const auto total = this->total_->get_state();
-  this->gas_.start_today = total;
-  this->gas_.start_yesterday = total;
-  this->gas_.start_week = total;
-  this->gas_.start_month = total;
-  this->gas_.start_year = total;
 
+  uint32_t now = millis(); 
+  
+  if (!std::isnan(total) && total != 0.0) {
+    // Use the current total value as the new start points
+    this->gas_.start_today = total;
+    this->gas_.start_yesterday = total;
+    this->gas_.start_week = total;
+    this->gas_.start_month = total;
+    this->gas_.start_year = total;
+    ESP_LOGI(TAG, "Start points for Gas Statistics set after reset: %.3f", total);
+  } else {
+    // If total is not valid, flag to wait for a valid reading
+    this->waiting_for_sensor_read_ = true;
+    if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
+      ESP_LOGW(TAG, "Total for Gas Statistics is invalid, waiting for valid sensor reading.");
+      this->last_warning_time_ = now;  // Update the last warning log time
+    }
+  }
+
+  
   // Publish the reset values to sensors
   if (this->gas_today_) this->gas_today_->publish_state(0.0);
   if (this->gas_yesterday_) this->gas_yesterday_->publish_state(0.0);
@@ -206,7 +257,6 @@ void GasStatistics::reset_statistics() {
 
   // Save reset state to flash memory
   this->save_();
-  this->is_resetting_ = false;  // Clear flag after reset
 }
 
 
