@@ -48,9 +48,10 @@ protected:
 
   // Resetting state flag
   bool is_resetting_{false};
-
   // To prevent sensor updates
-  bool prevent_sensor_update_{false}; // Add this line if you want to keep this functionality
+  bool prevent_sensor_update_{false};
+  // Flag to wait for a valid sensor reading after reset
+  bool waiting_for_sensor_read_{false};
 
   // start day of week configuration
   int water_week_start_day_{2};
