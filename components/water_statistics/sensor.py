@@ -31,6 +31,7 @@ CONF_WATER_YESTERDAY = "water_yesterday"
 CONF_WATER_WEEK = "water_week"
 CONF_WATER_MONTH = "water_month"
 CONF_WATER_YEAR = "water_year"
+CONF_SAVE_FREQUENCY = "save_frequency"
 
 water_statistics_ns = cg.esphome_ns.namespace("water_statistics")
 
