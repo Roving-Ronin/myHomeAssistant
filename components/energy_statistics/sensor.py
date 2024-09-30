@@ -40,7 +40,6 @@ CONFIG_SCHEMA = cv.Schema(
         cv.GenerateID(): cv.declare_id(EnergyStatistics),
         cv.GenerateID(CONF_TIME_ID): cv.use_id(time.RealTimeClock),
         cv.Optional(CONF_SAVE_FREQUENCY, default="5m"): cv.string,
-        cv.Required(CONF_TOTAL): cv.use_id(sensor.Sensor),
         cv.Optional(CONF_ENERGY_TODAY): sensor.sensor_schema(
             unit_of_measurement=UNIT_KILOWATT_HOURS,
             icon=ICON_TODAY,
@@ -76,6 +75,8 @@ CONFIG_SCHEMA = cv.Schema(
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
+        # Add save_frequency to the schema
+        cv.Optional(CONF_SAVE_FREQUENCY, default="5m"): cv.string,
     }
 ).extend(cv.COMPONENT_SCHEMA)
 
