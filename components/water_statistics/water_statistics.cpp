@@ -118,8 +118,7 @@ void WaterStatistics::loop() {
 
 
 void WaterStatistics::process_(float total) {
-  // Get the current time
-  uint32_t now = millis();
+  uint32_t now = millis();        // Get the current time
 
   // If we're waiting for the sensor to update, skip calculation until valid
   if (this->waiting_for_sensor_read_) {
@@ -218,9 +217,6 @@ void WaterStatistics::process_(float total) {
 
 
 void WaterStatistics::reset_statistics() {
-    // Get the current time
-  uint32_t now = millis();
-  
   ESP_LOGI(TAG, "Resetting Water Statistics to 0.0");
 
   // Reset water values to 0.0
@@ -233,6 +229,8 @@ void WaterStatistics::reset_statistics() {
   // Get the current total value
   const auto total = this->total_->get_state();
 
+  uint32_t now = millis(); 
+  
   if (!std::isnan(total) && total != 0.0) {
     // Use the current total value as the new start points
     this->water_.start_today = total;
@@ -244,9 +242,9 @@ void WaterStatistics::reset_statistics() {
   } else {
     // If total is not valid, flag to wait for a valid reading
     this->waiting_for_sensor_read_ = true;
-      if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
-        ESP_LOGW(TAG, "Total for Water Statistics is invalid, waiting for valid sensor reading.");
-        this->last_warning_time_ = now;  // Update the last warning log time
+    if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
+      ESP_LOGW(TAG, "Total for Water Statistics is invalid, waiting for valid sensor reading.");
+      this->last_warning_time_ = now;  // Update the last warning log time
     }
   }
 
