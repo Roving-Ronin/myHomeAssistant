@@ -12,7 +12,7 @@ static const char *const GAP = "  ";
 static const uint32_t WARNING_LOG_INTERVAL = 60000;  // 60 seconds
 
 void EnergyStatistics::dump_config() {
-  ESP_LOGCONFIG(TAG, "Energy statistics sensors");
+  ESP_LOGCONFIG(TAG, "Energy Statistics (MJ) - Sensors");
   if (this->energy_today_) {
     LOG_SENSOR(GAP, "Energy Today", this->energy_today_);
   }
@@ -125,7 +125,7 @@ void EnergyStatistics::process_(float total) {
     if (std::isnan(total) || total == 0.0) {
       // Only log the warning once per minute
       if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
-        ESP_LOGW(TAG, "Skipping Energy sensor reading update, waiting for valid sensor reading.");
+        ESP_LOGW(TAG, "Energy Statistics - Skipping sensor reading update, waiting for valid sensor reading.");
         this->last_warning_time_ = now;  // Update the last warning log time
       }
       return;
@@ -139,14 +139,14 @@ void EnergyStatistics::process_(float total) {
     this->energy_.start_year = total;
 
     this->waiting_for_sensor_read_ = false;  // Disable the wait flag
-    ESP_LOGI(TAG, "Valid Energy sensor reading obtained: %.3f", total);
+    ESP_LOGI(TAG, "Energy Statistics - Valid sensor reading obtained: %.3f", total);
   }
   
   // Ensure total is greater than or equal to start points
   if (total < this->energy_.start_today || std::isnan(this->energy_.start_today)) {
     // Only log the warning once per minute
     if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
-      ESP_LOGW(TAG, "Total is less than start point or invalid. Skipping.");
+      ESP_LOGW(TAG, "Energy Statistics - Total Energy sensor total is less than start point or invalid. Skipping.");
       this->last_warning_time_ = now;  // Update the last warning log time
     }
     return;
@@ -217,7 +217,7 @@ void EnergyStatistics::process_(float total) {
 
 void EnergyStatistics::reset_statistics() {
   uint32_t now = millis();        // Get the current time
-  ESP_LOGI(TAG, "Resetting Energy Statistics to 0.0");
+  ESP_LOGI(TAG, "Energy Statistics - Resetting values to 0.0");
 
   // Reset energy values to 0.0
   this->energy_.energy_today = 0.0;
@@ -236,12 +236,12 @@ void EnergyStatistics::reset_statistics() {
     this->energy_.start_week = total;
     this->energy_.start_month = total;
     this->energy_.start_year = total;
-    ESP_LOGI(TAG, "Start points for Energy Statistics set after reset: %.3f", total);
+    ESP_LOGI(TAG, "Energy Statistics - Start points set after reset: %.3f", total);
   } else {
     // If total is not valid, flag to wait for a valid reading
     this->waiting_for_sensor_read_ = true;
     if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
-      ESP_LOGW(TAG, "Total for Energy Statistics is invalid, waiting for valid sensor reading.");
+      ESP_LOGW(TAG, "Energy Statistics - Total is invalid, waiting for valid sensor reading.");
       this->last_warning_time_ = now;  // Update the last warning log time
     }
   }
