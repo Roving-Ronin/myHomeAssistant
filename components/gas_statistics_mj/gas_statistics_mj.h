@@ -30,8 +30,9 @@ class GasStatisticsMJ : public Component {
   void set_gas_year(Sensor *sensor) { this->gas_year_ = sensor; }
 
 protected:
-  uint32_t save_interval_{300}; // Save every 5min (adjust as needed, based on seconds)
-  uint32_t last_save_time_{0};   // Timestamp of the last save
+  uint32_t save_interval_{300};        // Save every 5min (adjust as needed, based on seconds)
+  uint32_t last_save_time_{0};         // Timestamp of the last save
+  uint32_t last_warning_time_{0};      // Timestamp of the last warning log
 
   ESPPreferenceObject pref_;
   time::RealTimeClock *time_;
@@ -48,9 +49,10 @@ protected:
 
   // Resetting state flag
   bool is_resetting_{false};
-
   // To prevent sensor updates
-  bool prevent_sensor_update_{false}; // Add this line if you want to keep this functionality
+  bool prevent_sensor_update_{false};
+  // Flag to wait for a valid sensor reading after reset
+  bool waiting_for_sensor_read_{false};
 
   // start day of week configuration
   int gas_week_start_day_{2};
