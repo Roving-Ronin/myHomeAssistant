@@ -116,3 +116,8 @@ async def to_code(config):
     await setup_sensor(config, CONF_ENERGY_WEEK, var.set_energy_week)
     await setup_sensor(config, CONF_ENERGY_MONTH, var.set_energy_month)
     await setup_sensor(config, CONF_ENERGY_YEAR, var.set_energy_year)
+
+    # Handle save_frequency
+    if CONF_SAVE_FREQUENCY in config:
+        save_frequency = config[CONF_SAVE_FREQUENCY]
+        cg.add(var.set_save_frequency(save_frequency))
