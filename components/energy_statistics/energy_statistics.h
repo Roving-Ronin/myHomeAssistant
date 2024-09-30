@@ -19,12 +19,6 @@ class EnergyStatistics : public Component {
 
   void reset_statistics();
 
-  // Add option for save (to flash memory) frequency
-  uint32_t parse_save_frequency(const std::string &str);
-  void set_save_frequency(const std::string &str) {
-    this->save_interval_ = parse_save_frequency(str);
-  }
-
   void set_time(time::RealTimeClock *time) { this->time_ = time; }
   void set_total(Sensor *sensor) { this->total_ = sensor; }
 
@@ -35,37 +29,27 @@ class EnergyStatistics : public Component {
   void set_energy_year(Sensor *sensor) { this->energy_year_ = sensor; }
 
 protected:
-  // Method to parse the save_frequency (e.g., "5m", "2h") from YAML
-  uint32_t parse_save_frequency(const std::string &str);
-  // Save every 5min (adjust as needed, based on seconds)
-  uint32_t save_interval_{300};
-  // Timestamp of the last save
-  uint32_t last_save_time_{0};
+  uint32_t save_interval_{300};              // Save every 5min (adjust as needed, based on seconds)
+  uint32_t last_save_time_{0};               // Timestamp of the last save (in milliseconds)
 
-  ESPPreferenceObject pref_;
-  time::RealTimeClock *time_;
+  ESPPreferenceObject pref_;                 // Object for saving statistics to flash memory
+  time::RealTimeClock *time_;                // Pointer to real-time clock
 
-  // input sensors
-  Sensor *total_{nullptr};
+  Sensor *total_{nullptr};                   // Input sensors
 
-  // exposed sensors
+  // Exposed sensors for energy statistics
   Sensor *energy_today_{nullptr};
   Sensor *energy_yesterday_{nullptr};
   Sensor *energy_week_{nullptr};
   Sensor *energy_month_{nullptr};
   Sensor *energy_year_{nullptr};
 
-  // Resetting state flag
-  bool is_resetting_{false};
-  // To prevent sensor updates, whilst resetting
-  bool prevent_sensor_update_{false}; // Add this line if you want to keep this functionality
+  bool is_resetting_{false};                 // Resetting state flag
+  bool prevent_sensor_update_{false};        // To prevent sensor updates, whilst resetting
 
-  // start day of week configuration
-  int energy_week_start_day_{2};
-  // start day of month configuration
-  int energy_month_start_day_{1};
-  // start day of year configuration
-  int energy_year_start_day_{1};
+  int energy_week_start_day_{2};             // start day of week configuration
+  int energy_month_start_day_{1};            // start day of month configuration
+  int energy_year_start_day_{1};             // start day of year configuration
 
   struct energy_data_t {
     uint16_t current_day_of_year{0};
