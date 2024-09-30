@@ -8,22 +8,25 @@ namespace gas_statistics_mj {
 static const char *const TAG = "gas_statistics_mj";
 static const char *const GAP = "  ";
 
+// Time between warning log messages being repeated (in milliseconds)
+static const uint32_t WARNING_LOG_INTERVAL = 60000;  // 60 seconds
+
 void GasStatisticsMJ::dump_config() {
-  ESP_LOGCONFIG(TAG, "Gas (MJ) statistics sensors");
+  ESP_LOGCONFIG(TAG, "Gas Statistics (MJ) - Statistics sensors");
   if (this->gas_today_) {
-    LOG_SENSOR(GAP, "Gas Today (MJ)", this->gas_today_);
+    LOG_SENSOR(GAP, "Gas (MJ) Today", this->gas_today_);
   }
   if (this->gas_yesterday_) {
-    LOG_SENSOR(GAP, "Gas Yesterday (MJ)", this->gas_yesterday_);
+    LOG_SENSOR(GAP, "Gas (MJ) Yesterday", this->gas_yesterday_);
   }
   if (this->gas_week_) {
-    LOG_SENSOR(GAP, "Gas Week (MJ)", this->gas_week_);
+    LOG_SENSOR(GAP, "Gas (MJ) Week", this->gas_week_);
   }
   if (this->gas_month_) {
-    LOG_SENSOR(GAP, "Gas Month (MJ)", this->gas_month_);
+    LOG_SENSOR(GAP, "Gas (MJ) Month", this->gas_month_);
   }
   if (this->gas_year_) {
-    LOG_SENSOR(GAP, "Gas Year (MJ)", this->gas_year_);
+    LOG_SENSOR(GAP, "Gas (MJ) Year", this->gas_year_);
   }
 
   ESP_LOGCONFIG(TAG, "Restored Gas Today (MJ): %.3f", this->gas_.gas_today);
@@ -115,6 +118,40 @@ void GasStatisticsMJ::loop() {
 
 
 void GasStatisticsMJ::process_(float total) {
+  uint32_t now = millis();        // Get the current time
+
+  // If we're waiting for the sensor to update, skip calculation until valid
+  if (this->waiting_for_sensor_read_) {
+    if (std::isnan(total) || total == 0.0) {
+      // Only log the warning once per minute
+      if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
+        ESP_LOGW(TAG, "Gas Statistics (MJ) - Skipping sensor reading update, waiting for valid sensor reading.");
+        this->last_warning_time_ = now;  // Update the last warning log time
+      }
+      return;
+    }
+
+    // Once we have a valid reading, set the start values
+    this->gas_.start_today = total;
+    this->gas_.start_yesterday = total;
+    this->gas_.start_week = total;
+    this->gas_.start_month = total;
+    this->gas_.start_year = total;
+
+    this->waiting_for_sensor_read_ = false;  // Disable the wait flag
+    ESP_LOGI(TAG, "Gas Statistics (MJ) - Valid sensor reading obtained: %.3f", total);
+  }
+  
+  // Ensure total is greater than or equal to start points
+  if (total < this->gas_.start_today || std::isnan(this->gas_.start_today)) {
+    // Only log the warning once per minute
+    if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
+      ESP_LOGW(TAG, "Gas Statistics (MJ) - Gas Total (MJ) sensor total is less than start point or invalid. Skipping.");
+      this->last_warning_time_ = now;  // Update the last warning log time
+    }
+    return;
+  }
+  
   // Update gas today only if the value has changed
   if (this->gas_today_ && !std::isnan(this->gas_.start_today)) {
     float new_gas_today = total - this->gas_.start_today;
@@ -171,7 +208,6 @@ void GasStatisticsMJ::process_(float total) {
   }
 
   // Only save to flash if necessary
-  uint32_t now = millis();
   if (now - last_save_time_ >= save_interval_ * 1000) {
     this->save_();
     last_save_time_ = now;  // Update the last save time
@@ -180,7 +216,8 @@ void GasStatisticsMJ::process_(float total) {
 
 
 void GasStatisticsMJ::reset_statistics() {
-  ESP_LOGI(TAG, "Resetting Gas Statistics to 0.0");
+  uint32_t now = millis();         // Get the current time
+  ESP_LOGI(TAG, "Gas Statistics (MJ) - Resetting values to 0.0");
 
   // Reset gas values to 0.0
   this->gas_.gas_today = 0.0;
@@ -189,13 +226,25 @@ void GasStatisticsMJ::reset_statistics() {
   this->gas_.gas_month = 0.0;
   this->gas_.gas_year = 0.0;
 
-  // Reset start points for gas calculations
+  // Get the current total value
   const auto total = this->total_->get_state();
-  this->gas_.start_today = total;
-  this->gas_.start_yesterday = total;
-  this->gas_.start_week = total;
-  this->gas_.start_month = total;
-  this->gas_.start_year = total;
+ 
+  if (!std::isnan(total) && total != 0.0) {
+    // Use the current total value as the new start points
+    this->gas_.start_today = total;
+    this->gas_.start_yesterday = total;
+    this->gas_.start_week = total;
+    this->gas_.start_month = total;
+    this->gas_.start_year = total;
+    ESP_LOGI(TAG, "Gas Statistics (MJ) - Start points set after reset: %.3f", total);
+  } else {
+    // If total is not valid, flag to wait for a valid reading
+    this->waiting_for_sensor_read_ = true;
+    if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
+      ESP_LOGW(TAG, "Gas Statistics (MJ) - Total is invalid, waiting for valid sensor reading.");
+      this->last_warning_time_ = now;  // Update the last warning log time
+    }
+  }
 
   // Publish the reset values to sensors
   if (this->gas_today_) this->gas_today_->publish_state(0.0);
@@ -206,14 +255,13 @@ void GasStatisticsMJ::reset_statistics() {
 
   // Save reset state to flash memory
   this->save_();
-  this->is_resetting_ = false;  // Clear flag after reset
 }
 
 
 void GasStatisticsMJ::save_() {
   this->pref_.save(&this->gas_); // Save to flash memory
-  ESP_LOGD(TAG, "Gas Statistics - Values saved to flash memory."); // Log message indicating save action
+  ESP_LOGD(TAG, "Gas Statistics (MJ) - Values saved to flash memory."); // Log message indicating save action
 }
 
-}  // namespace gas_statistics_mj
+}  // namespace gas_statistics
 }  // namespace esphome
