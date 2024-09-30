@@ -12,8 +12,8 @@ static const char *const GAP = "  ";
 // Time between warning log messages being repeated (in milliseconds)
 static const uint32_t WARNING_LOG_INTERVAL = 60000;  // 60 seconds
 // Define the configuration schema for the component
-const Schema::TypeConfig EnergyStatistics::CONFIG_SCHEMA = sensor::SENSOR_SCHEMA.extend(
-  Schema::STRING("save_frequency", "5m")  // Accepts a string save_frequency (default is 5m)
+const auto EnergyStatistics::CONFIG_SCHEMA = sensor::SENSOR_SCHEMA.extend(
+  Schema::Field<Schema::String>("save_frequency", "5m")  // Accepts a string save_frequency (default is 5m)
 );
 
 
@@ -43,8 +43,8 @@ void EnergyStatistics::dump_config() {
 }
 
 void EnergyStatistics::setup() {
-  std::string save_frequency_value = "5m";      // Statistics frequency to be saved to flash memory. Default is 5 minutes.
-  set_save_frequency(save_frequency_value);     // Set save frequency from the YAML configuration
+  std::string save_frequency_value = this->config_->get<std::string>("save_frequency", "5m");  // Default to 5 minutes if not specified
+  set_save_frequency(save_frequency_value);  // Set save frequency from the YAML configuration
 
   // Load preferences and energy data
   this->pref_ = global_preferences->make_preference<energy_data_t>(fnv1_hash(TAG));
