@@ -132,8 +132,15 @@ void WaterStatistics::process_(float total) {
     this->water_.start_year = total;
 
     this->waiting_for_sensor_read_ = false;  // Disable the wait flag
+    ESP_LOGI(TAG, "Valid Water sensor reading obtained: %.3f", total);
   }
-
+  
+  // Ensure total is greater than or equal to start points
+  if (total < this->water_.start_today || std::isnan(this->water_.start_today)) {
+    ESP_LOGW(TAG, "Total is less than start point or invalid. Skipping.");
+    return;
+  }
+  
   // ADD FOR PAUSE POST RESET -----------------
   
   // Update water today only if the value has changed
