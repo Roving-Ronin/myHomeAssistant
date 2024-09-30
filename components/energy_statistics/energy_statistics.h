@@ -2,6 +2,7 @@
 
 #include "esphome/core/component.h"
 #include "esphome/core/preferences.h"
+#include "esphome/core/schema.h"
 
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/time/real_time_clock.h"
@@ -37,6 +38,9 @@ class EnergyStatistics : public Component {
   void set_energy_week(Sensor *sensor) { this->energy_week_ = sensor; }
   void set_energy_month(Sensor *sensor) { this->energy_month_ = sensor; }
   void set_energy_year(Sensor *sensor) { this->energy_year_ = sensor; }
+
+  // Define the configuration schema to accept the `save_frequency` option
+  static const Schema::TypeConfig CONFIG_SCHEMA;
 
 protected:
   uint32_t save_interval_{300};        // Save every 5min (adjust as needed, based on seconds)
