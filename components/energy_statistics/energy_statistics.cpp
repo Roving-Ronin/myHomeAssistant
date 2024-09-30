@@ -12,7 +12,7 @@ static const char *const GAP = "  ";
 static const uint32_t WARNING_LOG_INTERVAL = 60000;  // 60 seconds
 
 void EnergyStatistics::dump_config() {
-  ESP_LOGCONFIG(TAG, "Energy Statistics (MJ) - Sensors");
+  ESP_LOGCONFIG(TAG, "Energy Statistics - Sensors");
   if (this->energy_today_) {
     LOG_SENSOR(GAP, "Energy Today", this->energy_today_);
   }
@@ -146,7 +146,7 @@ void EnergyStatistics::process_(float total) {
   if (total < this->energy_.start_today || std::isnan(this->energy_.start_today)) {
     // Only log the warning once per minute
     if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
-      ESP_LOGW(TAG, "Energy Statistics - Total Energy sensor total is less than start point or invalid. Skipping.");
+      ESP_LOGW(TAG, "Energy Statistics - 'Total Energy' sensor total is less than start point or invalid. Skipping.");
       this->last_warning_time_ = now;  // Update the last warning log time
     }
     return;
@@ -260,7 +260,7 @@ void EnergyStatistics::reset_statistics() {
 
 void EnergyStatistics::save_() {
   this->pref_.save(&this->energy_); // Save to flash memory
-  ESP_LOGD(TAG, "Energy Statistics - Values saved to flash memory."); // Log message indicating save action
+  ESP_LOGD(TAG, "Energy Statistics - Values saved to flash memory (NVS)."); // Log message indicating save action
 }
 
 }  // namespace energy_statistics
