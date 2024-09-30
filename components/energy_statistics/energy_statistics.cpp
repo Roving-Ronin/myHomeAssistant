@@ -8,9 +8,11 @@ namespace energy_statistics {
 static const char *const TAG = "energy_statistics";
 static const char *const GAP = "  ";
 
+// Time between warning log messages being repeated (in milliseconds)
+static const uint32_t WARNING_LOG_INTERVAL = 60000;  // 60 seconds
+
 void EnergyStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Energy statistics sensors");
-  
   if (this->energy_today_) {
     LOG_SENSOR(GAP, "Energy Today", this->energy_today_);
   }
@@ -116,6 +118,40 @@ void EnergyStatistics::loop() {
 
 
 void EnergyStatistics::process_(float total) {
+  uint32_t now = millis();        // Get the current time
+
+  // If we're waiting for the sensor to update, skip calculation until valid
+  if (this->waiting_for_sensor_read_) {
+    if (std::isnan(total) || total == 0.0) {
+      // Only log the warning once per minute
+      if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
+        ESP_LOGW(TAG, "Skipping Energy sensor reading update, waiting for valid sensor reading.");
+        this->last_warning_time_ = now;  // Update the last warning log time
+      }
+      return;
+    }
+
+    // Once we have a valid reading, set the start values
+    this->energy_.start_today = total;
+    this->energy_.start_yesterday = total;
+    this->energy_.start_week = total;
+    this->energy_.start_month = total;
+    this->energy_.start_year = total;
+
+    this->waiting_for_sensor_read_ = false;  // Disable the wait flag
+    ESP_LOGI(TAG, "Valid Energy sensor reading obtained: %.3f", total);
+  }
+  
+  // Ensure total is greater than or equal to start points
+  if (total < this->energy_.start_today || std::isnan(this->energy_.start_today)) {
+    // Only log the warning once per minute
+    if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
+      ESP_LOGW(TAG, "Total is less than start point or invalid. Skipping.");
+      this->last_warning_time_ = now;  // Update the last warning log time
+    }
+    return;
+  }
+  
   // Update energy today only if the value has changed
   if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
     float new_energy_today = total - this->energy_.start_today;
@@ -172,7 +208,6 @@ void EnergyStatistics::process_(float total) {
   }
 
   // Only save to flash if necessary
-  uint32_t now = millis();
   if (now - last_save_time_ >= save_interval_ * 1000) {
     this->save_();
     last_save_time_ = now;  // Update the last save time
@@ -181,6 +216,7 @@ void EnergyStatistics::process_(float total) {
 
 
 void EnergyStatistics::reset_statistics() {
+  uint32_t now = millis();         // Get the current time
   ESP_LOGI(TAG, "Resetting Energy Statistics to 0.0");
 
   // Reset energy values to 0.0
@@ -190,13 +226,25 @@ void EnergyStatistics::reset_statistics() {
   this->energy_.energy_month = 0.0;
   this->energy_.energy_year = 0.0;
 
-  // Reset start points for energy calculations
+  // Get the current total value
   const auto total = this->total_->get_state();
-  this->energy_.start_today = total;
-  this->energy_.start_yesterday = total;
-  this->energy_.start_week = total;
-  this->energy_.start_month = total;
-  this->energy_.start_year = total;
+ 
+  if (!std::isnan(total) && total != 0.0) {
+    // Use the current total value as the new start points
+    this->energy_.start_today = total;
+    this->energy_.start_yesterday = total;
+    this->energy_.start_week = total;
+    this->energy_.start_month = total;
+    this->energy_.start_year = total;
+    ESP_LOGI(TAG, "Start points for Energy Statistics set after reset: %.3f", total);
+  } else {
+    // If total is not valid, flag to wait for a valid reading
+    this->waiting_for_sensor_read_ = true;
+    if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
+      ESP_LOGW(TAG, "Total for Energy Statistics is invalid, waiting for valid sensor reading.");
+      this->last_warning_time_ = now;  // Update the last warning log time
+    }
+  }
 
   // Publish the reset values to sensors
   if (this->energy_today_) this->energy_today_->publish_state(0.0);
@@ -207,7 +255,6 @@ void EnergyStatistics::reset_statistics() {
 
   // Save reset state to flash memory
   this->save_();
-  this->is_resetting_ = false;  // Clear flag after reset
 }
 
 
