@@ -2,6 +2,7 @@
 
 #include "esphome/core/component.h"
 #include "esphome/core/preferences.h"
+
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/time/real_time_clock.h"
 
@@ -29,27 +30,36 @@ class EnergyStatistics : public Component {
   void set_energy_year(Sensor *sensor) { this->energy_year_ = sensor; }
 
 protected:
-  uint32_t save_interval_{300};              // Save every 5min (adjust as needed, based on seconds)
-  uint32_t last_save_time_{0};               // Timestamp of the last save (in milliseconds)
+  uint32_t save_interval_{300};        // Save every 5min (adjust as needed, based on seconds)
+  uint32_t last_save_time_{0};         // Timestamp of the last save
+  uint32_t last_warning_time_{0};      // Timestamp of the last warning log
 
-  ESPPreferenceObject pref_;                 // Object for saving statistics to flash memory
-  time::RealTimeClock *time_;                // Pointer to real-time clock
+  ESPPreferenceObject pref_;
+  time::RealTimeClock *time_;
 
-  Sensor *total_{nullptr};                   // Input sensors
+  // input sensors
+  Sensor *total_{nullptr};
 
-  // Exposed sensors for energy statistics
+  // exposed sensors
   Sensor *energy_today_{nullptr};
   Sensor *energy_yesterday_{nullptr};
   Sensor *energy_week_{nullptr};
   Sensor *energy_month_{nullptr};
   Sensor *energy_year_{nullptr};
 
-  bool is_resetting_{false};                 // Resetting state flag
-  bool prevent_sensor_update_{false};        // To prevent sensor updates, whilst resetting
+  // Resetting state flag
+  bool is_resetting_{false};
+  // To prevent sensor updates
+  bool prevent_sensor_update_{false};
+  // Flag to wait for a valid sensor reading after reset
+  bool waiting_for_sensor_read_{false};
 
-  int energy_week_start_day_{2};             // start day of week configuration
-  int energy_month_start_day_{1};            // start day of month configuration
-  int energy_year_start_day_{1};             // start day of year configuration
+  // start day of week configuration
+  int energy_week_start_day_{2};
+  // start day of month configuration
+  int energy_month_start_day_{1};
+  // start day of year configuration
+  int energy_year_start_day_{1};
 
   struct energy_data_t {
     uint16_t current_day_of_year{0};
