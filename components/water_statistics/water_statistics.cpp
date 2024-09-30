@@ -218,6 +218,9 @@ void WaterStatistics::process_(float total) {
 
 
 void WaterStatistics::reset_statistics() {
+    // Get the current time
+  uint32_t now = millis();
+  
   ESP_LOGI(TAG, "Resetting Water Statistics to 0.0");
 
   // Reset water values to 0.0
@@ -246,7 +249,8 @@ void WaterStatistics::reset_statistics() {
         this->last_warning_time_ = now;  // Update the last warning log time
     }
   }
-    
+
+  
   // Publish the reset values to sensors
   if (this->water_today_) this->water_today_->publish_state(0.0);
   if (this->water_yesterday_) this->water_yesterday_->publish_state(0.0);
