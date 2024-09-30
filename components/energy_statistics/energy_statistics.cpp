@@ -1,5 +1,6 @@
 #include "esphome/core/log.h"
 #include "esphome/core/hal.h"
+#include "esphome/core/schema.h"
 #include "energy_statistics.h"
 
 namespace esphome {
@@ -10,6 +11,11 @@ static const char *const GAP = "  ";
 
 // Time between warning log messages being repeated (in milliseconds)
 static const uint32_t WARNING_LOG_INTERVAL = 60000;  // 60 seconds
+// Define the configuration schema for the component
+const Schema::TypeConfig EnergyStatistics::CONFIG_SCHEMA = sensor::SENSOR_SCHEMA.extend(
+  Schema::STRING("save_frequency", "5m")  // Accepts a string save_frequency (default is 5m)
+);
+
 
 void EnergyStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Energy statistics sensors");
