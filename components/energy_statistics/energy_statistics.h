@@ -40,7 +40,7 @@ class EnergyStatistics : public Component {
   void set_energy_year(Sensor *sensor) { this->energy_year_ = sensor; }
 
   // Define the configuration schema to accept the `save_frequency` option
-  static const Schema::TypeConfig CONFIG_SCHEMA;
+  static const auto CONFIG_SCHEMA;
 
 protected:
   uint32_t save_interval_{300};        // Save every 5min (adjust as needed, based on seconds)
