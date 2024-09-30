@@ -10,7 +10,6 @@ static const char *const GAP = "  ";
 
 void EnergyStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Energy statistics sensors");
-  ESP_LOGCONFIG(TAG, "Save Frequency: %d seconds", this->save_interval_);
   
   if (this->energy_today_) {
     LOG_SENSOR(GAP, "Energy Today", this->energy_today_);
@@ -215,25 +214,6 @@ void EnergyStatistics::reset_statistics() {
 void EnergyStatistics::save_() {
   this->pref_.save(&this->energy_); // Save to flash memory
   ESP_LOGD(TAG, "Energy Statistics - Values saved to flash memory."); // Log message indicating save action
-}
-
-
-void EnergyStatistics::set_save_frequency(const std::string &str) {
-  this->save_interval_ = parse_save_frequency(str);  // Set save frequency from YAML
-}
-
-
-uint32_t EnergyStatistics::parse_save_frequency(const std::string &str) {
-  if (str.back() == 's') {
-    return std::stoi(str.substr(0, str.size() - 1));  // seconds
-  } else if (str.back() == 'm') {
-    return std::stoi(str.substr(0, str.size() - 1)) * 60;  // minutes to seconds
-  } else if (str.back() == 'h') {
-    return std::stoi(str.substr(0, str.size() - 1)) * 3600;  // hours to seconds
-  } else {
-    ESP_LOGW(TAG, "Invalid save frequency format. Defaulting to 5 minutes.");
-    return 300;  // Default to 5 minutes if invalid
-  }
 }
 
 }  // namespace energy_statistics
