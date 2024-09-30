@@ -216,6 +216,7 @@ void WaterStatistics::process_(float total) {
 
 
 void WaterStatistics::reset_statistics() {
+  uint32_t now = millis();        // Get the current time
   ESP_LOGI(TAG, "Resetting Water Statistics to 0.0");
 
   // Reset water values to 0.0
@@ -227,8 +228,6 @@ void WaterStatistics::reset_statistics() {
 
   // Get the current total value
   const auto total = this->total_->get_state();
-
-  uint32_t now = millis(); 
   
   if (!std::isnan(total) && total != 0.0) {
     // Use the current total value as the new start points
@@ -247,7 +246,6 @@ void WaterStatistics::reset_statistics() {
     }
   }
 
-  
   // Publish the reset values to sensors
   if (this->water_today_) this->water_today_->publish_state(0.0);
   if (this->water_yesterday_) this->water_yesterday_->publish_state(0.0);
