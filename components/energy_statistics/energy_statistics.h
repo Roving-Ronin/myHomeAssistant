@@ -34,8 +34,12 @@ class EnergyStatistics : public Component {
   void set_energy_year(Sensor *sensor) { this->energy_year_ = sensor; }
 
 protected:
-  uint32_t save_interval_{300}; // Save every 5min (adjust as needed, based on seconds)
-  uint32_t last_save_time_{0};   // Timestamp of the last save
+  // Method to parse the save_frequency (e.g., "5m", "2h") from YAML
+  uint32_t parse_save_frequency(const std::string &str);
+  // Save every 5min (adjust as needed, based on seconds)
+  uint32_t save_interval_{300};
+  // Timestamp of the last save
+  uint32_t last_save_time_{0};
 
   ESPPreferenceObject pref_;
   time::RealTimeClock *time_;
