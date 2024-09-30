@@ -30,6 +30,7 @@ CONF_GAS_YESTERDAY = "gas_yesterday"
 CONF_GAS_WEEK = "gas_week"
 CONF_GAS_MONTH = "gas_month"
 CONF_GAS_YEAR = "gas_year"
+CONF_SAVE_FREQUENCY = "save_frequency"
 
 gas_statistics_mj_ns = cg.esphome_ns.namespace("gas_statistics_mj")
 
