@@ -216,6 +216,7 @@ void GasStatistics::process_(float total) {
 
 
 void GasStatistics::reset_statistics() {
+  uint32_t now = millis();         // Get the current time
   ESP_LOGI(TAG, "Resetting Gas Statistics to 0.0");
 
   // Reset gas values to 0.0
@@ -227,9 +228,7 @@ void GasStatistics::reset_statistics() {
 
   // Get the current total value
   const auto total = this->total_->get_state();
-
-  uint32_t now = millis(); 
-  
+ 
   if (!std::isnan(total) && total != 0.0) {
     // Use the current total value as the new start points
     this->gas_.start_today = total;
@@ -247,7 +246,6 @@ void GasStatistics::reset_statistics() {
     }
   }
 
-  
   // Publish the reset values to sensors
   if (this->gas_today_) this->gas_today_->publish_state(0.0);
   if (this->gas_yesterday_) this->gas_yesterday_->publish_state(0.0);
