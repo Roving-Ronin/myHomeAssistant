@@ -29,6 +29,7 @@ CONF_ENERGY_YESTERDAY = "energy_yesterday"
 CONF_ENERGY_WEEK = "energy_week"
 CONF_ENERGY_MONTH = "energy_month"
 CONF_ENERGY_YEAR = "energy_year"
+CONF_SAVE_FREQUENCY = "save_frequency"
 
 energy_statistics_ns = cg.esphome_ns.namespace("energy_statistics")
 
@@ -38,6 +39,7 @@ CONFIG_SCHEMA = cv.Schema(
     {
         cv.GenerateID(): cv.declare_id(EnergyStatistics),
         cv.GenerateID(CONF_TIME_ID): cv.use_id(time.RealTimeClock),
+        cv.Optional(CONF_SAVE_FREQUENCY, default="5m"): cv.string,
         cv.Required(CONF_TOTAL): cv.use_id(sensor.Sensor),
         cv.Optional(CONF_ENERGY_TODAY): sensor.sensor_schema(
             unit_of_measurement=UNIT_KILOWATT_HOURS,
