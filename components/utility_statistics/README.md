@@ -1,3 +1,5 @@
+DO NOT USE - NOTE TO SELF - UPDATE WITH CPP FROM INDIVIDUAL SENSORS THAT STOPS NEGATIVE COUNT UP AND THEN SENSOR/LOG SPAM NEGATIVE.
+
 # Utility Statistics
 
 To save on writes to Non-Volatile Storage (NVS) flash memory, this component combines the Gas (m3), Gas (MJ) and Water (L) components into a single component.
