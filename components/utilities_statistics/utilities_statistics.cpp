@@ -65,6 +65,8 @@ void UtilitiesStatistics::dump_config() {
     LOG_SENSOR(GAP, "Water Year", this->water_year_);
   }
 }
+
+
 void UtilitiesStatistics::setup() {
   // Gas (m³) preferences setup
   this->pref_ = global_preferences->make_preference<gas_data_m3_t>(fnv1_hash("gas_m3"));
@@ -156,21 +158,6 @@ void UtilitiesStatistics::setup() {
     reset_water_statistics();  // Reset if the load fails or reset is requested
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 void UtilitiesStatistics::loop() {
@@ -279,6 +266,7 @@ void UtilitiesStatistics::loop() {
 }
 
 
+// Process Gas (m³)
 void UtilitiesStatistics::process_gas_m3_(float total, const esphome::time::ESPTime &t) {
   uint32_t now = millis();
 
@@ -302,6 +290,7 @@ void UtilitiesStatistics::process_gas_m3_(float total, const esphome::time::ESPT
 
     this->waiting_for_sensor_read_ = false;  // Disable the wait flag
     ESP_LOGI(TAG, "Gas Statistics (m³) - Valid sensor reading obtained: %.3f", total);
+    data_changed = true;  // Data has changed, so set the flag
   }
 
   // Ensure total is greater than or equal to start points and clamp negative values
@@ -333,6 +322,7 @@ void UtilitiesStatistics::process_gas_m3_(float total, const esphome::time::ESPT
     if (this->gas_m3_yesterday_->get_state() != new_gas_yesterday) {
       this->gas_m3_.gas_m3_yesterday = new_gas_yesterday;
       this->gas_m3_yesterday_->publish_state(this->gas_m3_.gas_m3_yesterday);
+      data_changed = true;  // Data has changed, so set the flag
     }
   } else if (this->gas_m3_yesterday_ && (std::isnan(this->gas_m3_yesterday_->get_state()) || this->gas_m3_yesterday_->get_state() != 0.0)) {
     // If gas_yesterday_ is NaN or not 0.0, publish 0.0
@@ -345,6 +335,7 @@ void UtilitiesStatistics::process_gas_m3_(float total, const esphome::time::ESPT
     if (this->gas_m3_week_->get_state() != new_gas_week) {
       this->gas_m3_.gas_m3_week = new_gas_week;
       this->gas_m3_week_->publish_state(this->gas_m3_.gas_m3_week);
+      data_changed = true;  // Data has changed, so set the flag
     }
   } else if (this->gas_m3_week_ && (std::isnan(this->gas_m3_week_->get_state()) || this->gas_m3_week_->get_state() != 0.0)) {
     // If gas_week_ is NaN or not 0.0, publish 0.0
@@ -357,6 +348,7 @@ void UtilitiesStatistics::process_gas_m3_(float total, const esphome::time::ESPT
     if (this->gas_m3_month_->get_state() != new_gas_month) {
       this->gas_m3_.gas_m3_month = new_gas_month;
       this->gas_m3_month_->publish_state(this->gas_m3_.gas_m3_month);
+      data_changed = true;  // Data has changed, so set the flag
     }
   } else if (this->gas_m3_month_ && (std::isnan(this->gas_m3_month_->get_state()) || this->gas_m3_month_->get_state() != 0.0)) {
     // If gas_month_ is NaN or not 0.0, publish 0.0
@@ -369,6 +361,7 @@ void UtilitiesStatistics::process_gas_m3_(float total, const esphome::time::ESPT
     if (this->gas_m3_year_->get_state() != new_gas_year) {
       this->gas_m3_.gas_m3_year = new_gas_year;
       this->gas_m3_year_->publish_state(this->gas_m3_.gas_m3_year);
+      data_changed = true;  // Data has changed, so set the flag
     }
   } else if (this->gas_m3_year_ && (std::isnan(this->gas_m3_year_->get_state()) || this->gas_m3_year_->get_state() != 0.0)) {
     // If gas_year_ is NaN or not 0.0, publish 0.0
@@ -376,6 +369,8 @@ void UtilitiesStatistics::process_gas_m3_(float total, const esphome::time::ESPT
   }
 }
 
+
+// Process Gas (MJ)
 void UtilitiesStatistics::process_gas_mj_() {
   float gas_mj = this->gas_mj_total_->get_state();  // Get the total in MJ
   uint32_t now = millis();
@@ -400,6 +395,7 @@ void UtilitiesStatistics::process_gas_mj_() {
 
     this->waiting_for_sensor_read_ = false;  // Disable the wait flag
     ESP_LOGI(TAG, "Gas Statistics (MJ) - Valid sensor reading obtained: %.3f", gas_mj);
+    data_changed = true;  // Data has changed, so set the flag
   }
 
   // Ensure total is greater than or equal to start points and clamp negative values
@@ -418,6 +414,7 @@ void UtilitiesStatistics::process_gas_mj_() {
     if (this->gas_mj_today_->get_state() != new_gas_today) {
       this->gas_mj_.gas_mj_today = new_gas_today;
       this->gas_mj_today_->publish_state(this->gas_mj_.gas_mj_today);
+      data_changed = true;  // Data has changed, so set the flag
     }
   } else if (this->gas_mj_today_ && (std::isnan(this->gas_mj_today_->get_state()) || this->gas_mj_today_->get_state() != 0.0)) {
     // If gas_today_ is NaN or not 0.0, publish 0.0
@@ -430,6 +427,7 @@ void UtilitiesStatistics::process_gas_mj_() {
     if (this->gas_mj_yesterday_->get_state() != new_gas_yesterday) {
       this->gas_mj_.gas_mj_yesterday = new_gas_yesterday;
       this->gas_mj_yesterday_->publish_state(this->gas_mj_.gas_mj_yesterday);
+      data_changed = true;  // Data has changed, so set the flag
     }
   } else if (this->gas_mj_yesterday_ && (std::isnan(this->gas_mj_yesterday_->get_state()) || this->gas_mj_yesterday_->get_state() != 0.0)) {
     this->gas_mj_yesterday_->publish_state(0.0);
@@ -441,6 +439,7 @@ void UtilitiesStatistics::process_gas_mj_() {
     if (this->gas_mj_week_->get_state() != new_gas_week) {
       this->gas_mj_.gas_mj_week = new_gas_week;
       this->gas_mj_week_->publish_state(this->gas_mj_.gas_mj_week);
+      data_changed = true;  // Data has changed, so set the flag
     }
   } else if (this->gas_mj_week_ && (std::isnan(this->gas_mj_week_->get_state()) || this->gas_mj_week_->get_state() != 0.0)) {
     this->gas_mj_week_->publish_state(0.0);
@@ -452,6 +451,7 @@ void UtilitiesStatistics::process_gas_mj_() {
     if (this->gas_mj_month_->get_state() != new_gas_month) {
       this->gas_mj_.gas_mj_month = new_gas_month;
       this->gas_mj_month_->publish_state(this->gas_mj_.gas_mj_month);
+      data_changed = true;  // Data has changed, so set the flag
     }
   } else if (this->gas_mj_month_ && (std::isnan(this->gas_mj_month_->get_state()) || this->gas_mj_month_->get_state() != 0.0)) {
     this->gas_mj_month_->publish_state(0.0);
@@ -463,6 +463,7 @@ void UtilitiesStatistics::process_gas_mj_() {
     if (this->gas_mj_year_->get_state() != new_gas_year) {
       this->gas_mj_.gas_mj_year = new_gas_year;
       this->gas_mj_year_->publish_state(this->gas_mj_.gas_mj_year);
+      data_changed = true;  // Data has changed, so set the flag
     }
   } else if (this->gas_mj_year_ && (std::isnan(this->gas_mj_year_->get_state()) || this->gas_mj_year_->get_state() != 0.0)) {
     this->gas_mj_year_->publish_state(0.0);
@@ -497,6 +498,7 @@ void UtilitiesStatistics::process_water_(float total, const esphome::time::ESPTi
 
     this->waiting_for_sensor_read_ = false;  // Disable the wait flag
     ESP_LOGI(TAG, "Water Statistics - Valid sensor reading obtained: %.3f", total);
+    data_changed = true;  // Data has changed, so set the flag
   }
 
   // Ensure total is greater than or equal to start points and clamp negative values
@@ -515,6 +517,7 @@ void UtilitiesStatistics::process_water_(float total, const esphome::time::ESPTi
     if (this->water_today_->get_state() != new_water_today) {
       this->water_.water_today = new_water_today;
       this->water_today_->publish_state(this->water_.water_today);
+      data_changed = true;  // Data has changed, so set the flag
     }
   } else if (this->water_today_ && (std::isnan(this->water_today_->get_state()) || this->water_today_->get_state() != 0.0)) {
     // If water_today_ is NaN or not 0.0, publish 0.0
@@ -527,6 +530,7 @@ void UtilitiesStatistics::process_water_(float total, const esphome::time::ESPTi
     if (this->water_yesterday_->get_state() != new_water_yesterday) {
       this->water_.water_yesterday = new_water_yesterday;
       this->water_yesterday_->publish_state(this->water_.water_yesterday);
+      data_changed = true;  // Data has changed, so set the flag
     }
   } else if (this->water_yesterday_ && (std::isnan(this->water_yesterday_->get_state()) || this->water_yesterday_->get_state() != 0.0)) {
     this->water_yesterday_->publish_state(0.0);
@@ -538,6 +542,7 @@ void UtilitiesStatistics::process_water_(float total, const esphome::time::ESPTi
     if (this->water_week_->get_state() != new_water_week) {
       this->water_.water_week = new_water_week;
       this->water_week_->publish_state(this->water_.water_week);
+      data_changed = true;  // Data has changed, so set the flag
     }
   } else if (this->water_week_ && (std::isnan(this->water_week_->get_state()) || this->water_week_->get_state() != 0.0)) {
     this->water_week_->publish_state(0.0);
@@ -549,6 +554,7 @@ void UtilitiesStatistics::process_water_(float total, const esphome::time::ESPTi
     if (this->water_month_->get_state() != new_water_month) {
       this->water_.water_month = new_water_month;
       this->water_month_->publish_state(this->water_.water_month);
+      data_changed = true;  // Data has changed, so set the flag
     }
   } else if (this->water_month_ && (std::isnan(this->water_month_->get_state()) || this->water_month_->get_state() != 0.0)) {
     this->water_month_->publish_state(0.0);
@@ -560,14 +566,12 @@ void UtilitiesStatistics::process_water_(float total, const esphome::time::ESPTi
     if (this->water_year_->get_state() != new_water_year) {
       this->water_.water_year = new_water_year;
       this->water_year_->publish_state(this->water_.water_year);
+      data_changed = true;  // Data has changed, so set the flag
     }
   } else if (this->water_year_ && (std::isnan(this->water_year_->get_state()) || this->water_year_->get_state() != 0.0)) {
     this->water_year_->publish_state(0.0);
   }
 }
-
-
-
 
 
 void UtilitiesStatistics::loop() {
@@ -672,10 +676,6 @@ void UtilitiesStatistics::loop() {
 }
 
 
-
-
-
-
 void UtilitiesStatistics::reset_gas_m3_statistics() {
   uint32_t now = millis();  // Get the current time
   ESP_LOGI(TAG, "Gas Statistics (m³) - Resetting values to 0.0");
@@ -711,9 +711,6 @@ void UtilitiesStatistics::reset_gas_m3_statistics() {
   // Save reset state to flash memory
   this->save_();
 }
-
-
-
 
 
 void UtilitiesStatistics::reset_gas_mj_statistics() {
@@ -752,9 +749,6 @@ void UtilitiesStatistics::reset_gas_mj_statistics() {
 }
 
 
-
-
-
 void UtilitiesStatistics::reset_water_statistics() {
   uint32_t now = millis();  // Get the current time
   ESP_LOGI(TAG, "Water Statistics - Resetting values to 0.0");
@@ -791,28 +785,25 @@ void UtilitiesStatistics::reset_water_statistics() {
 }
 
 
+void UtilitiesStatistics::save_() {
+  // Save Gas (m³) data
+  if (this->gas_m3_total_) {
+    this->pref_.save(&this->gas_m3_);  // Save the Gas (m³) data to NVS
+    ESP_LOGD(TAG, "Gas Statistics (m³) - Values saved to flash memory (NVS).");
+  }
 
+  // Save Gas (MJ) data
+  if (this->gas_mj_total_) {
+    this->pref_mj_.save(&this->gas_mj_);  // Save the Gas (MJ) data to NVS
+    ESP_LOGD(TAG, "Gas Statistics (MJ) - Values saved to flash memory (NVS).");
+  }
 
+  // Save Water data
+  if (this->water_total_) {
+    this->pref_water_.save(&this->water_);  // Save the Water data to NVS
+    ESP_LOGD(TAG, "Water Statistics - Values saved to flash memory (NVS).");
+  }
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}  // namespace utilities_statistics
+}  // namespace esphome
