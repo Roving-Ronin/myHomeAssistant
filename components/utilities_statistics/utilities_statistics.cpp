@@ -1,36 +1,57 @@
-# sensor.py
+// utilities_statistics.cpp
 
-from homeassistant.components.sensor import SensorEntity
+#include "utilities_statistics.h"
+#include "nvs_flash.h"  // Include for NVS functions
 
-class UtilitiesSensor(SensorEntity):
-    """Representation of a sensor for the Utilities Component."""
+UtilitiesComponent::UtilitiesComponent() {
+    // Initialize data from NVS
+    this->loadFromNVS();
+}
 
-    def __init__(self, utilities_component, sensor_type):
-        """Initialize the sensor."""
-        self._utilities_component = utilities_component
-        self._sensor_type = sensor_type
-        self._state = None
+void UtilitiesComponent::updateGasM3(float newGasM3) {
+    this->data.gas_m3 = newGasM3;
+    this->saveToNVS();
+}
 
-    @property
-    def name(self):
-        """Return the name of the sensor."""
-        if self._sensor_type == "gas_m3":
-            return "Gas Usage (m3)"
-        elif self._sensor_type == "gas_mj":
-            return "Gas Usage (MJ)"
-        elif self._sensor_type == "water":
-            return "Water Usage"
-    
-    @property
-    def state(self):
-        """Return the state of the sensor."""
-        if self._sensor_type == "gas_m3":
-            return self._utilities_component.data.gas_m3
-        elif self._sensor_type == "gas_mj":
-            return self._utilities_component.data.gas_mj
-        elif self._sensor_type == "water":
-            return self._utilities_component.data.water
+void UtilitiesComponent::updateGasMJ(float newGasMJ) {
+    this->data.gas_mj = newGasMJ;
+    this->saveToNVS();
+}
 
-    def update(self):
-        """Fetch new state data for the sensor."""
-        self._utilities_component.loadFromNVS()  # Load latest values from NVS
+void UtilitiesComponent::updateWater(float newWater) {
+    this->data.water = newWater;
+    this->saveToNVS();
+}
+
+void UtilitiesComponent::saveToNVS() {
+    // Save all the utility data to NVS at once
+    this->writeNVS("gas_m3", this->data.gas_m3);
+    this->writeNVS("gas_mj", this->data.gas_mj);
+    this->writeNVS("water", this->data.water);
+}
+
+void UtilitiesComponent::loadFromNVS() {
+    // Load values from NVS, with default values set to 0
+    this->data.gas_m3 = this->readNVS("gas_m3", 0.0f);
+    this->data.gas_mj = this->readNVS("gas_mj", 0.0f);
+    this->data.water = this->readNVS("water", 0.0f);
+}
+
+void UtilitiesComponent::writeNVS(const char* key, float value) {
+    // Helper method to write a float value to NVS
+    nvs_handle_t my_handle;
+    nvs_open("storage", NVS_READWRITE, &my_handle);
+    nvs_set_float(my_handle, key, value);
+    nvs_commit(my_handle);
+    nvs_close(my_handle);
+}
+
+float UtilitiesComponent::readNVS(const char* key, float default_value) {
+    // Helper method to read a float value from NVS
+    nvs_handle_t my_handle;
+    nvs_open("storage", NVS_READWRITE, &my_handle);
+    float value = default_value;
+    nvs_get_float(my_handle, key, &value);
+    nvs_close(my_handle);
+    return value;
+}
