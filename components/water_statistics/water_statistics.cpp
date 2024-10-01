@@ -117,7 +117,7 @@ void WaterStatistics::loop() {
 }
 
 
-void GasStatistics::process_(float total) {
+void WaterStatistics::process_(float total) {
   uint32_t now = millis();  // Get the current time
 
   // If we're waiting for the sensor to update, skip calculation until valid
