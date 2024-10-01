@@ -155,11 +155,22 @@ void WaterStatistics::process_(float total) {
   // Update water today only if the value has changed
   if (this->water_today_ && !std::isnan(this->water_.start_today)) {
     float new_water_today = total - this->water_.start_today;
+    if (new_water_today < 0.0) new_water_today = 0.0;  // Clamp negative values to zero
+    this->water_.water_today = new_water_today;
+    this->water_today_->publish_state(this->water_.water_today);
+  }
+  } else if (this->water_today_ && this->water_today_->get_state() != 0.0) {
+    this->water_today_->publish_state(0.0);
+
+    // Update water today only if the value has changed
+  if (this->water_today_ && !std::isnan(this->water_.start_today)) {
+    float new_water_today = total - this->water_.start_today;
     if (this->water_today_->get_state() != new_water_today) {
       this->water_.water_today = new_water_today;
       this->water_today_->publish_state(this->water_.water_today);
-    }
-  } else if (this->water_today_ && this->water_today_->get_state() != 0.0) {
+  }
+  } else if (this->water_today_ && (std::isnan(this->water_today_->get_state()) || this->water_today_->get_state() != 0.0)) {
+    // If water_today_ is NaN or not 0.0, publish 0.0
     this->water_today_->publish_state(0.0);
   }
 
@@ -170,7 +181,8 @@ void WaterStatistics::process_(float total) {
       this->water_.water_yesterday = new_water_yesterday;
       this->water_yesterday_->publish_state(this->water_.water_yesterday);
     }
-  } else if (this->water_yesterday_ && this->water_yesterday_->get_state() != 0.0) {
+  } else if (this->water_yesterday_ && (std::isnan(this->water_yesterday_->get_state()) || this->water_yesterday_->get_state() != 0.0)) {
+    // If water_yesterday_ is NaN or not 0.0, publish 0.0
     this->water_yesterday_->publish_state(0.0);
   }
 
@@ -181,7 +193,8 @@ void WaterStatistics::process_(float total) {
       this->water_.water_week = new_water_week;
       this->water_week_->publish_state(this->water_.water_week);
     }
-  } else if (this->water_week_ && this->water_week_->get_state() != 0.0) {
+  } else if (this->water_week_ && (std::isnan(this->water_week_->get_state()) || this->water_week_->get_state() != 0.0)) {
+    // If water_week_ is NaN or not 0.0, publish 0.0
     this->water_week_->publish_state(0.0);
   }
 
@@ -192,7 +205,8 @@ void WaterStatistics::process_(float total) {
       this->water_.water_month = new_water_month;
       this->water_month_->publish_state(this->water_.water_month);
     }
-  } else if (this->water_month_ && this->water_month_->get_state() != 0.0) {
+  } else if (this->water_month_ && (std::isnan(this->water_month_->get_state()) || this->water_month_->get_state() != 0.0)) {
+    // If water_month_ is NaN or not 0.0, publish 0.0
     this->water_month_->publish_state(0.0);
   }
 
@@ -203,10 +217,11 @@ void WaterStatistics::process_(float total) {
       this->water_.water_year = new_water_year;
       this->water_year_->publish_state(this->water_.water_year);
     }
-  } else if (this->water_year_ && this->water_year_->get_state() != 0.0) {
+  } else if (this->water_year_ && (std::isnan(this->water_year_->get_state()) || this->water_year_->get_state() != 0.0)) {
+    // If water_year_ is NaN or not 0.0, publish 0.0
     this->water_year_->publish_state(0.0);
   }
-
+  
   // Only save to flash if necessary
   if (now - last_save_time_ >= save_interval_ * 1000) {
     this->save_();
