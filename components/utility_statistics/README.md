@@ -21,8 +21,8 @@ external_components:
     refresh: 0s
 ...
 sensor:
-  - platform: "utilities_statistics"
-    id: utilities_statistics_component
+  - platform: "utility_statistics"
+    id: utility_statistics_component
 
     # Time source
     time_id: sntp_time  # Make sure you define this time integration elsewhere
