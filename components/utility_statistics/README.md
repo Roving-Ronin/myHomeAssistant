@@ -30,56 +30,56 @@ sensor:
     # Gas (m³) statistics
     gas_m3_total: gas_meter_m3_total  # The id of the sensor tracking total consumed Gas (m3)
     gas_m3_today:
-      name: "Gas (m³) Today"
-      id: gas_m3_today
+      name: "Gas - Used Today"
+      id: gas_m3_used_today
     gas_m3_yesterday:
-      name: "Gas (m³) Yesterday"
-      id: gas_m3_yesterday
+      name: "Gas - Used Yesterday"
+      id: gas_m3_used_yesterday
     gas_m3_week:
-      name: "Gas (m³) Week"
-      id: gas_m3_week
+      name: "Gas - Used Week"
+      id: gas_m3_used_week
     gas_m3_month:
-      name: "Gas (m³) Month"
-      id: gas_m3_month
+      name: "Gas - Used Month"
+      id: gas_m3_used_month
     gas_m3_year:
-      name: "Gas (m³) Year"
-      id: gas_m3_year
+      name: "Gas - Used Year"
+      id: gas_m3_used_year
 
     # Gas (MJ) statistics
     gas_mj_total: gas_meter_mj_total  # The id of the sensor tracking total consumed Gas (MJ)
     gas_mj_today:
-      name: "Gas MJ Today"
-      id: gas_mj_today
+      name: "Gas - MJ Used Today"
+      id: gas_mj_used_today
     gas_mj_yesterday:
-      name: "Gas MJ Yesterday"
-      id: gas_mj_yesterday
+      name: "Gas - MJ Used Yesterday"
+      id: gas_mj_used_yesterday
     gas_mj_week:
-      name: "Gas MJ Week"
-      id: gas_mj_week
+      name: "Gas - MJ Used Week"
+      id: gas_mj_used_week
     gas_mj_month:
-      name: "Gas MJ Month"
-      id: gas_mj_month
+      name: "Gas - MJ Used Month"
+      id: gas_mj_used_month
     gas_mj_year:
-      name: "Gas MJ Year"
-      id: gas_mj_year
+      name: "Gas - MJ Used Year"
+      id: gas_mj_used_year
 
-    # Water statistics
-    water_total: water_consumed_litres  # The id of the sensor tracking total consumed water (litres)
+    # Water (L) statistics
+    water_total: water_used_litres  # The id of the sensor tracking total consumed water (litres)
     water_today:
-      name: "Water Consumed Today"
-      id: water_consumed_today
+      name: "Water - Used Today"
+      id: water_used_today
     water_yesterday:
-      name: "Water Consumed Yesterday"
-      id: water_consumed_yesterday
+      name: "Water - Used Yesterday"
+      id: water_used_yesterday
     water_week:
-      name: "Water Consumed Week"
-      id: water_consumed_week
+      name: "Water - Used Week"
+      id: water_used_week
     water_month:
-      name: "Water Consumed Month"
-      id: water_consumed_month
+      name: "Water - Used  Month"
+      id: water_used_month
     water_year:
-      name: "Water Consumed Year"
-      id: water_consumed_year
+      name: "Water - Used  Year"
+      id: water_used_year
 ```
 
 TO UPDATE STILL
