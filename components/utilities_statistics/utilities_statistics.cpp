@@ -99,14 +99,25 @@ void UtilitiesStatistics::setup() {
   }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void UtilitiesStatistics::loop() {
   const auto t = this->time_->now();
   if (!t.is_valid()) {
-    return;
-  }
-
-  const auto total = this->gas_m3_total_->get_state();
-  if (std::isnan(total)) {
     return;
   }
 
@@ -116,102 +127,91 @@ void UtilitiesStatistics::loop() {
     return;
   }
 
-  // Check if a new day has started
-  if (t.day_of_year != this->gas_m3_.current_day_of_year) {
-    // Update start points for the new day, week, month, year
-    this->gas_m3_.start_yesterday = this->gas_m3_.start_today;
-    this->gas_m3_.start_today = total;
-
-    if (t.day_of_week == this->gas_m3_week_start_day_) {
-      this->gas_m3_.start_week = total;
-    }
-    if (t.day_of_month == this->gas_m3_month_start_day_) {
-      this->gas_m3_.start_month = total;
-    }
-    if (t.day_of_year == this->gas_m3_year_start_day_) {
-      this->gas_m3_.start_year = total;
-    }
-
-    this->gas_m3_.current_day_of_year = t.day_of_year;  // Update the current day
-    this->process_gas_m3_(total);  // Process new gas m3 values
-  }
-
-  // Continue processing the total sensor value
-  this->process_gas_m3_(total);
-
-  // Save data periodically
-  uint32_t now = millis();
-  if (now - last_save_time_ >= save_interval_ * 1000) {
-    this->save_();
-    last_save_time_ = now;
-  }
-}
-
-// Process gas statistics (m³)
-void UtilitiesStatistics::process_gas_m3_(float total) {
-  uint32_t now = millis();  // Get the current time
-
-  // If waiting for a valid sensor reading, skip the process
-  if (this->waiting_for_sensor_read_) {
-    if (std::isnan(total) || total == 0.0) {
-      // Log a warning if no valid reading is found
-      if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
-        ESP_LOGW(TAG, "Gas Statistics (m³) - Waiting for valid sensor reading.");
-        this->last_warning_time_ = now;
-      }
-      return;
-    }
-
-    // Once a valid reading is found, initialize the start points
-    this->gas_m3_.start_today = total;
-    this->gas_m3_.start_yesterday = total;
-    this->gas_m3_.start_week = total;
-    this->gas_m3_.start_month = total;
-    this->gas_m3_.start_year = total;
-
-    this->waiting_for_sensor_read_ = false;
-    ESP_LOGI(TAG, "Gas Statistics (m³) - Valid sensor reading obtained: %.3f", total);
-  }
-
-  // Ensure the total is valid and greater than the start points
-  if (total < this->gas_m3_.start_today || std::isnan(this->gas_m3_.start_today)) {
-    if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
-      ESP_LOGW(TAG, "Gas Statistics (m³) - 'Total Gas' sensor value is invalid.");
-      this->last_warning_time_ = now;
-    }
+  // Process Gas (m³)
+  const auto gas_total_m3 = this->gas_m3_total_->get_state();
+  if (std::isnan(gas_total_m3)) {
     return;
   }
 
-  // Update today, yesterday, week, month, year statistics
-  if (this->gas_m3_today_ && !std::isnan(this->gas_m3_.start_today)) {
-    float new_gas_today = total - this->gas_m3_.start_today;
-    if (this->gas_m3_today_->get_state() != new_gas_today) {
-      this->gas_m3_.gas_m3_today = new_gas_today;
-      this->gas_m3_today_->publish_state(new_gas_today);
+  // Check if a new day has started for Gas (m³)
+  if (t.day_of_year != this->gas_m3_.current_day_of_year) {
+    // Update start points for new day, week, month, year
+    this->gas_m3_.start_yesterday = this->gas_m3_.start_today;
+    this->gas_m3_.start_today = gas_total_m3;
+
+    if (t.day_of_week == this->gas_m3_week_start_day_) {
+      this->gas_m3_.start_week = gas_total_m3;
     }
+    if (t.day_of_month == this->gas_m3_month_start_day_) {
+      this->gas_m3_.start_month = gas_total_m3;
+    }
+    if (t.day_of_year == this->gas_m3_year_start_day_) {
+      this->gas_m3_.start_year = gas_total_m3;
+    }
+
+    this->gas_m3_.current_day_of_year = t.day_of_year;  // Update the current day
   }
 
-  if (this->gas_m3_yesterday_ && !std::isnan(this->gas_m3_.start_yesterday)) {
-    float new_gas_yesterday = this->gas_m3_.start_today - this->gas_m3_.start_yesterday;
-    this->gas_m3_yesterday_->publish_state(new_gas_yesterday);
+  // Continue processing the total gas (m³) sensor value
+  this->process_gas_m3_(gas_total_m3, t);
+
+  // Process Gas (MJ)
+  const auto gas_total_mj = this->gas_mj_total_->get_state();
+  if (std::isnan(gas_total_mj)) {
+    return;
   }
 
-  if (this->gas_m3_week_ && !std::isnan(this->gas_m3_.start_week)) {
-    float new_gas_week = total - this->gas_m3_.start_week;
-    this->gas_m3_week_->publish_state(new_gas_week);
+  // Check if a new day has started for Gas (MJ)
+  if (t.day_of_year != this->gas_mj_.current_day_of_year) {
+    // Update start points for new day, week, month, year
+    this->gas_mj_.start_yesterday = this->gas_mj_.start_today;
+    this->gas_mj_.start_today = gas_total_mj;
+
+    if (t.day_of_week == this->gas_mj_week_start_day_) {
+      this->gas_mj_.start_week = gas_total_mj;
+    }
+    if (t.day_of_month == this->gas_mj_month_start_day_) {
+      this->gas_mj_.start_month = gas_total_mj;
+    }
+    if (t.day_of_year == this->gas_mj_year_start_day_) {
+      this->gas_mj_.start_year = gas_total_mj;
+    }
+
+    this->gas_mj_.current_day_of_year = t.day_of_year;  // Update the current day
   }
 
-  if (this->gas_m3_month_ && !std::isnan(this->gas_m3_.start_month)) {
-    float new_gas_month = total - this->gas_m3_.start_month;
-    this->gas_m3_month_->publish_state(new_gas_month);
+  // Continue processing the total gas (MJ) sensor value
+  this->process_gas_mj_();
+
+  // Process Water
+  const auto water_total = this->water_total_->get_state();
+  if (std::isnan(water_total)) {
+    return;
   }
 
-  if (this->gas_m3_year_ && !std::isnan(this->gas_m3_.start_year)) {
-    float new_gas_year = total - this->gas_m3_.start_year;
-    this->gas_m3_year_->publish_state(new_gas_year);
+  // Check if a new day has started for Water
+  if (t.day_of_year != this->water_.current_day_of_year) {
+    // Update start points for new day, week, month, year
+    this->water_.start_yesterday = this->water_.start_today;
+    this->water_.start_today = water_total;
+
+    if (t.day_of_week == this->water_week_start_day_) {
+      this->water_.start_week = water_total;
+    }
+    if (t.day_of_month == this->water_month_start_day_) {
+      this->water_.start_month = water_total;
+    }
+    if (t.day_of_year == this->water_year_start_day_) {
+      this->water_.start_year = water_total;
+    }
+
+    this->water_.current_day_of_year = t.day_of_year;  // Update the current day
   }
 
-  // Only save data when necessary
+  // Continue processing the total water sensor value
+  this->process_water_(water_total, t);
+
+  // Save state at intervals
   uint32_t now = millis();
   if (now - last_save_time_ >= save_interval_ * 1000) {
     this->save_();
@@ -219,50 +219,16 @@ void UtilitiesStatistics::process_gas_m3_(float total) {
   }
 }
 
-// Process gas statistics (MJ) based on gas in m³
-void UtilitiesStatistics::process_gas_mj_() {
-  if (this->gas_mj_total_ != nullptr && this->gas_m3_total_ != nullptr) {
-    float gas_mj = this->gas_m3_total_->state * 1.022; // Conversion factor
-    this->gas_mj_total_->publish_state(gas_mj);
 
-    // Update MJ sensors for today, yesterday, etc.
-    if (this->gas_mj_today_ != nullptr) {
-      this->gas_mj_today_->publish_state(gas_mj - this->gas_mj_.start_today);
-    }
-  }
-}
 
-// Process water statistics
-void UtilitiesStatistics::process_water_(float total) {
-  if (this->water_today_ != nullptr) {
-    this->water_today_->publish_state(total - this->water_.start_today);
-  }
-  if (this->water_yesterday_ != nullptr) {
-    this->water_yesterday_->publish_state(this->water_.water_yesterday);
-  }
-  if (this->water_week_ != nullptr) {
-    this->water_week_->publish_state(this->water_.water_week);
-  }
-  if (this->water_month_ != nullptr) {
-    this->water_month_->publish_state(this->water_.water_month);
-  }
-  if (this->water_year_ != nullptr) {
-    this->water_year_->publish_state(this->water_.water_year);
-  }
-}
 
-// Reset gas m3 statistics
-void UtilitiesStatistics::reset_gas_m3_statistics() {
-  ESP_LOGI(TAG, "Resetting Gas (m³) statistics.");
-  this->gas_m3_ = {};  // Reset the gas_m3 structure
-  this->save_();       // Save reset data to NVS
-}
 
-// Save the current statistics to NVS
-void UtilitiesStatistics::save_() {
-  this->pref_.save(&this->gas_m3_);  // Save gas_m3 data to flash
-  ESP_LOGD(TAG, "Gas (m³) statistics saved to NVS.");
-}
 
-}  // namespace utilities_statistics
-}  // namespace esphome
+
+
+
+
+
+
+
+
