@@ -510,6 +510,121 @@ void UtilitiesStatistics::process_water_(float total, const esphome::time::ESPTi
 
 
 
+void UtilitiesStatistics::loop() {
+  const auto t = this->time_->now();
+  if (!t.is_valid()) {
+    return;
+  }
+
+  // If sensor updates are prevented, skip this loop
+  if (this->prevent_sensor_update_) {
+    this->prevent_sensor_update_ = false;
+    return;
+  }
+
+  // Process Gas (m³)
+  const auto gas_total_m3 = this->gas_m3_total_->get_state();
+  if (!std::isnan(gas_total_m3)) {
+    // Check if a new day has started for Gas (m³)
+    if (t.day_of_year != this->gas_m3_.current_day_of_year) {
+      // Update start points for new day, week, month, year
+      this->gas_m3_.start_yesterday = this->gas_m3_.start_today;
+      this->gas_m3_.start_today = gas_total_m3;
+
+      if (t.day_of_week == this->gas_m3_week_start_day_) {
+        this->gas_m3_.start_week = gas_total_m3;
+      }
+      if (t.day_of_month == this->gas_m3_month_start_day_) {
+        this->gas_m3_.start_month = gas_total_m3;
+      }
+      if (t.day_of_year == this->gas_m3_year_start_day_) {
+        this->gas_m3_.start_year = gas_total_m3;
+      }
+
+      this->gas_m3_.current_day_of_year = t.day_of_year;  // Update the current day
+      this->process_gas_m3_(gas_total_m3, t);  // Process new gas values
+    }
+
+    // Continue processing the total gas (m³) sensor value
+    this->process_gas_m3_(gas_total_m3, t);
+  }
+
+  // Process Gas (MJ)
+  const auto gas_total_mj = this->gas_mj_total_->get_state();
+  if (!std::isnan(gas_total_mj)) {
+    // Check if a new day has started for Gas (MJ)
+    if (t.day_of_year != this->gas_mj_.current_day_of_year) {
+      // Update start points for new day, week, month, year
+      this->gas_mj_.start_yesterday = this->gas_mj_.start_today;
+      this->gas_mj_.start_today = gas_total_mj;
+
+      if (t.day_of_week == this->gas_mj_week_start_day_) {
+        this->gas_mj_.start_week = gas_total_mj;
+      }
+      if (t.day_of_month == this->gas_mj_month_start_day_) {
+        this->gas_mj_.start_month = gas_total_mj;
+      }
+      if (t.day_of_year == this->gas_mj_year_start_day_) {
+        this->gas_mj_.start_year = gas_total_mj;
+      }
+
+      this->gas_mj_.current_day_of_year = t.day_of_year;  // Update the current day
+      this->process_gas_mj_();  // Process new gas values (MJ)
+    }
+
+    // Continue processing the total gas (MJ) sensor value
+    this->process_gas_mj_();
+  }
+
+  // Process Water
+  const auto water_total = this->water_total_->get_state();
+  if (!std::isnan(water_total)) {
+    // Check if a new day has started for Water
+    if (t.day_of_year != this->water_.current_day_of_year) {
+      // Update start points for new day, week, month, year
+      this->water_.start_yesterday = this->water_.start_today;
+      this->water_.start_today = water_total;
+
+      if (t.day_of_week == this->water_week_start_day_) {
+        this->water_.start_week = water_total;
+      }
+      if (t.day_of_month == this->water_month_start_day_) {
+        this->water_.start_month = water_total;
+      }
+      if (t.day_of_year == this->water_year_start_day_) {
+        this->water_.start_year = water_total;
+      }
+
+      this->water_.current_day_of_year = t.day_of_year;  // Update the current day
+      this->process_water_(water_total, t);  // Process new water values
+    }
+
+    // Continue processing the total water sensor value
+    this->process_water_(water_total, t);
+  }
+
+  // Only save to flash if necessary, for all utilities at once
+  uint32_t now = millis();
+  if (now - last_save_time_ >= save_interval_ * 1000) {
+    this->save_();
+    last_save_time_ = now;  // Update the last save time
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
