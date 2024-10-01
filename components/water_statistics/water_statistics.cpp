@@ -29,11 +29,11 @@ void WaterStatistics::dump_config() {
     LOG_SENSOR(GAP, "Water Year", this->water_year_);
   }
 
-  ESP_LOGCONFIG(TAG, "Restored Water Today (m³): %.3f", this->water_.water_today);
-  ESP_LOGCONFIG(TAG, "Restored Water Yesterday (m³): %.3f", this->water_.water_yesterday);
-  ESP_LOGCONFIG(TAG, "Restored Water Week (m³): %.3f", this->water_.water_week);
-  ESP_LOGCONFIG(TAG, "Restored Water Month (m³): %.3f", this->water_.water_month);
-  ESP_LOGCONFIG(TAG, "Restored Water Year (m³): %.3f", this->water_.water_year);
+  ESP_LOGCONFIG(TAG, "Restored Water Today (L): %.3f", this->water_.water_today);
+  ESP_LOGCONFIG(TAG, "Restored Water Yesterday (L): %.3f", this->water_.water_yesterday);
+  ESP_LOGCONFIG(TAG, "Restored Water Week (L): %.3f", this->water_.water_week);
+  ESP_LOGCONFIG(TAG, "Restored Water Month (L): %.3f", this->water_.water_month);
+  ESP_LOGCONFIG(TAG, "Restored Water Year (L): %.3f", this->water_.water_year);
 }
 
 void WaterStatistics::setup() {
@@ -143,7 +143,6 @@ void WaterStatistics::process_(float total) {
   }
 
   // Ensure total is greater than or equal to start points
-  // If not, reset start points to the current total to prevent negative values
   if (total < this->water_.start_today) {
     ESP_LOGW(TAG, "Water Statistics (L) - Total is less than start point, resetting start_today.");
     this->water_.start_today = total;
@@ -171,49 +170,73 @@ void WaterStatistics::process_(float total) {
   // Update water today only if the value has changed
   if (this->water_today_ && !std::isnan(this->water_.start_today)) {
     float new_water_today = total - this->water_.start_today;
+
+    // Handle negative usage
     if (new_water_today < 0.0) {
       ESP_LOGW(TAG, "Water Statistics (L) - Negative water usage detected, resetting start_today.");
       this->water_.start_today = total;  // Reset to avoid negative value
       new_water_today = 0.0;
     }
-    this->water_.water_today = new_water_today;
-    this->water_today_->publish_state(this->water_.water_today);
+
+    // Publish only if the new value differs from the current state
+    if (this->water_today_->get_state() != new_water_today) {
+      this->water_.water_today = new_water_today;
+      this->water_today_->publish_state(this->water_.water_today);
+    }
   }
 
   // Update water week only if the value has changed
   if (this->water_week_ && !std::isnan(this->water_.start_week)) {
     float new_water_week = total - this->water_.start_week;
+
+    // Handle negative usage
     if (new_water_week < 0.0) {
       ESP_LOGW(TAG, "Water Statistics (L) - Negative water usage detected, resetting start_week.");
       this->water_.start_week = total;  // Reset to avoid negative value
       new_water_week = 0.0;
     }
-    this->water_.water_week = new_water_week;
-    this->water_week_->publish_state(this->water_.water_week);
+
+    // Publish only if the new value differs from the current state
+    if (this->water_week_->get_state() != new_water_week) {
+      this->water_.water_week = new_water_week;
+      this->water_week_->publish_state(this->water_.water_week);
+    }
   }
 
   // Update water month only if the value has changed
   if (this->water_month_ && !std::isnan(this->water_.start_month)) {
     float new_water_month = total - this->water_.start_month;
+
+    // Handle negative usage
     if (new_water_month < 0.0) {
       ESP_LOGW(TAG, "Water Statistics (L) - Negative water usage detected, resetting start_month.");
       this->water_.start_month = total;  // Reset to avoid negative value
       new_water_month = 0.0;
     }
-    this->water_.water_month = new_water_month;
-    this->water_month_->publish_state(this->water_.water_month);
+
+    // Publish only if the new value differs from the current state
+    if (this->water_month_->get_state() != new_water_month) {
+      this->water_.water_month = new_water_month;
+      this->water_month_->publish_state(this->water_.water_month);
+    }
   }
 
   // Update water year only if the value has changed
   if (this->water_year_ && !std::isnan(this->water_.start_year)) {
     float new_water_year = total - this->water_.start_year;
+
+    // Handle negative usage
     if (new_water_year < 0.0) {
       ESP_LOGW(TAG, "Water Statistics (L) - Negative water usage detected, resetting start_year.");
       this->water_.start_year = total;  // Reset to avoid negative value
       new_water_year = 0.0;
     }
-    this->water_.water_year = new_water_year;
-    this->water_year_->publish_state(this->water_.water_year);
+
+    // Publish only if the new value differs from the current state
+    if (this->water_year_->get_state() != new_water_year) {
+      this->water_.water_year = new_water_year;
+      this->water_year_->publish_state(this->water_.water_year);
+    }
   }
 
   // Only save to flash if necessary
@@ -222,6 +245,7 @@ void WaterStatistics::process_(float total) {
     last_save_time_ = now;  // Update the last save time
   }
 }
+
 
 
 void WaterStatistics::reset_statistics() {
