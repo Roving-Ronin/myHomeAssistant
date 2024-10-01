@@ -52,12 +52,12 @@ CONF_GAS_MJ_YEAR = "gas_mj_year"
 
 CONF_SAVE_FREQUENCY = "save_frequency"
 
-utilities_statistics_ns = cg.esphome_ns.namespace("utilities_statistics")
-UtilitiesStatistics = utilities_statistics_ns.class_("UtilitiesStatistics", cg.Component)
+utility_statistics_ns = cg.esphome_ns.namespace("utility_statistics")
+UtilityStatistics = utility_statistics_ns.class_("UtilityStatistics", cg.Component)
 
 CONFIG_SCHEMA = cv.Schema(
     {
-        cv.GenerateID(): cv.declare_id(UtilitiesStatistics),
+        cv.GenerateID(): cv.declare_id(UtilityStatistics),
         cv.GenerateID(CONF_TIME_ID): cv.use_id(time.RealTimeClock),
         
         # Water configuration
