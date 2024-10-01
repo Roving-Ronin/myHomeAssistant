@@ -65,14 +65,12 @@ void UtilitiesStatistics::dump_config() {
     LOG_SENSOR(GAP, "Water Year", this->water_year_);
   }
 }
-
 void UtilitiesStatistics::setup() {
-  // Load saved state from preferences
-  this->pref_ = global_preferences->make_preference<gas_m3_data_t>(fnv1_hash(TAG));
-
-  gas_m3_data_t loaded{};
-  if (this->pref_.load(&loaded) && !this->is_resetting_) {
-    this->gas_m3_ = loaded;
+  // Gas (m³) preferences setup
+  this->pref_ = global_preferences->make_preference<gas_data_m3_t>(fnv1_hash("gas_m3"));
+  gas_data_m3_t loaded_gas_m3{};
+  if (this->pref_.load(&loaded_gas_m3) && !this->is_resetting_) {
+    this->gas_m3_ = loaded_gas_m3;
 
     if (this->gas_m3_today_ && !std::isnan(this->gas_m3_.gas_m3_today)) {
       this->gas_m3_today_->publish_state(this->gas_m3_.gas_m3_today);
@@ -92,10 +90,70 @@ void UtilitiesStatistics::setup() {
 
     auto total = this->gas_m3_total_->get_state();
     if (!std::isnan(total)) {
-      this->process_gas_m3_(total);
+      this->process_gas_m3_(total, this->time_->now());
     }
   } else {
     reset_gas_m3_statistics();  // Reset if the load fails or reset is requested
+  }
+
+  // Gas (MJ) preferences setup
+  this->pref_mj_ = global_preferences->make_preference<gas_data_mj_t>(fnv1_hash("gas_mj"));
+  gas_data_mj_t loaded_gas_mj{};
+  if (this->pref_mj_.load(&loaded_gas_mj) && !this->is_resetting_) {
+    this->gas_mj_ = loaded_gas_mj;
+
+    if (this->gas_mj_today_ && !std::isnan(this->gas_mj_.gas_mj_today)) {
+      this->gas_mj_today_->publish_state(this->gas_mj_.gas_mj_today);
+    }
+    if (this->gas_mj_yesterday_ && !std::isnan(this->gas_mj_.gas_mj_yesterday)) {
+      this->gas_mj_yesterday_->publish_state(this->gas_mj_.gas_mj_yesterday);
+    }
+    if (this->gas_mj_week_ && !std::isnan(this->gas_mj_.gas_mj_week)) {
+      this->gas_mj_week_->publish_state(this->gas_mj_.gas_mj_week);
+    }
+    if (this->gas_mj_month_ && !std::isnan(this->gas_mj_.gas_mj_month)) {
+      this->gas_mj_month_->publish_state(this->gas_mj_.gas_mj_month);
+    }
+    if (this->gas_mj_year_ && !std::isnan(this->gas_mj_.gas_mj_year)) {
+      this->gas_mj_year_->publish_state(this->gas_mj_.gas_mj_year);
+    }
+
+    auto total_mj = this->gas_mj_total_->get_state();
+    if (!std::isnan(total_mj)) {
+      this->process_gas_mj_();
+    }
+  } else {
+    reset_gas_mj_statistics();  // Reset if the load fails or reset is requested
+  }
+
+  // Water preferences setup
+  this->pref_water_ = global_preferences->make_preference<water_data_t>(fnv1_hash("water"));
+  water_data_t loaded_water{};
+  if (this->pref_water_.load(&loaded_water) && !this->is_resetting_) {
+    this->water_ = loaded_water;
+
+    if (this->water_today_ && !std::isnan(this->water_.water_today)) {
+      this->water_today_->publish_state(this->water_.water_today);
+    }
+    if (this->water_yesterday_ && !std::isnan(this->water_.water_yesterday)) {
+      this->water_yesterday_->publish_state(this->water_.water_yesterday);
+    }
+    if (this->water_week_ && !std::isnan(this->water_.water_week)) {
+      this->water_week_->publish_state(this->water_.water_week);
+    }
+    if (this->water_month_ && !std::isnan(this->water_.water_month)) {
+      this->water_month_->publish_state(this->water_.water_month);
+    }
+    if (this->water_year_ && !std::isnan(this->water_.water_year)) {
+      this->water_year_->publish_state(this->water_.water_year);
+    }
+
+    auto total_water = this->water_total_->get_state();
+    if (!std::isnan(total_water)) {
+      this->process_water_(total_water, this->time_->now());
+    }
+  } else {
+    reset_water_statistics();  // Reset if the load fails or reset is requested
   }
 }
 
@@ -213,9 +271,10 @@ void UtilitiesStatistics::loop() {
 
   // Save state at intervals
   uint32_t now = millis();
-  if (now - last_save_time_ >= save_interval_ * 1000) {
-    this->save_();
-    last_save_time_ = now;
+  if (data_changed && (now - last_save_time_ >= save_interval_ * 1000)) {
+    this->save_();  // Save the changed data to NVS
+    last_save_time_ = now;  // Update the last save time
+    data_changed = false;   // Reset the flag after saving
   }
 }
 
@@ -261,6 +320,7 @@ void UtilitiesStatistics::process_gas_m3_(float total, const esphome::time::ESPT
     if (this->gas_m3_today_->get_state() != new_gas_today) {
       this->gas_m3_.gas_m3_today = new_gas_today;
       this->gas_m3_today_->publish_state(this->gas_m3_.gas_m3_today);
+      data_changed = true;  // Mark that data has changed
     }
   } else if (this->gas_m3_today_ && (std::isnan(this->gas_m3_today_->get_state()) || this->gas_m3_today_->get_state() != 0.0)) {
     // If gas_today_ is NaN or not 0.0, publish 0.0
