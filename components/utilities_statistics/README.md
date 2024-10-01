@@ -1,4 +1,4 @@
-# Utilities Statistics
+# Utility Statistics
 
 To save on writes to Non-Volatile Storage (NVS) flash memory, this component combines the Gas (m3), Gas (MJ) and Water (L) components into a single component.
 
@@ -81,6 +81,9 @@ sensor:
       name: "Water Consumed Year"
       id: water_consumed_year
 ```
+
+TO UPDATE STILL
+
 
 ## Configuration variables:
 * **id** (*Optional*, [ID](https://esphome.io/guides/configuration-types.html#config-id)): Manually specify the ID used for code generation.
