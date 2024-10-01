@@ -220,6 +220,196 @@ void UtilitiesStatistics::loop() {
 }
 
 
+void UtilitiesStatistics::process_gas_m3_(float total, const esphome::time::ESPTime &t) {
+  uint32_t now = millis();
+
+  // If we're waiting for the sensor to update, skip calculation until valid
+  if (this->waiting_for_sensor_read_) {
+    if (std::isnan(total) || total == 0.0) {
+      // Only log the warning once per minute
+      if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
+        ESP_LOGW(TAG, "Gas Statistics (m³) - Skipping sensor reading update, waiting for valid sensor reading.");
+        this->last_warning_time_ = now;  // Update the last warning log time
+      }
+      return;
+    }
+
+    // Once we have a valid reading, set the start values
+    this->gas_m3_.start_today = total;
+    this->gas_m3_.start_yesterday = total;
+    this->gas_m3_.start_week = total;
+    this->gas_m3_.start_month = total;
+    this->gas_m3_.start_year = total;
+
+    this->waiting_for_sensor_read_ = false;  // Disable the wait flag
+    ESP_LOGI(TAG, "Gas Statistics (m³) - Valid sensor reading obtained: %.3f", total);
+  }
+
+  // Ensure total is greater than or equal to start points and clamp negative values
+  if (total < this->gas_m3_.start_today || std::isnan(this->gas_m3_.start_today)) {
+    // Only log the warning once per minute
+    if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
+      ESP_LOGW(TAG, "Gas Statistics (m³) - 'Total Gas' sensor total is less than start point or invalid. Skipping.");
+      this->last_warning_time_ = now;  // Update the last warning log time
+    }
+    return;
+  }
+
+  // Update gas today only if the value has changed
+  if (this->gas_m3_today_ && !std::isnan(this->gas_m3_.start_today)) {
+    float new_gas_today = total - this->gas_m3_.start_today;
+    if (this->gas_m3_today_->get_state() != new_gas_today) {
+      this->gas_m3_.gas_m3_today = new_gas_today;
+      this->gas_m3_today_->publish_state(this->gas_m3_.gas_m3_today);
+    }
+  } else if (this->gas_m3_today_ && (std::isnan(this->gas_m3_today_->get_state()) || this->gas_m3_today_->get_state() != 0.0)) {
+    // If gas_today_ is NaN or not 0.0, publish 0.0
+    this->gas_m3_today_->publish_state(0.0);
+  }
+
+  // Update gas yesterday only if the value has changed
+  if (this->gas_m3_yesterday_ && !std::isnan(this->gas_m3_.start_yesterday)) {
+    float new_gas_yesterday = this->gas_m3_.start_today - this->gas_m3_.start_yesterday;
+    if (this->gas_m3_yesterday_->get_state() != new_gas_yesterday) {
+      this->gas_m3_.gas_m3_yesterday = new_gas_yesterday;
+      this->gas_m3_yesterday_->publish_state(this->gas_m3_.gas_m3_yesterday);
+    }
+  } else if (this->gas_m3_yesterday_ && (std::isnan(this->gas_m3_yesterday_->get_state()) || this->gas_m3_yesterday_->get_state() != 0.0)) {
+    // If gas_yesterday_ is NaN or not 0.0, publish 0.0
+    this->gas_m3_yesterday_->publish_state(0.0);
+  }
+
+  // Update gas week only if the value has changed
+  if (this->gas_m3_week_ && !std::isnan(this->gas_m3_.start_week)) {
+    float new_gas_week = total - this->gas_m3_.start_week;
+    if (this->gas_m3_week_->get_state() != new_gas_week) {
+      this->gas_m3_.gas_m3_week = new_gas_week;
+      this->gas_m3_week_->publish_state(this->gas_m3_.gas_m3_week);
+    }
+  } else if (this->gas_m3_week_ && (std::isnan(this->gas_m3_week_->get_state()) || this->gas_m3_week_->get_state() != 0.0)) {
+    // If gas_week_ is NaN or not 0.0, publish 0.0
+    this->gas_m3_week_->publish_state(0.0);
+  }
+
+  // Update gas month only if the value has changed
+  if (this->gas_m3_month_ && !std::isnan(this->gas_m3_.start_month)) {
+    float new_gas_month = total - this->gas_m3_.start_month;
+    if (this->gas_m3_month_->get_state() != new_gas_month) {
+      this->gas_m3_.gas_m3_month = new_gas_month;
+      this->gas_m3_month_->publish_state(this->gas_m3_.gas_m3_month);
+    }
+  } else if (this->gas_m3_month_ && (std::isnan(this->gas_m3_month_->get_state()) || this->gas_m3_month_->get_state() != 0.0)) {
+    // If gas_month_ is NaN or not 0.0, publish 0.0
+    this->gas_m3_month_->publish_state(0.0);
+  }
+
+  // Update gas year only if the value has changed
+  if (this->gas_m3_year_ && !std::isnan(this->gas_m3_.start_year)) {
+    float new_gas_year = total - this->gas_m3_.start_year;
+    if (this->gas_m3_year_->get_state() != new_gas_year) {
+      this->gas_m3_.gas_m3_year = new_gas_year;
+      this->gas_m3_year_->publish_state(this->gas_m3_.gas_m3_year);
+    }
+  } else if (this->gas_m3_year_ && (std::isnan(this->gas_m3_year_->get_state()) || this->gas_m3_year_->get_state() != 0.0)) {
+    // If gas_year_ is NaN or not 0.0, publish 0.0
+    this->gas_m3_year_->publish_state(0.0);
+  }
+}
+
+void UtilitiesStatistics::process_gas_mj_() {
+  float gas_mj = this->gas_mj_total_->get_state();  // Get the total in MJ
+  uint32_t now = millis();
+
+  // If we're waiting for the sensor to update, skip calculation until valid
+  if (this->waiting_for_sensor_read_) {
+    if (std::isnan(gas_mj) || gas_mj == 0.0) {
+      // Only log the warning once per minute
+      if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
+        ESP_LOGW(TAG, "Gas Statistics (MJ) - Skipping sensor reading update, waiting for valid sensor reading.");
+        this->last_warning_time_ = now;  // Update the last warning log time
+      }
+      return;
+    }
+
+    // Once we have a valid reading, set the start values
+    this->gas_mj_.start_today = gas_mj;
+    this->gas_mj_.start_yesterday = gas_mj;
+    this->gas_mj_.start_week = gas_mj;
+    this->gas_mj_.start_month = gas_mj;
+    this->gas_mj_.start_year = gas_mj;
+
+    this->waiting_for_sensor_read_ = false;  // Disable the wait flag
+    ESP_LOGI(TAG, "Gas Statistics (MJ) - Valid sensor reading obtained: %.3f", gas_mj);
+  }
+
+  // Ensure total is greater than or equal to start points and clamp negative values
+  if (gas_mj < this->gas_mj_.start_today || std::isnan(this->gas_mj_.start_today)) {
+    // Only log the warning once per minute
+    if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
+      ESP_LOGW(TAG, "Gas Statistics (MJ) - 'Total Gas' sensor total is less than start point or invalid. Skipping.");
+      this->last_warning_time_ = now;  // Update the last warning log time
+    }
+    return;
+  }
+
+  // Update gas (MJ) today only if the value has changed
+  if (this->gas_mj_today_ && !std::isnan(this->gas_mj_.start_today)) {
+    float new_gas_today = gas_mj - this->gas_mj_.start_today;
+    if (this->gas_mj_today_->get_state() != new_gas_today) {
+      this->gas_mj_.gas_mj_today = new_gas_today;
+      this->gas_mj_today_->publish_state(this->gas_mj_.gas_mj_today);
+    }
+  } else if (this->gas_mj_today_ && (std::isnan(this->gas_mj_today_->get_state()) || this->gas_mj_today_->get_state() != 0.0)) {
+    // If gas_today_ is NaN or not 0.0, publish 0.0
+    this->gas_mj_today_->publish_state(0.0);
+  }
+
+  // Update gas (MJ) yesterday only if the value has changed
+  if (this->gas_mj_yesterday_ && !std::isnan(this->gas_mj_.start_yesterday)) {
+    float new_gas_yesterday = this->gas_mj_.start_today - this->gas_mj_.start_yesterday;
+    if (this->gas_mj_yesterday_->get_state() != new_gas_yesterday) {
+      this->gas_mj_.gas_mj_yesterday = new_gas_yesterday;
+      this->gas_mj_yesterday_->publish_state(this->gas_mj_.gas_mj_yesterday);
+    }
+  } else if (this->gas_mj_yesterday_ && (std::isnan(this->gas_mj_yesterday_->get_state()) || this->gas_mj_yesterday_->get_state() != 0.0)) {
+    this->gas_mj_yesterday_->publish_state(0.0);
+  }
+
+  // Update gas (MJ) week only if the value has changed
+  if (this->gas_mj_week_ && !std::isnan(this->gas_mj_.start_week)) {
+    float new_gas_week = gas_mj - this->gas_mj_.start_week;
+    if (this->gas_mj_week_->get_state() != new_gas_week) {
+      this->gas_mj_.gas_mj_week = new_gas_week;
+      this->gas_mj_week_->publish_state(this->gas_mj_.gas_mj_week);
+    }
+  } else if (this->gas_mj_week_ && (std::isnan(this->gas_mj_week_->get_state()) || this->gas_mj_week_->get_state() != 0.0)) {
+    this->gas_mj_week_->publish_state(0.0);
+  }
+
+  // Update gas (MJ) month only if the value has changed
+  if (this->gas_mj_month_ && !std::isnan(this->gas_mj_.start_month)) {
+    float new_gas_month = gas_mj - this->gas_mj_.start_month;
+    if (this->gas_mj_month_->get_state() != new_gas_month) {
+      this->gas_mj_.gas_mj_month = new_gas_month;
+      this->gas_mj_month_->publish_state(this->gas_mj_.gas_mj_month);
+    }
+  } else if (this->gas_mj_month_ && (std::isnan(this->gas_mj_month_->get_state()) || this->gas_mj_month_->get_state() != 0.0)) {
+    this->gas_mj_month_->publish_state(0.0);
+  }
+
+  // Update gas (MJ) year only if the value has changed
+  if (this->gas_mj_year_ && !std::isnan(this->gas_mj_.start_year)) {
+    float new_gas_year = gas_mj - this->gas_mj_.start_year;
+    if (this->gas_mj_year_->get_state() != new_gas_year) {
+      this->gas_mj_.gas_mj_year = new_gas_year;
+      this->gas_mj_year_->publish_state(this->gas_mj_.gas_mj_year);
+    }
+  } else if (this->gas_mj_year_ && (std::isnan(this->gas_mj_year_->get_state()) || this->gas_mj_year_->get_state() != 0.0)) {
+    this->gas_mj_year_->publish_state(0.0);
+  }
+}
+
+
 
 
 
