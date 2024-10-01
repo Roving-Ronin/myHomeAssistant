@@ -616,6 +616,134 @@ void UtilitiesStatistics::loop() {
 
 
 
+void UtilitiesStatistics::reset_gas_m3_statistics() {
+  uint32_t now = millis();  // Get the current time
+  ESP_LOGI(TAG, "Gas Statistics (m³) - Resetting values to 0.0");
+
+  // Reset Gas (m³) values
+  this->gas_m3_.gas_m3_today = 0.0;
+  this->gas_m3_.gas_m3_yesterday = 0.0;
+  this->gas_m3_.gas_m3_week = 0.0;
+  this->gas_m3_.gas_m3_month = 0.0;
+  this->gas_m3_.gas_m3_year = 0.0;
+
+  const auto gas_total_m3 = this->gas_m3_total_->get_state();
+  if (!std::isnan(gas_total_m3) && gas_total_m3 != 0.0) {
+    // Use the current total value as the new start points
+    this->gas_m3_.start_today = gas_total_m3;
+    this->gas_m3_.start_yesterday = gas_total_m3;
+    this->gas_m3_.start_week = gas_total_m3;
+    this->gas_m3_.start_month = gas_total_m3;
+    this->gas_m3_.start_year = gas_total_m3;
+    ESP_LOGI(TAG, "Gas Statistics (m³) - Start points set after reset: %.3f", gas_total_m3);
+  } else {
+    this->waiting_for_sensor_read_ = true;
+    ESP_LOGW(TAG, "Gas Statistics (m³) - Total is invalid, waiting for valid sensor reading.");
+  }
+
+  // Publish the reset values to sensors
+  if (this->gas_m3_today_) this->gas_m3_today_->publish_state(0.0);
+  if (this->gas_m3_yesterday_) this->gas_m3_yesterday_->publish_state(0.0);
+  if (this->gas_m3_week_) this->gas_m3_week_->publish_state(0.0);
+  if (this->gas_m3_month_) this->gas_m3_month_->publish_state(0.0);
+  if (this->gas_m3_year_) this->gas_m3_year_->publish_state(0.0);
+
+  // Save reset state to flash memory
+  this->save_();
+}
+
+
+
+
+
+void UtilitiesStatistics::reset_gas_mj_statistics() {
+  uint32_t now = millis();  // Get the current time
+  ESP_LOGI(TAG, "Gas Statistics (MJ) - Resetting values to 0.0");
+
+  // Reset Gas (MJ) values
+  this->gas_mj_.gas_mj_today = 0.0;
+  this->gas_mj_.gas_mj_yesterday = 0.0;
+  this->gas_mj_.gas_mj_week = 0.0;
+  this->gas_mj_.gas_mj_month = 0.0;
+  this->gas_mj_.gas_mj_year = 0.0;
+
+  const auto gas_total_mj = this->gas_mj_total_->get_state();
+  if (!std::isnan(gas_total_mj) && gas_total_mj != 0.0) {
+    this->gas_mj_.start_today = gas_total_mj;
+    this->gas_mj_.start_yesterday = gas_total_mj;
+    this->gas_mj_.start_week = gas_total_mj;
+    this->gas_mj_.start_month = gas_total_mj;
+    this->gas_mj_.start_year = gas_total_mj;
+    ESP_LOGI(TAG, "Gas Statistics (MJ) - Start points set after reset: %.3f", gas_total_mj);
+  } else {
+    this->waiting_for_sensor_read_ = true;
+    ESP_LOGW(TAG, "Gas Statistics (MJ) - Total is invalid, waiting for valid sensor reading.");
+  }
+
+  // Publish the reset values to sensors
+  if (this->gas_mj_today_) this->gas_mj_today_->publish_state(0.0);
+  if (this->gas_mj_yesterday_) this->gas_mj_yesterday_->publish_state(0.0);
+  if (this->gas_mj_week_) this->gas_mj_week_->publish_state(0.0);
+  if (this->gas_mj_month_) this->gas_mj_month_->publish_state(0.0);
+  if (this->gas_mj_year_) this->gas_mj_year_->publish_state(0.0);
+
+  // Save reset state to flash memory
+  this->save_();
+}
+
+
+
+
+
+void UtilitiesStatistics::reset_water_statistics() {
+  uint32_t now = millis();  // Get the current time
+  ESP_LOGI(TAG, "Water Statistics - Resetting values to 0.0");
+
+  // Reset Water values
+  this->water_.water_today = 0.0;
+  this->water_.water_yesterday = 0.0;
+  this->water_.water_week = 0.0;
+  this->water_.water_month = 0.0;
+  this->water_.water_year = 0.0;
+
+  const auto water_total = this->water_total_->get_state();
+  if (!std::isnan(water_total) && water_total != 0.0) {
+    this->water_.start_today = water_total;
+    this->water_.start_yesterday = water_total;
+    this->water_.start_week = water_total;
+    this->water_.start_month = water_total;
+    this->water_.start_year = water_total;
+    ESP_LOGI(TAG, "Water Statistics - Start points set after reset: %.3f", water_total);
+  } else {
+    this->waiting_for_sensor_read_ = true;
+    ESP_LOGW(TAG, "Water Statistics - Total is invalid, waiting for valid sensor reading.");
+  }
+
+  // Publish the reset values to sensors
+  if (this->water_today_) this->water_today_->publish_state(0.0);
+  if (this->water_yesterday_) this->water_yesterday_->publish_state(0.0);
+  if (this->water_week_) this->water_week_->publish_state(0.0);
+  if (this->water_month_) this->water_month_->publish_state(0.0);
+  if (this->water_year_) this->water_year_->publish_state(0.0);
+
+  // Save reset state to flash memory
+  this->save_();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
