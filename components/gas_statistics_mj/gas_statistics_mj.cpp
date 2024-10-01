@@ -146,7 +146,7 @@ void GasStatisticsMJ::process_(float total) {
   if (total < this->gas_.start_today || std::isnan(this->gas_.start_today)) {
     // Only log the warning once per minute
     if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
-      ESP_LOGW(TAG, "Gas Statistics (MJ) - Gas Total (MJ) sensor total is less than start point or invalid. Skipping.");
+      ESP_LOGW(TAG, "Gas Statistics (MJ) - 'Total Gas' sensor total is less than start point or invalid. Skipping.");
       this->last_warning_time_ = now;  // Update the last warning log time
     }
     return;
@@ -155,11 +155,22 @@ void GasStatisticsMJ::process_(float total) {
   // Update gas today only if the value has changed
   if (this->gas_today_ && !std::isnan(this->gas_.start_today)) {
     float new_gas_today = total - this->gas_.start_today;
+    if (new_gas_today < 0.0) new_gas_today = 0.0;  // Clamp negative values to zero
+    this->gas_.gas_today = new_gas_today;
+    this->gas_today_->publish_state(this->gas_.gas_today);
+  }
+  } else if (this->gas_today_ && this->gas_today_->get_state() != 0.0) {
+    this->gas_today_->publish_state(0.0);
+
+    // Update gas today only if the value has changed
+  if (this->gas_today_ && !std::isnan(this->gas_.start_today)) {
+    float new_gas_today = total - this->gas_.start_today;
     if (this->gas_today_->get_state() != new_gas_today) {
       this->gas_.gas_today = new_gas_today;
       this->gas_today_->publish_state(this->gas_.gas_today);
-    }
-  } else if (this->gas_today_ && this->gas_today_->get_state() != 0.0) {
+  }
+  } else if (this->gas_today_ && (std::isnan(this->gas_today_->get_state()) || this->gas_today_->get_state() != 0.0)) {
+    // If gas_today_ is NaN or not 0.0, publish 0.0
     this->gas_today_->publish_state(0.0);
   }
 
@@ -170,7 +181,8 @@ void GasStatisticsMJ::process_(float total) {
       this->gas_.gas_yesterday = new_gas_yesterday;
       this->gas_yesterday_->publish_state(this->gas_.gas_yesterday);
     }
-  } else if (this->gas_yesterday_ && this->gas_yesterday_->get_state() != 0.0) {
+  } else if (this->gas_yesterday_ && (std::isnan(this->gas_yesterday_->get_state()) || this->gas_yesterday_->get_state() != 0.0)) {
+    // If gas_yesterday_ is NaN or not 0.0, publish 0.0
     this->gas_yesterday_->publish_state(0.0);
   }
 
@@ -181,7 +193,8 @@ void GasStatisticsMJ::process_(float total) {
       this->gas_.gas_week = new_gas_week;
       this->gas_week_->publish_state(this->gas_.gas_week);
     }
-  } else if (this->gas_week_ && this->gas_week_->get_state() != 0.0) {
+  } else if (this->gas_week_ && (std::isnan(this->gas_week_->get_state()) || this->gas_week_->get_state() != 0.0)) {
+    // If gas_week_ is NaN or not 0.0, publish 0.0
     this->gas_week_->publish_state(0.0);
   }
 
@@ -192,7 +205,8 @@ void GasStatisticsMJ::process_(float total) {
       this->gas_.gas_month = new_gas_month;
       this->gas_month_->publish_state(this->gas_.gas_month);
     }
-  } else if (this->gas_month_ && this->gas_month_->get_state() != 0.0) {
+  } else if (this->gas_month_ && (std::isnan(this->gas_month_->get_state()) || this->gas_month_->get_state() != 0.0)) {
+    // If gas_month_ is NaN or not 0.0, publish 0.0
     this->gas_month_->publish_state(0.0);
   }
 
@@ -203,10 +217,11 @@ void GasStatisticsMJ::process_(float total) {
       this->gas_.gas_year = new_gas_year;
       this->gas_year_->publish_state(this->gas_.gas_year);
     }
-  } else if (this->gas_year_ && this->gas_year_->get_state() != 0.0) {
+  } else if (this->gas_year_ && (std::isnan(this->gas_year_->get_state()) || this->gas_year_->get_state() != 0.0)) {
+    // If gas_year_ is NaN or not 0.0, publish 0.0
     this->gas_year_->publish_state(0.0);
   }
-
+  
   // Only save to flash if necessary
   if (now - last_save_time_ >= save_interval_ * 1000) {
     this->save_();
@@ -216,7 +231,7 @@ void GasStatisticsMJ::process_(float total) {
 
 
 void GasStatisticsMJ::reset_statistics() {
-  uint32_t now = millis();         // Get the current time
+  uint32_t now = millis();        // Get the current time
   ESP_LOGI(TAG, "Gas Statistics (MJ) - Resetting values to 0.0");
 
   // Reset gas values to 0.0
@@ -228,7 +243,7 @@ void GasStatisticsMJ::reset_statistics() {
 
   // Get the current total value
   const auto total = this->total_->get_state();
- 
+  
   if (!std::isnan(total) && total != 0.0) {
     // Use the current total value as the new start points
     this->gas_.start_today = total;
