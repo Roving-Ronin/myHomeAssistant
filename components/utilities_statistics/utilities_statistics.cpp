@@ -414,6 +414,97 @@ void UtilitiesStatistics::process_gas_mj_() {
 
 
 
+void UtilitiesStatistics::process_water_(float total, const esphome::time::ESPTime &t) {
+  uint32_t now = millis();
+
+  // If we're waiting for the sensor to update, skip calculation until valid
+  if (this->waiting_for_sensor_read_) {
+    if (std::isnan(total) || total == 0.0) {
+      // Only log the warning once per minute
+      if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
+        ESP_LOGW(TAG, "Water Statistics - Skipping sensor reading update, waiting for valid sensor reading.");
+        this->last_warning_time_ = now;  // Update the last warning log time
+      }
+      return;
+    }
+
+    // Once we have a valid reading, set the start values
+    this->water_.start_today = total;
+    this->water_.start_yesterday = total;
+    this->water_.start_week = total;
+    this->water_.start_month = total;
+    this->water_.start_year = total;
+
+    this->waiting_for_sensor_read_ = false;  // Disable the wait flag
+    ESP_LOGI(TAG, "Water Statistics - Valid sensor reading obtained: %.3f", total);
+  }
+
+  // Ensure total is greater than or equal to start points and clamp negative values
+  if (total < this->water_.start_today || std::isnan(this->water_.start_today)) {
+    // Only log the warning once per minute
+    if (now - this->last_warning_time_ >= WARNING_LOG_INTERVAL) {
+      ESP_LOGW(TAG, "Water Statistics - 'Total Water' sensor total is less than start point or invalid. Skipping.");
+      this->last_warning_time_ = now;  // Update the last warning log time
+    }
+    return;
+  }
+
+  // Update water today only if the value has changed
+  if (this->water_today_ && !std::isnan(this->water_.start_today)) {
+    float new_water_today = total - this->water_.start_today;
+    if (this->water_today_->get_state() != new_water_today) {
+      this->water_.water_today = new_water_today;
+      this->water_today_->publish_state(this->water_.water_today);
+    }
+  } else if (this->water_today_ && (std::isnan(this->water_today_->get_state()) || this->water_today_->get_state() != 0.0)) {
+    // If water_today_ is NaN or not 0.0, publish 0.0
+    this->water_today_->publish_state(0.0);
+  }
+
+  // Update water yesterday only if the value has changed
+  if (this->water_yesterday_ && !std::isnan(this->water_.start_yesterday)) {
+    float new_water_yesterday = this->water_.start_today - this->water_.start_yesterday;
+    if (this->water_yesterday_->get_state() != new_water_yesterday) {
+      this->water_.water_yesterday = new_water_yesterday;
+      this->water_yesterday_->publish_state(this->water_.water_yesterday);
+    }
+  } else if (this->water_yesterday_ && (std::isnan(this->water_yesterday_->get_state()) || this->water_yesterday_->get_state() != 0.0)) {
+    this->water_yesterday_->publish_state(0.0);
+  }
+
+  // Update water week only if the value has changed
+  if (this->water_week_ && !std::isnan(this->water_.start_week)) {
+    float new_water_week = total - this->water_.start_week;
+    if (this->water_week_->get_state() != new_water_week) {
+      this->water_.water_week = new_water_week;
+      this->water_week_->publish_state(this->water_.water_week);
+    }
+  } else if (this->water_week_ && (std::isnan(this->water_week_->get_state()) || this->water_week_->get_state() != 0.0)) {
+    this->water_week_->publish_state(0.0);
+  }
+
+  // Update water month only if the value has changed
+  if (this->water_month_ && !std::isnan(this->water_.start_month)) {
+    float new_water_month = total - this->water_.start_month;
+    if (this->water_month_->get_state() != new_water_month) {
+      this->water_.water_month = new_water_month;
+      this->water_month_->publish_state(this->water_.water_month);
+    }
+  } else if (this->water_month_ && (std::isnan(this->water_month_->get_state()) || this->water_month_->get_state() != 0.0)) {
+    this->water_month_->publish_state(0.0);
+  }
+
+  // Update water year only if the value has changed
+  if (this->water_year_ && !std::isnan(this->water_.start_year)) {
+    float new_water_year = total - this->water_.start_year;
+    if (this->water_year_->get_state() != new_water_year) {
+      this->water_.water_year = new_water_year;
+      this->water_year_->publish_state(this->water_.water_year);
+    }
+  } else if (this->water_year_ && (std::isnan(this->water_year_->get_state()) || this->water_year_->get_state() != 0.0)) {
+    this->water_year_->publish_state(0.0);
+  }
+}
 
 
 
