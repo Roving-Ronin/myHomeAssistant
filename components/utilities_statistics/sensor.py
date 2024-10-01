@@ -25,7 +25,7 @@ from .const import (
 # Import your custom UNIT_MEGAJOULE from const.py
 from .const import UNIT_MEGAJOULE
 
-CODEOWNERS = ["@dentra", "@roving-ronin"]
+CODEOWNERS = ["@roving-ronin"]
 
 DEPENDENCIES = ["time"]
 
