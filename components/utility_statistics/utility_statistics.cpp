@@ -1,17 +1,17 @@
 #include "esphome/core/log.h"
 #include "esphome/core/hal.h"
-#include "utilities_statistics.h"
+#include "utility_statistics.h"
 
 namespace esphome {
-namespace utilities_statistics {
+namespace utility_statistics {
 
-static const char *const TAG = "utilities_statistics";
+static const char *const TAG = "utility_statistics";
 static const char *const GAP = "  ";
 
 // Time between warning log messages being repeated (in milliseconds)
 static const uint32_t WARNING_LOG_INTERVAL = 60000;  // 60 seconds
 
-void UtilitiesStatistics::dump_config() {
+void UtilityStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Gas (m³), Gas (MJ), and Water Statistics - Sensors");
 
   // Gas (m³) sensors
@@ -67,7 +67,7 @@ void UtilitiesStatistics::dump_config() {
 }
 
 
-void UtilitiesStatistics::setup() {
+void UtilityStatistics::setup() {
   // Gas (m³) preferences setup
   this->pref_ = global_preferences->make_preference<gas_data_m3_t>(fnv1_hash("gas_m3"));
   gas_data_m3_t loaded_gas_m3{};
@@ -160,7 +160,7 @@ void UtilitiesStatistics::setup() {
 }
 
 
-void UtilitiesStatistics::loop() {
+void UtilityStatistics::loop() {
   const auto t = this->time_->now();
   if (!t.is_valid()) {
     return;
@@ -267,7 +267,7 @@ void UtilitiesStatistics::loop() {
 
 
 // Process Gas (m³)
-void UtilitiesStatistics::process_gas_m3_(float total, const esphome::time::ESPTime &t) {
+void UtilityStatistics::process_gas_m3_(float total, const esphome::time::ESPTime &t) {
   uint32_t now = millis();
 
   // If we're waiting for the sensor to update, skip calculation until valid
@@ -371,7 +371,7 @@ void UtilitiesStatistics::process_gas_m3_(float total, const esphome::time::ESPT
 
 
 // Process Gas (MJ)
-void UtilitiesStatistics::process_gas_mj_() {
+void UtilityStatistics::process_gas_mj_() {
   float gas_mj = this->gas_mj_total_->get_state();  // Get the total in MJ
   uint32_t now = millis();
 
@@ -475,7 +475,7 @@ void UtilitiesStatistics::process_gas_mj_() {
 
 
 
-void UtilitiesStatistics::process_water_(float total, const esphome::time::ESPTime &t) {
+void UtilityStatistics::process_water_(float total, const esphome::time::ESPTime &t) {
   uint32_t now = millis();
 
   // If we're waiting for the sensor to update, skip calculation until valid
@@ -574,7 +574,7 @@ void UtilitiesStatistics::process_water_(float total, const esphome::time::ESPTi
 }
 
 
-void UtilitiesStatistics::loop() {
+void UtilityStatistics::loop() {
   const auto t = this->time_->now();
   if (!t.is_valid()) {
     return;
@@ -667,7 +667,7 @@ void UtilitiesStatistics::loop() {
     this->process_water_(water_total, t);
   }
 
-  // Only save to flash if necessary, for all utilities at once
+  // Only save to flash if necessary, for all utility at once
   uint32_t now = millis();
   if (now - last_save_time_ >= save_interval_ * 1000) {
     this->save_();
@@ -676,7 +676,7 @@ void UtilitiesStatistics::loop() {
 }
 
 
-void UtilitiesStatistics::reset_gas_m3_statistics() {
+void UtilityStatistics::reset_gas_m3_statistics() {
   uint32_t now = millis();  // Get the current time
   ESP_LOGI(TAG, "Gas Statistics (m³) - Resetting values to 0.0");
 
@@ -713,7 +713,7 @@ void UtilitiesStatistics::reset_gas_m3_statistics() {
 }
 
 
-void UtilitiesStatistics::reset_gas_mj_statistics() {
+void UtilityStatistics::reset_gas_mj_statistics() {
   uint32_t now = millis();  // Get the current time
   ESP_LOGI(TAG, "Gas Statistics (MJ) - Resetting values to 0.0");
 
@@ -749,7 +749,7 @@ void UtilitiesStatistics::reset_gas_mj_statistics() {
 }
 
 
-void UtilitiesStatistics::reset_water_statistics() {
+void UtilityStatistics::reset_water_statistics() {
   uint32_t now = millis();  // Get the current time
   ESP_LOGI(TAG, "Water Statistics - Resetting values to 0.0");
 
@@ -785,7 +785,7 @@ void UtilitiesStatistics::reset_water_statistics() {
 }
 
 
-void UtilitiesStatistics::save_() {
+void UtilityStatistics::save_() {
   // Save Gas (m³) data
   if (this->gas_m3_total_) {
     this->pref_.save(&this->gas_m3_);  // Save the Gas (m³) data to NVS
@@ -805,5 +805,5 @@ void UtilitiesStatistics::save_() {
   }
 }
 
-}  // namespace utilities_statistics
+}  // namespace utility_statistics
 }  // namespace esphome
