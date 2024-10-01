@@ -53,6 +53,7 @@ class UtilitiesStatistics : public Component {
   uint32_t save_interval_{300};  // Save every 5 minutes
   uint32_t last_save_time_{0};   // Timestamp of the last save
   uint32_t last_warning_time_{0}; // Timestamp of the last warning log
+  bool data_changed{false};  // Flag to track if data has changed
 
   ESPPreferenceObject pref_;
   time::RealTimeClock *time_;
@@ -96,10 +97,18 @@ class UtilitiesStatistics : public Component {
 
   // start day of week configuration
   int gas_m3_week_start_day_{2};
+  int gas_mj_week_start_day_{2};  // New line for gas MJ week start day
+  int water_week_start_day_{2};   // New line for water week start day
+
   // start day of month configuration
   int gas_m3_month_start_day_{1};
+  int gas_mj_month_start_day_{1};  // New line for gas MJ month start day
+  int water_month_start_day_{1};   // New line for water month start day
+
   // start day of year configuration
   int gas_m3_year_start_day_{1};
+  int gas_mj_year_start_day_{1};   // New line for gas MJ year start day
+  int water_year_start_day_{1};    // New line for water year start day
 
   // Gas m3 statistics data
   struct gas_m3_data_t {
@@ -150,9 +159,9 @@ class UtilitiesStatistics : public Component {
   } water_;
 
   // Internal helper methods
-  void process_gas_m3_(float total);
-  void process_gas_mj_();
-  void process_water_(float total);
+  void process_gas_m3_(float total, const esphome::time::ESPTime &t);  // Updated
+  void process_gas_mj_(const esphome::time::ESPTime &t);               // Updated
+  void process_water_(float total, const esphome::time::ESPTime &t);    // Updated
   void save_();
 };  // class UtilitiesStatistics
 
