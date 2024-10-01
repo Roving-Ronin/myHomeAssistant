@@ -6,11 +6,11 @@
 #include "esphome/components/time/real_time_clock.h"
 
 namespace esphome {
-namespace utilities_statistics {
+namespace utility_statistics {
 
 using sensor::Sensor;
 
-class UtilitiesStatistics : public Component {
+class UtilityStatistics : public Component {
  public:
   float get_setup_priority() const override { return setup_priority::DATA; }
   void dump_config() override;
@@ -163,7 +163,7 @@ class UtilitiesStatistics : public Component {
   void process_gas_mj_(const esphome::time::ESPTime &t);               // Updated
   void process_water_(float total, const esphome::time::ESPTime &t);    // Updated
   void save_();
-};  // class UtilitiesStatistics
+};  // class UtilityStatistics
 
-}  // namespace utilities_statistics
+}  // namespace utility_statistics
 }  // namespace esphome
