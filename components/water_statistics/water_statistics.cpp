@@ -90,18 +90,19 @@ void WaterStatistics::loop() {
     // Update start points for new day, week, month, year
     this->water_.start_yesterday = this->water_.start_today;
     this->water_.start_today = total;
+    ESP_LOGI(TAG, "Water Statistics (L) - New DAY detected, resetting start_today to %.3f", total);
 
     if (t.day_of_week == this->water_week_start_day_) {
       this->water_.start_week = total;
-      ESP_LOGI(TAG, "Water Statistics - New WEEK detected, resetting start_week.");
+      ESP_LOGI(TAG, "Water Statistics - New WEEK detected, resetting start_week to %.3f", total);
     }
     if (t.day_of_month == this->water_month_start_day_) {
       this->water_.start_month = total;
-      ESP_LOGI(TAG, "Water Statistics - New MONTH detected, resetting start_week.");
+      ESP_LOGI(TAG, "Water Statistics - New MONTH detected, resetting start_week to %.3f", total);
     }
     if (t.day_of_year == this->water_year_start_day_) {
       this->water_.start_year = total;
-      ESP_LOGI(TAG, "Water Statistics - New YEAR detected, resetting start_week.");
+      ESP_LOGI(TAG, "Water Statistics - New YEAR detected, resetting start_week to %.3f", total);
     }
 
     this->water_.current_day_of_year = t.day_of_year;  // Update the current day
