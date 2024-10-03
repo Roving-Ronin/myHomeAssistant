@@ -167,6 +167,9 @@ void WaterStatistics::process_(float total) {
     return;
   }
 
+  // Add time-based checks
+  const auto t = this->time_->now();
+
   // Update water today only if the value has changed
   if (this->water_today_ && !std::isnan(this->water_.start_today)) {
     float new_water_today = total - this->water_.start_today;
@@ -185,8 +188,8 @@ void WaterStatistics::process_(float total) {
     }
   }
 
-  // Update water week only if the value has changed
-  if (this->water_week_ && !std::isnan(this->water_.start_week)) {
+  // Ensure water week only updates at the start of a new week
+  if (this->water_week_ && t.day_of_week == this->water_week_start_day_ && !std::isnan(this->water_.start_week)) {
     float new_water_week = total - this->water_.start_week;
 
     // Handle negative usage
@@ -203,8 +206,8 @@ void WaterStatistics::process_(float total) {
     }
   }
 
-  // Update water month only if the value has changed
-  if (this->water_month_ && !std::isnan(this->water_.start_month)) {
+  // Ensure water month only updates at the start of a new month
+  if (this->water_month_ && t.day_of_month == this->water_month_start_day_ && !std::isnan(this->water_.start_month)) {
     float new_water_month = total - this->water_.start_month;
 
     // Handle negative usage
@@ -221,8 +224,8 @@ void WaterStatistics::process_(float total) {
     }
   }
 
-  // Update water year only if the value has changed
-  if (this->water_year_ && !std::isnan(this->water_.start_year)) {
+  // Ensure water year only updates at the start of a new year
+  if (this->water_year_ && t.day_of_year == this->water_year_start_day_ && !std::isnan(this->water_.start_year)) {
     float new_water_year = total - this->water_.start_year;
 
     // Handle negative usage
