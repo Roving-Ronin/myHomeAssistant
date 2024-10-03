@@ -79,38 +79,29 @@ void WaterStatistics::loop() {
     return;  // Skip if total is invalid
   }
 
-  // Time-based reset logic: always check for new day/week/month/year
+  // Time-based reset logic (day, week, month, year)
   if (t.day_of_year != this->water_.current_day_of_year) {
-    // Reset for a new day
+    // New day detected, reset day/week/month/year start points if needed
     this->water_.start_yesterday = this->water_.start_today;
     this->water_.start_today = total;
 
-    ESP_LOGI(TAG, "New day detected, resetting start_today to %.3f", total);
-
-    // Check for new week, based on configured start day
     if (t.day_of_week == this->water_week_start_day_) {
       this->water_.start_week = total;
-      ESP_LOGI(TAG, "New week detected, resetting start_week to %.3f", total);
     }
 
-    // Check for new month, based on configured start day
     if (t.day_of_month == this->water_month_start_day_) {
       this->water_.start_month = total;
-      ESP_LOGI(TAG, "New month detected, resetting start_month to %.3f", total);
     }
 
-    // Check for new year, based on configured start day
     if (t.day_of_year == this->water_year_start_day_) {
       this->water_.start_year = total;
-      ESP_LOGI(TAG, "New year detected, resetting start_year to %.3f", total);
     }
 
-    // Update the current day of the year to track daily changes
     this->water_.current_day_of_year = t.day_of_year;
     this->process_(total);  // Process the new water values after resetting periods
   }
 
-  // Now check for sensor update prevention
+  // Sensor update prevention logic (only after reset logic)
   if (this->prevent_sensor_update_) {
     this->prevent_sensor_update_ = false;
     return;  // Skip further sensor updates but after time-based checks
@@ -118,15 +109,15 @@ void WaterStatistics::loop() {
 
   // Continue processing the total sensor value (for regular updates)
   this->process_(total);
-}
 
   // Only save if save interval has passed
   uint32_t now = millis();
   if (now - last_save_time_ >= save_interval_ * 1000) {
-    this->save_();
-    last_save_time_ = now;
+    this->save_();  // Save the state
+    last_save_time_ = now;  // Update the last save time
   }
 }
+
 
 
 void WaterStatistics::process_(float total) {
