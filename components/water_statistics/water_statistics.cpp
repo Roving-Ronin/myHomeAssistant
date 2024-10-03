@@ -170,6 +170,10 @@ void WaterStatistics::process_(float total) {
     return;
   }
 
+  // Log the current start points for debugging
+  ESP_LOGI(TAG, "Water Statistics - Start Values: Today: %.3f, Week: %.3f, Month: %.3f, Year: %.3f", 
+            this->water_.start_today, this->water_.start_week, this->water_.start_month, this->water_.start_year);
+  
   // Update water today only if the value has changed
   if (this->water_today_ && !std::isnan(this->water_.start_today)) {
     float new_water_today = total - this->water_.start_today;
@@ -185,6 +189,7 @@ void WaterStatistics::process_(float total) {
     if (this->water_today_->get_state() != new_water_today) {
       this->water_.water_today = new_water_today;
       this->water_today_->publish_state(this->water_.water_today);
+      ESP_LOGI(TAG, "Water Statistics (L) - Water Usage - Today: %.3f L", new_water_today);
     }
   }
 
@@ -203,6 +208,7 @@ void WaterStatistics::process_(float total) {
     if (this->water_week_->get_state() != new_water_week) {
       this->water_.water_week = new_water_week;
       this->water_week_->publish_state(this->water_.water_week);
+      ESP_LOGI(TAG, "Water Statistics (L) - Water Usage - Week: %.3f L", new_water_week);
     }
   }
 
@@ -221,6 +227,7 @@ void WaterStatistics::process_(float total) {
     if (this->water_month_->get_state() != new_water_month) {
       this->water_.water_month = new_water_month;
       this->water_month_->publish_state(this->water_.water_month);
+      ESP_LOGI(TAG, "Water Statistics (L) - Water Usage - Month: %.3f L", new_water_month);
     }
   }
 
@@ -239,6 +246,7 @@ void WaterStatistics::process_(float total) {
     if (this->water_year_->get_state() != new_water_year) {
       this->water_.water_year = new_water_year;
       this->water_year_->publish_state(this->water_.water_year);
+      ESP_LOGI(TAG, "Water Statistics (L) - Water Usage - Year: %.3f L", new_water_year);
     }
   }
 
@@ -246,6 +254,7 @@ void WaterStatistics::process_(float total) {
   if (now - last_save_time_ >= save_interval_ * 1000) {
     this->save_();
     last_save_time_ = now;  // Update the last save time
+    ESP_LOGI(TAG, "Water Statistics - Values saved to flash memory (NVS).");
   }
 }
 
