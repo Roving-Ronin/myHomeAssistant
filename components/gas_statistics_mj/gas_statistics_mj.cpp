@@ -37,9 +37,9 @@ void GasStatisticsMJ::dump_config() {
 }
 
 void GasStatisticsMJ::setup() {
-  this->pref_ = global_preferences->make_preference<gas_data_mj_t>(fnv1_hash(TAG));
+  this->pref_ = global_preferences->make_preference<gas_data_t>(fnv1_hash(TAG));
 
-  gas_data_mj_t loaded{};
+  gas_data_t loaded{};
   if (this->pref_.load(&loaded) && !this->is_resetting_) {
     this->gas_ = loaded;
 
@@ -167,6 +167,9 @@ void GasStatisticsMJ::process_(float total) {
     return;
   }
 
+  // Add time-based checks
+  const auto t = this->time_->now();
+
   // Update gas today only if the value has changed
   if (this->gas_today_ && !std::isnan(this->gas_.start_today)) {
     float new_gas_today = total - this->gas_.start_today;
@@ -185,8 +188,8 @@ void GasStatisticsMJ::process_(float total) {
     }
   }
 
-  // Update gas week only if the value has changed
-  if (this->gas_week_ && !std::isnan(this->gas_.start_week)) {
+  // Ensure gas week only updates at the start of a new week
+  if (this->gas_week_ && t.day_of_week == this->gas_week_start_day_ && !std::isnan(this->gas_.start_week)) {
     float new_gas_week = total - this->gas_.start_week;
 
     // Handle negative usage
@@ -203,8 +206,8 @@ void GasStatisticsMJ::process_(float total) {
     }
   }
 
-  // Update gas month only if the value has changed
-  if (this->gas_month_ && !std::isnan(this->gas_.start_month)) {
+  // Ensure gas month only updates at the start of a new month
+  if (this->gas_month_ && t.day_of_month == this->gas_month_start_day_ && !std::isnan(this->gas_.start_month)) {
     float new_gas_month = total - this->gas_.start_month;
 
     // Handle negative usage
@@ -221,8 +224,8 @@ void GasStatisticsMJ::process_(float total) {
     }
   }
 
-  // Update gas year only if the value has changed
-  if (this->gas_year_ && !std::isnan(this->gas_.start_year)) {
+  // Ensure gas year only updates at the start of a new year
+  if (this->gas_year_ && t.day_of_year == this->gas_year_start_day_ && !std::isnan(this->gas_.start_year)) {
     float new_gas_year = total - this->gas_.start_year;
 
     // Handle negative usage
@@ -251,9 +254,11 @@ void GasStatisticsMJ::reset_statistics() {
   uint32_t now = millis();        // Get the current time
   ESP_LOGI(TAG, "Gas Statistics (MJ) - Resetting values to 0.0");
 
-  // Reset gas values to 0.0
+  // Reset today’s gas value to 0.0 (this is the only one that changes immediately)
   this->gas_.gas_today = 0.0;
   this->gas_.gas_yesterday = 0.0;
+  
+  // Reset week, month, and year values to 0.0 (these should remain 0 until their time periods start)
   this->gas_.gas_week = 0.0;
   this->gas_.gas_month = 0.0;
   this->gas_.gas_year = 0.0;
@@ -262,12 +267,10 @@ void GasStatisticsMJ::reset_statistics() {
   const auto total = this->total_->get_state();
   
   if (!std::isnan(total) && total != 0.0) {
-    // Use the current total value as the new start points
+    // Only set today’s start point to the current total
     this->gas_.start_today = total;
     this->gas_.start_yesterday = total;
-    this->gas_.start_week = total;
-    this->gas_.start_month = total;
-    this->gas_.start_year = total;
+
     ESP_LOGI(TAG, "Gas Statistics (MJ) - Start points set after reset: %.3f", total);
   } else {
     // If total is not valid, flag to wait for a valid reading
