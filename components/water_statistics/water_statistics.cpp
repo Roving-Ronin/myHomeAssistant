@@ -71,46 +71,54 @@ void WaterStatistics::setup() {
 void WaterStatistics::loop() {
   const auto t = this->time_->now();
   if (!t.is_valid()) {
-    return;
+    return;  // If time is invalid, skip the loop
   }
 
   const auto total = this->total_->get_state();
   if (std::isnan(total)) {
-    return;
+    return;  // Skip if total is invalid
   }
 
-  // If sensor updates are prevented, skip this loop
-  if (this->prevent_sensor_update_) {
-    this->prevent_sensor_update_ = false;
-    return;
-  }
-
-  // Check if a new day has started
+  // Time-based reset logic: always check for new day/week/month/year
   if (t.day_of_year != this->water_.current_day_of_year) {
-    // Update start points for new day, week, month, year
+    // Reset for a new day
     this->water_.start_yesterday = this->water_.start_today;
     this->water_.start_today = total;
-    ESP_LOGI(TAG, "Water Statistics (L) - New DAY detected, resetting start_today to %.3f", total);
 
+    ESP_LOGI(TAG, "New day detected, resetting start_today to %.3f", total);
+
+    // Check for new week, based on configured start day
     if (t.day_of_week == this->water_week_start_day_) {
       this->water_.start_week = total;
-      ESP_LOGI(TAG, "Water Statistics - New WEEK detected, resetting start_week to %.3f", total);
+      ESP_LOGI(TAG, "New week detected, resetting start_week to %.3f", total);
     }
+
+    // Check for new month, based on configured start day
     if (t.day_of_month == this->water_month_start_day_) {
       this->water_.start_month = total;
-      ESP_LOGI(TAG, "Water Statistics - New MONTH detected, resetting start_week to %.3f", total);
+      ESP_LOGI(TAG, "New month detected, resetting start_month to %.3f", total);
     }
+
+    // Check for new year, based on configured start day
     if (t.day_of_year == this->water_year_start_day_) {
       this->water_.start_year = total;
-      ESP_LOGI(TAG, "Water Statistics - New YEAR detected, resetting start_week to %.3f", total);
+      ESP_LOGI(TAG, "New year detected, resetting start_year to %.3f", total);
     }
 
-    this->water_.current_day_of_year = t.day_of_year;  // Update the current day
-    this->process_(total);  // Process new water values
+    // Update the current day of the year to track daily changes
+    this->water_.current_day_of_year = t.day_of_year;
+    this->process_(total);  // Process the new water values after resetting periods
   }
 
-  // Continue processing the total sensor value
+  // Now check for sensor update prevention
+  if (this->prevent_sensor_update_) {
+    this->prevent_sensor_update_ = false;
+    return;  // Skip further sensor updates but after time-based checks
+  }
+
+  // Continue processing the total sensor value (for regular updates)
   this->process_(total);
+}
 
   // Only save if save interval has passed
   uint32_t now = millis();
