@@ -87,10 +87,18 @@ void WaterStatistics::loop() {
 
   // Check if a new day has started
   if (t.day_of_year != this->water_.current_day_of_year) {
-    // Update start points for new day, week, month, year
+    // Transfer today's water usage to yesterday before resetting today
+    if (this->water_yesterday_) {
+      this->water_.water_yesterday = this->water_.water_today;  // Transfer today's water usage to yesterday
+      this->water_yesterday_->publish_state(this->water_.water_yesterday);  // Publish the updated yesterday value
+    }
+
+    // Reset today's water usage and update start points for new day, week, month, year
     this->water_.start_yesterday = this->water_.start_today;
     this->water_.start_today = total;
+    this->water_.water_today = 0.0;  // Reset today's water usage to 0
 
+    // Update week, month, year start points as necessary
     if (t.day_of_week == this->water_week_start_day_) {
       this->water_.start_week = total;
     }
@@ -115,6 +123,7 @@ void WaterStatistics::loop() {
     last_save_time_ = now;
   }
 }
+
 
 
 void WaterStatistics::process_(float total) {
