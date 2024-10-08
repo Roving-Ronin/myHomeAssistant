@@ -87,10 +87,18 @@ void GasStatistics::loop() {
 
   // Check if a new day has started
   if (t.day_of_year != this->gas_.current_day_of_year) {
-    // Update start points for new day, week, month, year
+    // Transfer today's gas usage to yesterday before resetting today
+    if (this->gas_yesterday_) {
+      this->gas_.gas_yesterday = this->gas_.gas_today;  // Transfer today's gas usage to yesterday
+      this->gas_yesterday_->publish_state(this->gas_.gas_yesterday);  // Publish the updated yesterday value
+    }
+
+    // Reset today's gas usage and update start points for new day, week, month, year
     this->gas_.start_yesterday = this->gas_.start_today;
     this->gas_.start_today = total;
+    this->gas_.gas_today = 0.0;  // Reset today's gas usage to 0
 
+    // Update week, month, year start points as necessary
     if (t.day_of_week == this->gas_week_start_day_) {
       this->gas_.start_week = total;
     }
@@ -115,6 +123,7 @@ void GasStatistics::loop() {
     last_save_time_ = now;
   }
 }
+
 
 
 void GasStatistics::process_(float total) {
