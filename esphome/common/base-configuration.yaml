@@ -21,7 +21,7 @@ substitutions:
    # Set timezone of the smart plug. Useful if the plug is in a location different to the HA server. Can be entered in unix Country/Area format (i.e. "Australia/Sydney")
   timezone: "Australia/Sydney"
    # Set the duration between the sntp service polling ntp.org servers for an update
-  sntp_update_interval: 6h
+  sntp_update_interval: 4h
    # Network time servers for your region, enter from lowest to highest priority
   sntp_server_1: "0.au.pool.ntp.org"
   sntp_server_2: "1.au.pool.ntp.org"
