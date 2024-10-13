@@ -1,6 +1,6 @@
 #############################
 #   
-#   WLCRS - Huawei Solar Integrattion - Combine multiple inverter values
+#   WLCRS - Huawei Solar Integration (FOR VERSION 1.4.0+ ) - Combines multiple inverter values
 #   See: https://github.com/wlcrs/huawei_solar/wiki/Connecting-to-daisy-chained-inverters
 #
 #   Note: To use this you MUST install the Energy_Meter integration using HACS.
@@ -15,9 +15,9 @@ template:
 
   # Inverter 1 - PV String 1  - Power. Calculated from current x voltage.
   # Referred to as PV1 on the SunSynk card.
-  - sensor:
+  - sensor
     - name: "Inverter 1 - PV 1 Power"
-      unique_id: inverter_1_pv_1_power
+      unique_id: inverter_pv_1_power
       state_class: "measurement"
       device_class: power
       unit_of_measurement: "W"
@@ -32,18 +32,18 @@ template:
           {% set voltage = voltage_state | float(default=0) %}
           {{ (current * voltage) | round(3) }}
         {% else %}
-          N/A
+          unknown
         {% endif %}
       availability: >-
-        {{  states('sensor.inverter_pv_1_current') | is_number
-        and states('sensor.inverter_pv_1_voltage') | is_number }}
+        {{ states('sensor.inverter_pv_1_current') | is_number and 
+           states('sensor.inverter_pv_1_voltage') | is_number }}
 
 
   # Inverter 1 - PV String 2  - Power. Calculated from current x voltage.
   # Referred to as PV2 on the SunSynk card.
   - sensor:
     - name: "Inverter 1 - PV 2 Power"
-      unique_id: inverter_1_pv_2_power
+      unique_id: inverter_pv_2_power
       state_class: "measurement"
       device_class: power
       unit_of_measurement: "W"
@@ -58,18 +58,18 @@ template:
           {% set voltage = voltage_state | float(default=0) %}
           {{ (current * voltage) | round(3) }}
         {% else %}
-          N/A
+          unknown
         {% endif %}
       availability: >-
-        {{  states('sensor.inverter_pv_2_current') | is_number
-        and states('sensor.inverter_pv_2_voltage') | is_number }}
+        {{ states('sensor.inverter_pv_2_current') | is_number and 
+           states('sensor.inverter_pv_2_voltage') | is_number }}
 
 
   # Inverter 2 - PV String 1  - Power. Calculated from current x voltage.
   # Referred to as PV3 on the SunSynk card.
   - sensor:
     - name: "Inverter 2 - PV 1 Power"
-      unique_id: inverter_2_pv_1_power
+      unique_id: inverter_pv_1_power_2
       state_class: "measurement"
       device_class: power
       unit_of_measurement: "W"
@@ -84,40 +84,168 @@ template:
           {% set voltage = voltage_state | float(default=0) %}
           {{ (current * voltage) | round(3) }}
         {% else %}
-          N/A
+          unknown
         {% endif %}
       availability: >-
-        {{  states('sensor.inverter_pv_1_current_2') | is_number
-        and states('sensor.inverter_pv_1_voltage_2') | is_number }}
+        {{ states('sensor.inverter_pv_1_current_2') | is_number and 
+           states('sensor.inverter_pv_1_voltage_2') | is_number }}
+
 
   # Inverter 2 - PV String 2  - Power. Calculated from current x voltage.
   # Referred to as PV2 on the SunSynk card.
   - sensor:
     - name: "Inverter 2 - PV 2 Power"
-      unique_id: inverter_2_pv_2_power
+      unique_id: inverter_pv_2_power_2
       state_class: "measurement"
       device_class: power
       unit_of_measurement: "W"
       icon: mdi:solar-power
       state: >-
-
         {% set current_state = states('sensor.inverter_pv_2_current_2') %}
         {% set voltage_state = states('sensor.inverter_pv_2_voltage_2') %}
-
          {% if current_state not in ['unknown', 'none', 'unavailable'] and
               voltage_state not in ['unknown', 'none', 'unavailable'] %}
           {% set current = current_state | float(default=0) %}
           {% set voltage = voltage_state | float(default=0) %}
           {{ (current * voltage) | round(3) }}
         {% else %}
-          N/A
+          unknown
         {% endif %}
       availability: >-
-        {{  states('sensor.inverter_pv_2_current_2') | is_number
-        and states('sensor.inverter_pv_2_voltage_2') | is_number }}
+        {{ states('sensor.inverter_pv_2_current_2') | is_number and 
+           states('sensor.inverter_pv_2_voltage_2') | is_number }}
   
 
 ########### Start: Inverters - Combined values for 2 inverters ###########
+
+  # Provides maximum rate (Watts) that the inverter(s) can export power to the grid.
+  - sensor:
+    - name: "Inverters - Grid Export Limit"
+      unique_id: inverters_grid_export_limit
+      icon: phu:huawei-solar-inverter
+      unit_of_measurement: 'W'
+      state: >-
+          {% set export_limit = states('sensor.inverter_active_power_control') %}
+          {% if export_limit == 'Unlimited' %}
+            {{ states('sensor.inverters_rated_power') | int }}
+          {% else %}
+            {% set export_limited = export_limit | regex_findall('Limited to (\d+)W') %}
+            {% if export_limited %}
+              {{ export_limited[0] | int }}
+            {% else %}
+              Unknown
+            {% endif %}
+          {% endif %}
+
+
+  # Provides the combined Rated Power of both inverters, in Watts.
+  - sensor:
+    - name: "Inverters - Rated Power"
+      unique_id: inverters_rated_power
+      icon: mdi:flash
+      unit_of_measurement: 'W'
+      state: >-
+        {% set inverter_1_rated_power = states('sensor.inverter_rated_power') | float(default=0) %}
+        {% set inverter_2_rated_power = states('sensor.inverter_rated_power_2') | float(default=0) %}
+
+        {% if states('sensor.inverter_rated_power_2') == 'unknown' %}
+          {{ inverter_1_rated_power }}
+        {% else %}
+          {% set count = 0 %}
+          {% set sum = 0 %}
+
+          {% if states('sensor.inverter_rated_power') != 'unknown' %}
+            {% set sum = sum + inverter_1_rated_power %}
+            {% set count = count + 1 %}
+          {% endif %}
+
+          {% if states('sensor.inverter_rated_power_2') != 'unknown' %}
+            {% set sum = sum + inverter_2_rated_power %}
+            {% set count = count + 1 %}
+          {% endif %}
+
+          {% if count > 0 %}
+            {{ sum | round(0) }}
+          {% else %}
+            N/A
+          {% endif %}
+        {% endif %}
+      availability: >
+        {% set inverter_1_available = has_value('sensor.inverter_rated_power') %}
+        {% set inverter_2_available = false %}
+        {% if 'sensor.inverter_rated_power_2' in states %}
+          {% set inverter_2_available = has_value('sensor.inverter_rated_power_2') %}
+        {% endif %}
+        {{ inverter_1_available or inverter_2_available }}
+
+
+
+  # Provides the combined Maximum Active Power both inverters, in Watts.
+  - sensor:
+    - name: "Inverters - Max Active Power"
+      unique_id: inverters_max_active_power
+      icon: mdi:flash
+      unit_of_measurement: 'W'
+      state: >-
+        {% set inverter_1_pmax = states('sensor.inverter_max_active_power') | float(default=0) %}
+        {% set inverter_2_pmax = states('sensor.inverter_max_active_power_2') | float(default=0) %}
+
+        {% if states('sensor.inverter_max_active_power_2') == 'unknown' %}
+          {{ inverter_1_pmax }}
+        {% else %}
+          {% set count = 0 %}
+          {% set sum = 0 %}
+
+          {% if states('sensor.inverter_max_active_power') != 'unknown' %}
+            {% set sum = sum + inverter_1_pmax %}
+            {% set count = count + 1 %}
+          {% endif %}
+
+          {% if states('sensor.inverter_max_active_power_2') != 'unknown' %}
+            {% set sum = sum + inverter_2_pmax %}
+            {% set count = count + 1 %}
+          {% endif %}
+
+          {% if count > 0 %}
+            {{ sum | round(0) }}
+          {% else %}
+            N/A
+          {% endif %}
+        {% endif %}
+      availability: >
+        {% set inverter_1_available = has_value('sensor.inverter_max_active_power') %}
+        {% set inverter_2_available = false %}
+        {% if 'sensor.inverter_max_active_power_2' in states %}
+          {% set inverter_2_available = has_value('sensor.inverter_max_active_power_2') %}
+        {% endif %}
+        {{ inverter_1_available or inverter_2_available }}
+
+
+  # PRIMARY INVERETER CONTROLS OVERALL PLANT
+  # Provides the combined 'Power Derating' value both inverters, in Watts.
+  - sensor:
+    - name: "Inverters - Power Derating Watts"
+      unique_id: inverters_power_derating_watts
+      icon: phu:huawei-solar-inverter
+      unit_of_measurement: 'W'
+      state: >-
+        {% set inverter_1 = states('number.inverter_power_derating') | float(0) %}
+        {% set inverter_2 = states('number.inverter_power_derating_2') | float(0) %}
+        {{ (inverter_1 + inverter_2) | round(0) | int }}
+
+
+   # PRIMARY INVERETER CONTROLS OVERALL PLANT
+   # Provides the combined 'Power Derating' value both inverters, in %.
+  - sensor:
+    - name: "Inverters - Power Derating (by percentage)"
+      unique_id: inverters_power_derating_by_percentage
+      icon: phu:huawei-solar-inverter
+      unit_of_measurement: '%'
+      state: >-
+        {% set inverter_1 = states('number.inverter_power_derating_by_percentage') | float(0) %}
+        {% set inverter_2 = states('number.inverter_power_derating_by_percentage_2') | float(0) %}
+        {{ (inverter_1 + inverter_2) / 2 | round(0) | int }}
+
 
   # Provides the combined current Active Power of both inverters, in Watts.
   - sensor:
@@ -129,32 +257,31 @@ template:
       state: >-
         {% set inverter_1_active_power = states('sensor.inverter_active_power') | float(default=0) %}
         {% set inverter_2_active_power = states('sensor.inverter_active_power_2') | float(default=0) %}
+        {% set count = 0 %}
+        {% set sum = 0 %}
 
-        {% if states('sensor.inverter_active_power_2') == 'unknown' %}
-          {{ inverter_1_active_power }}
-        {% else %}
-          {% set count = 0 %}
-          {% set sum = 0 %}
-
-          {% if states('sensor.inverter_active_power') != 'unknown' %}
-            {% set sum = sum + inverter_1_active_power %}
-            {% set count = count + 1 %}
-          {% endif %}
-
-          {% if states('sensor.inverter_active_power_2') != 'unknown' %}
-            {% set sum = sum + inverter_2_active_power %}
-            {% set count = count + 1 %}
-          {% endif %}
-
-          {% if count > 0 %}
-            {{ sum | round(1) }}
-          {% else %}
-            N/A
-          {% endif %}
+        {% if states('sensor.inverter_active_power') != ['unknown', 'unavailable', 'none'] %}
+          {% set sum = sum + inverter_1_active_power %}
+          {% set count = count + 1 %}
         {% endif %}
-      availability: >-
-        {{  states('sensor.inverter_active_power')   | is_number
-        and states('sensor.inverter_active_power_2') | is_number }}
+
+        {% if states('sensor.inverter_active_power_2') != ['unknown', 'unavailable', 'none'] %}
+          {% set sum = sum + inverter_2_active_power %}
+          {% set count = count + 1 %}
+        {% endif %}
+
+        {% if count > 0 %}
+          {{ sum | round(1) }}
+        {% else %}
+          unavailable
+        {% endif %}
+      availability: >
+        {% set inverter_1_available = has_value('sensor.inverter_active_power') %}
+        {% set inverter_2_available = false %}
+        {% if 'sensor.inverter_active_power_2' in states %}
+          {% set inverter_2_available = has_value('sensor.inverter_active_power_2') %}
+        {% endif %}
+        {{ inverter_1_available or inverter_2_available }}
 
 
   # Provides the combined Input Power from PV string of both inverters, in Watts
@@ -190,9 +317,13 @@ template:
             N/A
           {% endif %}
         {% endif %}
-      availability: >-
-        {{  states('sensor.inverter_input_power')   | is_number
-        and states('sensor.inverter_input_power_2') | is_number }}
+      availability: >
+        {% set inverter_1_available = has_value('sensor.inverter_input_power') %}
+        {% set inverter_2_available = false %}
+        {% if 'sensor.inverter_input_power_2' in states %}
+          {% set inverter_2_available = has_value('sensor.inverter_input_power_2') %}
+        {% endif %}
+        {{ inverter_1_available or inverter_2_available }}
 
 
   # Provides the combined Lifetime Yield of both inverters, in kWh.
@@ -228,9 +359,13 @@ template:
             N/A
           {% endif %}
         {% endif %}
-      availability: >-
-        {{  states('sensor.inverter_total_yield')   | is_number
-        and states('sensor.inverter_total_yield_2') | is_number }}
+      availability: >
+        {% set inverter_1_available = has_value('sensor.inverter_total_yield') %}
+        {% set inverter_2_available = false %}
+        {% if 'sensor.inverter_total_yield_2' in states %}
+          {% set inverter_2_available = has_value('sensor.inverter_total_yield_2') %}
+        {% endif %}
+        {{ inverter_1_available or inverter_2_available }}
 
 
   # Provides the combined daily yield of both inverters, in kWh.
@@ -266,9 +401,14 @@ template:
             N/A
           {% endif %}
         {% endif %}
-      availability: >-
-        {{  states('sensor.inverter_daily_yield')   | is_number
-        and states('sensor.inverter_daily_yield_2') | is_number }}
+      availability: >
+        {% set inverter_1_available = has_value('sensor.inverter_daily_yield') %}
+        {% set inverter_2_available = false %}
+        {% if 'sensor.inverter_daily_yield_2' in states %}
+          {% set inverter_2_available = has_value('sensor.inverter_daily_yield_2') %}
+        {% endif %}
+        {{ inverter_1_available or inverter_2_available }}
+
 
 #############################
 
@@ -341,7 +481,7 @@ template:
       availability: >-
         {{ (states('sensor.inverters_input_power') | is_number) }}
 
-        
+
   # Provides the combined status of inverter(s).  If either inverter is in state unknown or an error/stop state
   # then the combined state will be shown as the error/stop state. Otherwise the standby/grid connected state
   # of Inverter 1 will be shown, with Inverter 2 state as a fall back.
@@ -368,9 +508,13 @@ template:
             {% else %}
               {{ inverter_1_state if inverter_1_state not in ['unknown', 'unavailable'] else inverter_2_state }}
             {% endif %}
-      availability: >-
-        {{ (states('sensor.inverter_inverter_state') not in [ 'unknown', 'unavailable', 'none' ] )
-        or (states('sensor.inverter_inverter_state_2') not in [ 'unknown', 'unavailable', 'none' ]) }}
+      availability: >
+        {% set inverter_1_available = has_value('sensor.inverter_inverter_state') %}
+        {% set inverter_2_available = false %}
+        {% if 'sensor.inverter_inverter_state_2' in states %}
+          {% set inverter_2_available = has_value('sensor.inverter_inverter_state_2') %}
+        {% endif %}
+        {{ inverter_1_available or inverter_2_available }}
 
 
   # Provides the Temperature of both inverters in °C, with the inverter with the higher temperature being displayed.
@@ -384,16 +528,20 @@ template:
         {% set inverter_temp_1 = states('sensor.inverter_internal_temperature') | float(default=0) %}
         {% set inverter_temp_2 = states('sensor.inverter_internal_temperature_2') | float(default=0) %}
         {{ max(inverter_temp_1, inverter_temp_2) | round(1) }}
-      availability: >-
-        {{ states('sensor.inverter_internal_temperature') != 'unavailable'
-        or states('sensor.inverter_internal_temperature_2') != 'unavailable' }}
-        
-        
+      availability: >
+        {% set inverter_1_available = has_value('sensor.inverter_internal_temperature') %}
+        {% set inverter_2_available = false %}
+        {% if 'sensor.inverter_internal_temperature_2' in states %}
+          {% set inverter_2_available = has_value('sensor.inverter_internal_temperature_2') %}
+        {% endif %}
+        {{ inverter_1_available or inverter_2_available }}
+
+
   # Provides the combined status off-grid status of both inverters. If either inverter is off-grid
   # then the sensor will show this as the overall status both the combined status.
   - sensor:
-    - name: "Inverters - Off Grid Status"
-      unique_id: inverters_off_grid_status
+    - name: "Inverters - Grid Status"
+      unique_id: inverters_grid_status
       state: >-
           {% set inverter_1_grid_status = states('sensor.inverter_off_grid_status') %}
           {% set inverter_2_grid_status = states('sensor.inverter_off_grid_status_2') %}
@@ -402,9 +550,13 @@ template:
           {% else %}
             {{ inverter_1_grid_status if inverter_1_grid_status not in ['unknown', 'unavailable'] else inverter_2_grid_status }}
           {% endif %}
-      availability: >-
-        {{ (states('sensor.inverter_off_grid_status') not in [ 'unknown', 'unavailable', 'none'  ] )
-        or (states('sensor.inverter_off_grid_status_2') not in [ 'unknown', 'unavailable', 'none' ]) }}
+      availability: >
+        {% set inverter_1_available = has_value('sensor.inverter_off_grid_status') %}
+        {% set inverter_2_available = false %}
+        {% if 'sensor.inverter_internal_temperature_2' in states %}
+          {% set inverter_2_available = has_value('sensor.inverter_off_grid_status_2') %}
+        {% endif %}
+        {{ inverter_1_available or inverter_2_available }}
 
 
 ########### Start: Batteries - Combined values for 2 batteries ###########
@@ -412,229 +564,6 @@ template:
 #  Note: If you do NOT have two batteries, these sensors may cause your configuration to not load, due to yaml error
 #        casued by the  sensor.battery_<entity_name>_2 not being detected.
 #
-
-  # Provides the combined avaeraged State of Capacity both batteries, as a %.
-  - sensor:
-    - name: "Batteries - State of Capacity"
-      unique_id: batteries_state_of_capacity
-      unit_of_measurement: "%"
-      device_class: "battery"
-      state_class: measurement
-      state: >-
-        {% set battery_1_soc = states('sensor.battery_state_of_capacity') |float(default=0) %}
-        {% set battery_2_soc = states('sensor.battery_state_of_capacity_2') |float(default=0) %}
-
-        {% if states('sensor.battery_state_of_capacity_2') == 'unknown' %}
-          {{ battery_1_soc }}
-        {% else %}
-          {% set count = 0 %}
-          {% set sum = 0 %}
-
-          {% if states('sensor.battery_state_of_capacity') != 'unknown' %}
-            {% set sum = sum + battery_1_soc %}
-            {% set count = count + 1 %}
-          {% endif %}
-
-          {% if states('sensor.battery_state_of_capacity_2') != 'unknown' %}
-            {% set sum = sum + battery_2_soc %}
-            {% set count = count + 1 %}
-          {% endif %}
-
-          {% if count > 0 %}
-            {{ (sum / count) }}
-          {% else %}
-            N/A
-          {% endif %}
-        {% endif %}
-      availability: >-
-        {{ states('sensor.battery_state_of_capacity')   | is_number
-        or states('sensor.battery_state_of_capacity_2') | is_number }}
-
-
-  # Provides the combined daily charge of both batteries, in kWh.
-  - sensor:
-    - name: "Batteries - Day Charge"
-      unique_id: batteries_day_charge
-      unit_of_measurement: "kWh"
-      device_class: "energy_storage"
-      state: >-
-        {% set battery_1_day_charge = states('sensor.battery_day_charge') |float(default=0) %}
-        {% set battery_2_day_charge = states('sensor.battery_day_charge_2') |float(default=0) %}
-
-        {% if states('sensor.battery_day_charge_2') == 'unknown' %}
-          {{ battery_1_day_charge }}
-        {% else %}
-          {% set count = 0 %}
-          {% set sum = 0 %}
-
-          {% if states('sensor.battery_day_charge') != 'unknown' %}
-            {% set sum = sum + battery_1_day_charge %}
-            {% set count = count + 1 %}
-          {% endif %}
-
-          {% if states('sensor.battery_day_charge_2') != 'unknown' %}
-            {% set sum = sum + battery_2_day_charge %}
-            {% set count = count + 1 %}
-          {% endif %}
-
-          {% if count > 0 %}
-            {{ sum }}
-          {% else %}
-            N/A
-          {% endif %}
-        {% endif %}
-      availability: >-
-        {{ states('sensor.battery_day_charge')   | is_number
-        or states('sensor.battery_day_charge_2') | is_number }}
-        
-
-  # Provides the combined daily discharge of both batteries, in kWh.
-  - sensor:
-    - name: "Batteries - Day Discharge"
-      unique_id: batteries_day_discharge
-      unit_of_measurement: "kWh"
-      device_class: "energy_storage"
-      state: >-
-        {% set battery_1_day_discharge = states('sensor.battery_day_discharge') |float(default=0) %}
-        {% set battery_2_day_discharge = states('sensor.battery_day_discharge_2') |float(default=0) %}
-
-        {% if states('sensor.battery_day_discharge_2') == 'unknown' %}
-          {{ battery_1_day_discharge }}
-        {% else %}
-          {% set count = 0 %}
-          {% set sum = 0 %}
-
-          {% if states('sensor.battery_day_discharge') != 'unknown' %}
-            {% set sum = sum + battery_1_day_discharge %}
-            {% set count = count + 1 %}
-          {% endif %}
-
-          {% if states('sensor.battery_day_discharge_2') != 'unknown' %}
-            {% set sum = sum + battery_2_day_discharge %}
-            {% set count = count + 1 %}
-          {% endif %}
-
-          {% if count > 0 %}
-            {{ sum | round(2) }}
-          {% else %}
-            N/A
-          {% endif %}
-        {% endif %}
-      availability: >-
-        {{ states('sensor.battery_day_discharge')   | is_number
-        or states('sensor.battery_day_discharge_2') | is_number }}
-
-
-  # Provides the combined daily Charge/Discharge of both batteries, in Watts.
-  - sensor:
-    - name: "Batteries - Charge/Discharge Power"
-      unique_id: batteries_charge_discharge_power
-      unit_of_measurement: "W"
-      device_class: "power"
-      state: >-
-        {% set battery_1_charge_discharge = states('sensor.battery_charge_discharge_power') |float(default=0) %}
-        {% set battery_2_charge_discharge = states('sensor.battery_charge_discharge_power_2') |float(default=0) %}
-
-        {% if states('sensor.battery_charge_discharge_power_2') == 'unknown' %}
-          {{ battery_1_charge_discharge }}
-        {% else %}
-          {% set count = 0 %}
-          {% set sum = 0 %}
-
-          {% if states('sensor.battery_charge_discharge_power') != 'unknown' %}
-            {% set sum = sum + battery_1_charge_discharge %}
-            {% set count = count + 1 %}
-          {% endif %}
-
-          {% if states('sensor.battery_charge_discharge_power_2') != 'unknown' %}
-            {% set sum = sum + battery_2_charge_discharge %}
-            {% set count = count + 1 %}
-          {% endif %}
-
-          {% if count > 0 %}
-            {{ sum }}
-          {% else %}
-            N/A
-          {% endif %}
-        {% endif %}
-      availability: >-
-        {{ states('sensor.battery_charge_discharge_power')   | is_number
-        or states('sensor.battery_charge_discharge_power_2') | is_number }}
-
-  
-  # Provides the combined averaged Bus Current both batteries, in Amps.
-  - sensor:
-    - name: "Batteries - Bus Current"
-      unique_id: batteries_bus_current
-      unit_of_measurement: "A"
-      device_class: "current"      
-      state: >-
-        {% set battery_1_bus_current = states('sensor.battery_bus_current') | float(default=0) %}
-        {% set battery_2_bus_current = states('sensor.battery_bus_current_2') | float(default=0) %}
-
-        {% if states('sensor.battery_bus_current_2') == 'unknown' %}
-          {{ battery_1_bus_current | round(1) }}
-        {% else %}
-          {% set count = 0 %}
-          {% set sum = 0 %}
-
-          {% if states('sensor.battery_bus_current') != 'unknown' %}
-            {% set sum = sum + battery_1_bus_current %}
-            {% set count = count + 1 %}
-          {% endif %}
-
-          {% if states('sensor.battery_bus_current_2') != 'unknown' %}
-            {% set sum = sum + battery_2_bus_current %}
-            {% set count = count + 1 %}
-          {% endif %}
-
-          {% if count > 0 %}
-            {{ sum / count }}
-          {% else %}
-            N/A
-          {% endif %}
-        {% endif %}
-      availability: >-
-        {{ states('sensor.battery_bus_current')   | is_number
-        or states('sensor.battery_bus_current_2') | is_number }}
-
-
-  # Provides the combined averaged Bus Voltage both batteries, in Volts.
-  - sensor:
-    - name: "Batteries - Bus Voltage"
-      unique_id: batteries_bus_voltage
-      unit_of_measurement: "V"
-      device_class: "voltage"      
-      state: >-
-        {% set battery_1_bus_voltage = states('sensor.battery_bus_voltage') | float(default=0) %}
-        {% set battery_2_bus_voltage = states('sensor.battery_bus_voltage_2') | float(default=0) %}
-
-        {% if states('sensor.battery_bus_voltage_2') == 'unknown' %}
-          {{ battery_1_bus_voltage | round(1) }}
-        {% else %}
-          {% set count = 0 %}
-          {% set sum = 0 %}
-
-          {% if states('sensor.battery_bus_voltage') != 'unknown' %}
-            {% set sum = sum + battery_1_bus_voltage %}
-            {% set count = count + 1 %}
-          {% endif %}
-
-          {% if states('sensor.battery_bus_voltage_2') != 'unknown' %}
-            {% set sum = sum + battery_2_bus_voltage %}
-            {% set count = count + 1 %}
-          {% endif %}
-
-          {% if count > 0 %}
-            {{ (sum / count) | round(1) }}
-          {% else %}
-            N/A
-          {% endif %}
-        {% endif %}
-      availability: >-
-        {{ states('sensor.battery_bus_voltage')   | is_number
-        or states('sensor.battery_bus_voltage_2') | is_number }}
-
 
   # Provides the Temperature of both batteries in °C, with the battery with the higher temperature being displayed.
   # Note: If either batteries temperature state is 'uknown', then displays the state of the other battery.
@@ -649,28 +578,8 @@ template:
         {{ max(battery_temp_1, battery_temp_2) | round(1) }}
       availability: >-
         {{ states('sensor.battery_battery_1_temperature') != 'unavailable'
-        or states('sensor.battery_battery_1_temperature_2') != 'unavailable' }}
+        or states('sensor.battery_battery_2_temperature') != 'unavailable' }}
 
-     
-  # Provides the combined status both batteries. If either battery is offline of faulty
-  # then the sensor will show this as the overall status, otherwise it will the status of the online battery.
-  - sensor:
-    - name: "Batteries - Status"
-      unique_id: batteries_status
-      state: >-
-          {% set battery_1_state = states('sensor.battery_status') %}
-          {% set battery_2_state = states('sensor.battery_status_2') %}
-          {% if 'offline' in [battery_1_state, battery_2_state] %}
-            offline
-          {% elif 'fault' in [battery_1_state, battery_2_state] %}
-            fault
-          {% else %}
-            {{ battery_1_state if battery_1_state not in ['unknown', 'unavailable'] else battery_2_state }}
-          {% endif %}
-      availability: >-
-        {{ (states('sensor.battery_status') not in [ 'unknown', 'unavailable', 'none' ] )
-        or (states('sensor.battery_status_2') not in [ 'unknown', 'unavailable', 'none' ]) }}
-    
 
 ########### Start: Power Meter - Calculates the Active Power being consumed in the house from grid, inveters & battery ###########
 
@@ -689,11 +598,13 @@ template:
         {{ max(0, (inverters_power - power_meter_power)) }}
 
       availability: >-
-        {{  states('sensor.inverters_active_power') | is_number
-        and states('sensor.power_meter_active_power') | is_number }}
+        {{ states('sensor.inverters_active_power') | is_number and
+           states('sensor.power_meter_active_power') | is_number }}
 
-
+        
 ########### Start: Power Flows - Derive power flows between PV, Batteries, Grid and House ###########
+
+# ***** REPLACE WITH PEES ??? *****
 
   # Calculates the Power (W) being exported from the Battery(s) to the Grid.
   - sensor:
@@ -703,7 +614,7 @@ template:
       icon: mdi:home-export-outline
       device_class: power
       state_class: measurement                                                        
-      state: >                                                                        
+      state: >-
         {% set inverters_output = states('sensor.inverters_active_power')|int(default=0) %}         
         {% set battery = states('sensor.batteries_charge_discharge_power')|int(default=0) %}
         {% set grid_power = states('sensor.power_meter_active_power')|int(default=0) %}     
@@ -727,7 +638,7 @@ template:
       device_class: power                                                             
       state_class: measurement                                                        
       unit_of_measurement: W                                                          
-      state: >-                                             
+      state: >-
         {% set battery = states('sensor.batteries_charge_discharge_power')|int(default=0) %}
         {% set to_grid = states('sensor.batteries_to_grid')|int(default=0) %}
 
@@ -739,6 +650,27 @@ template:
         or (states('sensor.batteries_to_grid') not in [ 'unknown', 'none', 'unavailable' ]) }}
 
 
+  # Calculates the Power (W) being consumed from the Battery(s) to the EV Charger.
+  - sensor:    
+    - name: Batteries - Power to EV Charger
+      unique_id: batteries_power_to_ev_charger
+      device_class: power                                                             
+      state_class: measurement                                                        
+      unit_of_measurement: W                                                          
+      state: >-
+        {% set battery = states('sensor.batteries_charge_discharge_power')|int(default=0) %}
+        {% set grid_power = states('sensor.power_meter_active_power')|int(default=0) %}     
+        {% set ev_charger = states('sensor.ev_charger_active_power')|int(default=0) %}
+
+        {% if battery < 0 and grid_power > 0 %} {{ ev_charger | int }}  
+        {% else %} 0                                                          
+        {% endif %}
+      availability: >-
+        {{ (states('sensor.batteries_charge_discharge_power') not in [ 'unknown', 'none', 'unavailable' ])
+        or (states('sensor.power_meter_active_power') not in [ 'unknown', 'none', 'unavailable' ])
+        or (states('sensor.ev_charger_active_power') not in [ 'unknown', 'none', 'unavailable' ]) }}
+
+
   # Calculates the Power (W) being produced by the Solar Inverter(s) and consumed by the House.
   - sensor:    
     - name: Inverters - Solar Power to House
@@ -746,24 +678,27 @@ template:
       device_class: power
       state_class: measurement
       unit_of_measurement: W
-      state: >
+      state: >-
         {% set grid_power = states('sensor.power_meter_active_power')|int(default=0) %}
+        {% set inverters_input = states('sensor.inverters_input_power')|int(default=0) %}
         {% set inverters_output = states('sensor.inverters_active_power')|int(default=0) %}
         {% set battery = states('sensor.batteries_charge_discharge_power')|int(default=0) %}
-        {% if inverters_output > 0 %}                      
-          {% if grid_power > 0 %}                  
-            {% if battery > 0 %} {{ inverters_output - grid_power }}             
-            {% else %} {{ inverters_output + battery - grid_power | abs }}
-            {% endif %}       
-          {% else %}          
-            {% if battery > 0 %} {{ inverters_output }}       
-            {% else %} {{ inverters_output - battery | abs }} 
-            {% endif %}       
-          {% endif %}         
-        {% else %} 0                                                             
+        {% if inverters_output > 0 %}
+          {% if grid_power > 0 %}
+            {% if battery >= 0 %}
+              {{ inverters_output - grid_power }}
+            {% else %}
+              {{ inverters_output + battery - grid_power | abs }}
+            {% endif %}
+          {% else %}
+            0
+          {% endif %}
+        {% else %}
+          0
         {% endif %}
       availability: >-
-        {{ (states('sensor.inverters_active_power') not in [ 'unknown', 'none', 'unavailable' ])
+        {{ (states('sensor.power_meter_active_power') not in [ 'unknown', 'none', 'unavailable' ])
+        or (states('sensor.inverters_input_power') not in [ 'unknown', 'none', 'unavailable' ])
         or (states('sensor.inverters_active_power') not in [ 'unknown', 'none', 'unavailable' ])
         or (states('sensor.batteries_charge_discharge_power') not in [ 'unknown', 'none', 'unavailable' ]) }}
 
@@ -775,7 +710,7 @@ template:
       device_class: power
       state_class: measurement
       unit_of_measurement: W
-      state: >
+      state: >-
         {% set inverters_input = states('sensor.inverters_input_power')|int(default=0) %}
         {% set battery = states('sensor.batteries_charge_discharge_power')|int(default=0) %}
         {% set inverters_output = states('sensor.inverters_active_power')|int(default=0) %}
@@ -786,11 +721,10 @@ template:
           {% endif %}
         {% else %} 0
         {% endif %}
-      availability: >
-        {{ (states('sensor.inverters_input_power') not in [ 'unavailable', 'none', 'unknown' ] )
-          and (states('sensor.batteries_charge_discharge_power') not in [ 'unavailable', 'none', 'unknown' ]) 
-          and (states('sensor.inverters_active_power') not in [ 'unavailable', 'none', 'unknown' ]) }}
-
+      availability: >-
+        {{ (states('sensor.power_meter_active_power') not in [ 'unavailable', 'none', 'unknown' ] )
+          and (states('sensor.inverters_active_power') not in [ 'unavailable', 'none', 'unknown' ]) 
+          and (states('sensor.ev_charger_active_power') not in [ 'unavailable', 'none', 'unknown' ]) }}
 
 
   # Calculates the Power (W) being produced by the Solar Inverter(s) and Exported to the Power Grid.
@@ -800,14 +734,14 @@ template:
       device_class: power                                                        
       state_class: measurement                                                   
       unit_of_measurement: W                                                     
-      state: >
+      state: >-
         {% set grid_power = states('sensor.power_meter_active_power')|int(default=0) %}     
         {% set inverters_output = states('sensor.inverters_active_power')|int(default=0) %}
         
         {% if inverters_output > 0 and grid_power > 0 %} {{ grid_power }}                                      
         {% else %} 0                                                                  
         {% endif %}         
-      availability: >
+      availability: >-
         {{ (states('sensor.power_meter_active_power') not in [ 'unavailable', 'none', 'unknown' ] )
           and (states('sensor.inverters_active_power') not in [ 'unavailable', 'none', 'unknown' ]) }}
 
@@ -819,7 +753,7 @@ template:
       device_class: power                                                        
       state_class: measurement                                                   
       unit_of_measurement: W                                                     
-      state: >
+      state: >-
         {% set grid_power = states('sensor.power_meter_active_power')|int(default=0) %}     
         {% set inverters_output = states('sensor.inverters_active_power')|int(default=0) %}
         {% set ev_charger = states('sensor.ev_charger_active_power')|int(default=0) %}
@@ -827,7 +761,7 @@ template:
         {% if inverters_output > 0 and grid_power > 0 %} {{ ev_charger }}
         {% else %} 0                                                                  
         {% endif %} 
-      availability: >
+      availability: >-
         {{ (states('sensor.power_meter_active_power') not in [ 'unavailable', 'none', 'unknown' ] )
           and (states('sensor.inverters_active_power') not in [ 'unavailable', 'none', 'unknown' ]) 
           and (states('sensor.ev_charger_active_power') not in [ 'unavailable', 'none', 'unknown' ]) }}
@@ -840,7 +774,7 @@ template:
       device_class: power                                                        
       state_class: measurement                                                   
       unit_of_measurement: W                                                     
-      state: >
+      state: >-
         {% set inverters_power = states('sensor.inverters_active_power') |int(default=0) %}
         {% set batteries_cdp = states('sensor.batteries_charge_discharge_power') | int(default=0) %}
         {% if inverters_power < 0 and batteries_cdp > 0 %}
@@ -853,14 +787,14 @@ template:
         and (states('sensor.batteries_charge_discharge_power') not in [ 'unavailable', 'none', 'unknown' ]) }}
 
 
-  # Calculates the Power (W) being Imported from the GRID and consumed by the House.
+  # Calculates the Power (W) being Imported from the GRID and consumed by the house.
   - sensor:    
     - name: Power Meter - Grid to House
       unique_id: power_meter_grid_to_house
       device_class: power                                                        
       state_class: measurement                                                   
       unit_of_measurement: W                                                     
-      state: >
+      state: >-
         {% set inverters_power = states('sensor.inverters_active_power')|int(default=0) %}
         {% set grid_power = states('sensor.power_meter_active_power')|int(default=0) %}
         {% if grid_power < 0 %}
@@ -869,7 +803,7 @@ template:
           {% endif %}
         {% else %} 0
         {% endif %}
-      availability: >
+      availability: >-
         {{ (states('sensor.inverters_active_power') not in [ 'unavailable', 'none', 'unknown' ] )
                 and (states('sensor.power_meter_active_power') not in [ 'unavailable', 'none', 'unknown' ]) }}
 
@@ -881,21 +815,21 @@ template:
       device_class: power                                                        
       state_class: measurement                                                   
       unit_of_measurement: W                                                     
-      state: >
+      state: >-
         {% set grid_power = states('sensor.power_meter_active_power')|int(default=0) %}     
-        {% set inverters_output = states('sensor.inverters_active_power')|int(default=0) %}
-        {% set ev_charger = states('sensor.ev_charger_active_power')|int(default=0) %}
+        {% set battery = states('sensor.batteries_charge_discharge_power')|int(default=0) %}
+        {% set inverters_input = states('sensor.inverters_input_power')|int(default=0) %}
+        {% set ev_charger = states('sensor.pro3em_em2_active_power')|int(default=0) %}
         
-        {% if inverters_output > 0 and grid_power < 0 %} {{ ev_charger }}                                 
+        {% if battery >= 0 and inverters_input <= 0 and grid_power < 0 %}  {{ ev_charger | int }} 
+        {% elif battery < 0 and grid_power < 0 %} {{ ev_charger | int }} 
         {% else %} 0                                                                  
-        {% endif %}         
-      availability: >
+        {% endif %}
+      availability: >-
         {{ (states('sensor.power_meter_active_power') not in [ 'unavailable', 'none', 'unknown' ] )
-          and (states('sensor.inverters_active_power') not in [ 'unavailable', 'none', 'unknown' ]) 
-          and (states('sensor.ev_charger_active_power') not in [ 'unavailable', 'none', 'unknown' ]) }}
-
-
-
+          and (states('sensor.batteries_charge_discharge_power') not in [ 'unavailable', 'none', 'unknown' ])
+          and (states('sensor.inverters_input_power') not in [ 'unknown', 'none', 'unavailable' ])
+          and (states('sensor.pro3em_em2_active_power') not in [ 'unavailable', 'none', 'unknown' ]) }}
 
 
 ########### Start: Helpers - Riemann Sum to conver Power (W) to Energy (kWh) ###########
@@ -903,7 +837,7 @@ template:
   # Riemann Sum sensor to take "Inverters - Input Power with efficiency loss" and convert it into an ENERGY sensor.
 sensor:
   - platform: integration
-    name: "Inverter - Input Power - Energy"
+    name: "Inverters - Input Power - Energy"
     unique_id: inverters_input_power_energy
     source: sensor.inverters_input_power_with_efficiency_loss
     round: 3
