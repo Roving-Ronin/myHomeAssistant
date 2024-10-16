@@ -124,19 +124,19 @@ button:
   - platform: restart
     name: 'Restart Device'
     entity_category: config
-    web_server_sorting_weight: 25
+#    web_server_sorting_weight: 25
 
   - platform: safe_mode
     name: "Safe Mode"
     internal: false
     entity_category: config
-    web_server_sorting_weight: 26
+#    web_server_sorting_weight: 26
 
   - platform: factory_reset
     name: Reset - Factory Default
     id: Reset
     entity_category: config
-    web_server_sorting_weight: 27
+#    web_server_sorting_weight: 27
 
 #########################################################################
 #
