@@ -24,7 +24,7 @@ substitutions:
    # (Optional, Pin Schema): The pin controlling the power/reset status of the Ethernet controller.
 #  ether_power_pin: "GPIO16"
 
-########################## End of Substitutions #########################
+########################## End of Substitutions ##########################
 #
 # Combined with web_server settings in /common/base-configuration to
 # define a network information group
@@ -32,10 +32,10 @@ substitutions:
 
 web_server:
   version: 3
-    sorting_groups:
-    - id: group_network_information
-      name: "Network"
-      sorting_weight: 50
+  sorting_groups:
+    - id: group_network_info
+      name: "Network Information"
+      sorting_weight: -10
 
 ##########################################################################
 #
