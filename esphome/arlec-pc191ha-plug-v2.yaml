@@ -252,7 +252,8 @@ sensor:
         - multiply: ${watts_factor}
         - skip_initial: 2
       icon: mdi:power
-      web_server_sorting_weight: 1
+      web_server:
+        sorting_weight: 1
     
     current:
       name: "Current"
@@ -266,7 +267,8 @@ sensor:
         - above: ${current_limit}
           then:
             - switch.turn_off: relay
-      web_server_sorting_weight: 2
+      web_server:
+        sorting_weight: 2
 
     voltage:
       name: Voltage
@@ -276,7 +278,8 @@ sensor:
       icon: mdi:sine-wave 
       filters:
         - skip_initial: 2
-      web_server_sorting_weight: 3
+      web_server:
+        sorting_weight: 3
 
      # Shows the Energy kWh since the device was last booted
     energy:
@@ -313,7 +316,8 @@ sensor:
       id: total_energy_today
       accuracy_decimals: 3
       icon: mdi:hours-24
-      web_server_sorting_weight: 4
+      web_server:
+        sorting_weight: 4
 
      # Dentra Components - Adds Energy Yesterday
     energy_yesterday:
@@ -321,7 +325,8 @@ sensor:
       id: total_energy_yesterday
       accuracy_decimals: 3
       icon: mdi:calendar-today
-      web_server_sorting_weight: 5
+      web_server:
+        sorting_weight: 5
 
      # Dentra Components - Adds Energy Week
     energy_week:
@@ -329,7 +334,8 @@ sensor:
       id: total_energy_week
       accuracy_decimals: 3
       icon: mdi:calendar-week
-      web_server_sorting_weight: 6
+      web_server:
+        sorting_weight: 6
 
      # Dentra Components - Adds Energy Month
     energy_month:
@@ -337,14 +343,16 @@ sensor:
       id: total_energy_month
       accuracy_decimals: 3
       icon: mdi:calendar-month
-      web_server_sorting_weight: 7
+      web_server:
+        sorting_weight: 7
 
     energy_year:
       name: "Energy Year"
       id: total_energy_year
       accuracy_decimals: 3
       icon: "mdi:calendar-text"
-      web_server_sorting_weight: 8
+      web_server:
+        sorting_weight: 8
 
 #########################################################################
 
@@ -359,7 +367,8 @@ sensor:
     accuracy_decimals: 3
     lambda: |-
       return id(total_energy);
-    web_server_sorting_weight: 9
+    web_server:
+        sorting_weight: 9
     
      # Shows the Energy kWh for the current day
 #  - platform: total_daily_energy
@@ -392,7 +401,8 @@ switch:
     on_turn_off:
       then:
         - light.turn_off: button_led
-    web_server_sorting_weight: 10
+    web_server:
+        sorting_weight: 10
 
 light:
   - platform: status_led
@@ -402,4 +412,5 @@ light:
     disabled_by_default: true
     pin:
       number: GPIO26
-    web_server_sorting_weight: 11
+    web_server:
+        sorting_weight: 11
