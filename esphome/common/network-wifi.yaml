@@ -14,7 +14,7 @@ web_server:
   sorting_groups:
     - id: group_network_info
       name: "Network Information"
-      sorting_weight: 10
+      sorting_weight: -1
 
 ##########################################################################
 # Configuration to add WiFi network connection to ESP Devices
