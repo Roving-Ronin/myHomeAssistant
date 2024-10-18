@@ -112,7 +112,7 @@ light:
   - platform: color_temperature
     name: "Downlight"
     id: downlight
-    icon: mdi:mdi:lightbulb-on
+    icon: mdi:lightbulb-on
     color_temperature: colour_temp
     brightness: bright_control
     cold_white_color_temperature: 6536 K
