@@ -58,7 +58,7 @@ sensor:
     pressure:
       name: "${bme_sensor1_location}Pressure"
       id: bme280a_pressure
-      icon: 'phu:air-presure'
+      icon: 'mdi:weather-hurricane'
       accuracy_decimals: 1
       filters:
         offset: ${pressure_1_offset}
