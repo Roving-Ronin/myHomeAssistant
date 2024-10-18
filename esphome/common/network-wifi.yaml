@@ -58,8 +58,8 @@ text_sensor:
       icon: mdi:ip-network
       entity_category: diagnostic
       web_server:
-      sorting_group_id: group_network_information
-#      web_server_sorting_weight: 41
+        sorting_group_id: group_network_information
+        sorting_weight: 1 # 41
 
    # Creates sensor for tracking the WiFi IP MAC address
     mac_address:
@@ -67,8 +67,8 @@ text_sensor:
       icon: mdi:network-pos
       entity_category: diagnostic
       web_server:
-      sorting_group_id: group_network_information
-#      web_server_sorting_weight: 42
+        sorting_group_id: group_network_information
+        sorting_weight: 2 #42
 
    # Defines the WiFi SSID network to connect to
     ssid:
@@ -76,8 +76,8 @@ text_sensor:
       icon: mdi:wifi-strength-2
       entity_category: diagnostic
       web_server:
-      sorting_group_id: group_network_information
-#      web_server_sorting_weight: 43
+        sorting_group_id: group_network_information
+        sorting_weight: 3 #43
 
 ##########################################################################
 #
@@ -97,8 +97,8 @@ sensor:
     entity_category: "diagnostic"
     device_class: ""
     web_server:
-      sorting_group_id: group_network_information
-#    web_server_sorting_weight: 44
+      sorting_group_id: group_network_information    
+      sorting_weight: 4 # 44
 
    # Reports the WiFi signal strength/RSSI in dB
   - platform: wifi_signal
@@ -107,9 +107,9 @@ sensor:
     update_interval: 150s
     icon: mdi:wifi-strength-2
     entity_category: "diagnostic"
-#    web_server_sorting_weight: 45
     web_server:
       sorting_group_id: group_network_information
+      sorting_weight: 5 #45
     internal: true
 
 ##########################################################################
