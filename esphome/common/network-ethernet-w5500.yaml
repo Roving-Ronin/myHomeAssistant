@@ -75,7 +75,8 @@ text_sensor:
       icon: "mdi:ip-network"
 #      web_server_sorting_weight: 48
       web_server:
-      sorting_group_id: group_network_information
+        sorting_group_id: group_network_info
+        sorting_weight: 1
 #      address_0:
 #        name: Device IP 0
 #      address_1:
@@ -91,14 +92,16 @@ text_sensor:
       name: MAC Address
       icon: "mdi:network-pos"
       web_server:
-      sorting_group_id: group_network_information
+      web_server:
+        sorting_group_id: group_network_info
+        sorting_weight: 2
 #      web_server_sorting_weight: 49
 
     dns_address:
       name: DNS Servers
       icon: "mdi:check-network-outline"
       web_server:
-      sorting_group_id: group_network_information
-#      web_server_sorting_weight: 50
+        sorting_group_id: group_network_info
+        sorting_weight: 3
 
 ##########################################################################
