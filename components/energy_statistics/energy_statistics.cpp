@@ -65,6 +65,7 @@ void EnergyStatistics::setup() {
     }
   } else {
     reset_statistics(); // Ensure reset if resetting
+    this->save_();  // Save the reset state immediately
   }
 }
 
