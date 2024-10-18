@@ -56,7 +56,7 @@ text_sensor:
     ip_address:
       name: 'WiFi IP Address'
       icon: mdi:ip-network
-      entity_category: diagnostic
+#      entity_category: diagnostic
       web_server:
         sorting_group_id: group_network_information
         sorting_weight: 1 # 41
@@ -65,7 +65,7 @@ text_sensor:
     mac_address:
       name: 'WiFi MAC Address'
       icon: mdi:network-pos
-      entity_category: diagnostic
+#      entity_category: diagnostic
       web_server:
         sorting_group_id: group_network_information
         sorting_weight: 2 #42
@@ -74,7 +74,7 @@ text_sensor:
     ssid:
       name: 'WiFi SSID'
       icon: mdi:wifi-strength-2
-      entity_category: diagnostic
+#      entity_category: diagnostic
       web_server:
         sorting_group_id: group_network_information
         sorting_weight: 3 #43
@@ -94,7 +94,7 @@ sensor:
     filters:
       - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
     unit_of_measurement: "%"
-    entity_category: "diagnostic"
+#    entity_category: "diagnostic"
     device_class: ""
     web_server:
       sorting_group_id: group_network_information    
@@ -106,7 +106,7 @@ sensor:
     name: "WiFi Signal dB"
     update_interval: 150s
     icon: mdi:wifi-strength-2
-    entity_category: "diagnostic"
+ #   entity_category: "diagnostic"
     web_server:
       sorting_group_id: group_network_information
       sorting_weight: 5 #45
