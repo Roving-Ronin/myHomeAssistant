@@ -97,6 +97,19 @@ web_server:
   port: 80
    # Webserver version (default is 2).
   version: 3
+    sorting_groups:
+    - id: group_1
+      name: "Group 1 Displayed Last"
+      sorting_weight: 40
+    - id: group_2
+      name: "Group 2 Displayed Third"
+      sorting_weight: 30
+    - id: group_3
+      name: "Group 3 Displayed Second"
+      sorting_weight: 20
+    - id: group_4
+      name: "Group 4 Displayed First"
+      sorting_weight: 10
 
 network:
   enable_ipv6: ${ipv6_enable}
@@ -149,7 +162,7 @@ binary_sensor:
     id: device_status
     entity_category: diagnostic
     icon: "mdi:check-network-outline"
-    web_server_sorting_weight: 35
+#    web_server_sorting_weight: 35
 
 ##########################################################################
 #
@@ -199,7 +212,7 @@ text_sensor:
       }
     update_interval: ${sensor_update_interval}
     icon: mdi:clock-start
-    web_server_sorting_weight: 36
+#    web_server_sorting_weight: 36
     
    # Creates a sensor showing when the device was last restarted
   - platform: template
@@ -207,7 +220,7 @@ text_sensor:
     id: device_last_restart
     icon: mdi:clock
     entity_category: diagnostic
-    web_server_sorting_weight: 37
+#    web_server_sorting_weight: 37
 
   #  Creates a sensor showing power circuit / phase of the device
   - platform: template
@@ -218,7 +231,7 @@ text_sensor:
     lambda: |-
       return {"${power_circuit}"};
     update_interval: 6h
-    web_server_sorting_weight: 38
+#    web_server_sorting_weight: 38
 
    # Creates a sensor of the name of installed project
   - platform: template
@@ -240,7 +253,7 @@ text_sensor:
     lambda: |-
       return {"${project_version}"};
     update_interval: 6h
-    web_server_sorting_weight: 40
+#    web_server_sorting_weight: 40
 
    # Updates the system time using SNTP. Upon boot also publishes when the device was started.
 time:
