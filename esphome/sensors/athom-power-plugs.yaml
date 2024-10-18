@@ -191,22 +191,23 @@ sensor:
         sorting_group_id: group_electricity
         sorting_weight: 2
 
-    reactive_power:
-      name: "Reactive Power"
-      unit_of_measurement: var
-      accuracy_decimals: 0   
-      filters:
-        - throttle_average: ${sensor_update_interval}
-        - lambda: |-
-            if (x < 0) {
-              return 0;  // Ignore negative values and set to 0
-            } else {
-              return x;
-            }
-      icon: "mdi:flash"
-      web_server:
-        sorting_group_id: group_electricity
-        sorting_weight: 3
+#  REM OUT - Known issue with CSE7766 sees some plugs reporting/spamming "Impossible reactive power: -0.xxx "
+#    reactive_power:
+#      name: "Reactive Power"
+#      unit_of_measurement: var
+#      accuracy_decimals: 0   
+#      filters:
+#        - throttle_average: ${sensor_update_interval}
+#        - lambda: |-
+#            if (x < 0) {
+#              return 0;  // Ignore negative values and set to 0
+#            } else {
+#              return x;
+#            }
+#      icon: "mdi:flash"
+#      web_server:
+#        sorting_group_id: group_electricity
+#        sorting_weight: 3
       
     current:
       name: "Current"
