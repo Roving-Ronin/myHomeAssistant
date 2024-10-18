@@ -197,7 +197,12 @@ sensor:
       accuracy_decimals: 0   
       filters:
         - throttle_average: ${sensor_update_interval}
-        - lambda: if (x < 0.1) return 0.0; else return x;   #For the chip will report less than 3w power when no load is connected
+        - lambda: |-
+            if (x < 0) {
+              return 0;  // Ignore negative values and set to 0
+            } else {
+              return x;
+            }
       icon: "mdi:flash"
       web_server:
         sorting_group_id: group_electricity
