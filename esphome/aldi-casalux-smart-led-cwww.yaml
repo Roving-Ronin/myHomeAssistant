@@ -74,6 +74,19 @@ packages:
  # Remove Network section (IPv6), as not supported on this chipset
 network: !remove
 
+#####################################################################
+#
+# Combined with web_server settings in /common/base-configuration to
+# define a network information group
+#
+
+web_server:
+  version: 3
+  sorting_groups:
+    - id: group_light_controls
+      name: "Light Controls"
+      sorting_weight: -30
+
 #########################################################################
 #
 # Define the RGBW Lights and their GPIO PINS to control them.
@@ -99,11 +112,15 @@ light:
   - platform: color_temperature
     name: "Downlight"
     id: downlight
+    icon: mdi:mdi:lightbulb-on
     color_temperature: colour_temp
     brightness: bright_control
     cold_white_color_temperature: 6536 K
     warm_white_color_temperature: 2000 K
     restore_mode: ${light_restore_mode}
+    web_server:
+      sorting_group_id: group_light_controls
+      sorting_weight: 1
 
 #########################################################################
 #
