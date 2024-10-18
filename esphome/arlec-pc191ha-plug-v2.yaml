@@ -442,6 +442,7 @@ light:
     disabled_by_default: true
     pin:
       number: GPIO26
+    icon: "mdi:lightbulb-outline"
     web_server:
       sorting_group_id: group_controls
       sorting_weight: 2
