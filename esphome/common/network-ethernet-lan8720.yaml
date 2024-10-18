@@ -26,6 +26,19 @@ substitutions:
 
 ########################## End of Substitutions #########################
 #
+# Combined with web_server settings in /common/base-configuration to
+# define a network information group
+#
+
+web_server:
+  version: 3
+    sorting_groups:
+    - id: group_network_information
+      name: "Network"
+      sorting_weight: 50
+
+##########################################################################
+#
 # Configuration to add Ethernet network connection to ESP Devices
 #
 
@@ -58,7 +71,7 @@ text_sensor:
     ip_address:
       name: Device IP
       icon: "mdi:ip-network"
-      web_server_sorting_weight: 48
+#      web_server_sorting_weight: 48
 #      address_0:
 #        name: Device IP 0
 #      address_1:
@@ -73,11 +86,11 @@ text_sensor:
     mac_address:
       name: MAC Address
       icon: "mdi:network-pos"
-      web_server_sorting_weight: 49
+#      web_server_sorting_weight: 49
 
     dns_address:
       name: DNS Servers
       icon: "mdi:check-network-outline"
-      web_server_sorting_weight: 50
+#      web_server_sorting_weight: 50
 
 ##########################################################################
