@@ -6,21 +6,7 @@ substitutions:
    # Enables faster network connections, with last connected SSID being connected to and no full scan for SSID being undertaken
   wifi_fast_connect: "true"
 
-########################## End of Substitutions #########################
-#
-# Combined with web_server settings in /common/base-configuration to
-# define a network information group
-#
-
-web_server:
-  version: 3
-    sorting_groups:
-    - id: group_network_information
-      name: "Network"
-      sorting_weight: 50
-
-
-###########################################################################
+########################## End of Substitutions ##########################
 # Configuration to add WiFi network connection to ESP Devices
 #
 wifi:
@@ -56,28 +42,25 @@ text_sensor:
     ip_address:
       name: 'WiFi IP Address'
       icon: mdi:ip-network
-      entity_category: "None" #diagnostic
+      entity_category: diagnostic
       web_server:
-        sorting_group_id: group_network_information
-        sorting_weight: 1 # 41
+        sorting_weight: 41
 
    # Creates sensor for tracking the WiFi IP MAC address
     mac_address:
       name: 'WiFi MAC Address'
       icon: mdi:network-pos
-      entity_category: "" #diagnostic
+      entity_category: diagnostic
       web_server:
-        sorting_group_id: group_network_information
-        sorting_weight: 2 #42
+        sorting_weight: 42
 
    # Defines the WiFi SSID network to connect to
     ssid:
       name: 'WiFi SSID'
       icon: mdi:wifi-strength-2
-      entity_category: "" #diagnostic
+      entity_category: diagnostic
       web_server:
-        sorting_group_id: group_network_information
-        sorting_weight: 3 #43
+        sorting_weight: 43
 
 ##########################################################################
 #
@@ -94,11 +77,10 @@ sensor:
     filters:
       - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
     unit_of_measurement: "%"
-    entity_category: "" #diagnostic
+    entity_category: diagnostic
     device_class: ""
     web_server:
-      sorting_group_id: group_network_information    
-      sorting_weight: 4 # 44
+      sorting_weight: 44
 
    # Reports the WiFi signal strength/RSSI in dB
   - platform: wifi_signal
@@ -106,10 +88,9 @@ sensor:
     name: "WiFi Signal dB"
     update_interval: 150s
     icon: mdi:wifi-strength-2
-    entity_category: "" #diagnostic
+    entity_category: diagnostic
     web_server:
-      sorting_group_id: group_network_information
-      sorting_weight: 5 #45
+      sorting_weight: 45
     internal: true
 
 ##########################################################################
