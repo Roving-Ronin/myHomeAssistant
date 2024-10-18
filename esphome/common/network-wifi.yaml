@@ -7,6 +7,16 @@ substitutions:
   wifi_fast_connect: "true"
 
 ########################## End of Substitutions ##########################
+
+
+web_server:
+  version: 3
+  sorting_groups:
+    - id: group_network_info
+      name: "Network Information"
+      sorting_weight: 10
+
+##########################################################################
 # Configuration to add WiFi network connection to ESP Devices
 #
 wifi:
@@ -42,25 +52,28 @@ text_sensor:
     ip_address:
       name: 'WiFi IP Address'
       icon: mdi:ip-network
-      entity_category: diagnostic
+  #    entity_category: diagnostic
       web_server:
-        sorting_weight: 41
+        sorting_group_id: group_network_info
+        sorting_weight: 1
 
    # Creates sensor for tracking the WiFi IP MAC address
     mac_address:
       name: 'WiFi MAC Address'
       icon: mdi:network-pos
-      entity_category: diagnostic
+ #     entity_category: diagnostic
       web_server:
-        sorting_weight: 42
+        sorting_group_id: group_network_info
+        sorting_weight: 2
 
    # Defines the WiFi SSID network to connect to
     ssid:
       name: 'WiFi SSID'
       icon: mdi:wifi-strength-2
-      entity_category: diagnostic
+#      entity_category: diagnostic
       web_server:
-        sorting_weight: 43
+        sorting_group_id: group_network_info
+        sorting_weight: 3
 
 ##########################################################################
 #
@@ -77,10 +90,11 @@ sensor:
     filters:
       - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
     unit_of_measurement: "%"
-    entity_category: diagnostic
+#    entity_category: diagnostic
     device_class: ""
     web_server:
-      sorting_weight: 44
+      sorting_group_id: group_network_info
+      sorting_weight: 4
 
    # Reports the WiFi signal strength/RSSI in dB
   - platform: wifi_signal
@@ -88,9 +102,10 @@ sensor:
     name: "WiFi Signal dB"
     update_interval: 150s
     icon: mdi:wifi-strength-2
-    entity_category: diagnostic
+#    entity_category: diagnostic
     web_server:
-      sorting_weight: 45
+      sorting_group_id: group_network_info
+      sorting_weight: 5
     internal: true
 
 ##########################################################################
