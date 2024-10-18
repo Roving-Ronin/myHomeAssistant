@@ -97,19 +97,6 @@ web_server:
   port: 80
    # Webserver version (default is 2).
   version: 3
-    sorting_groups:
-    - id: group_1
-      name: "Group 1 Displayed Last"
-      sorting_weight: 40
-    - id: group_2
-      name: "Group 2 Displayed Third"
-      sorting_weight: 30
-    - id: group_3
-      name: "Group 3 Displayed Second"
-      sorting_weight: 20
-    - id: group_4
-      name: "Group 4 Displayed First"
-      sorting_weight: 10
 
 network:
   enable_ipv6: ${ipv6_enable}
