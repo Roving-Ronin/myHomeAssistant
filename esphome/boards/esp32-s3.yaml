@@ -1,3 +1,19 @@
+#####################################################################
+#
+# Combined with web_server settings in /common/base-configuration to
+# define a network information group
+#
+
+web_server:
+  version: 3
+  sorting_groups:
+    - id: group_environmental_sensors_1
+      name: "Environmental Sensors"
+      sorting_weight: -50  
+    - id: group_light_controls
+      name: "Light Controls"
+      sorting_weight: -20
+
 #########################################################################
 #
 # Configure the onboard RGB LED of the ESP32-S3 board
@@ -20,5 +36,8 @@ light:
       - addressable_random_twinkle:
       - addressable_fireworks:
       - addressable_flicker:
+    web_server:
+      sorting_group_id: group_light_controls
+      sorting_weight: 1
 
 #########################################################################
