@@ -15,7 +15,7 @@ substitutions:
    # Project Name
   project_name: "Arlec.Smart Plug (PC191HA v2)"
    # Project Version
-  project_version: "1.2.0"
+  project_version: "1.3.0"
    # Restore the relay (GPO switch) upon reboot to state:
   relay_restore_mode: RESTORE_DEFAULT_ON   # RESTORE_DEFAULT_ON
    # Set the update interval for sensors
@@ -37,6 +37,26 @@ substitutions:
   change_mode_every: "3"
 
 ########################## End of Substitutions #########################
+#
+# Combined with web_server settings in /common/base-configuration to
+# define a network information group
+#
+
+web_server:
+  version: 3
+  sorting_groups:
+    - id: group_electricity
+      name: "Electricity Sensors"
+      sorting_weight: -50
+    - id: group_energy
+      name: "Energy Sensors"
+      sorting_weight: -40
+    - id: group_controls
+      name: "Controls"
+      sorting_weight: -30
+
+
+#####################################################################
 #
 # On Boot script to set dedault 'Power Mode' to "ALWAYS ON"
 #
@@ -174,6 +194,10 @@ select:
       then:
         - lambda: |-
             id(restore_mode)=i+1;
+    web_server:
+      sorting_group_id: group_controls
+      sorting_weight: 3
+
 
 #########################################################################
 #
@@ -249,6 +273,7 @@ sensor:
         - skip_initial: 2
       icon: mdi:power
       web_server:
+        sorting_group_id: group_electricity
         sorting_weight: 1
     
     current:
@@ -264,6 +289,7 @@ sensor:
           then:
             - switch.turn_off: relay
       web_server:
+        sorting_group_id: group_electricity
         sorting_weight: 2
 
     voltage:
@@ -275,6 +301,7 @@ sensor:
       filters:
         - skip_initial: 2
       web_server:
+        sorting_group_id: group_electricity
         sorting_weight: 3
 
      # Shows the Energy kWh since the device was last booted
@@ -313,7 +340,8 @@ sensor:
       accuracy_decimals: 3
       icon: mdi:hours-24
       web_server:
-        sorting_weight: 4
+        sorting_group_id: group_energy
+        sorting_weight: 1
 
      # Dentra Components - Adds Energy Yesterday
     energy_yesterday:
@@ -322,7 +350,8 @@ sensor:
       accuracy_decimals: 3
       icon: mdi:calendar-today
       web_server:
-        sorting_weight: 5
+        sorting_group_id: group_energy
+        sorting_weight: 2
 
      # Dentra Components - Adds Energy Week
     energy_week:
@@ -331,7 +360,8 @@ sensor:
       accuracy_decimals: 3
       icon: mdi:calendar-week
       web_server:
-        sorting_weight: 6
+        sorting_group_id: group_energy
+        sorting_weight: 3
 
      # Dentra Components - Adds Energy Month
     energy_month:
@@ -340,7 +370,8 @@ sensor:
       accuracy_decimals: 3
       icon: mdi:calendar-month
       web_server:
-        sorting_weight: 7
+        sorting_group_id: group_energy
+        sorting_weight: 4
 
     energy_year:
       name: "Energy Year"
@@ -348,7 +379,8 @@ sensor:
       accuracy_decimals: 3
       icon: "mdi:calendar-text"
       web_server:
-        sorting_weight: 8
+        sorting_group_id: group_energy
+        sorting_weight: 5
 
 #########################################################################
 
@@ -364,7 +396,8 @@ sensor:
     lambda: |-
       return id(total_energy);
     web_server:
-        sorting_weight: 9
+      sorting_group_id: group_energy
+      sorting_weight: 6
     
      # Shows the Energy kWh for the current day
 #  - platform: total_daily_energy
@@ -398,7 +431,8 @@ switch:
       then:
         - light.turn_off: button_led
     web_server:
-        sorting_weight: 10
+      sorting_group_id: group_controls
+      sorting_weight: 1
 
 light:
   - platform: status_led
@@ -409,4 +443,5 @@ light:
     pin:
       number: GPIO26
     web_server:
-        sorting_weight: 11
+      sorting_group_id: group_controls
+      sorting_weight: 2
