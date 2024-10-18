@@ -164,6 +164,15 @@ sensor:
         - throttle_average: ${sensor_update_interval}
       icon: "mdi:power"
       web_server_sorting_weight: 2
+
+    reactive_power:
+      name: "Reactive Power"
+      unit_of_measurement: var
+      accuracy_decimals: 0   
+      filters:
+        - throttle_average: ${sensor_update_interval}
+      icon: "mdi:flash"
+      web_server_sorting_weight: 3
       
     current:
       name: "Current"
@@ -178,7 +187,7 @@ sensor:
         - above: ${current_limit}
           then:
             - switch.turn_off: relay
-      web_server_sorting_weight: 3
+      web_server_sorting_weight: 4
 
     voltage:
       name: "Voltage"
@@ -188,14 +197,14 @@ sensor:
       icon: "mdi:sine-wave"
       filters:
         - throttle_average: ${sensor_update_interval}
-      web_server_sorting_weight: 4
+      web_server_sorting_weight: 5
 
     power_factor:
       name: "Power Factor"
       filters:
         - throttle_average: ${sensor_update_interval}
       icon: "mdi:percent-outline"
-      web_server_sorting_weight: 5
+      web_server_sorting_weight: 6
 
     energy:
       name: "Energy"
@@ -232,7 +241,7 @@ sensor:
       id: total_energy_today_sensor
       accuracy_decimals: 3
       icon: "mdi:hours-24"
-      web_server_sorting_weight: 6
+      web_server_sorting_weight: 7
 
      # Dentra Components - Adds Energy Yesterday
     energy_yesterday:
@@ -240,7 +249,7 @@ sensor:
       id: total_energy_yesterday_sensor
       accuracy_decimals: 3
       icon: "mdi:calendar-today"
-      web_server_sorting_weight: 7
+      web_server_sorting_weight: 8
 
      # Dentra Components - Adds Energy Week
     energy_week:
@@ -248,7 +257,7 @@ sensor:
       id: total_energy_week_sensor
       accuracy_decimals: 3
       icon: "mdi:calendar-week"
-      web_server_sorting_weight: 8
+      web_server_sorting_weight: 9
 
      # Dentra Components - Adds Energy Month
     energy_month:
@@ -256,14 +265,14 @@ sensor:
       id: total_energy_month_sensor
       accuracy_decimals: 3
       icon: "mdi:calendar-month"
-      web_server_sorting_weight: 9
+      web_server_sorting_weight: 10
 
     energy_year:
       name: "Energy Year"
       id: total_energy_year_sensor
       accuracy_decimals: 3
       icon: "mdi:calendar-text"
-      web_server_sorting_weight: 10
+      web_server_sorting_weight: 11
 
 #########################################################################
 
@@ -278,7 +287,7 @@ sensor:
     icon: "mdi:lightning-bolt"
     lambda: |-
       return id(total_energy);
-    web_server_sorting_weight: 11
+    web_server_sorting_weight: 12
    
 #  - platform: total_daily_energy
 #    name: "Energy Total Today"
@@ -304,7 +313,7 @@ switch:
     id: relay
     restore_mode: ${relay_restore_mode}
     icon: "mdi:power-socket-au"
-    web_server_sorting_weight: 12
+    web_server_sorting_weight: 13
 
 light:
   - platform: status_led
@@ -315,6 +324,6 @@ light:
       inverted: true
       number: ${gpo_status_led_pin}
     icon: "mdi:lightbulb-outline"
-    web_server_sorting_weight: 13
+    web_server_sorting_weight: 14
 
 #########################################################################
