@@ -137,19 +137,22 @@ button:
   - platform: restart
     name: 'Restart Device'
     entity_category: config
-#    web_server_sorting_weight: 25
+    web_server:
+      sorting_weight: 25
 
   - platform: safe_mode
     name: "Safe Mode"
     internal: false
     entity_category: config
-#    web_server_sorting_weight: 26
+    web_server:
+      sorting_weight: 26
 
   - platform: factory_reset
     name: Reset - Factory Default
     id: Reset
     entity_category: config
-#    web_server_sorting_weight: 27
+    web_server:
+      sorting_weight: 27
 
 #########################################################################
 #
@@ -162,7 +165,8 @@ binary_sensor:
     id: device_status
     entity_category: diagnostic
     icon: "mdi:check-network-outline"
-#    web_server_sorting_weight: 35
+    web_server:
+      sorting_weight: 35
 
 ##########################################################################
 #
@@ -212,7 +216,8 @@ text_sensor:
       }
     update_interval: ${sensor_update_interval}
     icon: mdi:clock-start
-#    web_server_sorting_weight: 36
+    web_server:
+      sorting_weight: 36
     
    # Creates a sensor showing when the device was last restarted
   - platform: template
@@ -220,7 +225,8 @@ text_sensor:
     id: device_last_restart
     icon: mdi:clock
     entity_category: diagnostic
-#    web_server_sorting_weight: 37
+    web_server:
+      sorting_weight: 37
 
   #  Creates a sensor showing power circuit / phase of the device
   - platform: template
@@ -231,7 +237,8 @@ text_sensor:
     lambda: |-
       return {"${power_circuit}"};
     update_interval: 6h
-#    web_server_sorting_weight: 38
+    web_server:
+      sorting_weight: 38
 
    # Creates a sensor of the name of installed project
   - platform: template
@@ -242,7 +249,8 @@ text_sensor:
     lambda: |-
       return {"${project_name}"};
     update_interval: 6h
-    web_server_sorting_weight: 39
+    web_server:
+      sorting_weight: 39
 
    # Creates a sensor of the version of installed project
   - platform: template
@@ -253,7 +261,8 @@ text_sensor:
     lambda: |-
       return {"${project_version}"};
     update_interval: 6h
-#    web_server_sorting_weight: 40
+    web_server:
+      sorting_weight: 40
 
    # Updates the system time using SNTP. Upon boot also publishes when the device was started.
 time:
