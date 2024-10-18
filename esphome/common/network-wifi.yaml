@@ -8,6 +8,19 @@ substitutions:
 
 ########################## End of Substitutions #########################
 #
+# Combined with web_server settings in /common/base-configuration to
+# define a network information group
+#
+
+web_server:
+  version: 3
+    sorting_groups:
+    - id: group_network_information
+      name: "Network"
+      sorting_weight: 50
+
+
+###########################################################################
 # Configuration to add WiFi network connection to ESP Devices
 #
 wifi:
@@ -44,21 +57,27 @@ text_sensor:
       name: 'WiFi IP Address'
       icon: mdi:ip-network
       entity_category: diagnostic
-      web_server_sorting_weight: 41
+      web_server:
+      sorting_group_id: group_network_information
+#      web_server_sorting_weight: 41
 
    # Creates sensor for tracking the WiFi IP MAC address
     mac_address:
       name: 'WiFi MAC Address'
       icon: mdi:network-pos
       entity_category: diagnostic
-      web_server_sorting_weight: 42
+      web_server:
+      sorting_group_id: group_network_information
+#      web_server_sorting_weight: 42
 
    # Defines the WiFi SSID network to connect to
     ssid:
       name: 'WiFi SSID'
       icon: mdi:wifi-strength-2
       entity_category: diagnostic
-      web_server_sorting_weight: 43
+      web_server:
+      sorting_group_id: group_network_information
+#      web_server_sorting_weight: 43
 
 ##########################################################################
 #
@@ -77,7 +96,9 @@ sensor:
     unit_of_measurement: "%"
     entity_category: "diagnostic"
     device_class: ""
-    web_server_sorting_weight: 44
+    web_server:
+      sorting_group_id: group_network_information
+#    web_server_sorting_weight: 44
 
    # Reports the WiFi signal strength/RSSI in dB
   - platform: wifi_signal
@@ -86,7 +107,9 @@ sensor:
     update_interval: 150s
     icon: mdi:wifi-strength-2
     entity_category: "diagnostic"
-    web_server_sorting_weight: 45
+#    web_server_sorting_weight: 45
+    web_server:
+      sorting_group_id: group_network_information
     internal: true
 
 ##########################################################################
