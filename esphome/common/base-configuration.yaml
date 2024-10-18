@@ -165,8 +165,8 @@ binary_sensor:
     id: device_status
     entity_category: diagnostic
     icon: "mdi:check-network-outline"
-    web_server:
-      sorting_weight: 35
+#    web_server:
+#      sorting_weight: 35
 
 ##########################################################################
 #
