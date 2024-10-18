@@ -11,14 +11,10 @@ substitutions:
   friendly_name: "Aldi - Casalux - LED Downlight"
    # Description as appears in ESPHome & top of webserver page
   device_description: "Aldi Casalux Smart LED Downlight - 8W CW/WW"
-   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
-  location: ""
    # Project Name
   project_name: "Aldi Casalux.Smart LED Downlight CW/WW"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
   project_version: "1.0.25"
-  # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
-  power_circuit: "TBC"  
    # Restore the relay (Light switch) upon reboot to state:
   light_restore_mode: RESTORE_DEFAULT_OFF
    # Set your locations latitude and longitude. Useful if you want to use the sun and its location in relation to the horizon to on/off (or as a condition) to control lights.
