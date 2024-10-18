@@ -6,7 +6,7 @@
 
 web_server:
   version: 3
-    sorting_groups:
+  sorting_groups:
     - id: sort_electricity
       name: "Electricity Sensors"
       sorting_weight: 50
