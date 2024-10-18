@@ -7,9 +7,6 @@
 web_server:
   version: 3
   sorting_groups:
-    - id: group_environmental_sensors_1
-      name: "Environmental Sensors"
-      sorting_weight: -50  
     - id: group_light_controls
       name: "Light Controls"
       sorting_weight: -20
