@@ -134,7 +134,7 @@ light:
   - platform: rgbct
     name: "Downlight"
     id: downlight
-    icon: mdi:mdi:lightbulb-on
+    icon: mdi:lightbulb-on
     red: output_red
     green: output_green
     blue: output_blue
