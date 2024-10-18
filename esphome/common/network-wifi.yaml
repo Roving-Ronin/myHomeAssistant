@@ -7,7 +7,10 @@ substitutions:
   wifi_fast_connect: "true"
 
 ########################## End of Substitutions ##########################
-
+#
+# Combined with web_server settings in /common/base-configuration to
+# define a network information group
+#
 
 web_server:
   version: 3
