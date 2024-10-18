@@ -147,13 +147,13 @@ button:
 #
 
 binary_sensor:
-#  - platform: status
-#    name: "Device Status"
-#    id: device_status
-#    entity_category: diagnostic
-#    icon: "mdi:check-network-outline"
-#    web_server:
-#      sorting_weight: 35
+  - platform: status
+    name: "Device Status"
+    id: device_status
+    entity_category: diagnostic
+    icon: "mdi:check-network-outline"
+    web_server:
+      sorting_weight: 35
 
 ##########################################################################
 #
