@@ -7,12 +7,15 @@
 web_server:
   version: 3
   sorting_groups:
-    - id: sort_electricity
+    - id: group_electricity
       name: "Electricity Sensors"
       sorting_weight: 10
-    - id: sort_energy
+    - id: group_energy
       name: "Energy Sensors"
       sorting_weight: 20
+    - id: group_controls
+      name: "Controls"
+      sorting_weight: 30
 
 #####################################################################
 #
@@ -123,6 +126,9 @@ select:
       then:
         - lambda: |-
             id(restore_mode)=i+1;
+    web_server:
+      sorting_group_id: group_controls
+      sorting_weight: 3
             
 #####################################################################
 #
@@ -171,7 +177,7 @@ sensor:
         - lambda: if (x < 0.3) return 0.0; else return x;    #For the chip will report less than 3w power when no load is connected
       icon: "mdi:power"
       web_server:
-        sorting_group_id: sort_electricity
+        sorting_group_id: group_electricity
         sorting_weight: 1
 
     apparent_power:
@@ -182,7 +188,7 @@ sensor:
         - throttle_average: ${sensor_update_interval}
       icon: "mdi:power"
       web_server:
-        sorting_group_id: sort_electricity
+        sorting_group_id: group_electricity
         sorting_weight: 2
 
     reactive_power:
@@ -193,7 +199,7 @@ sensor:
         - throttle_average: ${sensor_update_interval}
       icon: "mdi:flash"
       web_server:
-        sorting_group_id: sort_electricity
+        sorting_group_id: group_electricity
         sorting_weight: 3
       
     current:
@@ -210,7 +216,7 @@ sensor:
           then:
             - switch.turn_off: relay
       web_server:
-        sorting_group_id: sort_electricity
+        sorting_group_id: group_electricity
         sorting_weight: 4
 
     voltage:
@@ -222,7 +228,7 @@ sensor:
       filters:
         - throttle_average: ${sensor_update_interval}
       web_server:
-        sorting_group_id: sort_electricity
+        sorting_group_id: group_electricity
         sorting_weight: 5
 
     power_factor:
@@ -231,7 +237,7 @@ sensor:
         - throttle_average: ${sensor_update_interval}
       icon: "mdi:percent-outline"
       web_server:
-        sorting_group_id: sort_electricity
+        sorting_group_id: group_electricity
         sorting_weight: 6
 
     energy:
@@ -270,8 +276,8 @@ sensor:
       accuracy_decimals: 3
       icon: "mdi:hours-24"
       web_server:
-        sorting_group_id: sort_energy
-        sorting_weight: 7
+        sorting_group_id: group_energy
+        sorting_weight: 1
 
      # Dentra Components - Adds Energy Yesterday
     energy_yesterday:
@@ -280,8 +286,8 @@ sensor:
       accuracy_decimals: 3
       icon: "mdi:calendar-today"
       web_server:
-        sorting_group_id: sort_energy
-        sorting_weight: 8
+        sorting_group_id: group_energy
+        sorting_weight: 2
 
      # Dentra Components - Adds Energy Week
     energy_week:
@@ -290,8 +296,8 @@ sensor:
       accuracy_decimals: 3
       icon: "mdi:calendar-week"
       web_server:
-        sorting_group_id: sort_energy
-        sorting_weight: 9
+        sorting_group_id: group_energy
+        sorting_weight: 3
 
      # Dentra Components - Adds Energy Month
     energy_month:
@@ -300,8 +306,8 @@ sensor:
       accuracy_decimals: 3
       icon: "mdi:calendar-month"
       web_server:
-        sorting_group_id: sort_energy
-        sorting_weight: 10
+        sorting_group_id: group_energy
+        sorting_weight: 4
 
     energy_year:
       name: "Energy Year"
@@ -309,8 +315,8 @@ sensor:
       accuracy_decimals: 3
       icon: "mdi:calendar-text"
       web_server:
-        sorting_group_id: sort_energy
-        sorting_weight: 11
+        sorting_group_id: group_energy
+        sorting_weight: 5
 
 #########################################################################
 
@@ -326,8 +332,8 @@ sensor:
     lambda: |-
       return id(total_energy);
     web_server:
-      sorting_group_id: sort_energy
-      sorting_weight: 12
+      sorting_group_id: group_energy
+      sorting_weight: 6
    
 #  - platform: total_daily_energy
 #    name: "Energy Total Today"
@@ -354,7 +360,8 @@ switch:
     restore_mode: ${relay_restore_mode}
     icon: "mdi:power-socket-au"
     web_server:
-        sorting_weight: 13
+      sorting_group_id: group_controls
+      sorting_weight: 1
 
 light:
   - platform: status_led
@@ -366,6 +373,7 @@ light:
       number: ${gpo_status_led_pin}
     icon: "mdi:lightbulb-outline"
     web_server:
-        sorting_weight: 14
+      sorting_group_id: group_controls
+      sorting_weight: 2
 
 #########################################################################
