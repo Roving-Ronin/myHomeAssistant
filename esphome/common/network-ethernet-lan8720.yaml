@@ -31,7 +31,6 @@ substitutions:
 #
 
 web_server:
-  version: 3
   sorting_groups:
     - id: group_network_info
       name: "Network Information"
