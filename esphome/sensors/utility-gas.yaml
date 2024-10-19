@@ -1,0 +1,305 @@
+#########################################################################
+#
+# Utility - Gas Sensors
+# 
+# Used to monitor mains feed gas, with a reed sensor connected to the gas
+# meter, that has a rotating dial with a magnet inside that can be monitored.
+#
+
+#########################################################################
+#
+# Enable Home Assistant API
+#
+
+api:
+  # Define service that calls the 'button:' defined below to reset the Gas Meter - Current Reading'
+  services:
+    - service: reset_total_energy
+      then:
+        - button.press:
+            id: button_reset_gas_statistics
+
+#########################################################################
+
+button:
+  #  Reset the total energy entity (Gas - Current Reading)
+  - platform: template
+    name: 'Reset - Gas Statistics'
+    entity_category: config
+    icon: 'mdi:trash-can-outline'
+    id: button_reset_gas_statistics
+    on_press:
+      - lambda: |-
+          // Reset the total gas readings (m3 and MJ)
+          id(gas_total_mj) = 0;
+          id(gas_total_m3) = 0;
+
+          // Reset the gas statistics, as stored by the custom components
+          id(gas_statistics_component).reset_statistics();
+          id(gas_statistics_mj_component).reset_statistics();
+
+
+#######################################################################################
+
+globals:
+
+  - id: gas_pressure_factor
+    type: float
+    restore_value: true
+
+  - id: gas_heating_value
+    type: float
+    restore_value: true
+
+  - id: gas_total_mj
+    type: float
+    restore_value: yes
+
+  #  Globals for use with pulse meter, to allow storing and setting a base reading for gas meter
+  - id: gas_total_m3
+    type: float
+    restore_value: yes
+
+
+#######################################################################################
+#
+# Number Inputs - Used to configure the values used to convert Gas M3 to MJ
+#
+
+number:
+  - platform: template
+    name: "Gas - Pressure Factor"
+    id: input_gas_pressure_factor
+    min_value: 0.9
+    max_value: 1.1
+    step: 0.0001
+    unit_of_measurement: ""
+    initial_value: 0.9864
+    restore_value: true
+    optimistic: true
+    mode: box
+    icon: "mdi:scale"
+    entity_category: config
+    web_server:
+        sorting_weight: 23
+    
+  - platform: template
+    name: "Gas - Heating Value"
+    id: input_gas_heating_value
+    min_value: 34.0
+    max_value: 52.0
+    step: 0.01
+    unit_of_measurement: ""
+    initial_value: 37.98
+    restore_value: true
+    optimistic: true
+    mode: box
+    icon: "mdi:fire"
+    entity_category: config
+    web_server:
+        sorting_weight: 24
+
+
+################################################################################
+#
+#  Sensors
+#
+
+sensor:
+  ################################################################################
+  #
+  # GPIO Input 1 - PIN 32
+  # Utility - Gas Meter
+  #
+
+  - platform: pulse_counter
+    name: "Gas - Pulse Counter"
+    id: gas_pulse_counter
+    pin:
+      number: 32
+      allow_other_uses: true
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    web_server:
+        sorting_weight: 10
+
+
+  - platform: pulse_meter
+    name: 'Gas - Flow Rate'
+    id: "gas_flow_rate"
+    unit_of_measurement: "L/min" # "m³/h"
+    state_class: measurement
+#    device_class: volume  # Disabled to stop this being recorded in HA
+    icon: "mdi:pump"
+    accuracy_decimals: 3
+    pin:
+      number: 32
+      allow_other_uses: true
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    internal_filter_mode: PULSE
+    internal_filter: 100ms
+    timeout: 3min
+    filters:
+      - multiply: 10.0     # 1 pulse = 10L. The gas counter 'helper' in Home Assistant must still be set to 'step size' = 10.
+    web_server:
+        sorting_weight: 11
+
+    #  Uses the above pulse_meter and adds sensor and calculations for tracking m3
+    total:    
+      name: 'Gas - Used (m³)'
+      id: gas_used_m3
+      unit_of_measurement: "m³"
+      icon: "mdi:counter"
+      state_class: "total_increasing"
+      device_class: gas
+      accuracy_decimals: 3
+      internal: true
+    #  Adds the calculation for providing a reading since device last booted / reset
+      on_value: 
+        then:
+          - lambda: |-
+              static float previous_gas_m3_value = 0.0;
+              float current_gas_m3_value = id(gas_used_m3).state;
+              float delta_m3 = current_gas_m3_value - previous_gas_m3_value;
+
+              // Update gas total in m³
+              id(gas_total_m3) += delta_m3;
+
+              // Calculate MJ using current pressure and heating values
+              float delta_mj = delta_m3 * id(input_gas_pressure_factor).state * id(input_gas_heating_value).state;
+
+              // Update gas total in MJ
+              id(gas_total_mj) += delta_mj;
+
+              previous_gas_m3_value = current_gas_m3_value;
+      filters:
+        - multiply: 0.01   # 100 pulses = 1,000L = 1m3
+#    web_server:
+#        sorting_weight: 11
+
+  ################################################################################
+  #
+  # Custom Component - Gas m3 (Consumption) Statistics
+  #
+
+  - platform: "gas_statistics"
+    id: gas_statistics_component
+    total: gas_used_total
+
+    gas_today:
+      name: "Gas - Used Today"
+      id: gas_used_today
+      web_server:
+        sorting_weight: 12
+    
+    gas_yesterday:
+      name: "Gas - Used Yesterday"
+      id: gas_used_yesterday
+      web_server:
+        sorting_weight: 13
+
+    gas_week:
+      name: "Gas - Used Week"
+      id: gas_used_week
+      web_server:
+        sorting_weight: 14
+    
+    gas_month:
+      name: "Gas - Used Month"
+      id: gas_used_month
+      web_server:
+        sorting_weight: 15
+
+    gas_year:
+      name: "Gas - Used Year"
+      id: gas_used_year
+      web_server:
+        sorting_weight: 16
+
+  ################################################################################
+
+  #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
+  - platform: template
+    name: "Gas - Used Total"
+    id: gas_used_total
+    unit_of_measurement: "m³"
+    device_class: gas
+    state_class: "total_increasing"
+    icon: "mdi:counter"
+    accuracy_decimals: 3
+    # The number 5251.07 should be replaced with your own gas meters physical reading
+    lambda: |-
+          return id(gas_total_m3);
+    # Set interval that updates are sent to HA instance
+    update_interval: 1s
+    filters:
+      - delta : 0.001
+    web_server:
+        sorting_weight: 17
+
+
+  ################################################################################
+  #
+  # Custom Component - Gas MJ (Consumption) Statistics
+  #
+
+  - platform: "gas_statistics_mj"
+    id: gas_statistics_mj_component
+    total: gas_used_total_mj
+
+    gas_today:
+      name: "Gas - Used Today (MJ)"
+      id: gas_used_today_mj
+      web_server:
+        sorting_weight: 18
+    
+    gas_yesterday:
+      name: "Gas - Used Yesterday (MJ)"
+      id: gas_used_yesterday_mj
+      web_server:
+        sorting_weight: 19
+
+    gas_week:
+      name: "Gas - Used Week (MJ)"
+      id: gas_used_week_mj
+      web_server:
+        sorting_weight: 20
+    
+    gas_month:
+      name: "Gas - Used Month (MJ)"
+      id: gas_used_month_mj
+      web_server:
+        sorting_weight: 21
+
+    gas_year:
+      name: "Gas - Used Year (MJ)"
+      id: gas_used_year_mj
+      web_server:
+        sorting_weight: 22
+
+  ################################################################################
+  
+  - platform: template
+    name: "Gas - Used Total (MJ)"
+    id: gas_used_total_mj
+    unit_of_measurement: "MJ"
+    device_class: energy
+    state_class: "total_increasing"
+    icon: "mdi:counter"
+    accuracy_decimals: 3   
+    # With EACH QUARTERLY GAS BILL update the Jemena Pressure Factor and Heating Value below.   
+    # Formula - (Gas Used x Pressure Factor x Heating Value) = Usage MJ
+    lambda: |-
+       return id(gas_total_mj);
+    update_interval: 1s
+    filters:
+      - delta : 0.001
+    web_server:
+        sorting_weight: 23
+
+  ################################################################################
