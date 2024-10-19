@@ -80,7 +80,7 @@ sensor:
     name: "Water - Pulse Counter"
     id: water_pulse_counter
     pin:
-      number: 33
+      number: ${gpio_water_pin}
       allow_other_uses: true
       inverted: true
       mode:
@@ -102,7 +102,7 @@ sensor:
     icon: "mdi:pump"
     accuracy_decimals: 2
     pin:
-      number: 33
+      number: ${gpio_water_pin}
       allow_other_uses: true
       inverted: true
       mode:
