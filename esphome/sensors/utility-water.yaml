@@ -51,7 +51,7 @@ button:
           id(town_water_used_total_litres) = 0;
           id(town_water_used_litres).state = 0;
 
-          // Reset the gas statistics, as stored by the custom components
+          // Reset the water statistics, as stored by the custom components
           id(town_water_statistics_component).reset_statistics();
 
 
