@@ -20,10 +20,10 @@ web_server:
       name: "Gas & Water Meter Sensors"
       sorting_weight: -44
     - id: group_gas_mj_sensors
-      name: "Gas (MJ) Sensors"
+      name: "Gas Sensors (MJ)"
       sorting_weight: -38
     - id: group_gas_m3_sensors
-      name: "Gas (m³) Sensors"
+      name: "Gas Sensors (m³)"
       sorting_weight: -37
 
 
