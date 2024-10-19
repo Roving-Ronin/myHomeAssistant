@@ -235,7 +235,7 @@ number:
     mode: box
     icon: "mdi:fire"
     entity_category: config
-    wweb_server:
+    web_server:
         sorting_weight: 24
 
 #######################################################################################
