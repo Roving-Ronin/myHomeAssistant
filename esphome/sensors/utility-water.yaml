@@ -51,7 +51,8 @@ button:
 
           // Reset the water statistics, as stored by the custom components
           id(town_water_statistics_component).reset_statistics();
-
+    web_server:
+      sorting_weight: 31
 
 #######################################################################################
 
