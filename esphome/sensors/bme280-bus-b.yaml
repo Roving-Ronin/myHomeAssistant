@@ -14,7 +14,7 @@ web_server:
   sorting_groups:
     - id: group_environmental_sensors
       name: "Environmental Sensors"
-      sorting_weight: -50  
+      sorting_weight: -44  
 
 
 #########################################################################
