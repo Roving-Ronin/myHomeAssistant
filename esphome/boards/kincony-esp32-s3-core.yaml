@@ -1,0 +1,258 @@
+#########################################################################
+#
+# Kincony S3 Core Board - Settings
+# See: https://www.kincony.com/kincony-esp32-s3-core-board.html
+#
+
+#########################################################################
+#
+# Substitutions
+#
+substitutions:
+
+   # Configure the i2c bus, to Kincony S3-Core Board PINs
+  bus_a_sda_pin: "GPIO39"
+  bus_a_scl_pin: "GPIO38"
+  bus_a_frequency: "100kHz"    # Optional: 100kHz
+
+# Configure the ADC Ports PINS.
+  analog_1: "GPIO7"
+  analog_2: "GPIO6"
+  analog_3: "GPIO5"
+  analog_4: "GPIO4"
+
+# Configure the 1-Wire PINS.
+  one_wire_1: "GPIO8"
+  one_wire_2: "GPIO40"
+
+# Configure the RS485 (CAN / ModBus) ports RX & TX PINs.
+  rs485_rx: "GPIO15"
+  rs485_tx: "GPIO16"
+
+# Configure the 4G Mobile Add-on board  RX & TX PINs.
+  mobile_4g_module_rxd: "GPIO17"
+  mobile_4g_module_txd: "GPIO18"
+
+# Configure the 433Mhz RF Receiver PIN.
+  rf_433mhz_receiver: "GPIO9"
+
+
+
+########################## End of Substitutions #########################
+#
+# ESP Device Settings
+#
+
+esphome:
+  platformio_options:
+    board_build.flash_mode: dio
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: arduino
+  flash_size: 16MB
+
+logger:
+  hardware_uart: USB_CDC
+
+
+##########################################################################
+#
+# UARTS
+#
+
+#uart:
+#   # RS485 CAN / Modbus Initialize
+#  - id: uart_485
+#    baud_rate: 9600
+#    debug:
+#      direction: BOTH
+#      dummy_receiver: true
+#      after:
+#        timeout: 10ms
+#    tx_pin: 16
+#    rx_pin: 15
+
+   # 4G Mobile Module Initialize
+#  - id: uart_sim7600
+#    baud_rate: 115200
+#    debug:
+#      direction: BOTH
+#      dummy_receiver: true
+#      after:
+#        timeout: 10ms
+#      sequence:
+#        - lambda: UARTDebug::log_string(direction, bytes);
+#    tx_pin: 18
+#    rx_pin: 17
+
+##########################################################################
+#
+# Switches
+#
+
+#switch:
+#   # RS485 UART
+#  - platform: uart
+#    uart_id: uart_485
+#    name: "RS485 Button"
+#    data: [0x11, 0x22, 0x33, 0x44, 0x55]
+
+   # 4G Mobile Module UART
+#  - platform: uart
+#    uart_id: uart_sim7600
+#    name: "UART 4G"
+#    data: "AT+CGSN\r\n" # read 4G SIM7600 ID
+
+##########################################################################
+#
+# Sensors
+#
+
+sensor:
+
+#  - platform: adc
+#    pin: 4
+#    name: "Analog Port 4"
+#    update_interval: 2s
+#    unit_of_measurement: V
+#    attenuation: 12db
+#    filters:
+#      - multiply: 5
+
+#  - platform: adc
+#    pin: 5
+#    name: "Analog Port 3"
+#    update_interval: 2s
+#    unit_of_measurement: V
+#    attenuation: 12db
+#    filters:
+#      - multiply: 5
+
+#  - platform: adc
+#    pin: 6
+#    name: "Analog Port 2"
+#    update_interval: 2s
+#    unit_of_measurement: V
+#    attenuation: 12db
+#    filters:
+#      - multiply: 5
+
+
+##########################################################################
+#
+# Binary Sensors
+#
+
+binary_sensor:
+
+#  - platform: gpio
+#    name: "1-wire #1"
+#    pin: 
+#      number: 8
+#      inverted: true
+
+#  - platform: gpio
+#    name: "1-wire #2"
+#    pin: 
+#      number: 40
+#      inverted: true
+#
+#  - platform: gpio
+#    name: "S3 DL"
+#    pin: 
+#      number: 0
+#      inverted: true
+
+#  - platform: gpio
+#    name: "S3 SDA"
+#    pin: 
+#      number: 39
+#      inverted: true
+#      mode:
+#        input: true
+#        pullup: true
+
+#  - platform: gpio
+#    name: "S3 SCL"
+#    pin: 
+#      number: 38
+#      inverted: true
+#      mode:
+#        input: true
+#        pullup: true
+
+#  - platform: gpio
+#    name: "Spare GPIO 10"
+#    pin: 
+#      number: 10
+#      inverted: true
+#      mode:
+#        input: true
+#        pullup: true
+
+#  - platform: gpio
+#    name: "Spare GPIO 11"
+#    pin: 
+#      number: 11
+#      inverted: true
+#      mode:
+#        input: true
+#        pullup: true
+
+#  - platform: gpio
+#    name: "Spare GPIO 12"
+#    pin: 
+#      number: 12
+#      inverted: true
+#      mode:
+#        input: true
+#        pullup: true
+
+#  - platform: gpio
+#    name: "Spare GPIO 13"
+#    pin: 
+#      number: 13
+#      inverted: true
+#      mode:
+#        input: true
+#        pullup: true
+
+#  - platform: gpio
+#    name: "Spare GPIO 4"
+#    pin: 
+#      number: 14
+#      inverted: true
+#      mode:
+#        input: true
+#        pullup: true
+
+#  - platform: gpio
+#    name: "Spare GPIO 21"
+#    pin: 
+#      number: 21
+#      inverted: true
+#      mode:
+#        input: true
+#        pullup: true
+
+#  - platform: gpio
+#    name: "Spare GPIO 47"
+#    pin: 
+#      number: 47
+#      inverted: true
+#      mode:
+#        input: true
+#        pullup: true
+
+#  - platform: gpio
+#    name: "Spare GPIO 48"
+#    pin: 
+#      number: 48
+#      inverted: true
+#      mode:
+#        input: true
+#        pullup: true
+
+##########################################################################
