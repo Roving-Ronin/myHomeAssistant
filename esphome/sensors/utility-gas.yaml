@@ -138,7 +138,7 @@ sensor:
         pullup: true
     web_server:
       sorting_group_id: group_utility_meter_sensors
-      sorting_weight: 3
+      sorting_weight: 4
 
 
   - platform: pulse_meter
@@ -163,7 +163,7 @@ sensor:
       - multiply: 10.0     # 1 pulse = 10L. The gas counter 'helper' in Home Assistant must still be set to 'step size' = 10.
     web_server:
       sorting_group_id: group_utility_meter_sensors
-      sorting_weight: 4
+      sorting_weight: 3
 
     #  Uses the above pulse_meter and adds sensor and calculations for tracking m3
     total:    
