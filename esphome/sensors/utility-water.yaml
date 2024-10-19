@@ -30,6 +30,7 @@ web_server:
 #
 
 api:
+  services:
   # Define service that calls the 'button:' defined below to reset the Water - Current Reading'
     - service: reset_total_energy
       then:
