@@ -7,12 +7,12 @@
 #
 
 substitutions:
-  # Web_server v3 Sort Groups - These substitutes are applied to overwrite the default ones supplied by the 
-  # sensor specific template file, in this case the /sensors/hc-sr04-ultrasonic.yaml file.
-  ultrasonic_sensor_group_id: "group_garage_door_controls"
-  ultrasonic_sensor_group_name: "Garage Door Controls"
-  ultrasonic_sensor_group_sorting_weight: "-48"
-  ultrasonic_sensor_group_sensor_weight: "3"
+
+########################## End of Substitutions #########################
+#
+# Web_server v3 Sort Groups - These substitutes are applied to overwrite the default ones supplied by the 
+# sensor specific template file, in this case the /sensors/hc-sr04-ultrasonic.yaml file.
+#
 
 web_server:
   sorting_groups:
@@ -27,7 +27,7 @@ web_server:
       sorting_weight: -37
 
 
-########################## End of Substitutions #########################
+#########################################################################
 #
 # Enable Home Assistant API
 #
