@@ -106,7 +106,7 @@ packages:
   wifi-config:      !include common/network-wifi.yaml
   bme280a-sensors:  !include sensors/bme280-bus-a.yaml
 # bme280b-sensors:  !include sensors/bme280-bus-b.yaml
-  #hc-sr04-sensors: !include sensors/hc-sr04-ultrasonic.yaml
+  hc-sr04-sensors: !include sensors/hc-sr04-ultrasonic.yaml
 
 
 ########################## End of Substitutions ##########################
