@@ -12,7 +12,7 @@
 web_server:
   version: 3
   sorting_groups:
-    - id: group_environmental_sensors_1
+    - id: group_environmental_sensors
       name: "Environmental Sensors"
       sorting_weight: -45  
 
@@ -51,7 +51,7 @@ sensor:
       filters:
         offset: ${temperature_1_offset}
       web_server:
-        sorting_group_id: group_environmental_sensors_1
+        sorting_group_id: group_environmental_sensors
         sorting_weight: 1
         
      # Pressure in hPa
@@ -63,7 +63,7 @@ sensor:
       filters:
         offset: ${pressure_1_offset}
       web_server:
-        sorting_group_id: group_environmental_sensors_1
+        sorting_group_id: group_environmental_sensors
         sorting_weight: 5
     
      # Relative humidity %
@@ -75,7 +75,7 @@ sensor:
       filters:
         offset: ${humidity_1_offset}
       web_server:
-        sorting_group_id: group_environmental_sensors_1
+        sorting_group_id: group_environmental_sensors
         sorting_weight: 2
 
    # BME280 Sensor in I2C Port - Absolute Humidity
@@ -87,7 +87,7 @@ sensor:
     humidity: bme280a_humidity
     equation: Wobus   # Wobus (Default), optional Tetens or Buck
     web_server:
-      sorting_group_id: group_environmental_sensors_1
+      sorting_group_id: group_environmental_sensors
       sorting_weight: 3
 
 
@@ -113,7 +113,7 @@ sensor:
       (243.5+id(bme280a_temperature).state)))/(17.67-log(id(bme280a_humidity).state/100)-
       ((17.67*id(bme280a_temperature).state)/(243.5+id(bme280a_temperature).state))));
     web_server:
-      sorting_group_id: group_environmental_sensors_1
+      sorting_group_id: group_environmental_sensors
       sorting_weight: 4
 
 
@@ -131,7 +131,7 @@ sensor:
         (id(bme280a_temperature).state + (0.0065 * STANDARD_ALTITUDE) + 273.15)), 5.257); // in hPa
     update_interval: 15s
     web_server:
-      sorting_group_id: group_environmental_sensors_1
+      sorting_group_id: group_environmental_sensors
       sorting_weight: 6
 
 
