@@ -10,7 +10,6 @@
 #
 
 web_server:
-  version: 3
   sorting_groups:
     - id: group_environmental_sensors
       name: "Environmental Sensors"
