@@ -30,6 +30,19 @@ substitutions:
 
 ########################## End of Substitutions #########################
 #
+# Combined with web_server settings in /common/base-configuration to
+# define a network information group
+#
+
+web_server:
+  sorting_groups:
+    - id: group_water_tank_sensors
+      name: "Water Tank Sensors"
+      sorting_weight: -40
+
+
+###########################################################################
+#
 # Global Variables - Used to store a STATE, or share across multiple lambdas.
 #
 
@@ -135,6 +148,9 @@ sensor:
     update_interval: 1s #the delta filter will ensure it only sends values when something changes. 
     filters:
       - delta : 0.001     # Only send the result if the difference with the last sent result is higher than this
+    web_server:
+      sorting_group_id: group_water_tank_sensors
+      sorting_weight: 1
 
 ################################################################################
 #
@@ -154,6 +170,9 @@ sensor:
     # local gravity = 9.79697g ms2.  1,000L = 979.697kg
     filters:
       - delta : 0.1 #only send the result if the difference with the last sent result is higher than this
+    web_server:
+      sorting_group_id: group_water_tank_sensors
+      sorting_weight: 2
 
 ################################################################################
 #
@@ -182,7 +201,9 @@ sensor:
     update_interval: 1s #the delta filter will ensure it only sends values when something changes. 
     filters:
       - delta : 0.001 #only send the result if the difference with the last sent result is higher than this
-
+    web_server:
+      sorting_group_id: group_water_tank_sensors
+      sorting_weight: 2
 
 ## 655.4 m or 2150.3 feet Location :-34.72 , 149.72
 
