@@ -56,6 +56,14 @@ substitutions:
   garage_door_closed_sensor_pin: GPIO27 # gpio pin for close endstop sensor
   debounce_time: 30ms # debounce time for open/close endstops
 
+  # Web_server v3 Sort Groups - These substitutes are applied to overwrite the default ones supplied by the 
+  # sensor specific template file, in this case the /sensors/hc-sr04-ultrasonic.yaml file.
+  ultrasonic_sensor_group_id: "group_garage_door_controls"
+  ultrasonic_sensor_group_name: "Garage Door Controls"
+  ultrasonic_sensor_group_sorting_weight: "-48"
+  ultrasonic_sensor_group_sensor_weight: "3"
+
+
 ########################## End of Substitutions #########################
 
 esphome:
@@ -438,15 +446,3 @@ script:
           id(garage_door).publish_state();
 
 #########################################################################
-#
-# This section is included to allow use of the default hc-sr04-ultrasonic.yaml
-# template, but apply over this the web_server sorting_group_id specific to this device
-#
-
-sensor:
-  - platform: ultrasonic
-    name: ${ultrasonic_sensor_name}
-    id: ${ultrasonic_sensor_id}
-    web_server:
-      sorting_group_id: group_garage_door_controls
-      sorting_weight: 2    
