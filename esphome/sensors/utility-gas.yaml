@@ -328,8 +328,8 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-      web_server:
-        sorting_group_id: group_gas_mj_sensors
-        sorting_weight: 6
+    web_server:
+      sorting_group_id: group_gas_mj_sensors
+      sorting_weight: 6
 
   ################################################################################
