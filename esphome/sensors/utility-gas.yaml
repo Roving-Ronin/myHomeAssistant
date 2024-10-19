@@ -18,13 +18,13 @@ web_server:
   sorting_groups:
     - id: group_utility_meter_sensors
       name: "Gas & Water Meter Sensors"
-      sorting_weight: -49
+      sorting_weight: -44
     - id: group_gas_mj_sensors
       name: "Gas (MJ) Sensors"
-      sorting_weight: -48
+      sorting_weight: -38
     - id: group_gas_m3_sensors
       name: "Gas (m³) Sensors"
-      sorting_weight: -47
+      sorting_weight: -37
 
 
 ########################## End of Substitutions #########################
