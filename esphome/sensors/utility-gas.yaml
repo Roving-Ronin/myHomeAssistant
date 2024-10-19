@@ -133,7 +133,7 @@ sensor:
     name: "Gas - Pulse Counter"
     id: gas_pulse_counter
     pin:
-      number: 5
+      number: ${gpio_gas_pin}
       allow_other_uses: true
       inverted: true
       mode:
@@ -153,7 +153,7 @@ sensor:
     icon: "mdi:pump"
     accuracy_decimals: 3
     pin:
-      number: 5
+      number: ${gpio_gas_pin}
       allow_other_uses: true
       inverted: true
       mode:
