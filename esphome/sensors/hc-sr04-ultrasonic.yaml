@@ -4,14 +4,36 @@
 #
 
 substitutions:
-   # Ultrasonic HC-SR04+ PINs
+  # Ultrasonic HC-SR04+ PINs
   sonar_trigger_pin: GPIO19
   sonar_echo_pin:    GPIO18
 
-   # Sensor name and ID
+  # Sensor name and ID
   ultrasonic_sensor_name: "Ultrasonic Sensor"
   ultrasonic_sensor_id: "ultrasonic_sensor"
+
+  # Web_server v3 Sort Groups - The template DEVICE yaml (i.e. Garage-Controller.yaml) should repeat these entries, but contrain
+  # the settings required for that specific device, that will then overwrite these default settings.
+  ultrasonic_sensor_group_id: "group_ultrasonic_sensor"
+  ultrasonic_sensor_group_name: "Ultrasonic Sensor"
+  ultrasonic_sensor_group_sorting_weight: "-50"   # The sort order applied to the overall group
+  ultrasonic_sensor_group_sensor_weight: "3"      # The sort order applied to the ultrasonic sensor entity
+
   
+########################## End of Substitutions ##########################
+#
+# Combined with web_server settings in /common/base-configuration to
+# define a network information group
+#
+
+web_server:
+  version: 3
+  sorting_groups:
+    - id: ${ultrasonic_sensor_group_id}
+      name: ${ultrasonic_sensor_group_name}
+      sorting_weight: ${ultrasonic_sensor_group_sorting_weight}
+
+
 #########################################################################
 
 sensor:
@@ -33,3 +55,6 @@ sensor:
     timeout: 3.0m
      # Hides this sensor from ESPHome web interface
 #    internal: true
+    web_server:
+      sorting_group_id: ${ultrasonic_sensor_group_id}
+      sorting_weight: ${ultrasonic_sensor_group_sensor_weight}
