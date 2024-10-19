@@ -55,7 +55,8 @@ button:
           // Reset the gas statistics, as stored by the custom components
           id(gas_statistics_component).reset_statistics();
           id(gas_statistics_mj_component).reset_statistics();
-
+    web_server:
+      sorting_weight: 30
 
 #######################################################################################
 
