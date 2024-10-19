@@ -125,7 +125,7 @@ number:
 sensor:
   ################################################################################
   #
-  # GPIO Input A1 - PIN 7
+  # GPIO Input A3 - PIN 5
   # Utility - Gas Meter
   #
 
@@ -133,7 +133,7 @@ sensor:
     name: "Gas - Pulse Counter"
     id: gas_pulse_counter
     pin:
-      number: 7
+      number: 5
       allow_other_uses: true
       inverted: true
       mode:
@@ -153,7 +153,7 @@ sensor:
     icon: "mdi:pump"
     accuracy_decimals: 3
     pin:
-      number: 7
+      number: 5
       allow_other_uses: true
       inverted: true
       mode:
