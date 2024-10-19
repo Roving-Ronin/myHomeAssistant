@@ -14,10 +14,10 @@ substitutions:
 
   # Web_server v3 Sort Groups - The template DEVICE yaml (i.e. Garage-Controller.yaml) should repeat these entries, but contrain
   # the settings required for that specific device, that will then overwrite these default settings.
-  ultrasonic_sensor_group_id: "group_ultrasonic_sensor"
-  ultrasonic_sensor_group_name: "Ultrasonic Sensor"
-  ultrasonic_sensor_group_sorting_weight: "-50"   # The sort order applied to the overall group
-  ultrasonic_sensor_group_sensor_weight: "1"      # The sort order applied to the ultrasonic sensor entity
+#  ultrasonic_sensor_group_id: "group_ultrasonic_sensor"
+#  ultrasonic_sensor_group_name: "Ultrasonic Sensor"
+#  ultrasonic_sensor_group_sorting_weight: "-50"   # The sort order applied to the overall group
+#  ultrasonic_sensor_group_sensor_weight: "1"      # The sort order applied to the ultrasonic sensor entity
 
   
 ########################## End of Substitutions ##########################
