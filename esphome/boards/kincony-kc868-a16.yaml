@@ -1,0 +1,659 @@
+#########################################################################
+#
+# Kincony KC868-A16 Device
+#
+# Provides:
+#    - Environmental monitoring using ESP32-S3 chipset and BME280 sensor(s)
+#      for temperature, humidity, pressure & dew point.
+#    - Gas consumption and meter tracking monitoring
+#    - Water consumption and meter tracking monitoring
+#
+#########################################################################
+
+  # Provides substitutions or variables that are then called elsewhere multiple times in the config
+substitutions:
+  # Default name
+  name: "kc868-a16"
+  # Default friendly name  
+  friendly_name: "Kincony KC868-A16"
+  # Description as appears in ESPHome & top of webserver page
+  device_description: "Kincony KC868-A16 with 16 I/O and RS485 support"
+  # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
+  location: "Monitoring - ESPHome"
+  # Project Name
+  project_name: "Kincony.KC868-A16"
+  # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
+  project_version: "1.0.0"
+  # Restore the relay (GPO switch) upon reboot to state:
+  relay_restore_mode: RESTORE_DEFAULT_OFF
+  # Disable sensors
+  disable_entities: "false"
+
+   # I2C PINS - Used for BME280 sensor Bus A
+  bus_a_sda_pin: "GPIO4" 
+  bus_a_scl_pin: "GPIO5"
+  bus_a_frequency: "100kHz"    # Optional: 100kHz
+
+   # I2C PINS - Used for BME280 sensor Bus B
+  #bus_b_sda_pin: "GPIO14"      # Default on ESP32 is SDA = PIN14 ??. ES32-S3 (ESP-WROOM-32D) use ??
+  #bus_b_scl_pin: "GPIO15"      # Default on ESP32 is SLC = PIN15 ??. ES32-S3 (ESP-WROOM-32D) use ??  
+  #bus_b_frequency: "100kHz"    # Optional: 100kHz
+
+   # BME 280 / BME680 Sensor
+   #
+   # Location of BME280/680 Sensor #1. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
+  bme_sensor1_location: ""
+   # Location of BME280/680 Sensor #2. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
+  bme_sensor2_location: ""
+   # Calibrate the outpute of the temperature sensor(s).
+  temperature_1_offset: "0.0"
+  temperature_2_offset: "0.0"
+   # Calibrate the outpute of the pressure sensor(s).
+  pressure_1_offset: "0.0"
+  pressure_2_offset: "0.0"
+   # Calibrate the outpute of the humidity sensor(s).
+  humidity_1_offset: "0.0"
+  humidity_2_offset: "0.0"
+
+########################## End of Substitutions #########################
+#
+# Defines the type of ESP chip used on the device. 
+# Must be in the local devices configuration file.
+#
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+  flash_size: 4MB
+
+#########################################################################
+#
+# Remote Packages to be utilised
+#
+packages:
+  url:             github://roving-ronin/myhomeassistant/esphome
+  ref:             main
+  files:           [boards/network-ethernet-lan8270.yaml]
+  refresh:         0s
+
+#########################################################################
+#
+# RF 433mhz receiver configuration
+#
+  
+# remote_receiver:
+#  pin:
+#    number: 2
+#    inverted: true
+#  dump: rc_switch
+#  # Settings to optimize recognition of RF devices
+#  tolerance: 50%
+#  filter: 250us
+#  idle: 4ms
+#  buffer_size: 2kb
+  
+  # RF 433mhz transmitter configuration
+# remote_transmitter:
+#  pin: 15
+#  carrier_duty_percent: 100%
+
+#########################################################################
+#
+# PCF8574 I/O expander configuration
+# Address below are for v1.5 board - https://www.kincony.com/forum/showthread.php?tid=2128
+#
+
+pcf8574:
+  - id: 'pcf8574_hub_out_1' # for output channel 1-8
+    address: 0x24
+
+  - id: 'pcf8574_hub_out_2' # for output channel 9-16
+    address: 0x25
+
+  - id: 'pcf8574_hub_in_1' # for input channel 1-8
+    address: 0x22
+
+  - id: 'pcf8574_hub_in_2' # for input channel 9-16
+    address: 0x21
+
+#########################################################################
+#
+#  Outputs - 1 to 16. DC12V/24V 500mA per channel
+#
+
+switch:  # GPIO can be used to control LIGHTS
+
+  # Output 1 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 01'
+    id: sensor_relay_1
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_1
+      number: 0
+      mode: OUTPUT
+      inverted: false
+    internal: true
+
+  # Output 2 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 02'
+    id: sensor_relay_2
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_1
+      number: 1
+      mode: OUTPUT
+      inverted: false
+    internal: true
+
+  # Output 3 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 03'
+    id: sensor_relay_3
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_1
+      number: 2
+      mode: OUTPUT
+      inverted: false
+    internal: true
+
+  # Output 4 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 04'
+    id: sensor_relay_4
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_1
+      number: 3
+      mode: OUTPUT
+      inverted: false
+    internal: true
+
+  # Output 5 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 05'
+    id: sensor_relay_5
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_1
+      number: 4
+      mode: OUTPUT
+      inverted: false
+    internal: true
+
+  # Output 6 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 06'
+    id: sensor_relay_6
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_1
+      number: 5
+      mode: OUTPUT
+      inverted: false
+    internal: true
+
+  # Output 7 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 07'
+    id: sensor_relay_7
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_1
+      number: 6
+      mode: OUTPUT
+      inverted: false
+    internal: true
+
+    # Output 8 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 08'
+    id: sensor_relay_8
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_1
+      number: 7
+      mode: OUTPUT
+      inverted: false
+    internal: true
+
+  # Output 9 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 09'
+    id: sensor_relay_9
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_2
+      number: 0
+      mode: OUTPUT
+      inverted: false
+    internal: true
+
+  # Output 10 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 10'
+    id: sensor_relay_10
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_2
+      number: 1
+      mode: OUTPUT
+      inverted: false
+    internal: true
+
+# Output 11 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 11'
+    id: sensor_relay_11
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_2
+      number: 2
+      mode: OUTPUT
+      inverted: false
+    internal: true
+
+# Output 12 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 12'
+    id: sensor_relay_12
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_2
+      number: 3
+      mode: OUTPUT
+      inverted: false
+    internal: true
+
+# Output 13 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 13'
+    id: sensor_relay_13
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_2
+      number: 4
+      mode: OUTPUT
+      inverted: false
+    internal: true
+
+# Output 14 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 14'
+    id: sensor_relay_14
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_2
+      number: 5
+      mode: OUTPUT
+      inverted: false
+    internal: true
+
+# Output 15 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 15'
+    id: sensor_relay_15
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_2
+      number: 6
+      mode: OUTPUT
+      inverted: false
+    internal: true
+
+# Output 16 - Assigned Function ?
+  - platform: gpio
+    name: 'Ouput Relay 16'
+    id: sensor_relay_16
+    restore_mode: ${relay_restore_mode}
+    pin:
+      pcf8574: pcf8574_hub_out_2
+      number: 7
+      mode: OUTPUT
+      inverted: false
+    internal: true
+
+################################################################################
+#
+# Binary Sensors:
+#
+
+binary_sensor:
+
+################################################################################
+#  Digital Inputs - 1 to 16
+#
+#  DC 0-12V. Logical define:
+#  - DC 0-1.8V logical "0"
+#  - DC 8-12V logical "1"
+#
+
+    # Input 1 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 01'
+    id: input1
+    pin:
+      pcf8574: pcf8574_hub_in_1
+      number: 0
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 2 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 02'
+    id: input2
+    pin:
+      pcf8574: pcf8574_hub_in_1
+      number: 1
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 3 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 03'
+    id: input3
+    pin:
+      pcf8574: pcf8574_hub_in_1
+      number: 2
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 4 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 04'
+    id: input4
+    pin:
+      pcf8574: pcf8574_hub_in_1
+      number: 3
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 5 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 05'
+    id: input5
+    pin:
+      pcf8574: pcf8574_hub_in_1
+      number: 4
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 6 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 06'
+    id: input6
+    pin:
+      pcf8574: pcf8574_hub_in_1
+      number: 5
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 7 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 07'
+    id: input7
+    pin:
+      pcf8574: pcf8574_hub_in_1
+      number: 6
+      mode: INPUT
+      inverted: true
+    internal: true
+    
+    # Input 8 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 08'
+    id: input8
+    pin:
+      pcf8574: pcf8574_hub_in_1
+      number: 7
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 9 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 09'
+    id: input9
+    pin:
+      pcf8574: pcf8574_hub_in_2
+      number: 0
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 10 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 10'
+    id: input10
+    pin:
+      pcf8574: pcf8574_hub_in_2
+      number: 1
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 11 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 11'
+    id: input11
+    pin:
+      pcf8574: pcf8574_hub_in_2
+      number: 2
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 12 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 12'
+    id: input12
+    pin:
+      pcf8574: pcf8574_hub_in_2
+      number: 3
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 13 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 13'
+    id: input13
+    pin:
+      pcf8574: pcf8574_hub_in_2
+      number: 4
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 14 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 14'
+    id: input14
+    pin:
+      pcf8574: pcf8574_hub_in_2
+      number: 5
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 15 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 15'
+    id: input15
+    pin:
+      pcf8574: pcf8574_hub_in_2
+      number: 6
+      mode: INPUT
+      inverted: true
+    internal: true
+
+    # Input 16 - Assigned Function
+  - platform: gpio
+    name: 'Digital Input 16'
+    id: input16
+    pin:
+      pcf8574: pcf8574_hub_in_2
+      number: 7
+      mode: INPUT
+      inverted: true
+    internal: true
+
+
+################################################################################
+#
+#  Text Sensors:
+#
+
+#text_sensor:
+
+################################################################################
+#
+#  Sensors
+#
+
+sensor:
+
+
+################################################################################
+#
+# ADC Input Port 1 - 4-20mA
+#
+
+  - platform: adc
+    pin: 36
+    name: 'Analog Digital Input 1'
+    accuracy_decimals: 3
+    device_class: "current"
+    unit_of_measurement: "mA"
+    state_class: "measurement"
+    update_interval: 10s
+    attenuation: 11db  #auto
+#    filters:
+#    - calibrate_polynomial:
+#       degree: 2
+#       datapoints:
+          # Map from SENSOR -> TRUE value
+#          - 3.90 -> 3.31
+#          - 3.65 -> 3.04
+#          - 3.09 -> 2.73
+#          - 2.51 -> 2.28
+#          - 2.13 -> 1.95
+#          - 1.61 -> 1.51
+#          - 1.34 -> 1.28
+#          - 1.10 -> 1.08
+#          - 0.60 -> 0.66
+#          - 0.14 -> 0.25
+#          - 0.00 -> 0.00
+    internal: true
+
+
+################################################################################
+#
+# ADC Input Port 2 - 4-20mA
+#
+
+  - platform: adc
+    pin: 34
+    name: 'Analog Digital Input 2'
+    accuracy_decimals: 3
+    device_class: "current"
+    unit_of_measurement: "mA"
+    state_class: "measurement"
+    update_interval: 10s
+    attenuation: 11db  #auto
+#    filters:
+#    - calibrate_polynomial:
+#       degree: 2
+#       datapoints:
+          # Map from SENSOR -> TRUE value
+#          - 3.90 -> 3.31
+#          - 3.65 -> 3.04
+#          - 3.09 -> 2.73
+#          - 2.51 -> 2.28
+#          - 2.13 -> 1.95
+#          - 1.61 -> 1.51
+#          - 1.34 -> 1.28
+#          - 1.10 -> 1.08
+#          - 0.60 -> 0.66
+#          - 0.14 -> 0.25
+#          - 0.00 -> 0.00
+    internal: true
+
+
+################################################################################
+#
+# ADC Input Port 3 - 0-5V
+#
+
+  - platform: adc
+    pin: 35
+    name: 'Analog Digital Input 4'
+    accuracy_decimals: 3
+    device_class: "voltage"
+    state_class: "measurement"
+    unit_of_measurement: "V"
+    update_interval: 10s
+    attenuation: auto   # 12db
+#    filters:
+#    - calibrate_polynomial:
+#       degree: 2
+#       datapoints:
+#          # Map from SENSOR -> TRUE value
+#         - 4.15867 -> 4.01667
+#         - 3.75700 -> 3.61500
+#         - 3.35533 -> 3.21333
+#         - 2.95367 -> 2.81167
+#         - 2.55200 -> 2.41000
+#         - 2.15033 -> 2.00833
+#         - 1.74867 -> 1.60667
+#         - 1.34700 -> 1.20500
+#         - 0.94533 -> 0.80333
+#         - 0.14200 -> 0.00000
+    internal: true
+
+################################################################################
+#
+# ADC Input Port 4 - 0-5V
+#
+
+  - platform: adc
+    pin: 39
+    name: 'Analog Digital Input 4'
+    accuracy_decimals: 3
+    device_class: "voltage"
+    state_class: "measurement"
+    unit_of_measurement: "V"
+    update_interval: 10s
+    attenuation: auto   # 12db
+#    filters:
+#    - calibrate_polynomial:
+#       degree: 2
+#       datapoints:
+#          # Map from SENSOR -> TRUE value
+#          - 3.90 -> 3.31
+#          - 3.65 -> 3.04
+#          - 3.09 -> 2.73
+#          - 2.51 -> 2.28
+#          - 2.13 -> 1.95
+#          - 1.61 -> 1.51
+#          - 1.34 -> 1.28
+#          - 1.10 -> 1.08
+#          - 0.60 -> 0.66
+#          - 0.14 -> 0.25
+#          - 0.00 -> 0.00
+    internal: true
+
+
+################################################################################
+#
+#  GPIO Inputs - 1 to 3
+#
+
