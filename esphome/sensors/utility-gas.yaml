@@ -99,7 +99,7 @@ number:
     icon: "mdi:scale"
     entity_category: config
     web_server:
-      sorting_weight: 1
+      sorting_weight: -2
     
   - platform: template
     name: "Gas - Heating Value"
@@ -115,7 +115,7 @@ number:
     icon: "mdi:fire"
     entity_category: config
     web_server:
-      sorting_weight: 2
+      sorting_weight: -1
 
 
 ################################################################################
