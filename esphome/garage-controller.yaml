@@ -39,7 +39,7 @@ substitutions:
   sonar_echo_pin: GPIO18
 
    # Ultrasonic sensor name and ID
-  ultrasonic_sensor_name: "Parked Car Sensorr"
+  ultrasonic_sensor_name: "Parked Car Sensor"
   ultrasonic_sensor_id: "parked_car_sensor"
 
    # Garage Door Cover - Time to open or close (1,000ms = 1sec)
@@ -99,6 +99,24 @@ packages:
   bme280a-sensors:  !include sensors/bme280-bus-a.yaml
 # bme280b-sensors:  !include sensors/bme280-bus-b.yaml
   hc-sr04-sensors: !include sensors/hc-sr04-ultrasonic.yaml
+
+
+########################## End of Substitutions ##########################
+#
+# Combined with web_server settings in /common/base-configuration to
+# define a network information group
+#
+
+web_server:
+  version: 3
+  sorting_groups:
+    - id: group_garage_parking_status
+      name: "Garage Parking Status"
+      sorting_weight: -49
+    - id: group_garage_door_controls
+      name: "Garage Door Controls"
+      sorting_weight: -48
+
 
 #########################################################################
 
@@ -247,6 +265,9 @@ text_sensor:
         return {"Unknown"};  
       }
     update_interval: 30s
+    web_server:
+      sorting_group_id: group_garage_parking_status
+      sorting_weight: 1
 
     # Use the distance under the ultrasonic sensor to determine if the parking space is occupied or empty
   - platform: template
@@ -263,6 +284,9 @@ text_sensor:
         return {"Unknown"};  
       }
     update_interval: 30s
+    web_server:
+      sorting_group_id: group_garage_parking_status
+      sorting_weight: 2
 
 #########################################################################
 
@@ -378,6 +402,9 @@ cover:
                   {
                     id(target_action) = COVER_OPERATION_IDLE;
                   }
+    web_server:
+      sorting_group_id: group_garage_door_controls
+      sorting_weight: 1
 
 #########################################################################
 
@@ -411,3 +438,15 @@ script:
           id(garage_door).publish_state();
 
 #########################################################################
+#
+# This section is included to allow use of the default hc-sr04-ultrasonic.yaml
+# template, but apply over this the web_server sorting_group_id specific to this device
+#
+
+sensor:
+  - platform: ultrasonic
+    name: ${ultrasonic_sensor_name}
+    id: ${ultrasonic_sensor_id}
+    web_server:
+      sorting_group_id: group_garage_door_controls
+      sorting_weight: 2    
