@@ -16,9 +16,6 @@ substitutions:
 
 web_server:
   sorting_groups:
-    - id: group_utility_meter_sensors
-      name: "Gas & Water Meter Sensors"
-      sorting_weight: -44
     - id: group_town_water_sensors
       name: "Town Water Sensors"
       sorting_weight: -38
