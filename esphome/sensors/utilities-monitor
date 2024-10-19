@@ -1,0 +1,56 @@
+#########################################################################
+#
+# Environmental monitoring using ESP32-S3 chipset and BME280 sensor(s)
+# for temperature, humidity, pressure & dew point.
+#
+   # Provides substitutions or variables that are then called elsewhere multiple times in the config
+substitutions:
+
+###############################
+# Project Version Details:
+#
+   # Project Name
+  project_name: "DIY.Utilities Monitor"
+   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
+  project_version: "0.1.0"
+
+###############################
+# Device Details:
+#
+   # Default name  
+  name: "utilities-monitor"
+   # Default friendly name 
+  friendly_name: "Utilities Monitor"
+   # Description as appears in ESPHome & top of webserver page
+  device_description: "Gas, Water & Environmental Monitor (Temp./Humidity/Pressure)"
+
+###############################
+# Location & Site Details:
+#
+   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Front Gate, Decontamination, Shed XYZ etc  
+  location: "Garage"
+   # Location geographical height, in meters. Used for calculations in sensors such as BME280/BME680 and Water Tank sensors.
+   # Averages: Tirrannaville (656), Bowral (668), Goulburn (673) and Wagga Wagga (?). Average = 666m.
+  location_height: "673"
+   # The phase in the locations power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C).
+   # Used to populate a Text Sensor with this information, that may be used to loadshed in future, or trace outages to electrical faults.
+  power_circuit: "TBA"
+
+########################## End of Substitutions #########################
+#
+# Remote Packages to be utilised
+#
+
+dashboard_import:
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/utilities-monitor.yaml@main
+  import_full_config: false
+
+packages:
+  base-config:            !include common/base-configuration.yaml
+  network-config:         !include common/network-ethernet-w5500.yaml
+  bme280a-sensors:        !include sensors/bme280-bus-a.yaml
+#  ds18b20-sensors:        !include sensors/ds18b20-1wire.yaml
+  water-tank-sensors:     !include sensors/cylinder-liquid-pressure-tl136.yaml
+  kincony-esp32-s3-core:  !include boards/kincony-esp32-s3-core.yaml
+
+#########################################################################
