@@ -5,36 +5,38 @@
 #
    # Provides substitutions or variables that are then called elsewhere multiple times in the config
 substitutions:
-
-###############################
-# Project Version Details:
-#
-   # Project Name
-  project_name: "DIY.Utilities Monitor"
-   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "0.1.0"
-
-###############################
-# Device Details:
-#
-   # Default name  
+  # Default name  
   name: "utilities-monitor"
-   # Default friendly name 
+  # Default friendly name 
   friendly_name: "Utilities Monitor"
-   # Description as appears in ESPHome & top of webserver page
+  # Description as appears in ESPHome & top of webserver page
   device_description: "Gas, Water & Environmental Monitor (Temp./Humidity/Pressure)"
-
-###############################
-# Location & Site Details:
-#
-   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Front Gate, Decontamination, Shed XYZ etc  
+  # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Front Gate, Decontamination, Shed XYZ etc  
   location: "Garage"
-   # Location geographical height, in meters. Used for calculations in sensors such as BME280/BME680 and Water Tank sensors.
-   # Averages: Tirrannaville (656), Bowral (668), Goulburn (673) and Wagga Wagga (?). Average = 666m.
+  # Location geographical height, in meters. Used for calculations in sensors such as BME280/BME680 and Water Tank sensors. Goulburn (673)
   location_height: "673"
-   # The phase in the locations power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C).
-   # Used to populate a Text Sensor with this information, that may be used to loadshed in future, or trace outages to electrical faults.
+  # Project Name
+  project_name: "DIY.Utilities Monitor"
+  # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
+  project_version: "0.1.0"
+  # The phase in the locations power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C).
+  # Used to populate a Text Sensor with this information, that may be used to loadshed in future, or trace outages to electrical faults.
   power_circuit: "TBA"
+
+  # BME 280 / BME680 Sensor
+  # Location of BME280/680 Sensor #1. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
+  bme_sensor1_location: ""
+  # Location of BME280/680 Sensor #2. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
+  bme_sensor2_location: ""
+  # Calibrate the outpute of the temperature sensor(s).
+  temperature_1_offset: "0.0"
+  temperature_2_offset: "0.0"
+  # Calibrate the outpute of the pressure sensor(s).
+  pressure_1_offset: "0.0"
+  pressure_2_offset: "0.0"
+  # Calibrate the outpute of the humidity sensor(s).
+  humidity_1_offset: "0.0"
+  humidity_2_offset: "0.0"
 
 ########################## End of Substitutions #########################
 #
@@ -46,11 +48,11 @@ dashboard_import:
   import_full_config: false
 
 packages:
-  base-config:            !include common/base-configuration.yaml
-  network-config:         !include common/network-ethernet-w5500.yaml
-  bme280a-sensors:        !include sensors/bme280-bus-a.yaml
-#  ds18b20-sensors:        !include sensors/ds18b20-1wire.yaml
-  water-tank-sensors:     !include sensors/cylinder-liquid-pressure-tl136.yaml
-  kincony-esp32-s3-core:  !include boards/kincony-esp32-s3-core.yaml
+  base-config:         !include common/base-configuration.yaml              # Base configuration applied to all ESPHome devices
+  network-config:      !include common/network-ethernet-w5500.yaml          # Configure Ethernet port on this system board
+  bme280a-sensors:     !include sensors/bme280-bus-a.yaml                   # Temperature, Humidity, Pressure sensor probe
+#  ds18b20-sensors:     !include sensors/ds18b20-1wire.yaml
+  water-tank-sensors:  !include sensors/cylinder-liquid-pressure-tl136.yaml # Pressure sensor to monitor water tank
+  esp32-system-board:  !include boards/jacomms-esp32-s3-core.yaml           # Model of ESP Board being used. This is Kincony S3 Core with JAComms HAT.
 
 #########################################################################
