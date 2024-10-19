@@ -38,6 +38,10 @@ substitutions:
   humidity_1_offset: "0.0"
   humidity_2_offset: "0.0"
 
+  # PIN usage upon the JAComms S3-Core Board
+  gpio_gas_pin: "17"
+  gpio_water_pin: "18"
+
 ########################## End of Substitutions #########################
 #
 # Remote Packages to be utilised
