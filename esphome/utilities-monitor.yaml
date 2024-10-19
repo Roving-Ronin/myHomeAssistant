@@ -72,3 +72,14 @@ external_components:
     refresh: 0s
 
 #########################################################################
+#
+# Web_server v3 Sort Groups - These substitutes are applied to overwrite the default ones supplied by the 
+# sensor specific template file, in this case the /sensors/hc-sr04-ultrasonic.yaml file.
+#
+
+web_server:
+  sorting_groups:
+      # This sort group is used by both the Water and Gas Meter senors (flow rate / pulse counter), so must be in at this level, not in the water vs gas sensor yaml
+    - id: group_utility_meter_sensors
+      name: "Gas & Water Meter Sensors"
+      sorting_weight: -44
