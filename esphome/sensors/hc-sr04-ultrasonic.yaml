@@ -21,20 +21,6 @@ substitutions:
 
   
 ########################## End of Substitutions ##########################
-#
-# Combined with web_server settings in /common/base-configuration to
-# define a network information group
-#
-
-#web_server:
-#  version: 3
-#  sorting_groups:
-#    - id: ${ultrasonic_sensor_group_id}
-#      name: ${ultrasonic_sensor_group_name}
-#      sorting_weight: ${ultrasonic_sensor_group_sorting_weight}
-
-
-#########################################################################
 
 sensor:
 
