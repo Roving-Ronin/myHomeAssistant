@@ -30,7 +30,7 @@ class EnergyStatistics : public Component {
   void set_energy_year(Sensor *sensor) { this->energy_year_ = sensor; }
 
 protected:
-  uint32_t save_interval_{300};        // Save every 5min (adjust as needed, based on seconds)
+  uint32_t save_interval_{900};        // Save every 5min (adjust as needed, based on seconds)
   uint32_t last_save_time_{0};         // Timestamp of the last save
   uint32_t last_warning_time_{0};      // Timestamp of the last warning log
 
