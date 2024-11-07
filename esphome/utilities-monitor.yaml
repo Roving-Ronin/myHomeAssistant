@@ -39,8 +39,8 @@ substitutions:
   humidity_2_offset: "0.0"
 
   # PIN usage upon the JAComms S3-Core Board
-  gpio_gas_pin: "17"
-  gpio_water_pin: "18"
+  gpio_gas_pin: "10"
+  gpio_water_pin: "11"
 
 ########################## End of Substitutions #########################
 #
