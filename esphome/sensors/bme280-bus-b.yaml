@@ -137,7 +137,7 @@ sensor:
         (id(bme280b_temperature).state + (0.0065 * STANDARD_ALTITUDE) + 273.15)), 5.257); // in hPa
     update_interval: 15s
     web_server:
-      sorting_group_id: group_environmental_sensors_2_1
+      sorting_group_id: group_environmental_sensors_2
       sorting_weight: 12
 
    # Note: Only Altitude OR Equivalent Sea Level Pressure can be run at one time, not both.
