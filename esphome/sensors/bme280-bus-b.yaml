@@ -11,7 +11,7 @@
 
 web_server:
   sorting_groups:
-    - id: group_environmental_sensors
+    - id: group_environmental_sensors_2
       name: "Environmental Sensors"
       sorting_weight: -44  
 
@@ -57,7 +57,7 @@ sensor:
             window_size: 15
             send_every: 15
       web_server:
-        sorting_group_id: group_environmental_sensors
+        sorting_group_id: group_environmental_sensors_2
         sorting_weight: 7
 
      # Pressure in hPa
@@ -76,7 +76,7 @@ sensor:
             window_size: 15
             send_every: 15
       web_server:
-        sorting_group_id: group_environmental_sensors
+        sorting_group_id: group_environmental_sensors_2
         sorting_weight: 11
       
      # Relative humidity %
@@ -95,7 +95,7 @@ sensor:
             window_size: 15
             send_every: 15
       web_server:
-        sorting_group_id: group_environmental_sensors
+        sorting_group_id: group_environmental_sensors_2
         sorting_weight: 8
       
    # BME280 Sensor in I2C Port - Absolute Humidity
@@ -107,7 +107,7 @@ sensor:
     humidity: bme280b_humidity
     equation: Wobus   # Wobus (Default), optional Tetens or Buck
     web_server:
-      sorting_group_id: group_environmental_sensors
+      sorting_group_id: group_environmental_sensors_2
       sorting_weight: 9
 
    # BME280 Sensor in I2C Port - Dew Point
@@ -121,7 +121,7 @@ sensor:
       (243.5+id(bme280b_temperature).state)))/(17.67-log(id(bme280b_humidity).state/100)-
       ((17.67*id(bme280b_temperature).state)/(243.5+id(bme280b_temperature).state))));
     web_server:
-      sorting_group_id: group_environmental_sensors
+      sorting_group_id: group_environmental_sensors_2
       sorting_weight: 10
 
    # BME280 Sensor in I2C Port - Equivalent Sea Level Pressure 
@@ -137,7 +137,7 @@ sensor:
         (id(bme280b_temperature).state + (0.0065 * STANDARD_ALTITUDE) + 273.15)), 5.257); // in hPa
     update_interval: 15s
     web_server:
-      sorting_group_id: group_environmental_sensors_1
+      sorting_group_id: group_environmental_sensors_2_1
       sorting_weight: 12
 
    # Note: Only Altitude OR Equivalent Sea Level Pressure can be run at one time, not both.
