@@ -1,0 +1,314 @@
+#####################################################################
+#
+# Combined with web_server settings in /common/base-configuration to
+# define a network information group
+#
+
+web_server:
+  sorting_groups:
+    - id: group_electricity
+      name: "Electricity Sensors"
+      sorting_weight: -50
+    - id: group_energy
+      name: "Energy Sensors"
+      sorting_weight: -40
+    - id: group_controls
+      name: "Controls"
+      sorting_weight: -30
+
+#####################################################################
+#
+# This file contains all the common sensors that are used by
+# Athom v2 and v3 Power Plugs.
+#
+
+#####################################################################
+#
+# External Components
+#
+
+# Dentra Components - Adds 'Platform - Energy Statistics'
+# https://github.com/dentra/esphome-components/tree/master/components/energy_statistics
+
+external_components:
+  - source: github://roving-ronin/myhomeassistant/components@main
+    refresh: 0s
+
+#########################################################################
+#
+# Enable Home Assistant API
+#
+
+api:
+  # Define service that calls the 'button:' defined below to reset the energy readings
+  services:
+    - service: reset_total_energy
+      then:
+        - button.press:
+            id: button_reset_energy_statistics
+
+#########################################################################
+#
+# Button - Function to allow resetting energy readings to ZERO
+#
+
+button:
+  #  Reset the total energy entity (Gas - Current Reading)
+  - platform: template
+    name: 'Reset - Energy Statistics'
+    id: button_reset_energy_statistics
+    entity_category: config
+    icon: 'mdi:trash-can-outline'
+    on_press:
+      - lambda: |-
+          // Reset the energy statistics, as stored by the custom components
+          id(energy_statistics_component).reset_statistics();
+
+
+#####################################################################
+#
+# Used to store the Total kWh used (lifetime) between reboots
+#
+
+globals:
+  - id: total_energy
+    type: float
+    restore_value: yes
+    initial_value: '0.0' 
+            
+#####################################################################
+#
+# Binary Sensors
+#
+
+binary_sensor:
+
+    # Defines the Power On/Off button and its GPIO PIN#
+  - platform: gpio
+    pin:
+      number: ${power_button_pin}
+      mode: INPUT_PULLUP
+      inverted: true
+    id: power_button
+    name: "Power Button"
+    disabled_by_default: true
+    on_multi_click:
+      - timing:
+          - ON for at least 4s
+        then:
+          - button.press: Reset
+    internal: true
+
+#####################################################################
+#
+# Power / Current / Energy monitoring sensors. 
+# The chipset used is self calibrating, so no tuning is required.
+#
+
+sensor:
+
+  - platform: cse7766
+    power:
+      name: "Active Power"
+      id: active_power
+      unit_of_measurement: W
+      accuracy_decimals: 1         
+      filters:
+        - throttle_average: ${sensor_update_interval}
+        - lambda: if (x < 0.3) return 0.0; else return x;    #For the chip will report less than 3w power when no load is connected
+      icon: "mdi:power"
+      web_server:
+        sorting_group_id: group_electricity
+        sorting_weight: 1
+
+    apparent_power:
+      name: "Apparent Power"
+      unit_of_measurement: VA
+      accuracy_decimals: 1         
+      filters:
+        - throttle_average: ${sensor_update_interval}
+      icon: "mdi:power"
+      web_server:
+        sorting_group_id: group_electricity
+        sorting_weight: 2
+
+#  REM OUT - Known issue with CSE7766 sees some plugs reporting/spamming "Impossible reactive power: -0.xxx "
+#    reactive_power:
+#      name: "Reactive Power"
+#      unit_of_measurement: var
+#      accuracy_decimals: 0   
+#      filters:
+#        - throttle_average: ${sensor_update_interval}
+#        - lambda: |-
+#            if (x < 0) {
+#              return 0;  // Ignore negative values and set to 0
+#            } else {
+#              return x;
+#            }
+#      icon: "mdi:flash"
+#      web_server:
+#        sorting_group_id: group_electricity
+#        sorting_weight: 3
+      
+    current:
+      name: "Current"
+      id: current
+      unit_of_measurement: A
+      accuracy_decimals: 2
+      icon: "mdi:current-ac"
+      filters:
+        - throttle_average: ${sensor_update_interval}
+        - lambda: if (x < 0.060) return 0.0; else return x;   #For the chip will report less than 3w power when no load is connected
+      on_value_range:
+        - above: ${current_limit}
+          then:
+            - switch.turn_off: relay
+      web_server:
+        sorting_group_id: group_electricity
+        sorting_weight: 4
+
+    voltage:
+      name: "Voltage"
+      id:   voltage
+      unit_of_measurement: V
+      accuracy_decimals: 1
+      icon: "mdi:sine-wave"
+      filters:
+        - throttle_average: ${sensor_update_interval}
+      web_server:
+        sorting_group_id: group_electricity
+        sorting_weight: 5
+
+    power_factor:
+      name: "Power Factor"
+      filters:
+        - throttle_average: ${sensor_update_interval}
+      icon: "mdi:percent-outline"
+      web_server:
+        sorting_group_id: group_electricity
+        sorting_weight: 6
+
+    energy:
+      name: "Energy"
+      id: energy
+      unit_of_measurement: kWh
+      accuracy_decimals: 3      
+      filters:
+        - throttle: ${sensor_update_interval}
+        # Multiplication factor from W to kW is 0.001
+        - multiply: 0.001
+      on_value:
+        then:
+          - lambda: |-
+              static float previous_energy_value = 0.0;
+              float current_energy_value = id(energy).state;
+              id(total_energy) += current_energy_value - previous_energy_value;
+              previous_energy_value = current_energy_value;
+              id(energy_total_sensor).update();
+      internal: true
+
+#####################################################################
+#
+# Function added by the Dentra Components
+#
+
+     # Dentra Components - Define the id of the sensor tracking 'Total Energy' used
+  - platform: "energy_statistics"
+    id: energy_statistics_component
+    total: energy_total_sensor
+    
+     # Dentra Components - Adds Energy Today. Persistents if restarted, unlike 'total_daily_energy'
+    energy_today:
+      name: "Energy Today"
+      id: total_energy_today_sensor
+      accuracy_decimals: 3
+      icon: "mdi:hours-24"
+      web_server:
+        sorting_group_id: group_energy
+        sorting_weight: 1
+
+     # Dentra Components - Adds Energy Yesterday
+    energy_yesterday:
+      name: "Energy Yesterday"
+      id: total_energy_yesterday_sensor
+      accuracy_decimals: 3
+      icon: "mdi:calendar-today"
+      web_server:
+        sorting_group_id: group_energy
+        sorting_weight: 2
+
+     # Dentra Components - Adds Energy Week
+    energy_week:
+      name: "Energy Week"
+      id: total_energy_week_sensor
+      accuracy_decimals: 3
+      icon: "mdi:calendar-week"
+      web_server:
+        sorting_group_id: group_energy
+        sorting_weight: 3
+
+     # Dentra Components - Adds Energy Month
+    energy_month:
+      name: "Energy Month"
+      id: total_energy_month_sensor
+      accuracy_decimals: 3
+      icon: "mdi:calendar-month"
+      web_server:
+        sorting_group_id: group_energy
+        sorting_weight: 4
+
+    energy_year:
+      name: "Energy Year"
+      id: total_energy_year_sensor
+      accuracy_decimals: 3
+      icon: "mdi:calendar-text"
+      web_server:
+        sorting_group_id: group_energy
+        sorting_weight: 5
+
+#########################################################################
+
+    # Shows the TOTAL/Lifetime Energy kWh used by the device, will be reset to zero upon firmware updates though.
+  - platform: template
+    name: "Energy Total"
+    id: energy_total_sensor
+    unit_of_measurement: kWh
+    device_class: "energy"
+    state_class: "total_increasing"
+    accuracy_decimals: 3
+    icon: "mdi:lightning-bolt"
+    lambda: |-
+      return id(total_energy);
+    web_server:
+      sorting_group_id: group_energy
+      sorting_weight: 6
+   
+#  - platform: total_daily_energy
+#    name: "Energy Total Today"
+#    id: energy_total_today
+#    restore: true
+#    power_id: active_power
+#    unit_of_measurement: kWh
+#    accuracy_decimals: 3
+#    filters:
+#      - multiply: 0.001
+#    icon: "mdi:hours-24"
+
+#########################################################################
+#
+#
+
+light:
+  - platform: status_led
+    name: "GPO Status LED"
+    id: blue_led
+    disabled_by_default: true
+    pin:
+      inverted: true
+      number: ${gpo_status_led_pin}
+    icon: "mdi:lightbulb-outline"
+    web_server:
+      sorting_group_id: group_controls
+      sorting_weight: 2
+
+#########################################################################
