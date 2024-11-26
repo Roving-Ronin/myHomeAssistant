@@ -275,3 +275,5 @@ time:
               - text_sensor.template.publish:
                   id: device_last_restart
                   state: !lambda 'return id(sntp_time).now().strftime("%a %d %b %Y - %I:%M:%S %p");'
+        # Log a message when the time is synchronized
+        - logger.log: "SNTP - Synchronized system clock"
