@@ -267,17 +267,6 @@ time:
   # Publish the time the device was last restarted
     on_time_sync:
       then:
-        # Log a message when the time is synchronized
-        - logger.log:
-            level: DEBUG
-            format: "SNTP: Synchronized system clock"
-
-        - delay: 2s  # Introduce a slight delay for testing
-
-        - logger.log:
-            level: DEBUG
-            format: "DEBUG: SNTP: Synchronized system clock"
-        
         # Update last restart time, but only once.
         - if:
             condition:
@@ -286,3 +275,6 @@ time:
               - text_sensor.template.publish:
                   id: device_last_restart
                   state: !lambda 'return id(sntp_time).now().strftime("%a %d %b %Y - %I:%M:%S %p");'
+        # Log a message when the time is synchronized
+        - logger.log:
+            format: "SNTP: Synchronized system clock"
