@@ -271,6 +271,13 @@ time:
         - logger.log:
             level: DEBUG
             format: "SNTP: Synchronized system clock"
+
+        - delay: 2s  # Introduce a slight delay for testing
+
+        - logger.log:
+            level: DEBUG
+            format: "DEBUG: SNTP: Synchronized system clock"
+        
         # Update last restart time, but only once.
         - if:
             condition:
