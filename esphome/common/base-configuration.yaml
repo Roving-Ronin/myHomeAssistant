@@ -261,9 +261,9 @@ time:
     update_interval: ${sntp_update_interval}
   # Set specific sntp servers to use
     servers: 
-      - "${sntp_server_1}"
-      - "${sntp_server_2}"
-      - "${sntp_server_3}"
+      - ${sntp_server_1}
+      - ${sntp_server_2}
+      - ${sntp_server_3}
   # Publish the time the device was last restarted
     on_time_sync:
       then:
