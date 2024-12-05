@@ -65,18 +65,9 @@ ads1115:
    continuous_mode: on
 
 sensor:
-  - name: "MQ5 Flammable Gas Sensor"
-    id: mq5_flammable_gas_sensor #ads1115_48_a0
-    ads1115_id: ads1115_48
-    multiplexer: 'A0_GND'
-    gain: 6.144
-    platform: ads1115
-    accuracy_decimals: 2
-    update_interval: 30s
-    filters:
-      lambda: return (x/5 *100);    
-    unit_of_measurement: "%"
+# MQ2 - ensor is suitable for detecting LPG, i-butane, propane, methane ,alcohol, Hydrogen, smoke
 
+#  MQ7 - Carbon Monoxide (CO) sensor suitable for sensing CO concentrations in the air. It can detect CO-gas concentrations anywhere from 20 to 2000ppm.
   - name: "MQ7 CO2 Sensor"
     id: mq7_co_sensor #ads1115_48_a1
     ads1115_id: ads1115_48
@@ -88,7 +79,27 @@ sensor:
     filters:
       lambda: return (x/5 *100); 
     unit_of_measurement: "%"
+    web_server:
+      sorting_group_id: group_air_quality_sensors
+      sorting_weight: 1
 
+# MQ5 - suitable for detecting H2, LPG, CH4, CO, Alcohol
+  - name: "MQ5 Flammable Gas Sensor"
+    id: mq5_flammable_gas_sensor #ads1115_48_a0
+    ads1115_id: ads1115_48
+    multiplexer: 'A0_GND'
+    gain: 6.144
+    platform: ads1115
+    accuracy_decimals: 2
+    update_interval: 30s
+    filters:
+      lambda: return (x/5 *100);    
+    unit_of_measurement: "%"
+    web_server:
+      sorting_group_id: group_air_quality_sensors
+      sorting_weight: 2
+
+# Suitable for ammonia, aromatic compounds, sulfur, benzene vapor, smoke and other gases harmful gas detection. Gas-sensitive element test concentration range: 10 to 1000ppm
   - name: "MQ135 Harmful Gas Sensor"
     id: mq135_harmful_gas_sensor #ads1115_48_a2
     ads1115_id: ads1115_48
@@ -100,3 +111,18 @@ sensor:
     filters:
       lambda: return (x/5 *100);        
     unit_of_measurement: "%"    
+    web_server:
+      sorting_group_id: group_air_quality_sensors
+      sorting_weight: 3
+      
+#########################################################################
+#
+# Web_server v3 Sort Groups - These substitutes are applied to overwrite the default ones supplied by the 
+# sensor specific template file, in this case the /sensors/hc-sr04-ultrasonic.yaml file.
+#
+
+web_server:
+  sorting_groups:
+    - id: group_air_quality_sensors
+      name: "Air Quality Sensors"
+      sorting_weight: -38
