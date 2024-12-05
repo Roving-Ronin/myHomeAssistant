@@ -25,8 +25,8 @@ substitutions:
   disable_by_default: "false"
 
    # I2C PINS - Used for sensors on Bus A
-  sda_pin: "D3"      # For WeMOS D1 Mini
-  scl_pin: "D4"      # For WeMOS D1 Mini
+  sda_pin: "GPIO3"      # For WeMOS D1 Mini
+  scl_pin: "GPIO4"      # For WeMOS D1 Mini
   
 ########################## End of Substitutions #########################
 #
