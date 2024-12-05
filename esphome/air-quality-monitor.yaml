@@ -68,8 +68,8 @@ sensor:
 # MQ2 - ensor is suitable for detecting LPG, i-butane, propane, methane ,alcohol, Hydrogen, smoke
 
 #  MQ7 - Carbon Monoxide (CO) sensor suitable for sensing CO concentrations in the air. It can detect CO-gas concentrations anywhere from 20 to 2000ppm.
-  - name: "MQ7 CO2 Sensor"
-    id: mq7_co_sensor #ads1115_48_a1
+  - name: "CO2 Sensor (MQ7)"
+    id: co2_sensor #ads1115_48_a1
     ads1115_id: ads1115_48
     multiplexer: 'A1_GND'
     gain: 6.144
@@ -84,8 +84,8 @@ sensor:
       sorting_weight: 1
 
 # MQ5 - suitable for detecting H2, LPG, CH4, CO, Alcohol
-  - name: "MQ5 Flammable Gas Sensor"
-    id: mq5_flammable_gas_sensor #ads1115_48_a0
+  - name: "Flammable Gas Sensor (MQ5)"
+    id: flammable_gas_sensor #ads1115_48_a0
     ads1115_id: ads1115_48
     multiplexer: 'A0_GND'
     gain: 6.144
@@ -100,8 +100,8 @@ sensor:
       sorting_weight: 2
 
 # Suitable for ammonia, aromatic compounds, sulfur, benzene vapor, smoke and other gases harmful gas detection. Gas-sensitive element test concentration range: 10 to 1000ppm
-  - name: "MQ135 Harmful Gas Sensor"
-    id: mq135_harmful_gas_sensor #ads1115_48_a2
+  - name: "Harmful Gas Sensor (MQ135)"
+    id: harmful_gas_sensor #ads1115_48_a2
     ads1115_id: ads1115_48
     multiplexer: 'A2_GND'
     gain: 6.144
