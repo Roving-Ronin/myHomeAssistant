@@ -77,8 +77,9 @@ sensor:
     accuracy_decimals: 2
     update_interval: 30s
     filters:
-      lambda: return (x/5 *100); 
+      lambda: return (x/3.3 *100); 
     unit_of_measurement: "%"
+    icon: "mdi:percent"
     web_server:
       sorting_group_id: group_air_quality_sensors
       sorting_weight: 1
@@ -93,8 +94,9 @@ sensor:
     accuracy_decimals: 2
     update_interval: 30s
     filters:
-      lambda: return (x/5 *100);    
+      lambda: return (x/3.3 *100);    
     unit_of_measurement: "%"
+    icon: "mdi:percent"
     web_server:
       sorting_group_id: group_air_quality_sensors
       sorting_weight: 2
@@ -109,8 +111,9 @@ sensor:
     accuracy_decimals: 2
     update_interval: 30s
     filters:
-      lambda: return (x/5 *100);        
+      lambda: return (x/3.3 *100);        
     unit_of_measurement: "%"    
+    icon: "mdi:percent"
     web_server:
       sorting_group_id: group_air_quality_sensors
       sorting_weight: 3
