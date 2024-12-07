@@ -96,7 +96,7 @@ sensor:
     filters:
       lambda: return (x/3.3 *100);    
     unit_of_measurement: "%"
-    icon: "mdi:fire"
+    icon: "mdi:gas-burner"
     web_server:
       sorting_group_id: group_air_quality_sensors
       sorting_weight: 2
