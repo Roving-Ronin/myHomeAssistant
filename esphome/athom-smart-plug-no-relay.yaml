@@ -11,7 +11,7 @@ substitutions:
    # Default friendly name 
   friendly_name: "Smart Plug v2 - No Relay"
    # Description as appears in ESPHome & top of webserver page
-  device_description: "Athom Plug v2 - Smart Plug (ESP8285) without relay"
+  device_description: "Athom Plug v2 - Smart Plug (ESP8285) No Relay"
    # Project Name
   project_name: "Athom Technology.Smart Plug v2 without relay"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
