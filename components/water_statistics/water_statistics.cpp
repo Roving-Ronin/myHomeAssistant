@@ -1,14 +1,14 @@
 #include "esphome/core/log.h"
 #include "esphome/core/hal.h"
-#include "water_statistics_mj.h"
+#include "water_statistics.h"
 
 namespace esphome {
-namespace water_statistics_mj {
+namespace water_statistics {
 
-static const char *const TAG = "water_statistics_mj";
+static const char *const TAG = "water_statistics";
 static const char *const GAP = "  ";
 
-void WaterStatisticsMJ::dump_config() {
+void WaterStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Water Statistics (L) - Sensors");
   if (this->water_today_) {
     LOG_SENSOR(GAP, "Water (L) Today", this->water_today_);
@@ -27,7 +27,7 @@ void WaterStatisticsMJ::dump_config() {
   }
 }
 
-void WaterStatisticsMJ::setup() {
+void WaterStatistics::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
   
   this->pref_ = global_preferences->make_preference<water_data_mj_t>(fnv1_hash(TAG));
@@ -42,7 +42,7 @@ void WaterStatisticsMJ::setup() {
   }
 }
 
-void WaterStatisticsMJ::loop() {
+void WaterStatistics::loop() {
   const auto t = this->time_->now();
   if (!t.is_valid()) {
     // time is not sync yet
@@ -84,7 +84,7 @@ void WaterStatisticsMJ::loop() {
   this->process_(total);
 }
 
-void WaterStatisticsMJ::process_(float total) {
+void WaterStatistics::process_(float total) {
   if (this->water_today_ && !std::isnan(this->water_.start_today)) {
     this->water_today_->publish_state(total - this->water_.start_today);
   }
@@ -108,7 +108,7 @@ void WaterStatisticsMJ::process_(float total) {
   this->save_();
 }
 
-void WaterStatisticsMJ::save_() { this->pref_.save(&this->water_); } // Save to flash memory
+void WaterStatistics::save_() { this->pref_.save(&this->water_); } // Save to flash memory
 
 }  // namespace water_statistics
 }  // namespace esphome
