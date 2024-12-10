@@ -23,7 +23,7 @@ substitutions:
 
    # cse7766 Power Monitoring Chip  
    # Current Limit in Amps. AU Plug = 10. IL, BR, EU, UK, US Plug = 16.
-  current_limit : "8"
+  current_limit : "10"
 
    # DO NOT CHANGE THESE SETTINGS. They are specific to the Plug Hardware Version, as defined by Athom.
   power_button_pin:   "5"
