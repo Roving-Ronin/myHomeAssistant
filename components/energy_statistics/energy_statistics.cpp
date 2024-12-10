@@ -108,10 +108,7 @@ void EnergyStatistics::process_(float total) {
   this->save_();
 }
 
-void EnergyStatistics::save_() { 
-  this->pref_.save(&(this->energy_)); }  // Save to flash memory
-  ESP_LOGD(TAG, "Energy Statistics - Values saved to flash memory (NVS)."); // Log message indicating save action
-}
+void EnergyStatistics::save_() { this->pref_.save(&(this->energy_)); }  // Save to flash memory
 
 }  // namespace energy_statistics
 }  // namespace esphome
