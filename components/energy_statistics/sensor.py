@@ -29,7 +29,6 @@ CONF_ENERGY_YESTERDAY = "energy_yesterday"
 CONF_ENERGY_WEEK = "energy_week"
 CONF_ENERGY_MONTH = "energy_month"
 CONF_ENERGY_YEAR = "energy_year"
-CONF_SAVE_FREQUENCY = "save_frequency"
 
 energy_statistics_ns = cg.esphome_ns.namespace("energy_statistics")
 
