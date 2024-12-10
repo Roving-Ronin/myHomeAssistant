@@ -11,7 +11,7 @@ namespace water_statistics {
 
 using sensor::Sensor;
 
-class WaterStatisticsMJ : public Component {
+class WaterStatistics : public Component {
  public:
   float get_setup_priority() const override { return setup_priority::DATA; }
   void dump_config() override;
@@ -49,7 +49,7 @@ protected:
   int water_year_start_day_{1};
 
   // Structure for storing water statistics in Litres
-  struct water_data_mj_t {
+  struct water_data_t {
     uint16_t current_day_of_year{0};
     float start_today{NAN};
     float start_yesterday{NAN};
