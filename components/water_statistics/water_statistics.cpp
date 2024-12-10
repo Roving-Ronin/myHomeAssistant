@@ -1,14 +1,14 @@
 #include "esphome/core/log.h"
 #include "esphome/core/hal.h"
-#include "water_statistics.h"
+#include "water_statistics_mj.h"
 
 namespace esphome {
-namespace water_statistics {
+namespace water_statistics_mj {
 
-static const char *const TAG = "water_statistics";
+static const char *const TAG = "water_statistics_mj";
 static const char *const GAP = "  ";
 
-void WaterStatistics::dump_config() {
+void WaterStatisticsMJ::dump_config() {
   ESP_LOGCONFIG(TAG, "Water Statistics (L) - Sensors");
   if (this->water_today_) {
     LOG_SENSOR(GAP, "Water (L) Today", this->water_today_);
@@ -27,12 +27,12 @@ void WaterStatistics::dump_config() {
   }
 }
 
-void WaterStatistics::setup() {
+void WaterStatisticsMJ::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
+  
+  this->pref_ = global_preferences->make_preference<water_data_mj_t>(fnv1_hash(TAG));
 
-  this->pref_ = global_preferences->make_preference<water_data_t>(fnv1_hash(TAG));
-
-  water_data_t loaded{};
+  water_data_mj_t loaded{};
   if (this->pref_.load(&loaded)) {
     this->water_ = loaded;
     auto total = this->total_->get_state();
@@ -42,14 +42,16 @@ void WaterStatistics::setup() {
   }
 }
 
-void WaterStatistics::loop() {
+void WaterStatisticsMJ::loop() {
   const auto t = this->time_->now();
   if (!t.is_valid()) {
+    // time is not sync yet
     return;
   }
 
   const auto total = this->total_->get_state();
   if (std::isnan(total)) {
+    // total is not published yet
     return;
   }
 
@@ -82,7 +84,7 @@ void WaterStatistics::loop() {
   this->process_(total);
 }
 
-void WaterStatistics::process_(float total) {
+void WaterStatisticsMJ::process_(float total) {
   if (this->water_today_ && !std::isnan(this->water_.start_today)) {
     this->water_today_->publish_state(total - this->water_.start_today);
   }
@@ -106,7 +108,7 @@ void WaterStatistics::process_(float total) {
   this->save_();
 }
 
-void WaterStatistics::save_() { this->pref_.save(&this->water_); } // Save to flash memory
+void WaterStatisticsMJ::save_() { this->pref_.save(&this->water_); } // Save to flash memory
 
 }  // namespace water_statistics
 }  // namespace esphome
