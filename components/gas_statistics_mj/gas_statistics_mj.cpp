@@ -108,7 +108,7 @@ void GasStatisticsMJ::process_(float total) {
   this->save_();
 }
 
-void GasStatisticsMJ::save_() {  this->pref_.save(&this->gas_); // Save to flash memory
+void GasStatisticsMJ::save_() { this->pref_.save(&this->gas_); // Save to flash memory
   ESP_LOGD(TAG, "Gas Statistics (MJ) - Values saved to flash memory (NVS)."); // Log message indicating save action
 }
 
