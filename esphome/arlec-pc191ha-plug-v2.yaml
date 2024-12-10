@@ -134,30 +134,30 @@ external_components:
 # Enable Home Assistant API
 #
 
-api:
+#api:
   # Define service that calls the 'button:' defined below to reset the energy readings
-  services:
-    - service: reset_total_energy
-      then:
-        - button.press:
-            id: button_reset_energy_statistics
+#  services:
+#    - service: reset_total_energy
+#      then:
+#        - button.press:
+#            id: button_reset_energy_statistics
 
 #########################################################################
 #
 # Button - Function to allow resetting energy readings to ZERO
 #
 
-button:
+#button:
   #  Reset the total energy entity (Gas - Current Reading)
-  - platform: template
-    name: 'Reset - Energy Statistics'
-    id: button_reset_energy_statistics
-    entity_category: config
-    icon: 'mdi:trash-can-outline'
-    on_press:
-      - lambda: |-
-          // Reset the energy statistics, as stored by the custom components
-          id(energy_statistics_component).reset_statistics();
+#  - platform: template
+#    name: 'Reset - Energy Statistics'
+#    id: button_reset_energy_statistics
+#    entity_category: config
+#    icon: 'mdi:trash-can-outline'
+#    on_press:
+#      - lambda: |-
+#          // Reset the energy statistics, as stored by the custom components
+#          id(energy_statistics_component).reset_statistics();
 
 #########################################################################
 #
