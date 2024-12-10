@@ -106,8 +106,7 @@ void WaterStatistics::process_(float total) {
   this->save_();
 }
 
-void WaterStatistics::save_() {
-  this->pref_.save(&this->water_); // Save to flash memory
+void WaterStatistics::save_() { this->pref_.save(&this->water_); // Save to flash memory
   ESP_LOGD(TAG, "Water Statistics (L) - Values saved to flash memory (NVS)."); // Log message indicating save action
 }
 
