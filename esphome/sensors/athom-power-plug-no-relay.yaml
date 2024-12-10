@@ -39,31 +39,30 @@ external_components:
 # Enable Home Assistant API
 #
 
-api:
+#api:
   # Define service that calls the 'button:' defined below to reset the energy readings
-  services:
-    - service: reset_total_energy
-      then:
-        - button.press:
-            id: button_reset_energy_statistics
+#  services:
+#    - service: reset_total_energy
+#      then:
+#        - button.press:
+#            id: button_reset_energy_statistics
 
 #########################################################################
 #
 # Button - Function to allow resetting energy readings to ZERO
 #
 
-button:
+#button:
   #  Reset the total energy entity (Gas - Current Reading)
-  - platform: template
-    name: 'Reset - Energy Statistics'
-    id: button_reset_energy_statistics
-    entity_category: config
-    icon: 'mdi:trash-can-outline'
-    on_press:
-      - lambda: |-
-          // Reset the energy statistics, as stored by the custom components
-          id(energy_statistics_component).reset_statistics();
-
+#  - platform: template
+#    name: 'Reset - Energy Statistics'
+#    id: button_reset_energy_statistics
+#    entity_category: config
+#    icon: 'mdi:trash-can-outline'
+#    on_press:
+#      - lambda: |-
+#          // Reset the energy statistics, as stored by the custom components
+#          id(energy_statistics_component).reset_statistics();
 
 #####################################################################
 #
@@ -159,10 +158,6 @@ sensor:
       filters:
         - throttle_average: ${sensor_update_interval}
         - lambda: if (x < 0.060) return 0.0; else return x;   #For the chip will report less than 3w power when no load is connected
-      on_value_range:
-        - above: ${current_limit}
-          then:
-            - switch.turn_off: relay
       web_server:
         sorting_group_id: group_electricity
         sorting_weight: 4
