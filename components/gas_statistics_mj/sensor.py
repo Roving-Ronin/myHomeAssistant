@@ -16,7 +16,6 @@ from .const import (
     ICON_WEEK,
     ICON_MONTH,
     ICON_YEAR,
-    UNIT_MEGAJOULE,
 )
 
 # Import your custom UNIT_MEGAJOULE from const.py
