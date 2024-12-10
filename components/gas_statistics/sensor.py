@@ -4,7 +4,7 @@ from esphome.components import sensor, time
 from esphome.const import (
     CONF_ID,
     CONF_TIME_ID,
-    CONF_POWER,
+#    CONF_POWER,
     CONF_TOTAL,
     DEVICE_CLASS_GAS,
     STATE_CLASS_TOTAL_INCREASING,
