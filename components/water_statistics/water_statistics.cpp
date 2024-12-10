@@ -30,9 +30,9 @@ void WaterStatistics::dump_config() {
 void WaterStatistics::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
   
-  this->pref_ = global_preferences->make_preference<water_data_mj_t>(fnv1_hash(TAG));
+  this->pref_ = global_preferences->make_preference<water_data_t>(fnv1_hash(TAG));
 
-  water_data_mj_t loaded{};
+  water_data_t loaded{};
   if (this->pref_.load(&loaded)) {
     this->water_ = loaded;
     auto total = this->total_->get_state();
