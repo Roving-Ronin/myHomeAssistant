@@ -29,34 +29,34 @@ web_server:
 # Enable Home Assistant API
 #
 
-api:
+#api:
   # Define service that calls the 'button:' defined below to reset the Gas Meter - Current Reading'
-  services:
-    - service: reset_total_energy
-      then:
-        - button.press:
-            id: button_reset_gas_statistics
+#  services:
+#    - service: reset_total_energy
+#      then:
+#        - button.press:
+#            id: button_reset_gas_statistics
 
 #########################################################################
 
-button:
+#button:
   #  Reset the total energy entity (Gas - Current Reading)
-  - platform: template
-    name: 'Reset - Gas Statistics'
-    entity_category: config
-    icon: 'mdi:trash-can-outline'
-    id: button_reset_gas_statistics
-    on_press:
-      - lambda: |-
-          // Reset the total gas readings (m3 and MJ)
-          id(gas_total_mj) = 0;
-          id(gas_total_m3) = 0;
+#  - platform: template
+#    name: 'Reset - Gas Statistics'
+#    entity_category: config
+#    icon: 'mdi:trash-can-outline'
+#    id: button_reset_gas_statistics
+#    on_press:
+#      - lambda: |-
+#          // Reset the total gas readings (m3 and MJ)
+#          id(gas_total_mj) = 0;
+#          id(gas_total_m3) = 0;
 
-          // Reset the gas statistics, as stored by the custom components
-          id(gas_statistics_component).reset_statistics();
-          id(gas_statistics_mj_component).reset_statistics();
-    web_server:
-      sorting_weight: 30
+#          // Reset the gas statistics, as stored by the custom components
+#          id(gas_statistics_component).reset_statistics();
+#          id(gas_statistics_mj_component).reset_statistics();
+#    web_server:
+#      sorting_weight: 30
 
 #######################################################################################
 
