@@ -18,9 +18,6 @@ substitutions:
   project_version: "1.0.0"
    # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
   log_level: "DEBUG"
-   # cse7766 Power Monitoring Chip - Only required as using standard yaml for Athom sensors
-   # Current Limit in Amps. AU Plug = 10. IL, BR, EU, UK, US Plug = 16.
-  current_limit : "8"
 
    # DO NOT CHANGE THESE SETTINGS. They are specific to the Plug Hardware Version, as defined by Athom.
   power_button_pin:   "5"
