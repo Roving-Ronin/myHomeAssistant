@@ -109,7 +109,7 @@ void GasStatistics::process_(float total) {
   this->save_();
 }
 
-void EnergyStatistics::save_() { this->pref_.save(&(this->gas_)); }
+void GasStatistics::save_() { this->pref_.save(&(this->gas_)); }
 
 }  // namespace gas_statistics
 }  // namespace esphome
