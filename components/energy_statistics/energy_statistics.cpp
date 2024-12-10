@@ -1,60 +1,114 @@
-#pragma once
-
-#include "esphome/core/component.h"
-#include "esphome/core/preferences.h"
-
-#include "esphome/components/sensor/sensor.h"
-#include "esphome/components/time/real_time_clock.h"
+#include "esphome/core/log.h"
+#include "esphome/core/hal.h"
+#include "energy_statistics.h"
 
 namespace esphome {
 namespace energy_statistics {
 
-using sensor::Sensor;
+static const char *const TAG = "energy_statistics";
+static const char *const GAP = "  ";
 
-class EnergyStatistics : public Component {
- public:
-  float get_setup_priority() const override { return setup_priority::DATA; }
-  void dump_config() override;
-  void setup() override;
-  void loop() override;
+void EnergyStatistics::dump_config() {
+  ESP_LOGCONFIG(TAG, "Energy statistics sensors");
+  if (this->energy_today_) {
+    LOG_SENSOR(GAP, "Energy Today", this->energy_today_);
+  }
+  if (this->energy_yesterday_) {
+    LOG_SENSOR(GAP, "Energy Yesterday", this->energy_yesterday_);
+  }
+  if (this->energy_week_) {
+    LOG_SENSOR(GAP, "Energy Week", this->energy_week_);
+  }
+  if (this->energy_month_) {
+    LOG_SENSOR(GAP, "Energy Month", this->energy_month_);
+  }
+  if (this->energy_year_) {
+    LOG_SENSOR(GAP, "Energy Year", this->energy_year_);
+  }
+}
 
-  void set_time(time::RealTimeClock *time) { this->time_ = time; }
-  void set_total(Sensor *sensor) { this->total_ = sensor; }
+void EnergyStatistics::setup() {
+  this->total_->add_on_state_callback([this](float state) { this->process_(state); });
 
-  void set_energy_today(Sensor *sensor) { this->energy_today_ = sensor; }
-  void set_energy_yesterday(Sensor *sensor) { this->energy_yesterday_ = sensor; }
-  void set_energy_week(Sensor *sensor) { this->energy_week_ = sensor; }
-  void set_energy_month(Sensor *sensor) { this->energy_month_ = sensor; }
+  this->pref_ = global_preferences->make_preference<energy_data_t>(fnv1_hash(TAG));
 
- protected:
-  ESPPreferenceObject pref_;
-  time::RealTimeClock *time_;
+  energy_data_t loaded{};
+  if (this->pref_.load(&loaded)) {
+    this->energy_ = loaded;
+    auto total = this->total_->get_state();
+    if (!std::isnan(total)) {
+      this->process_(total);
+    }
+  }
+}
 
-  // input sensors
-  Sensor *total_{nullptr};
+void EnergyStatistics::loop() {
+  const auto t = this->time_->now();
+  if (!t.is_valid()) {
+    // time is not sync yet
+    return;
+  }
 
-  // exposed sensors
-  Sensor *energy_today_{nullptr};
-  Sensor *energy_yesterday_{nullptr};
-  Sensor *energy_week_{nullptr};
-  Sensor *energy_month_{nullptr};
+  const auto total = this->total_->get_state();
+  if (std::isnan(total)) {
+    // total is not published yet
+    return;
+  }
 
-  // start day of week configuration
-  int energy_week_start_day_{2};
-  // start day of month configuration
-  int energy_month_start_day_{1};
+  if (t.day_of_year == this->energy_.current_day_of_year) {
+    // nothing to do
+    return;
+  }
 
-  struct energy_data_t {
-    uint16_t current_day_of_year{0};
-    float start_today{NAN};
-    float start_yesterday{NAN};
-    float start_week{NAN};
-    float start_month{NAN};
-  } energy_;
+  this->energy_.start_yesterday = this->energy_.start_today;
 
-  void process_(float total);
-  void save_();
-};  // class EnergyStatistics
+  this->energy_.start_today = total;
+
+  if (this->energy_.current_day_of_year != 0) {
+    // at specified day of week we start a new week calculation
+    if (t.day_of_week == this->energy_week_start_day_) {
+      this->energy_.start_week = total;
+    }
+    // at first day of month we start a new month calculation
+    if (t.day_of_month == 1) {
+      this->energy_.start_month = total;
+    }
+    // at first day of year we start a new year calculation
+    if (t.day_of_year == 1) {
+      this->energy_.start_year = total;
+    }
+  }
+
+  this->energy_.current_day_of_year = t.day_of_year;
+
+  this->process_(total);
+}
+
+void EnergyStatistics::process_(float total) {
+  if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
+    this->energy_today_->publish_state(total - this->energy_.start_today);
+  }
+
+  if (this->energy_yesterday_ && !std::isnan(this->energy_.start_yesterday)) {
+    this->energy_yesterday_->publish_state(this->energy_.start_today - this->energy_.start_yesterday);
+  }
+
+  if (this->energy_week_ && !std::isnan(this->energy_.start_week)) {
+    this->energy_week_->publish_state(total - this->energy_.start_week);
+  }
+
+  if (this->energy_month_ && !std::isnan(this->energy_.start_month)) {
+    this->energy_month_->publish_state(total - this->energy_.start_month);
+  }
+
+  if (this->energy_year_ && !std::isnan(this->energy_.start_year)) {
+    this->energy_year_->publish_state(total - this->energy_.start_year);
+  }
+  
+  this->save_();
+}
+
+void EnergyStatistics::save_() { this->pref_.save(&(this->energy_)); }
 
 }  // namespace energy_statistics
 }  // namespace esphome
