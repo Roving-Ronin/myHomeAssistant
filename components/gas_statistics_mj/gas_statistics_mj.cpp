@@ -108,7 +108,7 @@ void GasStatisticsMJ::process_(float total) {
   this->save_();
 }
 
-void GasStatisticsMJ::save_() { this->pref_.save(&this->gas_); // Save to flash memory
+void GasStatisticsMJ::save_() { this->pref_.save(&this->gas_); } // Save to flash memory
 
 }  // namespace gas_statistics
 }  // namespace esphome
