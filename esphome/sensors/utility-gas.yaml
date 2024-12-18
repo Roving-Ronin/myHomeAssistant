@@ -181,6 +181,7 @@ sensor:
       accuracy_decimals: 3
       internal: true
     #  Adds the calculation for providing a reading since device last booted / reset
+    #  Line 201 and 202 added 18/12/2024
       on_value: 
         then:
           - lambda: |-
@@ -198,8 +199,8 @@ sensor:
               id(gas_total_mj) += delta_mj;
 
               previous_gas_m3_value = current_gas_m3_value;
-              id(gas_used_total).update();                  # Added 18/12/2024
-              id(gas_used_total_mj).update();               # Added 18/12/2024
+              id(gas_used_total).update();
+              id(gas_used_total_mj).update();
       filters:
         - multiply: 0.01   # 100 pulses = 1,000L = 1m3
 
