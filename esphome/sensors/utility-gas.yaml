@@ -198,6 +198,8 @@ sensor:
               id(gas_total_mj) += delta_mj;
 
               previous_gas_m3_value = current_gas_m3_value;
+              id(gas_used_total).update();                  # Added 18/12/2024
+              id(gas_used_total_mj).update();               # Added 18/12/2024
       filters:
         - multiply: 0.01   # 100 pulses = 1,000L = 1m3
 
