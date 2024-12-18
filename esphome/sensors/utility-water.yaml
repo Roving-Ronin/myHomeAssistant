@@ -62,6 +62,7 @@ globals:
   - id: town_water_used_total_litres
     type: float
     restore_value: yes
+#    initial_value: '0.0'   # When Factory Reset, return this value to '0.0'
 
 ################################################################################
 #
@@ -133,6 +134,7 @@ sensor:
               float current_town_water_used_litres_value = id(town_water_used_litres).state;
               id(town_water_used_total_litres) += current_town_water_used_litres_value - previous_town_water_used_litres_value;
               previous_town_water_used_litres_value = current_town_water_used_litres_value;
+              id(town_water_used_total).update();
       filters:
         - multiply: 5.0  # Each pulse equals 5 liters
       internal: true
