@@ -79,6 +79,46 @@ globals:
     type: float
     restore_value: yes
 
+  - id: gas_today_m3
+    type: float
+    restore_value: yes
+
+  - id: gas_yesterday_m3
+    type: float
+    restore_value: yes
+
+  - id: gas_week_m3
+    type: float
+    restore_value: yes
+
+  - id: gas_month_m3
+    type: float
+    restore_value: yes
+
+  - id: gas_year_m3
+    type: float
+    restore_value: yes
+
+
+  - id: gas_today_mj
+    type: float
+    restore_value: yes
+
+  - id: gas_yesterday_mj
+    type: float
+    restore_value: yes
+
+  - id: gas_week_mj
+    type: float
+    restore_value: yes
+
+  - id: gas_month_mj
+    type: float
+    restore_value: yes
+
+  - id: gas_year_mj
+    type: float
+    restore_value: yes
 
 #######################################################################################
 #
@@ -217,6 +257,8 @@ sensor:
     gas_today:
       name: "Gas - Used Today"
       id: gas_used_today
+      lambda: |-
+        return id(gas_today_m3);
       web_server:
         sorting_group_id: group_gas_m3_sensors
         sorting_weight: 1
@@ -224,6 +266,8 @@ sensor:
     gas_yesterday:
       name: "Gas - Used Yesterday"
       id: gas_used_yesterday
+      lambda: |-
+        return id(gas_yesterday_m3);
       web_server:
         sorting_group_id: group_gas_m3_sensors
         sorting_weight: 2
@@ -231,6 +275,8 @@ sensor:
     gas_week:
       name: "Gas - Used Week"
       id: gas_used_week
+      lambda: |-
+        return id(gas_week_m3);
       web_server:
         sorting_group_id: group_gas_m3_sensors
         sorting_weight: 3
@@ -238,6 +284,8 @@ sensor:
     gas_month:
       name: "Gas - Used Month"
       id: gas_used_month
+      lambda: |-
+        return id(gas_month_m3);
       web_server:
         sorting_group_id: group_gas_m3_sensors
         sorting_weight: 4
@@ -245,6 +293,8 @@ sensor:
     gas_year:
       name: "Gas - Used Year"
       id: gas_used_year
+      lambda: |-
+        return id(gas_year_m3);
       web_server:
         sorting_group_id: group_gas_m3_sensors
         sorting_weight: 5
@@ -284,6 +334,8 @@ sensor:
     gas_today:
       name: "Gas - Used Today (MJ)"
       id: gas_used_today_mj
+      lambda: |-
+        return id(gas_today_mj);
       web_server:
         sorting_group_id: group_gas_mj_sensors
         sorting_weight: 1
@@ -291,6 +343,8 @@ sensor:
     gas_yesterday:
       name: "Gas - Used Yesterday (MJ)"
       id: gas_used_yesterday_mj
+      lambda: |-
+        return id(gas_yesterday_mj);
       web_server:
         sorting_group_id: group_gas_mj_sensors
         sorting_weight: 2
@@ -298,6 +352,8 @@ sensor:
     gas_week:
       name: "Gas - Used Week (MJ)"
       id: gas_used_week_mj
+      lambda: |-
+        return id(gas_week_mj);
       web_server:
         sorting_group_id: group_gas_mj_sensors
         sorting_weight: 3
@@ -305,6 +361,8 @@ sensor:
     gas_month:
       name: "Gas - Used Month (MJ)"
       id: gas_used_month_mj
+      lambda: |-
+        return id(gas_month_mj);
       web_server:
         sorting_group_id: group_gas_mj_sensors
         sorting_weight: 4
@@ -312,6 +370,8 @@ sensor:
     gas_year:
       name: "Gas - Used Year (MJ)"
       id: gas_used_year_mj
+      lambda: |-
+        return id(gas_year_mj);
       web_server:
         sorting_group_id: group_gas_mj_sensors
         sorting_weight: 5
