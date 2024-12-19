@@ -38,14 +38,13 @@ substitutions:
 esp32:
   board: esp32-c3-devkitm-1
   flash_size: 4MB
-  erase_flash: false
   variant: ESP32C3
   framework:
     type: arduino
     version: recommended
     
-
 esphome:
+  erase_flash: false
   platformio_options:
     board_build.mcu: esp32c3
     board_build.variant: esp32c3
