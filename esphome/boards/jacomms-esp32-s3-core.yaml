@@ -52,7 +52,6 @@ esp32:
   framework:
     type: arduino
   flash_size: 16MB
-  erase_flash: false
 
 logger:
   hardware_uart: USB_CDC
