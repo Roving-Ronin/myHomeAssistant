@@ -48,7 +48,6 @@ esphome:
     board_build.mcu: esp32c3
     board_build.variant: esp32c3
     board_build.flash_mode: dio
-  erase_flash: false
 
 #########################################################################
 #
