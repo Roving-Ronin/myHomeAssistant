@@ -77,12 +77,12 @@ globals:
   - id: gas_pressure_factor
     type: float
     restore_value: true
-    initial_value: 0.9864  # Default value stored in flash
+    initial_value: "0.9864"  # Default value stored in flash
 
   - id: gas_heating_value
     type: float
     restore_value: true
-    initial_value: 37.98  # Default value stored in flash
+    initial_value: "37.98"  # Default value stored in flash
 
   - id: gas_total_mj
     type: float
