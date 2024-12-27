@@ -220,14 +220,14 @@ sensor:
               float gas_delta_mj = gas_delta_m3 * pressure_factor * heating_value;
               
               // Update total gas used in MJ
-              id(gas_used_mj_total) += gas_delta_mj;
+              id(gas_total_mj) += gas_delta_mj;
 
               // Save the current value for the next calculation
               previous_gas_m3_value = current_gas_m3_value;
 
               // Update global sensors
               id(gas_used_total).update();
-              id(gas_used_mj_total_sensor).update();
+              id(gas_used_total_mj).update();
       internal: true
 
   ################################################################################
