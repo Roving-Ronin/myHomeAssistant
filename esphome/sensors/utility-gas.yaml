@@ -10,6 +10,18 @@ substitutions:
 
 ########################## End of Substitutions #########################
 #
+# Restore input values from the valued stored by their respective globals
+#
+esphome:
+  on_boot:
+    priority: -10  # Ensure this runs before other components rely on the numbers' values
+    then:
+      - lambda: |-
+          id(input_gas_pressure_factor).publish_state(id(gas_pressure_factor));
+          id(input_gas_heating_value).publish_state(id(gas_heating_value));
+
+#########################################################################
+#
 # Web_server v3 Sort Groups - These substitutes are applied to overwrite the default ones supplied by the 
 # sensor specific template file, in this case the /sensors/hc-sr04-ultrasonic.yaml file.
 #
@@ -65,10 +77,12 @@ globals:
   - id: gas_pressure_factor
     type: float
     restore_value: true
+    initial_value: 0.9864  # Default value stored in flash
 
   - id: gas_heating_value
     type: float
     restore_value: true
+    initial_value: 37.98  # Default value stored in flash
 
   - id: gas_total_mj
     type: float
@@ -92,12 +106,16 @@ number:
     max_value: 1.1
     step: 0.0001
     unit_of_measurement: ""
-    initial_value: 0.9864
-    restore_value: true
+#    restore_value: true
     optimistic: true
     mode: box
     icon: "mdi:scale"
     entity_category: config
+    set_action:
+      then:
+        - globals.set:
+            id: gas_pressure_factor
+            value: !lambda "return x;"    
     web_server:
       sorting_weight: 20
     
@@ -108,12 +126,16 @@ number:
     max_value: 52.0
     step: 0.01
     unit_of_measurement: ""
-    initial_value: 37.98
-    restore_value: true
+#    restore_value: true
     optimistic: true
     mode: box
     icon: "mdi:fire"
     entity_category: config
+    set_action:
+      then:
+        - globals.set:
+            id: gas_heating_value
+            value: !lambda "return x;" 
     web_server:
       sorting_weight: 21
 
@@ -178,31 +200,35 @@ sensor:
       state_class: "total_increasing"
       device_class: gas
       accuracy_decimals: 3
-      internal: true
+      filters:
+        - multiply: 0.01   # 100 pulses = 1,000L = 1m3
     #  Adds the calculation for providing a reading since device last booted / reset
-    #  Line 201 and 202 added 18/12/2024
+    #  Linea below changed to seperate m3 and MJ gas totals and calculations
       on_value: 
         then:
           - lambda: |-
               static float previous_gas_m3_value = 0.0;
               float current_gas_m3_value = id(gas_used_m3).state;
-              float delta_m3 = current_gas_m3_value - previous_gas_m3_value;
+              float gas_delta_m3 = current_gas_m3_value - previous_gas_m3_value;
+              
+              // Update total gas used in m³
+              id(gas_total_m3) += gas_delta_m3;
 
-              // Update gas total in m³
-              id(gas_total_m3) += delta_m3;
+              // Calculate gas used in MJ
+              float pressure_factor = id(input_gas_pressure_factor).state;
+              float heating_value = id(input_gas_heating_value).state;
+              float gas_delta_mj = gas_delta_m3 * pressure_factor * heating_value;
+              
+              // Update total gas used in MJ
+              id(gas_used_mj_total) += gas_delta_mj;
 
-              // Calculate MJ using current pressure and heating values
-              float delta_mj = delta_m3 * id(input_gas_pressure_factor).state * id(input_gas_heating_value).state;
-
-              // Update gas total in MJ
-              id(gas_total_mj) += delta_mj;
-
+              // Save the current value for the next calculation
               previous_gas_m3_value = current_gas_m3_value;
-              id(gas_used_total).update();
-              id(gas_used_total_mj).update();
-      filters:
-        - multiply: 0.01   # 100 pulses = 1,000L = 1m3
 
+              // Update global sensors
+              id(gas_used_total).update();
+              id(gas_used_mj_total_sensor).update();
+      internal: true
 
   ################################################################################
   #
