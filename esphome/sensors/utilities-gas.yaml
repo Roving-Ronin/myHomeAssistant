@@ -226,7 +226,7 @@ sensor:
         then:
           - lambda: |-
               static float previous_gas_m3_value = 0.0;
-              float current_gas_m3_value = id(_m3).state;
+              float current_gas_m3_value = id(gas_used_m3).state;
               float gas_delta_m3 = current_gas_m3_value - previous_gas_m3_value;
               
               // Update total gas used in m³
