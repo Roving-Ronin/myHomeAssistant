@@ -20,40 +20,6 @@ web_server:
       name: "Town Water Sensors"
       sorting_weight: -39
 
-
-#########################################################################
-#
-# Enable Home Assistant API
-#
-
-#api:
-#  services:
-  # Define service that calls the 'button:' defined below to reset the Water - Current Reading'
-#    - service: reset_total_energy
-#      then:
-#        - button.press:
-#            id: button_reset_water_statistics
-
-#########################################################################
-
-#button:
-  #  Reset the total energy entity (Water - Current Reading)
-#  - platform: template
-#    name: 'Reset - Water Statistics'
-#    entity_category: config
-#    icon: 'mdi:trash-can-outline'
-#    id: button_reset_water_statistics
-#    on_press:
-#      - lambda: |-
-#          // Reset the total water reading
-#          id(town_water_used_total_litres) = 0;
-#          id(town_water_used_litres).state = 0;
-
-#          // Reset the water statistics, as stored by the custom components
-#          id(town_water_statistics_component).reset_statistics();
-#    web_server:
-#      sorting_weight: 31
-
 #######################################################################################
 
 globals:
