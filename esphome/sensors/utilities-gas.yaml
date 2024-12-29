@@ -392,7 +392,7 @@ sensor:
     accuracy_decimals: 3
     # The number 5251.07 should be replaced with your own gas meters physical reading
     lambda: |-
-          return id(gas_total_m3);
+          return id(global_gas_total_m3);
     # Set interval that updates are sent to HA instance
     update_interval: 1s
     filters:
@@ -545,7 +545,7 @@ sensor:
     # With EACH QUARTERLY GAS BILL update the Jemena Pressure Factor and Heating Value below.   
     # Formula - (Gas Used x Pressure Factor x Heating Value) = Usage MJ
     lambda: |-
-       return id(gas_total_mj);
+       return id(global_gas_total_mj);
     update_interval: 1s
     filters:
       - delta : 0.001
