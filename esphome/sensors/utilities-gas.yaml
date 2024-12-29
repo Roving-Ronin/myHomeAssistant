@@ -256,7 +256,7 @@ sensor:
 
   - platform: "gas_statistics"
     id: gas_statistics_component
-    total: total_m3
+    total: gas_used_total
 
     gas_today:
       id: gas_used_today_sensor
@@ -409,7 +409,7 @@ sensor:
 
   - platform: "gas_statistics_mj"
     id: gas_statistics_mj_component
-    total: total_mj
+    total: gas_used_total_mj
 
     gas_today:
       id: gas_used_today_mj_sensor
