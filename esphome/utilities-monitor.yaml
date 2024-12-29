@@ -56,9 +56,9 @@ packages:
   network-config:      !include common/network-ethernet-w5500.yaml          # Configure Ethernet port on this system board
   bme280a-sensors:     !include sensors/bme280-bus-a.yaml                   # Temperature, Humidity, Pressure sensor probe
 #  ds18b20-sensors:     !include sensors/ds18b20-1wire.yaml
-  water-tank-sensors:  !include sensors/cylinder-liquid-pressure-tl136.yaml # Pressure sensor to monitor water tank
   town-gas-sensors:    !include sensors/utility-gas.yaml                    # Sensors to monitor and calculate gas usage
-  town-water-sensors:  !include sensors/utility-water-v2.yaml               # Sensors to monitor and calculate gas usage
+  town-water-sensors:  !include sensors/utility-town-water.yaml             # Sensors to monitor and calculate gas usage
+  water-tank-sensors:  !include sensors/cylinder-liquid-pressure-tl136.yaml # Pressure sensor to monitor water tank  
   esp32-system-board:  !include boards/jacomms-esp32-s3-core.yaml           # Model of ESP Board being used. This is Kincony S3 Core with JAComms HAT.
 
 
