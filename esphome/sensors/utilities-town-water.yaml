@@ -68,8 +68,8 @@ sensor:
   #
 
   - platform: pulse_counter
-    name: "Water - Pulse Counter"
-    id: water_pulse_counter
+    name: "Town Water - Pulse Counter"
+    id: town_water_pulse_counter
     pin:
       number: ${gpio_water_pin}
       allow_other_uses: true
@@ -85,8 +85,8 @@ sensor:
 
 
   - platform: pulse_meter
-    name: "Water - Flow Rate"
-    id: water_flow_rate
+    name: "Town Water - Flow Rate"
+    id: town_water_flow_rate
     unit_of_measurement: "L/min"
     state_class: measurement
     device_class: water
