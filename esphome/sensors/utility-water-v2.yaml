@@ -189,9 +189,6 @@ sensor:
           - lambda: |-
               id(global_town_water_yesterday) = x;
       internal: true
-      web_server:
-        sorting_group_id: group_town_water_sensors
-        sorting_weight: 2
 
     water_week:
       id: town_water_used_week_sensor
@@ -200,9 +197,6 @@ sensor:
           - lambda: |-
               id(global_town_water_week) = x;
       internal: true
-      web_server:
-        sorting_group_id: group_town_water_sensors
-        sorting_weight: 3
     
     water_month:
       id: town_water_used_month_sensor
@@ -211,9 +205,6 @@ sensor:
           - lambda: |-
               id(global_town_water_month) = x;
       internal: true
-      web_server:
-        sorting_group_id: group_town_water_sensors
-        sorting_weight: 4
 
     water_year:
       id: town_water_used_year_sensor
@@ -237,9 +228,9 @@ sensor:
     lambda: |-
       return id(town_water_today);
     update_interval: 10s
-      web_server:
-        sorting_group_id: group_town_water_sensors
-        sorting_weight: 1
+    web_server:
+      sorting_group_id: group_town_water_sensors
+      sorting_weight: 1
         
   - platform: template
     name: "Town Water - Used Yesterday"
@@ -247,9 +238,9 @@ sensor:
     lambda: |-
       return id(town_water_yesterday);
     update_interval: 10s
-      web_server:
-        sorting_group_id: group_town_water_sensors
-        sorting_weight: 2
+    web_server:
+      sorting_group_id: group_town_water_sensors
+      sorting_weight: 2
 
   - platform: template
     name: "Town Water - Used Week"
@@ -257,9 +248,9 @@ sensor:
     lambda: |-
       return id(town_water_week);
     update_interval: 10s
-      web_server:
-        sorting_group_id: group_town_water_sensors
-        sorting_weight: 3
+    web_server:
+      sorting_group_id: group_town_water_sensors
+      sorting_weight: 3
 
   - platform: template
     name: "Town Water - Used Month"
@@ -267,9 +258,9 @@ sensor:
     lambda: |-
       return id(town_water_month);
     update_interval: 10s
-      web_server:
-        sorting_group_id: group_town_water_sensors
-        sorting_weight: 4
+    web_server:
+      sorting_group_id: group_town_water_sensors
+      sorting_weight: 4
 
   - platform: template
     name: "Town Water - Used Year"
@@ -277,9 +268,9 @@ sensor:
     lambda: |-
       return id(town_water_year);
     update_interval: 10s
-      web_server:
-        sorting_group_id: group_town_water_sensors
-        sorting_weight: 5
+    web_server:
+      sorting_group_id: group_town_water_sensors
+      sorting_weight: 5
 
   ################################################################################
   #
