@@ -100,7 +100,7 @@ globals:
     restore_value: true
 #    initial_value: '0'
 
-  - id: global_gas_mj_momth
+  - id: global_gas_mj_month
     type: float
     restore_value: true
 #    initial_value: '0'
