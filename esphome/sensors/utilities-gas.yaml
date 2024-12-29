@@ -244,8 +244,8 @@ sensor:
               previous_gas_m3_value = current_gas_m3_value;
 
               // Update global sensors
-              id(total_m3).update();
-              id(total_mj).update();
+              id(gas_used_total).update();
+              id(gas_used_total_mj).update();
       internal: true
 
   ################################################################################
