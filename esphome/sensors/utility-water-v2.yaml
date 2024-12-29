@@ -62,32 +62,32 @@ globals:
   - id: town_water_used_total_litres
     type: float
     restore_value: yes
-#    initial_value: '0.0'   # When Factory Reset, return this value to '0.0'
+#    initial_value: '0'   # When Factory Reset, return this value to '0.0'
 
   - id: global_town_water_today
     type: float
     restore_value: true
-    initial_value: '0.0'
+    initial_value: '0'
 
   - id: global_town_water_yesterday
     type: float
     restore_value: true
-    initial_value: '0.0'
+    initial_value: '0'
 
   - id: global_town_water_week
     type: float
     restore_value: true
-    initial_value: '0.0'
+    initial_value: '0'
 
   - id: global_town_water_month
     type: float
     restore_value: true
-    initial_value: '0.0'
+    initial_value: '0'
 
   - id: global_town_water_year
     type: float
     restore_value: true
-    
+    initial_value: '0'
 
 ################################################################################
 #
