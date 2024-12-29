@@ -52,15 +52,15 @@ dashboard_import:
   import_full_config: false
 
 packages:
-  base-config:         !include common/base-configuration.yaml              # Base configuration applied to all ESPHome devices
-  network-config:      !include common/network-ethernet-w5500.yaml          # Configure Ethernet port on this system board
-  bme280a-sensors:     !include sensors/bme280-bus-a.yaml                   # Temperature, Humidity, Pressure sensor probe
-#  ds18b20-sensors:     !include sensors/ds18b20-1wire.yaml
-  town-gas-sensors:    !include sensors/utility-gas.yaml                    # Sensors to monitor and calculate gas usage
-  town-water-sensors:  !include sensors/utility-town-water.yaml             # Sensors to monitor and calculate gas usage
-  water-tank-sensors:  !include sensors/cylinder-liquid-pressure-tl136.yaml # Pressure sensor to monitor water tank  
-  esp32-system-board:  !include boards/jacomms-esp32-s3-core.yaml           # Model of ESP Board being used. This is Kincony S3 Core with JAComms HAT.
-
+  base-config:             !include common/base-configuration.yaml              # Base configuration applied to all ESPHome devices
+  network-config:          !include common/network-ethernet-w5500.yaml          # Configure Ethernet port on this system board
+  bme280a-sensors:         !include sensors/bme280-bus-a.yaml                   # Temperature, Humidity, Pressure sensor probe
+  water-tank-sensors:      !include sensors/cylinder-liquid-pressure-tl136.yaml # Pressure sensor to monitor water tank  
+#  ds18b20-sensors:       !include sensors/ds18b20-1wire.yaml
+  consumption-gas:         !include sensors/utilities-gas.yaml                    # Sensors to monitor and calculate gas usage
+  consumption-town-water:  !include sensors/utilities-town-water.yaml             # Sensors to monitor and calculate gas usage
+  consumption-tank-water:  !include sensors/utilities-tank-water.yaml             # Sensors to monitor and calculate gas usage
+  esp32-system-board:      !include boards/jacomms-esp32-s3-core.yaml           # Model of ESP Board being used. This is Kincony S3 Core with JAComms HAT.
 
 #########################################################################
 #
