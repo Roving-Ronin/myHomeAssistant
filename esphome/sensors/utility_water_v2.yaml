@@ -167,6 +167,7 @@ sensor:
   ################################################################################
   #
   # Custom Component - Water (Consumption) Statistics in Litres
+  # These sensors are hidden as the publish their data into the globals, that stores them
   #
 
   - platform: "water_statistics"
@@ -174,43 +175,116 @@ sensor:
     total: town_water_used_total
 
     water_today:
-      name: "Town Water - Used Today"
-      id: town_water_used_today
-      web_server:
-        sorting_group_id: group_town_water_sensors
-        sorting_weight: 1
+      id: town_water_used_today_sensor
+      on_value:
+        then:
+          - lambda: |-
+              id(global_town_water_today) = x;
+      internal: true
     
     water_yesterday:
-      name: "Town Water - Used Yesterday"
-      id: town_water_used_yesterday
+      id: town_water_used_yesterday_sensor
+      on_value:
+        then:
+          - lambda: |-
+              id(global_town_water_yesterday) = x;
+      internal: true
       web_server:
         sorting_group_id: group_town_water_sensors
         sorting_weight: 2
 
     water_week:
-      name: "Town Water - Used Week"
-      id: town_water_used_week
+      id: town_water_used_week_sensor
+      on_value:
+        then:
+          - lambda: |-
+              id(global_town_water_week) = x;
+      internal: true
       web_server:
         sorting_group_id: group_town_water_sensors
         sorting_weight: 3
     
     water_month:
-      name: "Town Water - Used Month"
-      id: town_water_used_month
+      id: town_water_used_month_sensor
+      on_value:
+        then:
+          - lambda: |-
+              id(global_town_water_month) = x;
+      internal: true
       web_server:
         sorting_group_id: group_town_water_sensors
         sorting_weight: 4
 
     water_year:
-      name: "Town Water - Used Year"
-      id: town_water_used_year
+      id: town_water_used_year_sensor
+      on_value:
+        then:
+          - lambda: |-
+              id(global_town_water_year) = x;
+      internal: true
       web_server:
         sorting_group_id: group_town_water_sensors
         sorting_weight: 5
 
   ################################################################################
+  #
+  #  Publishes the above sensors, by calling the readings stored in the Globals
+  #
+# Town Water
+  - platform: template
+    name: "Town Water - Used Today"
+    id: town_water_used_today
+    lambda: |-
+      return id(town_water_today);
+    update_interval: 10s
+      web_server:
+        sorting_group_id: group_town_water_sensors
+        sorting_weight: 1
+        
+  - platform: template
+    name: "Town Water - Used Yesterday"
+    id: town_water_used_yesterday
+    lambda: |-
+      return id(town_water_yesterday);
+    update_interval: 10s
+      web_server:
+        sorting_group_id: group_town_water_sensors
+        sorting_weight: 2
 
+  - platform: template
+    name: "Town Water - Used Week"
+    id: town_water_used_week
+    lambda: |-
+      return id(town_water_week);
+    update_interval: 10s
+      web_server:
+        sorting_group_id: group_town_water_sensors
+        sorting_weight: 3
+
+  - platform: template
+    name: "Town Water - Used Month"
+    id: town_water_used_month
+    lambda: |-
+      return id(town_water_month);
+    update_interval: 10s
+      web_server:
+        sorting_group_id: group_town_water_sensors
+        sorting_weight: 4
+
+  - platform: template
+    name: "Town Water - Used Year"
+    id: town_water_used_year
+    lambda: |-
+      return id(town_water_year);
+    update_interval: 10s
+      web_server:
+        sorting_group_id: group_town_water_sensors
+        sorting_weight: 5
+
+  ################################################################################
+  #
   #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
+  #
   - platform: template
     name: "Town Water - Used Total"
     id: town_water_used_total
