@@ -316,6 +316,8 @@ sensor:
     lambda: |-
       return id(global_gas_m3_today);
     update_interval: 10s
+    filters:
+      - delta : 0.001
     web_server:
       sorting_group_id: group_gas_m3_sensors
       sorting_weight: 1
@@ -331,6 +333,8 @@ sensor:
     lambda: |-
       return id(global_gas_m3_yesterday);
     update_interval: 10s
+    filters:
+      - delta : 0.001
     web_server:
       sorting_group_id: group_gas_m3_sensors
       sorting_weight: 2
@@ -346,6 +350,8 @@ sensor:
     lambda: |-
       return id(global_gas_m3_week);
     update_interval: 10s
+    filters:
+      - delta : 0.001
     web_server:
       sorting_group_id: group_gas_m3_sensors
       sorting_weight: 3
@@ -361,6 +367,8 @@ sensor:
     lambda: |-
       return id(global_gas_m3_month);
     update_interval: 10s
+    filters:
+      - delta : 0.001
     web_server:
       sorting_group_id: group_gas_m3_sensors
       sorting_weight: 4
@@ -376,6 +384,8 @@ sensor:
     lambda: |-
       return id(global_gas_m3_year);
     update_interval: 10s
+    filters:
+      - delta : 0.001
     web_server:
       sorting_group_id: group_gas_m3_sensors
       sorting_weight: 5
@@ -468,6 +478,8 @@ sensor:
     lambda: |-
       return id(global_gas_mj_today);
     update_interval: 10s
+    filters:
+      - delta : 0.001
     web_server:
       sorting_group_id: group_gas_mj_sensors
       sorting_weight: 1
@@ -483,6 +495,8 @@ sensor:
     lambda: |-
       return id(global_gas_mj_yesterday);
     update_interval: 10s
+    filters:
+      - delta : 0.001
     web_server:
       sorting_group_id: group_gas_mj_sensors
       sorting_weight: 2
@@ -498,6 +512,8 @@ sensor:
     lambda: |-
       return id(global_gas_mj_week);
     update_interval: 10s
+    filters:
+      - delta : 0.001
     web_server:
       sorting_group_id: group_gas_mj_sensors
       sorting_weight: 3
@@ -513,6 +529,8 @@ sensor:
     lambda: |-
       return id(global_gas_mj_month);
     update_interval: 10s
+    filters:
+      - delta : 0.001
     web_server:
       sorting_group_id: group_gas_mj_sensors
       sorting_weight: 4
@@ -528,6 +546,8 @@ sensor:
     lambda: |-
       return id(global_gas_mj_year);
     update_interval: 10s
+    filters:
+      - delta : 0.001
     web_server:
       sorting_group_id: group_gas_mj_sensors
       sorting_weight: 5
