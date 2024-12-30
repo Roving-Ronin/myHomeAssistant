@@ -79,7 +79,7 @@ sensor:
         pullup: true
     filters:
       - multiply: 5.0  # Convert pulse count to liters
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_utility_meter_sensors
       sorting_weight: 2
@@ -105,7 +105,7 @@ sensor:
     timeout: 3min
     filters:
       - multiply: 5.0  # Each pulse equals 5 liters. The water counter 'helper' in Home Assistant must still be set to 'step size' = 5.
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_utility_meter_sensors
       sorting_weight: 1
@@ -201,7 +201,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 1.0
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 1
@@ -219,7 +219,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 1.0
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 2
@@ -237,7 +237,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 1.0
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 3
@@ -255,7 +255,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 1.0
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 4
@@ -273,7 +273,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 1.0
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 5
@@ -293,7 +293,7 @@ sensor:
     update_interval: 1s        # Set interval that updates are sent to HA instance
     filters:
       - delta : 1.0
-      - heartbeat: 5m
+      - heartbeat: 300s
     lambda: |-
           return id(global_town_water_total);
     web_server:
