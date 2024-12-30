@@ -212,8 +212,8 @@ sensor:
 
     #  Uses the above pulse_meter and adds sensor and calculations for tracking m3
     total:    
-      name: 'Gas - Used (m³)'
-      id: gas_used_m3
+      name: 'Gas - Consumed Calculations'
+      id: gas_consumed_calculations
       unit_of_measurement: "m³"
       icon: "mdi:counter"
       state_class: "total_increasing"
@@ -227,7 +227,7 @@ sensor:
         then:
           - lambda: |-
               static float previous_gas_m3_value = 0.0;
-              float current_gas_m3_value = id(gas_used_m3).state;
+              float current_gas_m3_value = id(gas_consumed_calculations).state;
               float gas_delta_m3 = current_gas_m3_value - previous_gas_m3_value;
               
               // Update total gas used in m³
@@ -245,8 +245,8 @@ sensor:
               previous_gas_m3_value = current_gas_m3_value;
 
               // Update global sensors
-              id(gas_used_total).update();
-              id(gas_used_total_mj).update();
+              id(gas_total_m3).update();
+              id(gas_total_mj).update();
       internal: true
 
   ################################################################################
@@ -257,10 +257,10 @@ sensor:
 
   - platform: "gas_statistics"
     id: gas_statistics_component
-    total: gas_used_total
+    total: gas_total_m3
 
     gas_today:
-      id: gas_used_today_sensor
+      id: gas_m3_today_sensor
       on_value:
         then:
           - lambda: |-
@@ -268,7 +268,7 @@ sensor:
       internal: true
     
     gas_yesterday:
-      id: gas_used_yesterday_sensor
+      id: gas_m3_yesterday_sensor
       on_value:
         then:
           - lambda: |-
@@ -276,7 +276,7 @@ sensor:
       internal: true
 
     gas_week:
-      id: gas_used_week_sensor
+      id: gas_m3_week_sensor
       on_value:
         then:
           - lambda: |-
@@ -284,7 +284,7 @@ sensor:
       internal: true
     
     gas_month:
-      id: gas_used_month_sensor
+      id: gas_m3_month_sensor
       on_value:
         then:
           - lambda: |-
@@ -292,7 +292,7 @@ sensor:
       internal: true
 
     gas_year:
-      id: gas_used_year_sensor
+      id: gas_m3_year_sensor
       on_value:
         then:
           - lambda: |-
@@ -306,8 +306,8 @@ sensor:
   #
 # Town Water
   - platform: template
-    name: "Gas - Used Today"
-    id: gas_used_today
+    name: "Gas - Today"
+    id: gas_today
     unit_of_measurement: 'm³'
     device_class: gas
     state_class: total_increasing
@@ -321,8 +321,8 @@ sensor:
       sorting_weight: 1
         
   - platform: template
-    name: "Gas - Used Yesterday"
-    id: gas_used_yesterday
+    name: "Gas - Yesterday"
+    id: gas_yesterday
     unit_of_measurement: 'm³'
     device_class: gas
     state_class: total_increasing
@@ -336,8 +336,8 @@ sensor:
       sorting_weight: 2
 
   - platform: template
-    name: "Gas - Used Week"
-    id: gas_used_week
+    name: "Gas - Week"
+    id: gas_week
     unit_of_measurement: 'm³'
     device_class: gas
     state_class: total_increasing
@@ -351,8 +351,8 @@ sensor:
       sorting_weight: 3
 
   - platform: template
-    name: "Gas - Used Month"
-    id: gas_used_month
+    name: "Gas - Month"
+    id: gas_month
     unit_of_measurement: 'm³'
     device_class: gas
     state_class: total_increasing
@@ -366,8 +366,8 @@ sensor:
       sorting_weight: 4
 
   - platform: template
-    name: "Gas - Used Year"
-    id: gas_used_year
+    name: "Gas - Year"
+    id: gas_year
     unit_of_measurement: 'm³'
     device_class: gas
     state_class: total_increasing
@@ -384,8 +384,8 @@ sensor:
 
   #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
   - platform: template
-    name: "Gas - Used Total"
-    id: gas_used_total
+    name: "Gas - Total"
+    id: gas_total_m3
     unit_of_measurement: "m³"
     device_class: gas
     state_class: "total_increasing"
@@ -410,7 +410,7 @@ sensor:
 
   - platform: "gas_statistics_mj"
     id: gas_statistics_mj_component
-    total: gas_used_total_mj
+    total: gas_total_mj
 
     gas_today:
       id: gas_used_today_mj_sensor
@@ -458,8 +458,8 @@ sensor:
   #
 # Town Water
   - platform: template
-    name: "Gas - Used Today (MJ)"
-    id: gas_used_today_mj
+    name: "Gas - Today (MJ)"
+    id: gas_today_mj
     unit_of_measurement: "MJ"
     device_class: energy
     state_class: total_increasing
@@ -473,8 +473,8 @@ sensor:
       sorting_weight: 1
         
   - platform: template
-    name: "Gas - Used Yesterday (MJ)"
-    id: gas_used_yesterday_mj
+    name: "Gas - Yesterday (MJ)"
+    id: gas_yesterday_mj
     unit_of_measurement: "MJ"
     device_class: energy
     state_class: total_increasing
@@ -488,8 +488,8 @@ sensor:
       sorting_weight: 2
 
   - platform: template
-    name: "Gas - Used Week (MJ)"
-    id: gas_used_week_mj
+    name: "Gas - Week (MJ)"
+    id: gas_week_mj
     unit_of_measurement: "MJ"
     device_class: energy
     state_class: total_increasing
@@ -503,8 +503,8 @@ sensor:
       sorting_weight: 3
 
   - platform: template
-    name: "Gas - Used Month (MJ)"
-    id: gas_used_month_mj
+    name: "Gas - Month (MJ)"
+    id: gas_month_mj
     unit_of_measurement: "MJ"
     device_class: energy
     state_class: total_increasing
@@ -518,8 +518,8 @@ sensor:
       sorting_weight: 4
 
   - platform: template
-    name: "Gas - Used Year (MJ)"
-    id: gas_used_year_mj
+    name: "Gas - Year (MJ)"
+    id: gas_year_mj
     unit_of_measurement: "MJ"
     device_class: energy
     state_class: total_increasing
@@ -536,8 +536,8 @@ sensor:
   ################################################################################
   
   - platform: template
-    name: "Gas - Used Total (MJ)"
-    id: gas_used_total_mj
+    name: "Gas - Total (MJ)"
+    id: gas_total_mj
     unit_of_measurement: "MJ"
     device_class: energy
     state_class: "total_increasing"
