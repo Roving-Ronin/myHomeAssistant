@@ -182,7 +182,7 @@ sensor:
         input: true
         pullup: true
     filters:
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_utility_meter_sensors
       sorting_weight: 4
@@ -208,7 +208,7 @@ sensor:
     timeout: 3min
     filters:
       - multiply: 10.0     # 1 pulse = 10L. The gas counter 'helper' in Home Assistant must still be set to 'step size' = 10.
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_utility_meter_sensors
       sorting_weight: 3
