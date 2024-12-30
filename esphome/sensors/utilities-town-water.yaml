@@ -25,7 +25,7 @@ web_server:
 globals:
 
   #  Globals for use with pulse meter, to allow storing and setting a base reading for water meter
-  - id: town_water_used_total_litres
+  - id: town_water_total_litres
     type: float
     restore_value: yes
 #    initial_value: '0'   # When Factory Reset, return this value to '0.0'
@@ -110,8 +110,8 @@ sensor:
 
     #  Uses the above pulse_meter and adds sensor and calculations for tracking current litres
     total:
-      name: 'Town Water - Used'
-      id: town_water_used_litres
+      name: 'Town Water - Consumned Calculation'
+      id: town_water_consumed_calculation
       unit_of_measurement: "L"
       icon: "mdi:water"
       state_class: "total_increasing"
@@ -124,10 +124,10 @@ sensor:
         then:
           - lambda: |-
               static float previous_town_water_used_litres_value = 0.0;
-              float current_town_water_used_litres_value = id(town_water_used_litres).state;
-              id(town_water_used_total_litres) += current_town_water_used_litres_value - previous_town_water_used_litres_value;
+              float current_town_water_used_litres_value = id(town_water_consumed_calculation).state;
+              id(town_water_total_litres) += current_town_water_used_litres_value - previous_town_water_used_litres_value;
               previous_town_water_used_litres_value = current_town_water_used_litres_value;
-              id(town_water_used_total).update();
+              id(town_water_total).update();
       internal: true
 
   ################################################################################
@@ -138,10 +138,10 @@ sensor:
 
   - platform: "water_statistics"
     id: town_water_statistics_component
-    total: town_water_used_total
+    total: town_water_total
 
     water_today:
-      id: town_water_used_today_sensor
+      id: town_water_today_sensor
       on_value:
         then:
           - lambda: |-
@@ -149,7 +149,7 @@ sensor:
       internal: true
     
     water_yesterday:
-      id: town_water_used_yesterday_sensor
+      id: town_water_yesterday_sensor
       on_value:
         then:
           - lambda: |-
@@ -157,7 +157,7 @@ sensor:
       internal: true
 
     water_week:
-      id: town_water_used_week_sensor
+      id: town_water_week_sensor
       on_value:
         then:
           - lambda: |-
@@ -165,7 +165,7 @@ sensor:
       internal: true
     
     water_month:
-      id: town_water_used_month_sensor
+      id: town_water_month_sensor
       on_value:
         then:
           - lambda: |-
@@ -173,7 +173,7 @@ sensor:
       internal: true
 
     water_year:
-      id: town_water_used_year_sensor
+      id: town_water_year_sensor
       on_value:
         then:
           - lambda: |-
@@ -187,8 +187,8 @@ sensor:
   #
 # Town Water
   - platform: template
-    name: "Town Water - Used Today"
-    id: town_water_used_today
+    name: "Town Water - Today"
+    id: town_water_today
     unit_of_measurement: L
     icon: "mdi:hours-24"
     accuracy_decimals: 0
@@ -202,8 +202,8 @@ sensor:
       sorting_weight: 1
         
   - platform: template
-    name: "Town Water - Used Yesterday"
-    id: town_water_used_yesterday
+    name: "Town Water - Yesterday"
+    id: town_water_yesterday
     unit_of_measurement: L
     icon: "mdi:calendar-today-outline"
     accuracy_decimals: 0
@@ -217,8 +217,8 @@ sensor:
       sorting_weight: 2
 
   - platform: template
-    name: "Town Water - Used Week"
-    id: town_water_used_week
+    name: "Town Water - Week"
+    id: town_water_week
     unit_of_measurement: L
     icon: "mdi:calendar-week"
     accuracy_decimals: 0
@@ -232,8 +232,8 @@ sensor:
       sorting_weight: 3
 
   - platform: template
-    name: "Town Water - Used Month"
-    id: town_water_used_month
+    name: "Town Water - Month"
+    id: town_water_month
     unit_of_measurement: L
     icon: "mdi:calendar"
     accuracy_decimals: 0
@@ -247,8 +247,8 @@ sensor:
       sorting_weight: 4
 
   - platform: template
-    name: "Town Water - Used Year"
-    id: town_water_used_year
+    name: "Town Water - Year"
+    id: town_water_year
     unit_of_measurement: L
     icon: "mdi:calendar-text"
     accuracy_decimals: 0
@@ -266,8 +266,8 @@ sensor:
   #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
   #
   - platform: template
-    name: "Town Water - Used Total"
-    id: town_water_used_total
+    name: "Town Water - Total"
+    id: town_water_total
     unit_of_measurement: "L"
     device_class: water
     state_class: "total_increasing"
@@ -277,7 +277,7 @@ sensor:
     filters:
       - delta : 0.001
     lambda: |-
-          return id(town_water_used_total_litres);
+          return id(town_water_total_litres);
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 6
