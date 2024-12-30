@@ -196,9 +196,10 @@ sensor:
     state_class: total_increasing
     lambda: |-
       return id(global_town_water_today);
-    update_interval: 10s
+    update_interval: 1s
     filters:
-      - delta : 0.001
+      - delta : 1.0
+      - heartbeat: 5m
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 1
@@ -213,9 +214,10 @@ sensor:
     state_class: total_increasing
     lambda: |-
       return id(global_town_water_yesterday);
-    update_interval: 10s
+    update_interval: 1s
     filters:
-      - delta : 0.001
+      - delta : 1.0
+      - heartbeat: 5m
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 2
@@ -230,9 +232,10 @@ sensor:
     state_class: total_increasing
     lambda: |-
       return id(global_town_water_week);
-    update_interval: 10s
+    update_interval: 1s
     filters:
-      - delta : 0.001
+      - delta : 1.0
+      - heartbeat: 5m
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 3
@@ -247,9 +250,10 @@ sensor:
     state_class: total_increasing
     lambda: |-
       return id(global_town_water_month);
-    update_interval: 10s
+    update_interval: 1s
     filters:
-      - delta : 0.001
+      - delta : 1.0
+      - heartbeat: 5m
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 4
@@ -264,9 +268,10 @@ sensor:
     state_class: total_increasing
     lambda: |-
       return id(global_town_water_year);
-    update_interval: 10s
+    update_interval: 1s
     filters:
-      - delta : 0.001
+      - delta : 1.0
+      - heartbeat: 5m
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 5
@@ -285,7 +290,8 @@ sensor:
     accuracy_decimals: 0       # As water meter only registers every 10L
     update_interval: 1s        # Set interval that updates are sent to HA instance
     filters:
-      - delta : 0.001
+      - delta : 1.0
+      - heartbeat: 5m
     lambda: |-
           return id(global_town_water_total);
     web_server:
