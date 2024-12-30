@@ -110,7 +110,7 @@ sensor:
 
     #  Uses the above pulse_meter and adds sensor and calculations for tracking current litres
     total:
-      name: 'Town Water - Consumned Calculation'
+      name: 'Town Water - Consumed Calculation'
       id: town_water_consumed_calculation
       unit_of_measurement: "L"
       icon: "mdi:water"
@@ -196,10 +196,7 @@ sensor:
     state_class: total_increasing
     lambda: |-
       return id(global_town_water_today);
-    update_interval: 1s
-    filters:
-      - delta : 1.0
-      - heartbeat: 300s
+    update_interval: 10s
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 1
@@ -214,10 +211,7 @@ sensor:
     state_class: total_increasing
     lambda: |-
       return id(global_town_water_yesterday);
-    update_interval: 1s
-    filters:
-      - delta : 1.0
-      - heartbeat: 300s
+    update_interval: 10s
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 2
@@ -232,10 +226,7 @@ sensor:
     state_class: total_increasing
     lambda: |-
       return id(global_town_water_week);
-    update_interval: 1s
-    filters:
-      - delta : 1.0
-      - heartbeat: 300s
+    update_interval: 10s
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 3
@@ -250,10 +241,7 @@ sensor:
     state_class: total_increasing
     lambda: |-
       return id(global_town_water_month);
-    update_interval: 1s
-    filters:
-      - delta : 1.0
-      - heartbeat: 300s
+    update_interval: 10s
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 4
@@ -268,10 +256,7 @@ sensor:
     state_class: total_increasing
     lambda: |-
       return id(global_town_water_year);
-    update_interval: 1s
-    filters:
-      - delta : 1.0
-      - heartbeat: 300s
+    update_interval: 10s
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 5
@@ -288,10 +273,7 @@ sensor:
     state_class: "total_increasing"
     icon: "mdi:counter"
     accuracy_decimals: 0       # As water meter only registers every 10L
-    update_interval: 1s        # Set interval that updates are sent to HA instance
-    filters:
-      - delta : 1.0
-      - heartbeat: 300s
+    update_interval: 10s        # Set interval that updates are sent to HA instance
     lambda: |-
           return id(global_town_water_total);
     web_server:
