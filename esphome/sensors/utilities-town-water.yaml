@@ -8,6 +8,8 @@
 
 substitutions:
 
+water_sensor_update_interval: '15s'
+
 ########################## End of Substitutions #########################
 #
 # Web_server v3 Sort Groups - These substitutes are applied to overwrite the default ones supplied by the 
@@ -196,7 +198,7 @@ sensor:
     state_class: total_increasing
     lambda: |-
       return id(global_town_water_today);
-    update_interval: 10s
+    update_interval: ${water_sensor_update_interval}
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 1
@@ -211,7 +213,7 @@ sensor:
     state_class: total_increasing
     lambda: |-
       return id(global_town_water_yesterday);
-    update_interval: 10s
+    update_interval: ${water_sensor_update_interval}
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 2
@@ -226,7 +228,7 @@ sensor:
     state_class: total_increasing
     lambda: |-
       return id(global_town_water_week);
-    update_interval: 10s
+    update_interval: ${water_sensor_update_interval}
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 3
@@ -241,7 +243,7 @@ sensor:
     state_class: total_increasing
     lambda: |-
       return id(global_town_water_month);
-    update_interval: 10s
+    update_interval: ${water_sensor_update_interval}
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 4
@@ -256,7 +258,7 @@ sensor:
     state_class: total_increasing
     lambda: |-
       return id(global_town_water_year);
-    update_interval: 10s
+    update_interval: ${water_sensor_update_interval}
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 5
@@ -272,8 +274,8 @@ sensor:
     device_class: water
     state_class: "total_increasing"
     icon: "mdi:counter"
-    accuracy_decimals: 0       # As water meter only registers every 10L
-    update_interval: 10s        # Set interval that updates are sent to HA instance
+    accuracy_decimals: 0                              # As water meter only registers every 10L / whole litres
+    update_interval: ${water_sensor_update_interval}  # Set interval that updates are sent to HA instance
     lambda: |-
           return id(global_town_water_total);
     web_server:
