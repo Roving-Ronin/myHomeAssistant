@@ -25,7 +25,7 @@ web_server:
 globals:
 
   #  Globals for use with pulse meter, to allow storing and setting a base reading for water meter
-  - id: town_water_total_litres
+  - id: global_town_water_total
     type: float
     restore_value: yes
 #    initial_value: '0'   # When Factory Reset, return this value to '0.0'
@@ -33,27 +33,27 @@ globals:
   - id: global_town_water_today
     type: float
     restore_value: true
-    initial_value: '0'
+#    initial_value: '0'
 
   - id: global_town_water_yesterday
     type: float
     restore_value: true
-    initial_value: '0'
+#    initial_value: '0'
 
   - id: global_town_water_week
     type: float
     restore_value: true
-    initial_value: '0'
+#    initial_value: '0'
 
   - id: global_town_water_month
     type: float
     restore_value: true
-    initial_value: '0'
+#    initial_value: '0'
 
   - id: global_town_water_year
     type: float
     restore_value: true
-    initial_value: '0'
+#    initial_value: '0'
 
 ################################################################################
 #
@@ -125,7 +125,7 @@ sensor:
           - lambda: |-
               static float previous_town_water_used_litres_value = 0.0;
               float current_town_water_used_litres_value = id(town_water_consumed_calculation).state;
-              id(town_water_total_litres) += current_town_water_used_litres_value - previous_town_water_used_litres_value;
+              id(global_town_water_total) += current_town_water_used_litres_value - previous_town_water_used_litres_value;
               previous_town_water_used_litres_value = current_town_water_used_litres_value;
               id(town_water_total).update();
       internal: true
@@ -277,7 +277,7 @@ sensor:
     filters:
       - delta : 0.001
     lambda: |-
-          return id(town_water_total_litres);
+          return id(global_town_water_total);
     web_server:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 6
