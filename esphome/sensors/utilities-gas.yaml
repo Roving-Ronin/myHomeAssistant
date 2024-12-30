@@ -8,6 +8,8 @@
 
 substitutions:
 
+  gas_sensor_update_interval: '15s'
+  
 ########################## End of Substitutions #########################
 #
 # Restore input values from the valued stored by their respective globals
@@ -315,10 +317,7 @@ sensor:
     icon: "mdi:hours-24"
     lambda: |-
       return id(global_gas_m3_today);
-    update_interval: 1s
-    filters:
-      - delta : 0.001
-      - heartbeat: 300s
+    update_interval: ${gas_sensor_update_interval}
     web_server:
       sorting_group_id: group_gas_m3_sensors
       sorting_weight: 1
@@ -333,10 +332,7 @@ sensor:
     icon: "mdi:calendar-today-outline"
     lambda: |-
       return id(global_gas_m3_yesterday);
-    update_interval: 1s
-    filters:
-      - delta : 0.001
-      - heartbeat: 300s
+    update_interval: ${gas_sensor_update_interval}
     web_server:
       sorting_group_id: group_gas_m3_sensors
       sorting_weight: 2
@@ -351,10 +347,7 @@ sensor:
     icon: "mdi:calendar-week"
     lambda: |-
       return id(global_gas_m3_week);
-    update_interval: 1s
-    filters:
-      - delta : 0.001
-      - heartbeat: 300s
+    update_interval: ${gas_sensor_update_interval}
     web_server:
       sorting_group_id: group_gas_m3_sensors
       sorting_weight: 3
@@ -369,10 +362,7 @@ sensor:
     icon: "mdi:calendar"
     lambda: |-
       return id(global_gas_m3_month);
-    update_interval: 1s
-    filters:
-      - delta : 0.001
-      - heartbeat: 300s
+    update_interval: ${gas_sensor_update_interval}
     web_server:
       sorting_group_id: group_gas_m3_sensors
       sorting_weight: 4
@@ -387,10 +377,7 @@ sensor:
     icon: "mdi:calendar-text"    
     lambda: |-
       return id(global_gas_m3_year);
-    update_interval: 1s
-    filters:
-      - delta : 0.001
-      - heartbeat: 300s
+    update_interval: ${gas_sensor_update_interval}
     web_server:
       sorting_group_id: group_gas_m3_sensors
       sorting_weight: 5
@@ -410,10 +397,7 @@ sensor:
     lambda: |-
           return id(global_gas_total_m3);
     # Set interval that updates are sent to HA instance
-    update_interval: 1s
-    filters:
-      - delta : 0.001
-      - heartbeat: 300s
+    update_interval: ${gas_sensor_update_interval}
     web_server:
       sorting_group_id: group_gas_m3_sensors
       sorting_weight: 6
@@ -483,10 +467,7 @@ sensor:
     icon: "mdi:hours-24"
     lambda: |-
       return id(global_gas_mj_today);
-    update_interval: 1s
-    filters:
-      - delta : 0.001
-      - heartbeat: 300s
+    update_interval: ${gas_sensor_update_interval}
     web_server:
       sorting_group_id: group_gas_mj_sensors
       sorting_weight: 1
@@ -501,10 +482,7 @@ sensor:
     icon: "mdi:calendar-today-outline"
     lambda: |-
       return id(global_gas_mj_yesterday);
-    update_interval: 1s
-    filters:
-      - delta : 0.001
-      - heartbeat: 300s
+    update_interval: ${gas_sensor_update_interval}
     web_server:
       sorting_group_id: group_gas_mj_sensors
       sorting_weight: 2
@@ -519,10 +497,7 @@ sensor:
     icon: "mdi:calendar-week"
     lambda: |-
       return id(global_gas_mj_week);
-    update_interval: 1s
-    filters:
-      - delta : 0.001
-      - heartbeat: 300s
+    update_interval: ${gas_sensor_update_interval}
     web_server:
       sorting_group_id: group_gas_mj_sensors
       sorting_weight: 3
@@ -537,10 +512,7 @@ sensor:
     icon: "mdi:calendar"
     lambda: |-
       return id(global_gas_mj_month);
-    update_interval: 1s
-    filters:
-      - delta : 0.001
-      - heartbeat: 300s
+    update_interval: ${gas_sensor_update_interval}
     web_server:
       sorting_group_id: group_gas_mj_sensors
       sorting_weight: 4
@@ -555,10 +527,7 @@ sensor:
     icon: "mdi:calendar-text"
     lambda: |-
       return id(global_gas_mj_year);
-    update_interval: 1s
-    filters:
-      - delta : 0.001
-      - heartbeat: 300s
+    update_interval: ${gas_sensor_update_interval}
     web_server:
       sorting_group_id: group_gas_mj_sensors
       sorting_weight: 5
@@ -578,10 +547,7 @@ sensor:
     # Formula - (Gas Used x Pressure Factor x Heating Value) = Usage MJ
     lambda: |-
        return id(global_gas_total_mj);
-    update_interval: 1s
-    filters:
-      - delta : 0.001
-      - heartbeat: 300s
+    update_interval: ${gas_sensor_update_interval}
     web_server:
       sorting_group_id: group_gas_mj_sensors
       sorting_weight: 6
