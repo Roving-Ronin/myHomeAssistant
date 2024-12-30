@@ -321,7 +321,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_gas_m3_sensors
       sorting_weight: 1
@@ -339,7 +339,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_gas_m3_sensors
       sorting_weight: 2
@@ -357,7 +357,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_gas_m3_sensors
       sorting_weight: 3
@@ -375,7 +375,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_gas_m3_sensors
       sorting_weight: 4
@@ -393,7 +393,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_gas_m3_sensors
       sorting_weight: 5
@@ -416,7 +416,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_gas_m3_sensors
       sorting_weight: 6
@@ -489,7 +489,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_gas_mj_sensors
       sorting_weight: 1
@@ -507,7 +507,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_gas_mj_sensors
       sorting_weight: 2
@@ -525,7 +525,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_gas_mj_sensors
       sorting_weight: 3
@@ -543,7 +543,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_gas_mj_sensors
       sorting_weight: 4
@@ -561,7 +561,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_gas_mj_sensors
       sorting_weight: 5
@@ -584,7 +584,7 @@ sensor:
     update_interval: 1s
     filters:
       - delta : 0.001
-      - heartbeat: 5m
+      - heartbeat: 300s
     web_server:
       sorting_group_id: group_gas_mj_sensors
       sorting_weight: 6
