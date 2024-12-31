@@ -329,7 +329,7 @@ sensor:
 # Energy Statistic Sensors
 
   - platform: template
-    name: "Town Water - Today"
+    name: "Energy - Today"
     id: energy_today
     unit_of_measurement: kWh
     device_class: "energy"
@@ -344,7 +344,7 @@ sensor:
       sorting_weight: 1
         
   - platform: template
-    name: "Town Water - Yesterday"
+    name: "Energy - Yesterday"
     id: energy_yesterday
     unit_of_measurement: kWh
     device_class: "energy"
@@ -359,7 +359,7 @@ sensor:
       sorting_weight: 2
 
   - platform: template
-    name: "Town Water - Week"
+    name: "Energy - Week"
     id: energy_week
     unit_of_measurement: kWh
     device_class: "energy"
@@ -374,7 +374,7 @@ sensor:
       sorting_weight: 3
 
   - platform: template
-    name: "Town Water - Month"
+    name: "Energy - Month"
     id: energy_month
     unit_of_measurement: kWh
     accuracy_decimals: 0
@@ -389,7 +389,7 @@ sensor:
       sorting_weight: 4
 
   - platform: template
-    name: "Town Water - Year"
+    name: "Energy - Year"
     id: energy_year
     unit_of_measurement: kWh
     accuracy_decimals: 0
