@@ -27,6 +27,7 @@ web_server:
 #
 
 esphome:
+  name: relay_power_on_state_selector
   on_boot:
     - priority: 600
       then:
