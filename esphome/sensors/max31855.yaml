@@ -1,0 +1,80 @@
+https://esphome.io/components/spi
+
+https://esphome.io/components/sensor/max31855
+
+#########################################################################
+#
+# Utility - Gas Sensors
+# 
+# Used to monitor mains feed gas, with a reed sensor connected to the gas
+# meter, that has a rotating dial with a magnet inside that can be monitored.
+#
+
+substitutions:
+
+  gas_sensor_update_interval: '15s'
+
+
+#########################################################################
+#
+# Web_server v3 Sort Groups - These substitutes are applied to overwrite the default ones supplied by the 
+# sensor specific template file, in this case the /sensors/hc-sr04-ultrasonic.yaml file.
+#
+
+web_server:
+  sorting_groups:
+    - id: group_fireplace_sensors
+      name: "Fireplace Sensors"
+      sorting_weight: -38
+
+      
+#########################################################################
+#
+# Example configuration entry - single controller
+#
+
+spi:
+  - id: spi_adc1
+    miso_pin: GPIO12
+    clk_pin: GPIO14
+
+
+#########################################################################
+#
+# Sensors
+#
+
+reference_temperature
+
+sensor:
+  - platform: max31855
+    name: "Fireplace - Temperature"
+    id: fireplace_temperature
+    cs_pin: GPIO14
+    Accuracy Decimals: 1
+    reference_temperature:
+      id: water_heater_left_reference
+    icon: 'mdi:fire'
+    update_interval: 15s
+
+  - platform: max31855
+    name: "Fireplace - Chimney Temperature"
+    id: chimney_temperature
+    cs_pin: GPIO15
+    Accuracy Decimals: 1
+    reference_temperature:
+      id: water_heater_right_reference
+    icon: 'mdi:fire'
+    update_interval: 15s
+
+  - platform: template
+    name: "Fireplace - Status"
+    icon: "mdi:fire"
+    lambda: |-
+     if (id(fireplace_temperature).state  > 50)
+      return {"ON"}
+     ;else
+      return {"OFF"};
+    update_interval: 15s  
+
+#########################################################################
