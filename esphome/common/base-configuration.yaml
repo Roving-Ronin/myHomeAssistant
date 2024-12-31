@@ -119,12 +119,21 @@ network:
 #  device_version: !include common/everything-presence-one-sen0395-stable.yaml
 #  sen0395_base: !include common/sen0395-common.yaml
 
-
+#####################################################################
+#
+# Used to store the values between reboots
+#
 globals:
   - id: current_log_level
     type: int
     restore_value: yes
-    initial_value: '2'  # Default: Warn (None=0, Error=1, Warn=2, Info=3, Debug=4, Verbose=5)
+    initial_value: '3'   # Default: Info (None=0, Error=1, Warn=2, Info=3, Debug=4, Verbose=5, Very Verbose=6)
+
+#####################################################################
+#
+# Script and Selector to add a pull down option to set the Logger Level
+# allows changing logger levels on the fly, without needing to reflash firmware
+#
 
 script:
   - id: conditional_log
@@ -153,6 +162,7 @@ select:
       - Info
       - Debug
       - Verbose
+      - Very Verbose
     on_value:
       then:
         - lambda: |-
@@ -168,6 +178,8 @@ select:
               id(current_log_level) = 4;
             } else if (x == "Verbose") {
               id(current_log_level) = 5;
+            } else if (x == "Very Verbose") {
+              id(current_log_level) = 6;
             }
     web_server:
       sorting_group_id: group_controls
