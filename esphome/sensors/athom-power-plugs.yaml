@@ -58,36 +58,6 @@ external_components:
   - source: github://roving-ronin/myhomeassistant/components@main
     refresh: 0s
 
-#########################################################################
-#
-# Enable Home Assistant API
-#
-
-#api:
-  # Define service that calls the 'button:' defined below to reset the energy readings
-#  services:
-#    - service: reset_total_energy
-#      then:
-#        - button.press:
-#            id: button_reset_energy_statistics
-
-#########################################################################
-#
-# Button - Function to allow resetting energy readings to ZERO
-#
-
-#button:
-  #  Reset the total energy entity (Gas - Current Reading)
-#  - platform: template
-#    name: 'Reset - Energy Statistics'
-#    id: button_reset_energy_statistics
-#    entity_category: config
-#    icon: 'mdi:trash-can-outline'
-#    on_press:
-#      - lambda: |-
-#          // Reset the energy statistics, as stored by the custom components
-#          id(energy_statistics_component).reset_statistics();
-
 
 #####################################################################
 #
@@ -341,16 +311,6 @@ sensor:
       sorting_group_id: group_energy
       sorting_weight: 6
    
-#  - platform: total_daily_energy
-#    name: "Energy Total Today"
-#    id: energy_total_today
-#    restore: true
-#    power_id: active_power
-#    unit_of_measurement: kWh
-#    accuracy_decimals: 3
-#    filters:
-#      - multiply: 0.001
-#    icon: "mdi:hours-24"
 
 #########################################################################
 #
