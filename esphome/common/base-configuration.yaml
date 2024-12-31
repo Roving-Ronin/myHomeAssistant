@@ -83,7 +83,7 @@ ota:
   - platform: esphome
   
 logger:
-#  level: ${log_level}
+  level: ${log_level}
   baud_rate: 0
   logs:
     component: ERROR # Fix for issue #4717 "Component xxxxxx took a long time for an operation"
@@ -97,10 +97,6 @@ web_server:
   port: 80
    # Webserver version (default is 2).
   version: 3
-  sorting_groups:
-    - id: group_controls
-      name: "Controls"
-      sorting_weight: -30
 
 network:
   enable_ipv6: ${ipv6_enable}
@@ -119,72 +115,6 @@ network:
 #  device_version: !include common/everything-presence-one-sen0395-stable.yaml
 #  sen0395_base: !include common/sen0395-common.yaml
 
-#####################################################################
-#
-# Used to store the values between reboots
-#
-globals:
-  - id: current_log_level
-    type: int
-    restore_value: yes
-    initial_value: '3'   # Default: Info (None=0, Error=1, Warn=2, Info=3, Debug=4, Verbose=5, Very Verbose=6)
-
-#####################################################################
-#
-# Script and Selector to add a pull down option to set the Logger Level
-# allows changing logger levels on the fly, without needing to reflash firmware
-#
-
-script:
-  - id: conditional_log
-    parameters:
-      level: int
-      message: string
-    then:
-      - if:
-          condition:
-            lambda: 'return level <= id(current_log_level);'
-          then:
-            - logger.log:
-                format: "%s"
-                args: ["message"]
-                
-select:
-  - platform: template
-    name: "Logger Level"
-    id: log_level
-    optimistic: true
-    icon: "mdi:math-log"
-    options:
-      - None
-      - Error
-      - Warn
-      - Info
-      - Debug
-      - Verbose
-      - Very Verbose
-    on_value:
-      then:
-        - lambda: |-
-            if (x == "None") {
-              id(current_log_level) = 0;
-            } else if (x == "Error") {
-              id(current_log_level) = 1;
-            } else if (x == "Warn") {
-              id(current_log_level) = 2;
-            } else if (x == "Info") {
-              id(current_log_level) = 3;
-            } else if (x == "Debug") {
-              id(current_log_level) = 4;
-            } else if (x == "Verbose") {
-              id(current_log_level) = 5;
-            } else if (x == "Very Verbose") {
-              id(current_log_level) = 6;
-            }
-    web_server:
-      sorting_group_id: group_controls
-      sorting_weight: 5
-      
 ##########################################################################
 #
 # Buttons - To trigger actions, such as reboot, reset
