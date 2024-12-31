@@ -273,7 +273,6 @@ sensor:
     
      # Dentra Components - Adds Energy Today. Persistents if restarted, unlike 'total_daily_energy'
     energy_today:
-      name: "Energy Today"
       id: total_energy_today_sensor
       on_value:
         then:
@@ -283,7 +282,6 @@ sensor:
 
      # Energy Statistics Components - Adds Energy Yesterday
     energy_yesterday:
-      name: "Energy Yesterday"
       id: total_energy_yesterday_sensor
       on_value:
         then:
@@ -293,7 +291,6 @@ sensor:
 
      # Energy Statistics Components - Adds Energy Week
     energy_week:
-      name: "Energy Week"
       id: total_energy_week_sensor
       on_value:
         then:
@@ -303,7 +300,6 @@ sensor:
 
      # Energy Statistics Components - Adds Energy Month
     energy_month:
-      name: "Energy Month"
       id: total_energy_month_sensor
       on_value:
         then:
@@ -313,7 +309,6 @@ sensor:
 
      # Energy Statistics Components - Adds Energy Year
     energy_year:
-      name: "Energy Year"
       id: total_energy_year_sensor
       on_value:
         then:
@@ -407,7 +402,7 @@ sensor:
 
     # Shows the TOTAL/Lifetime Energy kWh used by the device, will be reset to zero upon firmware updates though.
   - platform: template
-    name: "Energy Total"
+    name: "Energy - Total"
     id: energy_total_sensor
     unit_of_measurement: kWh
     device_class: "energy"
