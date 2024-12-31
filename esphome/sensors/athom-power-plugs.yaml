@@ -372,9 +372,9 @@ sensor:
     name: "Energy - Month"
     id: energy_month
     unit_of_measurement: kWh
-    accuracy_decimals: 0
-    device_class: water
+    device_class: "energy"
     state_class: total_increasing
+    accuracy_decimals: 3
     icon: "mdi:calendar-month"
     lambda: |-
       return id(global_energy_month);
@@ -387,9 +387,9 @@ sensor:
     name: "Energy - Year"
     id: energy_year
     unit_of_measurement: kWh
-    accuracy_decimals: 0
-    device_class: water
+    device_class: "energy"
     state_class: total_increasing
+    accuracy_decimals: 3
     icon: "mdi:calendar-text"
     lambda: |-
       return id(global_energy_year);
