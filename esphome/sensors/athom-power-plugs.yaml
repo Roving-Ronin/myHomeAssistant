@@ -15,9 +15,9 @@ web_server:
       name: "Energy Sensors"
       sorting_weight: -40
     
-#    - id: group_controls
-#      name: "Controls"
-#      sorting_weight: -30
+    - id: group_controls
+      name: "Controls"
+      sorting_weight: -30
       
 
 #####################################################################
