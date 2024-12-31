@@ -151,7 +151,7 @@ script:
                 
 select:
   - platform: template
-    name: "Log Level"
+    name: "Logger Level"
     id: log_level
     optimistic: true
     icon: "mdi:console"
@@ -183,7 +183,7 @@ select:
             }
     web_server:
       sorting_group_id: group_controls
-      sorting_weight: 3
+      sorting_weight: 5
       
 ##########################################################################
 #
