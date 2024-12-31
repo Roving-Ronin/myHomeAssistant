@@ -1,1 +1,78 @@
+#########################################################################
 #
+# Environmental monitoring using ESP32-S3 chipset and BME280 sensor(s)
+# for temperature, humidity, pressure & dew point.
+#
+   # Provides substitutions or variables that are then called elsewhere multiple times in the config
+substitutions:
+  # Default name  
+  name: "fireplace-monitor"
+  # Default friendly name 
+  friendly_name: "Fireplace Monitor"
+  # Description as appears in ESPHome & top of webserver page
+  device_description: "Monitoring of external fireplace and chimney temperature"
+  # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Front Gate, Decontamination, Shed XYZ etc  
+  location: "Living Room"
+  # Location geographical height, in meters. Used for calculations in sensors such as BME280/BME680 and Water Tank sensors. Goulburn (673)
+  location_height: "673"
+  # Project Name
+  project_name: "DIY.Fireplace Monitor"
+  # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
+  project_version: "0.1.0"
+  # The phase in the locations power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C).
+  # Used to populate a Text Sensor with this information, that may be used to loadshed in future, or trace outages to electrical faults.
+  power_circuit: "TBA"
+
+  # BME 280 / BME680 Sensor
+  # Location of BME280/680 Sensor #1. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
+  temp_sensor1_location: ""
+  # Location of BME280/680 Sensor #2. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
+  temp_sensor2_location: ""
+  # Calibrate the outpute of the temperature sensor(s).
+  temperature_1_offset: "0.0"
+  temperature_2_offset: "0.0"
+
+  # PIN usage for ???
+  spi_miso_pin: "10"
+  spi_clk_pin: "11"
+
+########################## End of Substitutions #########################
+#
+# Remote Packages to be utilised
+#
+
+dashboard_import:
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/fireplace-monitor.yaml@main
+  import_full_config: false
+
+packages:
+  base-config:             !include common/base-configuration.yaml              # Base configuration applied to all ESPHome devices
+  network-config:          !include common/network-ethernet-w5500.yaml          # Configure Ethernet port on this system board
+#  bme280a-sensors:         !include sensors/bme280-bus-a.yaml                   # Temperature, Humidity, Pressure sensor probe
+  thermocouple-sensors:    !include sensors/max6675.yaml                        # Temperature sensors probes
+#  ds18b20-sensors:       !include sensors/ds18b20-1wire.yaml
+
+
+#########################################################################
+#
+# Custom Components to be utilised - For Gas and Water Statistics
+#
+
+#external_components:
+#  - source: github://roving-ronin/myhomeassistant/components@main
+#    refresh: 0s
+
+#########################################################################
+#
+# Web_server v3 Sort Groups - These substitutes are applied to overwrite the default ones supplied by the 
+# sensor specific template file, in this case the /sensors/hc-sr04-ultrasonic.yaml file.
+#
+
+web_server:
+  sorting_groups:
+      # This sort group is used by both the Water and Gas Meter senors (flow rate / pulse counter), so must be in at this level, not in the water vs gas sensor yaml
+    - id: group_utility_meter_sensors
+      name: "Fireplace Sensors"
+      sorting_weight: -44
+
+#########################################################################
