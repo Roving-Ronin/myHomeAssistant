@@ -15,7 +15,7 @@ substitutions:
    # Project Name
   project_name: "Athom Technology.Smart Plug (No Relay)"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
-  project_version: "1.0.1"
+  project_version: "1.5.0"
    # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
   log_level: "DEBUG"
 
