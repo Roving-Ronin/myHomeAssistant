@@ -97,6 +97,11 @@ web_server:
   port: 80
    # Webserver version (default is 2).
   version: 3
+  web_server:
+    sorting_groups:
+      - id: group_controls
+        name: "Controls"
+        sorting_weight: -30
 
 network:
   enable_ipv6: ${ipv6_enable}
