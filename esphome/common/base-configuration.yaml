@@ -39,7 +39,7 @@ substitutions:
    # Set the update interval for sensors  
   sensor_update_interval: 10s   
    # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
-  log_level: "INFO"
+#  log_level: "INFO"
 
 ###############################
 # Network Settings - Static IP
@@ -71,6 +71,30 @@ esphome:
     name: "${project_name}"
     version: "${project_version}"
 
+  on_boot:
+    priority: 590
+    then:
+      - select.set:
+          id: log_level
+          option: !lambda |-
+            switch (id(current_log_level)) {
+              case ESPHOME_LOG_LEVEL_NONE:
+                return "None";
+              case ESPHOME_LOG_LEVEL_ERROR:
+                return "Error";
+              case ESPHOME_LOG_LEVEL_WARN:
+                return "Warn";
+              case ESPHOME_LOG_LEVEL_INFO:
+                return "Info";
+              case ESPHOME_LOG_LEVEL_DEBUG:
+                return "Debug";
+              case ESPHOME_LOG_LEVEL_VERBOSE:
+                return "Verbose";
+              default:
+                return "Default";
+            }
+    
+
 #########################################################################
 
 preferences:
@@ -97,6 +121,11 @@ web_server:
   port: 80
    # Webserver version (default is 2).
   version: 3
+   # Groups to sort sensors and controls into
+  sorting_groups:
+    - id: group_controls
+      name: "Controls"
+      sorting_weight: -30
 
 network:
   enable_ipv6: ${ipv6_enable}
@@ -115,6 +144,58 @@ network:
 #  device_version: !include common/everything-presence-one-sen0395-stable.yaml
 #  sen0395_base: !include common/sen0395-common.yaml
 
+
+#####################################################################
+#
+# Used to store the Total kWh used (lifetime) between reboots
+#
+
+globals:
+  - id: current_log_level
+    type: int
+    restore_value: yes
+    initial_value: 'ESPHOME_LOG_LEVEL_INFO'
+
+#####################################################################
+#
+# Select - To allow setting power on state from the GUI
+#
+
+select:
+  - platform: template
+    name: "Log Level"
+    id: log_level
+    optimistic: true
+    icon: "mdi:console"
+    options:
+      - None
+      - Error
+      - Warn
+      - Info
+      - Debug
+      - Verbose
+    on_value:
+      then:
+        - lambda: |-
+            if (x == "None") {
+              id(current_log_level) = ESPHOME_LOG_LEVEL_NONE;
+            } else if (x == "Error") {
+              id(current_log_level) = ESPHOME_LOG_LEVEL_ERROR;
+            } else if (x == "Warn") {
+              id(current_log_level) = ESPHOME_LOG_LEVEL_WARN;
+            } else if (x == "Info") {
+              id(current_log_level) = ESPHOME_LOG_LEVEL_INFO;
+            } else if (x == "Debug") {
+              id(current_log_level) = ESPHOME_LOG_LEVEL_DEBUG;
+            } else if (x == "Verbose") {
+              id(current_log_level) = ESPHOME_LOG_LEVEL_VERBOSE;
+            }
+            // Apply the log level dynamically
+            ESP_LOG_LEVEL_SET("*", id(current_log_level));
+    web_server:
+      sorting_group_id: group_controls
+      sorting_weight: 3
+      
 ##########################################################################
 #
 # Buttons - To trigger actions, such as reboot, reset
