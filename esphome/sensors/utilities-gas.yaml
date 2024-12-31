@@ -214,7 +214,7 @@ sensor:
 
     #  Uses the above pulse_meter and adds sensor and calculations for tracking m3
     total:
-      name: 'Gas - Consumed M3'
+#      name: 'Gas - Consumed M3'
       id: gas_consumed_m3
       unit_of_measurement: "m³"
       state_class: "total_increasing"
@@ -234,7 +234,7 @@ sensor:
 
     # Total sensor for megajoules
     total:
-      name: "Gas Consumed (MJ)"
+#      name: "Gas Consumed (MJ)"
       id: gas_consumed_mj
       unit_of_measurement: "MJ"
       state_class: "total_increasing"
