@@ -154,7 +154,7 @@ select:
     name: "Logger Level"
     id: log_level
     optimistic: true
-    icon: "mdi:console"
+    icon: "mdi:math-log"
     options:
       - None
       - Error
