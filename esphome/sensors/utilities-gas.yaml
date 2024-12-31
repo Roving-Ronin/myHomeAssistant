@@ -214,8 +214,8 @@ sensor:
 
     #  Uses the above pulse_meter and adds sensor and calculations for tracking m3
     total:    
-      - name: 'Gas - Consumed m3'
-        id: gas_consumed_m3
+      - name: 'Gas - Consumed'
+        id: gas_consumed
         unit_of_measurement: "m³"
         state_class: "total_increasing"
         device_class: gas
@@ -227,7 +227,7 @@ sensor:
           then:
             - lambda: |-
                 static float previous_gas_m3_value = 0.0;
-                float current_gas_m3_value = id(gas_consumed_m3).state;
+                float current_gas_m3_value = id(gas_consumed).state;
                 id(global_gas_total_m3) += current_gas_m3_value - previous_gas_m3_value;
                 previous_gas_m3_value = current_gas_m3_value;
                 id(gas_total_m3).update();
