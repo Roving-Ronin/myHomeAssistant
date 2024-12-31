@@ -15,7 +15,7 @@ substitutions:
    # Project Name
   project_name: "Athom Technology.Smart Plug v2"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
-  project_version: "2.2.0"
+  project_version: "2.5.0"
    # Restore the relay (GPO switch) upon reboot to state:
   relay_restore_mode: RESTORE_DEFAULT_ON      # RESTORE_DEFAULT_ON
    # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
