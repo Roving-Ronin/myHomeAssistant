@@ -23,7 +23,6 @@ web_server:
     - id: group_fireplace_sensors
       name: "Fireplace Sensors"
       sorting_weight: -38
-
       
 #########################################################################
 #
@@ -45,8 +44,8 @@ spi:
 
 sensor:
   - platform: max31855
-    name: "Fireplace - Temperature"
-    id: fireplace_temperature
+    name: "Firebox - Temperature"
+    id: firebox_temperature
     cs_pin: GPIO21
 #    Accuracy Decimals: 1
     reference_temperature:
@@ -55,7 +54,7 @@ sensor:
     update_interval: 15s
 
   - platform: max31855
-    name: "Fireplace - Chimney Temperature"
+    name: "Chimney - Temperature"
     id: chimney_temperature
     cs_pin: GPIO23
 #    Accuracy Decimals: 1
@@ -68,7 +67,7 @@ sensor:
     name: "Fireplace - Status"
     icon: "mdi:fire"
     lambda: |-
-     if (id(fireplace_temperature).state  > 50)
+     if (id(firebox_temperature).state  > 50)
       return {'ON'}
      ;else
       return {'OFF'};
