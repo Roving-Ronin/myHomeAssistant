@@ -30,7 +30,7 @@ web_server:
 #
 
 spi:
-  - id: max31855
+  - id: max31855a
     miso_pin: GPIO15
     clk_pin: GPIO13
 #    interface: hardware
