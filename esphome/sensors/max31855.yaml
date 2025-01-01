@@ -48,7 +48,7 @@ sensor:
     name: "Fireplace - Temperature"
     id: fireplace_temperature
     cs_pin: GPIO14
-    Accuracy Decimals: 1
+#    Accuracy Decimals: 1
     reference_temperature:
       id: water_heater_left_reference
     icon: 'mdi:fire'
@@ -58,7 +58,7 @@ sensor:
     name: "Fireplace - Chimney Temperature"
     id: chimney_temperature
     cs_pin: GPIO15
-    Accuracy Decimals: 1
+#    Accuracy Decimals: 1
     reference_temperature:
       id: water_heater_right_reference
     icon: 'mdi:fire'
