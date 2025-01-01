@@ -30,8 +30,12 @@ web_server:
 #
 
 spi:
-  miso_pin: GPIO15
-  clk_pin: GPIO13
+  miso_pin: 
+    number: GPIO15
+    mode:
+      input: true
+  clk_pin:
+    number: GPIO13
 
 #########################################################################
 #
@@ -50,7 +54,7 @@ sensor:
     unit_of_measurement: "°C"
     accuracy_decimals: 0
     icon: 'mdi:fire'
-    update_interval: 15s
+    update_interval: 5s
 
 #  - platform: max31855
 #    name: "Chimney - Temperature"
