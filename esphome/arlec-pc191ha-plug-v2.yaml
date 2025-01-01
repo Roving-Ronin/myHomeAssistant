@@ -129,7 +129,7 @@ network: !remove
 # https://github.com/Roving-Ronin/myHomeAssistant/tree/main/components/energy_statistics
 
 external_components:
-  - source: github://roving-ronin/myhomeassistant/components@main
+  - source: github://roving-ronin/myhomeassistant/components@statistics-partial-times
     refresh: 0s
 
 
