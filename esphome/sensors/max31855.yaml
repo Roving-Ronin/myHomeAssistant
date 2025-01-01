@@ -70,7 +70,6 @@ binary_sensor:
   - platform: template
     name: "Fireplace - Status"
     id: fireplace_status
-    icon: "mdi:fire"
     update_interval: 15s
     lambda: |-
       if (id(firebox_temperature).state >= 50 || id(chimney_temperature).state >= 50) {
