@@ -59,8 +59,14 @@ esphome:
 # https://github.com/Roving-Ronin/myHomeAssistant/tree/main/components/energy_statistics
 
 external_components:
-  - source: github://roving-ronin/myhomeassistant/components@main
+#  - source: github://roving-ronin/myhomeassistant/components@statistics-partial-times
+#    refresh: 0s
+  - source:
+      type: git
+      url: https://github.com/roving-ronin/myhomeassistant/
+      ref: main
     refresh: 0s
+    components: [ energy_statistics ]
 
 
 #####################################################################
