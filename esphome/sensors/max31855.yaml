@@ -65,12 +65,17 @@ sensor:
 
   - platform: template
     name: "Fireplace - Status"
+    id: fireplace_status
     icon: "mdi:fire"
     lambda: |-
-     if (id(firebox_temperature).state  > 50)
-      return {'ON'}
-     ;else
-      return {'OFF'};
+      if (id(firebox_temperature).state >= 50 || id(chimney_temperature).state >= 50) {
+        return "ON";
+      } else {
+        return "OFF";
+      }
     update_interval: 15s  
+
+
+
 
 #########################################################################
