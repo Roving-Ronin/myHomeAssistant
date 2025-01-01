@@ -29,7 +29,7 @@ void WaterStatistics::dump_config() {
 
 void WaterStatistics::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
-  
+
   this->pref_ = global_preferences->make_preference<water_data_t>(fnv1_hash(TAG));
 
   water_data_t loaded{};
@@ -45,13 +45,11 @@ void WaterStatistics::setup() {
 void WaterStatistics::loop() {
   const auto t = this->time_->now();
   if (!t.is_valid()) {
-    // time is not sync yet
     return;
   }
 
   const auto total = this->total_->get_state();
   if (std::isnan(total)) {
-    // total is not published yet
     return;
   }
 
@@ -61,20 +59,20 @@ void WaterStatistics::loop() {
   }
 
   this->water_.start_yesterday = this->water_.start_today;
+
   this->water_.start_today = total;
 
-  // Adjust start of week/month/year based on partial period
   if (this->water_.current_day_of_year != 0) {
-    // Start week on installation/reset, not just on specific day
-    if (t.day_of_week == this->water_week_start_day_ || this->water_.start_week == NAN) {
+    // at specified day of week we start a new week calculation
+    if (t.day_of_week == this->water_week_start_day_) {
       this->water_.start_week = total;
     }
-    // Start month on installation/reset, not just on the 1st
-    if (t.day_of_month == 1 || this->water_.start_month == NAN) {
+    // at first day of month we start a new month calculation
+    if (t.day_of_month == 1) {
       this->water_.start_month = total;
     }
-    // Start year on installation/reset, not just on the 1st
-    if (t.day_of_year == 1 || this->water_.start_year == NAN) {
+    // at first day of year we start a new year calculation
+    if (t.day_of_year == 1) {
       this->water_.start_year = total;
     }
   }
@@ -108,7 +106,7 @@ void WaterStatistics::process_(float total) {
   this->save_();
 }
 
-void WaterStatistics::save_() { this->pref_.save(&this->water_); } // Save to flash memory
+void WaterStatistics::save_() { this->pref_.save(&this->water_); // Save to flash memory
 
 }  // namespace water_statistics
 }  // namespace esphome
