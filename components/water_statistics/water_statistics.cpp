@@ -29,7 +29,7 @@ void WaterStatistics::dump_config() {
 
 void WaterStatistics::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
-
+  
   this->pref_ = global_preferences->make_preference<water_data_t>(fnv1_hash(TAG));
 
   water_data_t loaded{};
@@ -45,11 +45,13 @@ void WaterStatistics::setup() {
 void WaterStatistics::loop() {
   const auto t = this->time_->now();
   if (!t.is_valid()) {
+    // time is not sync yet
     return;
   }
 
   const auto total = this->total_->get_state();
   if (std::isnan(total)) {
+    // total is not published yet
     return;
   }
 
@@ -106,7 +108,7 @@ void WaterStatistics::process_(float total) {
   this->save_();
 }
 
-void WaterStatistics::save_() { this->pref_.save(&this->water_); // Save to flash memory
+void WaterStatistics::save_() { this->pref_.save(&this->water_); } // Save to flash memory
 
 }  // namespace water_statistics
 }  // namespace esphome
