@@ -35,12 +35,23 @@ void EnergyStatistics::setup() {
   energy_data_t loaded{};
   if (this->pref_.load(&loaded)) {
     this->energy_ = loaded;
-    auto total = this->total_->get_state();
-    if (!std::isnan(total)) {
-      this->process_(total);
+  }
+
+  const auto total = this->total_->get_state();
+  if (!std::isnan(total)) {
+    if (std::isnan(this->energy_.start_week)) {
+      this->energy_.start_week = total;
     }
+    if (std::isnan(this->energy_.start_month)) {
+      this->energy_.start_month = total;
+    }
+    if (std::isnan(this->energy_.start_year)) {
+      this->energy_.start_year = total;
+    }
+    this->process_(total);
   }
 }
+
 
 void EnergyStatistics::loop() {
   const auto t = this->time_->now();
