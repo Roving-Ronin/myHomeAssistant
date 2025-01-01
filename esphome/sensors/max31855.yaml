@@ -76,10 +76,10 @@ binary_sensor:
         return false;
       }
     icon: |-
-      if (state) {
-        return "mdi:fire";  # Fire icon if temp >= 50
+      if (id(fireplace_status).state == true) {
+        return "mdi:fire";  # Icon for "ON" state
       } else {
-        return "mdi:fireoff";  # Else fire off icon
+        return "mdi:fire-off";  # Icon for "OFF" state
       }
 
 text_sensor:
