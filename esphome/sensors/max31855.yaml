@@ -69,9 +69,9 @@ sensor:
     icon: "mdi:fire"
     lambda: |-
      if (id(fireplace_temperature).state  > 50)
-      return {"ON"}
+      return {'ON'}
      ;else
-      return {"OFF"};
+      return {'OFF'};
     update_interval: 15s  
 
 #########################################################################
