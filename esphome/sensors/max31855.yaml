@@ -75,4 +75,17 @@ binary_sensor:
         return false;
       }
 
+
+text_sensor:
+  - platform: template
+    name: "Fireplace - ON|OFF"
+    id: fireplace_on_off
+    icon: "mdi:fire"
+    lambda: |-
+      if (id(firebox_temperature).state >= 50 || id(chimney_temperature).state >= 50) {
+        return true;
+      } else {
+        return false;
+      }
+
 #########################################################################
