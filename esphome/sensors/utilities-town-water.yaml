@@ -30,12 +30,12 @@ globals:
   - id: global_town_water_total
     type: float
     restore_value: yes
-    initial_value: '720'   # When Factory Reset, return this value to '0.0'
+    initial_value: '245'   # When Factory Reset, return this value to '0.0'
 
   - id: global_town_water_today
     type: float
     restore_value: true
-    initial_value: '720'
+    initial_value: '245'
 
   - id: global_town_water_yesterday
     type: float
@@ -50,12 +50,12 @@ globals:
   - id: global_town_water_month
     type: float
     restore_value: true
-    initial_value: '720'
+    initial_value: '245'
 
   - id: global_town_water_year
     type: float
     restore_value: true
-    initial_value: '720'
+    initial_value: '245'
 
 ################################################################################
 #
