@@ -47,7 +47,7 @@ sensor:
   - platform: max31855
     name: "Fireplace - Temperature"
     id: fireplace_temperature
-    cs_pin: GPIO14
+    cs_pin: GPIO21
 #    Accuracy Decimals: 1
     reference_temperature:
       id: water_heater_left_reference
@@ -57,7 +57,7 @@ sensor:
   - platform: max31855
     name: "Fireplace - Chimney Temperature"
     id: chimney_temperature
-    cs_pin: GPIO15
+    cs_pin: GPIO23
 #    Accuracy Decimals: 1
     reference_temperature:
       id: water_heater_right_reference
