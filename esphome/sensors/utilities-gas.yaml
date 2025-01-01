@@ -54,11 +54,13 @@ globals:
   - id: global_gas_total_mj
     type: float
     restore_value: yes
+    initial_value: '26.97369984'
 
   #  Globals for use with pulse meter, to allow storing and setting a base reading for gas meter
   - id: global_gas_total_m3
     type: float
     restore_value: yes
+    initial_value: '0.720'
 
 ###################################
 
