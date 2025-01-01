@@ -72,7 +72,7 @@ binary_sensor:
     id: fireplace_status
  #      if (id(firebox_temperature).state >= 50 || id(chimney_temperature).state >= 50) {
     lambda: |-
-      if (id(firebox_temperature).state >= 50 {
+      if (id(firebox_temperature).state >= 50) {
         return true;
       } else {
         return false;
@@ -92,7 +92,7 @@ text_sensor:
     icon: "mdi:fire"
 #       if (id(firebox_temperature).state >= 50 || id(chimney_temperature).state >= 50) {
     lambda: |-
-      if (id(firebox_temperature).state >= 50 {
+      if (id(firebox_temperature).state >= 50) {
         return std::string("ON");
       } else {
         return std::string("OFF");
