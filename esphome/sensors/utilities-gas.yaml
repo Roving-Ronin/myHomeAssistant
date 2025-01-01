@@ -213,45 +213,41 @@ sensor:
       sorting_weight: 3
 
     #  Uses the above pulse_meter and adds sensor and calculations for tracking m3
-    total:
-#      name: 'Gas - Consumed M3'
-      id: gas_consumed_m3
+    total:    
+      name: 'Gas - Consumed Calculations'
+      id: gas_consumed_calculations
       unit_of_measurement: "m³"
+      icon: "mdi:counter"
       state_class: "total_increasing"
       device_class: gas
       accuracy_decimals: 3
       filters:
         - multiply: 0.01   # 100 pulses = 1,000L = 1m3
-      #  Adds the calculation for providing a reading since device last booted / reset
+    #  Adds the calculation for providing a reading since device last booted / reset
+    #  Linea below changed to seperate m3 and MJ gas totals and calculations
       on_value: 
         then:
           - lambda: |-
               static float previous_gas_m3_value = 0.0;
-              float current_gas_m3_value = id(gas_consumed_m3).state;
-              id(global_gas_total_m3) += current_gas_m3_value - previous_gas_m3_value;
-              previous_gas_m3_value = current_gas_m3_value;
-              id(gas_total_m3).update();
+              float current_gas_m3_value = id(gas_consumed_calculations).state;
+              float gas_delta_m3 = current_gas_m3_value - previous_gas_m3_value;
+              
+              // Update total gas used in m³
+              id(global_gas_total_m3) += gas_delta_m3;
 
-    # Total sensor for megajoules
-    total:
-#      name: "Gas Consumed (MJ)"
-      id: gas_consumed_mj
-      unit_of_measurement: "MJ"
-      state_class: "total_increasing"
-      accuracy_decimals: 3
-      filters:
-        - lambda: |-
-            // Convert pulses to MJ using the gas properties
-            const float pressure_factor = id(input_gas_pressure_factor).state;
-            const float heating_value = id(input_gas_heating_value).state;
-            return (x * 0.01) * pressure_factor * heating_value;
-      on_value:
-        then:
-          - lambda: |-
-              static float previous_gas_mj_value = 0.0;
-              float current_gas_mj_value = id(gas_consumed_mj).state;
-              id(global_gas_total_mj) += current_gas_mj_value - previous_gas_mj_value;
-              previous_gas_mj_value = current_gas_mj_value;
+              // Calculate gas used in MJ
+              float pressure_factor = id(input_gas_pressure_factor).state;
+              float heating_value = id(input_gas_heating_value).state;
+              float gas_delta_mj = gas_delta_m3 * pressure_factor * heating_value;
+              
+              // Update total gas used in MJ
+              id(global_gas_total_mj) += gas_delta_mj;
+
+              // Save the current value for the next calculation
+              previous_gas_m3_value = current_gas_m3_value;
+
+              // Update global sensors
+              id(gas_total_m3).update();
               id(gas_total_mj).update();
       internal: true
 
