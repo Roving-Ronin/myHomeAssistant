@@ -61,20 +61,20 @@ void GasStatistics::loop() {
   }
 
   this->gas_.start_yesterday = this->gas_.start_today;
+
   this->gas_.start_today = total;
 
-  // Adjust start of week/month/year based on partial period
   if (this->gas_.current_day_of_year != 0) {
-    // Start week on installation/reset, not just on specific day
-    if (t.day_of_week == this->gas_week_start_day_ || this->gas_.start_week == NAN) {
+    // at specified day of week we start a new week calculation
+    if (t.day_of_week == this->gas_week_start_day_) {
       this->gas_.start_week = total;
     }
-    // Start month on installation/reset, not just on the 1st
-    if (t.day_of_month == 1 || this->gas_.start_month == NAN) {
+    // at first day of month we start a new month calculation
+    if (t.day_of_month == 1) {
       this->gas_.start_month = total;
     }
-    // Start year on installation/reset, not just on the 1st
-    if (t.day_of_year == 1 || this->gas_.start_year == NAN) {
+    // at first day of year we start a new year calculation
+    if (t.day_of_year == 1) {
       this->gas_.start_year = total;
     }
   }
