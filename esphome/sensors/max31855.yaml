@@ -30,15 +30,15 @@ web_server:
 #
 
 spi:
-  - id: max31855a
+  - id: max31855
     miso_pin: GPIO15
     clk_pin: GPIO13
-    interface: hardware
+#    interface: hardware
     
-  - id: max31855b
-    miso_pin: GPIO35
-    clk_pin: GPIO33
-    interface: any
+#  - id: max31855b
+#    miso_pin: GPIO35
+#    clk_pin: GPIO33
+#    interface: any
 
 
 #########################################################################
@@ -52,9 +52,12 @@ sensor:
   - platform: max31855
     name: "Firebox - Temperature"
     id: firebox_temperature
-    spi_id: max31855a
+#    spi_id: max31855a
     cs_pin: GPIO14
-#    Accuracy Decimals: 1
+    device_class: "temperature"
+    state_class: "measurement"
+    unit_of_measurement: "°C"
+    accuracy_decimals: 0
     reference_temperature:
       id: water_heater_left_reference
     icon: 'mdi:fire'
@@ -63,9 +66,12 @@ sensor:
   - platform: max31855
     name: "Chimney - Temperature"
     id: chimney_temperature
-    spi_id: max31855b
+#    spi_id: max31855b
     cs_pin: GPIO32
-#    Accuracy Decimals: 1
+    device_class: "temperature"
+    state_class: "measurement"
+    unit_of_measurement: "°C"    
+    accuracy_decimals: 0
     reference_temperature:
       id: water_heater_right_reference
     icon: 'mdi:fire'
