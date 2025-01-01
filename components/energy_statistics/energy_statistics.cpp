@@ -61,20 +61,20 @@ void EnergyStatistics::loop() {
   }
 
   this->energy_.start_yesterday = this->energy_.start_today;
-
   this->energy_.start_today = total;
 
+  // Adjust start of week/month/year based on partial period
   if (this->energy_.current_day_of_year != 0) {
-    // at specified day of week we start a new week calculation
-    if (t.day_of_week == this->energy_week_start_day_) {
+    // Start week on installation/reset, not just on specific day
+    if (t.day_of_week == this->energy_week_start_day_ || this->energy_.start_week == NAN) {
       this->energy_.start_week = total;
     }
-    // at first day of month we start a new month calculation
-    if (t.day_of_month == 1) {
+    // Start month on installation/reset, not just on the 1st
+    if (t.day_of_month == 1 || this->energy_.start_month == NAN) {
       this->energy_.start_month = total;
     }
-    // at first day of year we start a new year calculation
-    if (t.day_of_year == 1) {
+    // Start year on installation/reset, not just on the 1st
+    if (t.day_of_year == 1 || this->energy_.start_year == NAN) {
       this->energy_.start_year = total;
     }
   }
