@@ -46,10 +46,10 @@ dashboard_import:
   import_full_config: false
 
 packages:
-  base-config:             !include common/base-configuration.yaml              # Base configuration applied to all ESPHome devices
-  network-config:          !include common/network-ethernet-w5500.yaml          # Configure Ethernet port on this system board
-#  bme280a-sensors:         !include sensors/bme280-bus-a.yaml                   # Temperature, Humidity, Pressure sensor probe
-  thermocouple-sensors:    !include sensors/max31855.yaml                        # Temperature sensors probes
+  base-config:             !include common/base-configuration.yaml          # Base configuration applied to all ESPHome devices
+  network-config:          !include common/network-wifi.yaml                # Configure Ethernet port on this system board
+#  bme280a-sensors:         !include sensors/bme280-bus-a.yaml              # Temperature, Humidity, Pressure sensor probe
+  thermocouple-sensors:    !include sensors/max31855.yaml                   # Temperature sensors probes
 #  ds18b20-sensors:       !include sensors/ds18b20-1wire.yaml
 
 
