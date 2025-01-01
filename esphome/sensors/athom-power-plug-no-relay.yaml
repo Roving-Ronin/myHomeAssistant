@@ -34,8 +34,14 @@ web_server:
 # https://github.com/dentra/esphome-components/tree/master/components/energy_statistics
 
 external_components:
-  - source: github://roving-ronin/myhomeassistant/components@main
+#  - source: github://roving-ronin/myhomeassistant/components@statistics-partial-times
+#    refresh: 0s
+  - source:
+      type: git
+      url: https://github.com/roving-ronin/myhomeassistant/
+      ref: statistics-partial-times
     refresh: 0s
+    components: [ energy_statistics ]
 
 #####################################################################
 #
