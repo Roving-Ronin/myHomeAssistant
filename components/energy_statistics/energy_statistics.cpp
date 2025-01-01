@@ -55,34 +55,33 @@ void EnergyStatistics::loop() {
     return;
   }
 
-  if (t.day_of_year == this->energy_.current_day_of_year) {
-    // nothing to do
-    return;
-  }
+  // Only update if the day has changed (to avoid redundant calculations)
+  if (t.day_of_year != this->energy_.current_day_of_year) {
+    this->energy_.start_yesterday = this->energy_.start_today;
+    this->energy_.start_today = total;
 
-  this->energy_.start_yesterday = this->energy_.start_today;
-  this->energy_.start_today = total;
-
-  // Adjust start of week/month/year based on partial period
-  if (this->energy_.current_day_of_year != 0) {
-    // Start week on installation/reset, not just on specific day
-    if (t.day_of_week == this->energy_week_start_day_ || this->energy_.start_week == NAN) {
+    // Handle new week start
+    if (this->energy_.start_week == NAN || t.day_of_week == this->energy_week_start_day_) {
       this->energy_.start_week = total;
     }
-    // Start month on installation/reset, not just on the 1st
-    if (t.day_of_month == 1 || this->energy_.start_month == NAN) {
+
+    // Handle new month start
+    if (this->energy_.start_month == NAN || t.day_of_month == 1) {
       this->energy_.start_month = total;
     }
-    // Start year on installation/reset, not just on the 1st
-    if (t.day_of_year == 1 || this->energy_.start_year == NAN) {
+
+    // Handle new year start
+    if (this->energy_.start_year == NAN || t.day_of_year == 1) {
       this->energy_.start_year = total;
     }
+
+    this->energy_.current_day_of_year = t.day_of_year;  // Update the current day of year
   }
 
-  this->energy_.current_day_of_year = t.day_of_year;
-
+  // Process the energy values
   this->process_(total);
 }
+
 
 void EnergyStatistics::process_(float total) {
   if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
