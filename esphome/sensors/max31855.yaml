@@ -1,6 +1,5 @@
-https://esphome.io/components/spi
-
-https://esphome.io/components/sensor/max31855
+# https://esphome.io/components/spi
+# https://esphome.io/components/sensor/max31855
 
 #########################################################################
 #
@@ -11,9 +10,7 @@ https://esphome.io/components/sensor/max31855
 #
 
 substitutions:
-
   gas_sensor_update_interval: '15s'
-
 
 #########################################################################
 #
@@ -44,7 +41,7 @@ spi:
 # Sensors
 #
 
-reference_temperature
+# reference_temperature
 
 sensor:
   - platform: max31855
