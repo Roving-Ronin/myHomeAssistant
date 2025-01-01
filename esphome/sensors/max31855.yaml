@@ -76,12 +76,13 @@ binary_sensor:
       } else {
         return false;
       }
-    icon: |-
-      if (id(fireplace_status).state == true) {
-        return "mdi:fire";  # Icon for "ON" state
-      } else {
-        return "mdi:fire-off";  # Icon for "OFF" state
-      }
+    icon: 'mdi:fire'
+#    icon: |-
+#      if (id(fireplace_status).state == true) {
+#        return "mdi:fire";  # Icon for "ON" state
+#      } else {
+#        return "mdi:fire-off";  # Icon for "OFF" state
+#      }
 
 text_sensor:
   - platform: template
