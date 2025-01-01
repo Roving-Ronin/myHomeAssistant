@@ -65,7 +65,7 @@ globals:
   - id: global_gas_m3_today
     type: float
     restore_value: true
-#    initial_value: '0.0'
+    initial_value: '0.720'
 
   - id: global_gas_m3_yesterday
     type: float
@@ -80,12 +80,12 @@ globals:
   - id: global_gas_m3_month
     type: float
     restore_value: true
-#    initial_value: '0.0'
+    initial_value: '0.720'
 
   - id: global_gas_m3_year
     type: float
     restore_value: true
-#    initial_value: '0.0'
+    initial_value: '0.720'
 
 ###################################
 
