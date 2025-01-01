@@ -95,28 +95,35 @@ void EnergyStatistics::loop() {
 
 
 void EnergyStatistics::process_(float total) {
-  if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
-    this->energy_today_->publish_state(total - this->energy_.start_today);
+  if (this->energy_today_) {
+    float today = !std::isnan(this->energy_.start_today) ? (total - this->energy_.start_today) : 0;
+    this->energy_today_->publish_state(today);
   }
 
-  if (this->energy_yesterday_ && !std::isnan(this->energy_.start_yesterday)) {
-    this->energy_yesterday_->publish_state(this->energy_.start_today - this->energy_.start_yesterday);
+  if (this->energy_yesterday_) {
+    float yesterday = !std::isnan(this->energy_.start_yesterday) ? 
+      (this->energy_.start_today - this->energy_.start_yesterday) : 0;
+    this->energy_yesterday_->publish_state(yesterday);
   }
 
-  if (this->energy_week_ && !std::isnan(this->energy_.start_week)) {
-    this->energy_week_->publish_state(total - this->energy_.start_week);
+  if (this->energy_week_) {
+    float week = !std::isnan(this->energy_.start_week) ? (total - this->energy_.start_week) : 0;
+    this->energy_week_->publish_state(week);
   }
 
-  if (this->energy_month_ && !std::isnan(this->energy_.start_month)) {
-    this->energy_month_->publish_state(total - this->energy_.start_month);
+  if (this->energy_month_) {
+    float month = !std::isnan(this->energy_.start_month) ? (total - this->energy_.start_month) : 0;
+    this->energy_month_->publish_state(month);
   }
 
-  if (this->energy_year_ && !std::isnan(this->energy_.start_year)) {
-    this->energy_year_->publish_state(total - this->energy_.start_year);
+  if (this->energy_year_) {
+    float year = !std::isnan(this->energy_.start_year) ? (total - this->energy_.start_year) : 0;
+    this->energy_year_->publish_state(year);
   }
-  
+
   this->save_();
 }
+
 
 void EnergyStatistics::save_() { this->pref_.save(&(this->energy_)); }  // Save to flash memory
 
