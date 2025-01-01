@@ -135,7 +135,7 @@ external_components:
       type: git
       url: https://github.com/roving-ronin/myhomeassistant/components
       ref: statistics-partial-times
-      refresh: 0s      
+    refresh: 0s
     components: [ energy_statistics ]
 #########################################################################
 #
