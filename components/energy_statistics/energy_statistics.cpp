@@ -40,41 +40,52 @@ void EnergyStatistics::setup() {
       this->process_(total);
     }
   }
+
+  // Initialize period start points
+  if (std::isnan(this->energy_.start_week)) {
+    this->energy_.start_week = this->total_->get_state();
+  }
+  if (std::isnan(this->energy_.start_month)) {
+    this->energy_.start_month = this->total_->get_state();
+  }
 }
+
 
 void EnergyStatistics::loop() {
   const auto t = this->time_->now();
   if (!t.is_valid()) {
-    // time is not sync yet
+    // Time not synced yet
     return;
   }
 
   const auto total = this->total_->get_state();
   if (std::isnan(total)) {
-    // total is not published yet
+    // Total not published yet
     return;
   }
 
   if (t.day_of_year == this->energy_.current_day_of_year) {
-    // nothing to do
+    // No need to recalculate
     return;
   }
 
-    // Save the current day's data
+  // Save the current day's data
   this->energy_.start_yesterday = this->energy_.start_today;
   this->energy_.start_today = total;
 
   if (this->energy_.current_day_of_year != 0) {
-    // at specified day of week we start a new week calculation
+    // Check for a new week
     if (t.day_of_week == this->energy_week_start_day_) {
       this->energy_.start_week = total;
     }
-    // at first day of month we start a new month calculation
-    if (t.day_of_month == 1) {
+
+    // Check for a new month
+    if (t.day_of_month == this->energy_month_start_day_) {
       this->energy_.start_month = total;
     }
-    // at first day of year we start a new year calculation
-    if (t.day_of_year == 1) {
+
+    // Check for a new year
+    if (t.day_of_year == this->energy_year_start_day_) {
       this->energy_.start_year = total;
     }
   }
@@ -83,6 +94,7 @@ void EnergyStatistics::loop() {
 
   this->process_(total);
 }
+
 
 void EnergyStatistics::process_(float total) {
   if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
@@ -104,11 +116,14 @@ void EnergyStatistics::process_(float total) {
   if (this->energy_year_ && !std::isnan(this->energy_.start_year)) {
     this->energy_year_->publish_state(total - this->energy_.start_year);
   }
-  
+
   this->save_();
 }
 
-void EnergyStatistics::save_() { this->pref_.save(&(this->energy_)); }  // Save to flash memory
+void EnergyStatistics::save_() {
+ // Save to flash memory  
+  this->pref_.save(&(this->energy_));
+}
 
 }  // namespace energy_statistics
 }  // namespace esphome
