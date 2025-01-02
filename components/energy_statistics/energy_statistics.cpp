@@ -41,87 +41,94 @@ void EnergyStatistics::setup() {
     }
   }
 
-  // Initialize period start points
-  if (std::isnan(this->energy_.start_week)) {
-    this->energy_.start_week = this->total_->get_state();
-  }
-  if (std::isnan(this->energy_.start_month)) {
-    this->energy_.start_month = this->total_->get_state();
+  // Initialize period start points if they are unset
+  auto total = this->total_->get_state();
+  if (!std::isnan(total)) {
+    if (std::isnan(this->energy_.start_week)) {
+      this->energy_.start_week = total;
+    }
+    if (std::isnan(this->energy_.start_month)) {
+      this->energy_.start_month = total;
+    }
+    if (std::isnan(this->energy_.start_year)) {
+      this->energy_.start_year = total;
+    }
   }
 }
-
 
 void EnergyStatistics::loop() {
   const auto t = this->time_->now();
   if (!t.is_valid()) {
-    // Time not synced yet
+    // Time is not synced yet
     return;
   }
 
   const auto total = this->total_->get_state();
   if (std::isnan(total)) {
-    // Total not published yet
+    // Total is not published yet
     return;
   }
 
+  // If the day has not changed, no further processing is needed
   if (t.day_of_year == this->energy_.current_day_of_year) {
-    // No need to recalculate
     return;
   }
 
-  // Save the current day's data
+  // Update yesterday's data and daily start point
   this->energy_.start_yesterday = this->energy_.start_today;
   this->energy_.start_today = total;
 
   if (this->energy_.current_day_of_year != 0) {
-    // Check for a new week
+    // Update weekly, monthly, and yearly reset points
     if (t.day_of_week == this->energy_week_start_day_) {
       this->energy_.start_week = total;
     }
-
-    // Check for a new month
     if (t.day_of_month == this->energy_month_start_day_) {
       this->energy_.start_month = total;
     }
-
-    // Check for a new year
     if (t.day_of_year == this->energy_year_start_day_) {
       this->energy_.start_year = total;
     }
   }
 
+  // Update the current day of year
   this->energy_.current_day_of_year = t.day_of_year;
 
+  // Process and publish all sensor states
   this->process_(total);
 }
 
-
 void EnergyStatistics::process_(float total) {
+  // Publish daily energy
   if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
     this->energy_today_->publish_state(total - this->energy_.start_today);
   }
 
+  // Publish yesterday's energy
   if (this->energy_yesterday_ && !std::isnan(this->energy_.start_yesterday)) {
     this->energy_yesterday_->publish_state(this->energy_.start_today - this->energy_.start_yesterday);
   }
 
+  // Publish weekly energy
   if (this->energy_week_ && !std::isnan(this->energy_.start_week)) {
     this->energy_week_->publish_state(total - this->energy_.start_week);
   }
 
+  // Publish monthly energy
   if (this->energy_month_ && !std::isnan(this->energy_.start_month)) {
     this->energy_month_->publish_state(total - this->energy_.start_month);
   }
 
+  // Publish yearly energy
   if (this->energy_year_ && !std::isnan(this->energy_.start_year)) {
     this->energy_year_->publish_state(total - this->energy_.start_year);
   }
 
+  // Save the updated energy data
   this->save_();
 }
 
 void EnergyStatistics::save_() {
- // Save to flash memory  
   this->pref_.save(&(this->energy_));
 }
 
