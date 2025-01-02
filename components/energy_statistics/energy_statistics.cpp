@@ -38,22 +38,29 @@ void EnergyStatistics::setup() {
   }
 
   auto total = this->total_->get_state();
-  if (!std::isnan(total)) {
-    // Initialize start points for partial periods
+  const auto t = this->time_->now();
+
+  if (!std::isnan(total) && t.is_valid()) {
+    // Initialize start points dynamically for partial periods
     if (std::isnan(this->energy_.start_week)) {
       this->energy_.start_week = total;
-      ESP_LOGD(TAG, "Initialized start_week for partial week: %.5f", total);
+      ESP_LOGD(TAG, "Dynamically initialized start_week: %.5f", total);
     }
+
     if (std::isnan(this->energy_.start_month)) {
       this->energy_.start_month = total;
-      ESP_LOGD(TAG, "Initialized start_month for partial month: %.5f", total);
+      ESP_LOGD(TAG, "Dynamically initialized start_month: %.5f", total);
     }
+
     if (std::isnan(this->energy_.start_year)) {
       this->energy_.start_year = total;
-      ESP_LOGD(TAG, "Initialized start_year for partial year: %.5f", total);
+      ESP_LOGD(TAG, "Dynamically initialized start_year: %.5f", total);
     }
+
+    // Update the current day
+    this->energy_.current_day_of_year = t.day_of_year;
   } else {
-    ESP_LOGW(TAG, "Total energy sensor state is NaN during setup.");
+    ESP_LOGW(TAG, "Total energy state or time is invalid during setup.");
   }
 }
 
@@ -65,17 +72,12 @@ void EnergyStatistics::loop() {
     return;
   }
 
-  ESP_LOGD(TAG, "Current time: %02d:%02d:%02d", t.hour, t.minute, t.second);
-  ESP_LOGD(TAG, "Day of week: %d, Day of month: %d, Day of year: %d",
-           t.day_of_week, t.day_of_month, t.day_of_year);
-
   const auto total = this->total_->get_state();
   if (std::isnan(total)) {
     ESP_LOGW(TAG, "Total energy sensor state is NaN.");
     return;
   }
 
-  // Track new day transitions
   if (t.day_of_year != this->energy_.current_day_of_year) {
     ESP_LOGD(TAG, "New day detected: %d", t.day_of_year);
 
@@ -83,18 +85,22 @@ void EnergyStatistics::loop() {
     this->energy_.start_today = total;
     this->energy_.current_day_of_year = t.day_of_year;
 
-    // Check for resets
-    if (t.day_of_week == this->energy_week_start_day_) {
+    // Initialize or reset week
+    if (std::isnan(this->energy_.start_week) || t.day_of_week == this->energy_week_start_day_) {
       this->energy_.start_week = total;
-      ESP_LOGD(TAG, "Weekly reset: start_week set to %.5f", total);
+      ESP_LOGD(TAG, "Initialized or reset start_week: %.5f", total);
     }
-    if (t.day_of_month == this->energy_month_start_day_) {
+
+    // Initialize or reset month
+    if (std::isnan(this->energy_.start_month) || t.day_of_month == this->energy_month_start_day_) {
       this->energy_.start_month = total;
-      ESP_LOGD(TAG, "Monthly reset: start_month set to %.5f", total);
+      ESP_LOGD(TAG, "Initialized or reset start_month: %.5f", total);
     }
-    if (t.day_of_year == this->energy_year_start_day_) {
+
+    // Initialize or reset year
+    if (std::isnan(this->energy_.start_year) || t.day_of_year == this->energy_year_start_day_) {
       this->energy_.start_year = total;
-      ESP_LOGD(TAG, "Yearly reset: start_year set to %.5f", total);
+      ESP_LOGD(TAG, "Initialized or reset start_year: %.5f", total);
     }
   }
 
@@ -102,38 +108,34 @@ void EnergyStatistics::loop() {
 }
 
 
-
 void EnergyStatistics::process_(float total) {
   if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
     this->energy_today_->publish_state(total - this->energy_.start_today);
   }
 
+  if (this->energy_yesterday_ && !std::isnan(this->energy_.start_yesterday)) {
+    this->energy_yesterday_->publish_state(this->energy_.start_today - this->energy_.start_yesterday);
+  }
+
   if (this->energy_week_ && !std::isnan(this->energy_.start_week)) {
-    float week_value = total - this->energy_.start_week;
-    this->energy_week_->publish_state(week_value);
-    ESP_LOGD(TAG, "Updated energy_week: %.5f (start_week: %.5f)", week_value, this->energy_.start_week);
+    this->energy_week_->publish_state(total - this->energy_.start_week);
+    ESP_LOGD(TAG, "Updated energy_week: %.5f", total - this->energy_.start_week);
   }
 
   if (this->energy_month_ && !std::isnan(this->energy_.start_month)) {
-    float month_value = total - this->energy_.start_month;
-    this->energy_month_->publish_state(month_value);
-    ESP_LOGD(TAG, "Updated energy_month: %.5f (start_month: %.5f)", month_value, this->energy_.start_month);
+    this->energy_month_->publish_state(total - this->energy_.start_month);
+    ESP_LOGD(TAG, "Updated energy_month: %.5f", total - this->energy_.start_month);
   }
 
   if (this->energy_year_ && !std::isnan(this->energy_.start_year)) {
-    float year_value = total - this->energy_.start_year;
-    this->energy_year_->publish_state(year_value);
-    ESP_LOGD(TAG, "Updated energy_year: %.5f (start_year: %.5f)", year_value, this->energy_.start_year);
+    this->energy_year_->publish_state(total - this->energy_.start_year);
+    ESP_LOGD(TAG, "Updated energy_year: %.5f", total - this->energy_.start_year);
   }
 
   this->save_();
 }
 
-
-void EnergyStatistics::save_() {
-  this->pref_.save(&(this->energy_));
-  ESP_LOGD(TAG, "Energy data saved.");
-}
+void EnergyStatistics::save_() { this->pref_.save(&(this->energy_)); }  // Save to flash memory
 
 }  // namespace energy_statistics
 }  // namespace esphome
