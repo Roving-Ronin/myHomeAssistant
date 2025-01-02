@@ -39,20 +39,24 @@ void EnergyStatistics::setup() {
 
   auto total = this->total_->get_state();
   if (!std::isnan(total)) {
+    // Initialize start points for partial periods
     if (std::isnan(this->energy_.start_week)) {
       this->energy_.start_week = total;
-      ESP_LOGD(TAG, "Initialized start_week: %.5f", total);
+      ESP_LOGD(TAG, "Initialized start_week for partial week: %.5f", total);
     }
     if (std::isnan(this->energy_.start_month)) {
       this->energy_.start_month = total;
-      ESP_LOGD(TAG, "Initialized start_month: %.5f", total);
+      ESP_LOGD(TAG, "Initialized start_month for partial month: %.5f", total);
     }
     if (std::isnan(this->energy_.start_year)) {
       this->energy_.start_year = total;
-      ESP_LOGD(TAG, "Initialized start_year: %.5f", total);
+      ESP_LOGD(TAG, "Initialized start_year for partial year: %.5f", total);
     }
+  } else {
+    ESP_LOGW(TAG, "Total energy sensor state is NaN during setup.");
   }
 }
+
 
 void EnergyStatistics::loop() {
   const auto t = this->time_->now();
@@ -67,7 +71,7 @@ void EnergyStatistics::loop() {
 
   const auto total = this->total_->get_state();
   if (std::isnan(total)) {
-    ESP_LOGW(TAG, "Total energy state is NaN.");
+    ESP_LOGW(TAG, "Total energy sensor state is NaN.");
     return;
   }
 
@@ -78,28 +82,22 @@ void EnergyStatistics::loop() {
     this->energy_.start_today = total;
     this->energy_.current_day_of_year = t.day_of_year;
 
+    // Reset for new week
     if (t.day_of_week == this->energy_week_start_day_) {
       this->energy_.start_week = total;
       ESP_LOGD(TAG, "Weekly reset: start_week set to %.5f", total);
-    } else {
-      ESP_LOGD(TAG, "No weekly reset (day_of_week: %d, expected: %d)",
-               t.day_of_week, this->energy_week_start_day_);
     }
 
+    // Reset for new month
     if (t.day_of_month == this->energy_month_start_day_) {
       this->energy_.start_month = total;
       ESP_LOGD(TAG, "Monthly reset: start_month set to %.5f", total);
-    } else {
-      ESP_LOGD(TAG, "No monthly reset (day_of_month: %d, expected: %d)",
-               t.day_of_month, this->energy_month_start_day_);
     }
 
+    // Reset for new year
     if (t.day_of_year == this->energy_year_start_day_) {
       this->energy_.start_year = total;
       ESP_LOGD(TAG, "Yearly reset: start_year set to %.5f", total);
-    } else {
-      ESP_LOGD(TAG, "No yearly reset (day_of_year: %d, expected: %d)",
-               t.day_of_year, this->energy_year_start_day_);
     }
   }
 
