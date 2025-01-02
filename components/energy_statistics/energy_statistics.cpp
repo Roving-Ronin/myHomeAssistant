@@ -60,8 +60,8 @@ void EnergyStatistics::loop() {
     return;
   }
 
+    // Save the current day's data
   this->energy_.start_yesterday = this->energy_.start_today;
-
   this->energy_.start_today = total;
 
   if (this->energy_.current_day_of_year != 0) {
