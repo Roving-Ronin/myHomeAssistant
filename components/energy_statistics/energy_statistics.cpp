@@ -35,23 +35,21 @@ void EnergyStatistics::setup() {
   energy_data_t loaded{};
   if (this->pref_.load(&loaded)) {
     this->energy_ = loaded;
-    auto total = this->total_->get_state();
-    if (!std::isnan(total)) {
-      this->process_(total);
-    }
   }
 
-  // Initialize period start points if they are unset
   auto total = this->total_->get_state();
   if (!std::isnan(total)) {
     if (std::isnan(this->energy_.start_week)) {
       this->energy_.start_week = total;
+      ESP_LOGD(TAG, "Initialized start_week: %.5f", total);
     }
     if (std::isnan(this->energy_.start_month)) {
       this->energy_.start_month = total;
+      ESP_LOGD(TAG, "Initialized start_month: %.5f", total);
     }
     if (std::isnan(this->energy_.start_year)) {
       this->energy_.start_year = total;
+      ESP_LOGD(TAG, "Initialized start_year: %.5f", total);
     }
   }
 }
@@ -69,67 +67,67 @@ void EnergyStatistics::loop() {
     return;
   }
 
-  // If the day has not changed, no further processing is needed
-  if (t.day_of_year == this->energy_.current_day_of_year) {
-    return;
-  }
+  if (t.day_of_year != this->energy_.current_day_of_year) {
+    this->energy_.start_yesterday = this->energy_.start_today;
+    this->energy_.start_today = total;
+    this->energy_.current_day_of_year = t.day_of_year;
 
-  // Update yesterday's data and daily start point
-  this->energy_.start_yesterday = this->energy_.start_today;
-  this->energy_.start_today = total;
-
-  if (this->energy_.current_day_of_year != 0) {
-    // Update weekly, monthly, and yearly reset points
     if (t.day_of_week == this->energy_week_start_day_) {
       this->energy_.start_week = total;
+      ESP_LOGD(TAG, "Weekly reset: start_week updated to %.5f", total);
     }
+
     if (t.day_of_month == this->energy_month_start_day_) {
       this->energy_.start_month = total;
+      ESP_LOGD(TAG, "Monthly reset: start_month updated to %.5f", total);
     }
+
     if (t.day_of_year == this->energy_year_start_day_) {
       this->energy_.start_year = total;
+      ESP_LOGD(TAG, "Yearly reset: start_year updated to %.5f", total);
     }
   }
 
-  // Update the current day of year
-  this->energy_.current_day_of_year = t.day_of_year;
-
-  // Process and publish all sensor states
   this->process_(total);
 }
 
 void EnergyStatistics::process_(float total) {
-  // Publish daily energy
   if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
-    this->energy_today_->publish_state(total - this->energy_.start_today);
+    float value = total - this->energy_.start_today;
+    this->energy_today_->publish_state(value);
+    ESP_LOGD(TAG, "Updated energy_today: %.5f", value);
   }
 
-  // Publish yesterday's energy
   if (this->energy_yesterday_ && !std::isnan(this->energy_.start_yesterday)) {
-    this->energy_yesterday_->publish_state(this->energy_.start_today - this->energy_.start_yesterday);
+    float value = this->energy_.start_today - this->energy_.start_yesterday;
+    this->energy_yesterday_->publish_state(value);
+    ESP_LOGD(TAG, "Updated energy_yesterday: %.5f", value);
   }
 
-  // Publish weekly energy
   if (this->energy_week_ && !std::isnan(this->energy_.start_week)) {
-    this->energy_week_->publish_state(total - this->energy_.start_week);
+    float value = total - this->energy_.start_week;
+    this->energy_week_->publish_state(value);
+    ESP_LOGD(TAG, "Updated energy_week: %.5f", value);
   }
 
-  // Publish monthly energy
   if (this->energy_month_ && !std::isnan(this->energy_.start_month)) {
-    this->energy_month_->publish_state(total - this->energy_.start_month);
+    float value = total - this->energy_.start_month;
+    this->energy_month_->publish_state(value);
+    ESP_LOGD(TAG, "Updated energy_month: %.5f", value);
   }
 
-  // Publish yearly energy
   if (this->energy_year_ && !std::isnan(this->energy_.start_year)) {
-    this->energy_year_->publish_state(total - this->energy_.start_year);
+    float value = total - this->energy_.start_year;
+    this->energy_year_->publish_state(value);
+    ESP_LOGD(TAG, "Updated energy_year: %.5f", value);
   }
 
-  // Save the updated energy data
   this->save_();
 }
 
 void EnergyStatistics::save_() {
   this->pref_.save(&(this->energy_));
+  ESP_LOGD(TAG, "Energy data saved.");
 }
 
 }  // namespace energy_statistics
