@@ -64,12 +64,12 @@ void EnergyStatistics::loop() {
   this->energy_.start_yesterday = this->energy_.start_today;
   this->energy_.start_today = total;
 
-  if (this->energy_.current_day_of_year != 0) {
+//  if (this->energy_.current_day_of_year != 0) {
     // Start the calculations for the week, month, and year immediately
-    this->energy_.start_week = total;  // Start counting the week from current total
-    this->energy_.start_month = total; // Start counting the month from current total
-    this->energy_.start_year = total;  // Start counting the year from current total
-  }
+  this->energy_.start_week = total;  // Start counting the week from current total
+  this->energy_.start_month = total; // Start counting the month from current total
+  this->energy_.start_year = total;  // Start counting the year from current total
+//  }
 
   this->energy_.current_day_of_year = t.day_of_year;
 
