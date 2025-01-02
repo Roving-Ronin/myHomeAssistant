@@ -111,22 +111,26 @@ void EnergyStatistics::process_(float total) {
   }
 
   if (this->energy_week_ && !std::isnan(this->energy_.start_week)) {
-    this->energy_week_->publish_state(total - this->energy_.start_week);
-    ESP_LOGD(TAG, "Updated energy_week: %.5f", total - this->energy_.start_week);
+    float week_value = total - this->energy_.start_week;
+    this->energy_week_->publish_state(week_value);
+    ESP_LOGD(TAG, "Updated energy_week: %.5f (start_week: %.5f)", week_value, this->energy_.start_week);
   }
 
   if (this->energy_month_ && !std::isnan(this->energy_.start_month)) {
-    this->energy_month_->publish_state(total - this->energy_.start_month);
-    ESP_LOGD(TAG, "Updated energy_month: %.5f", total - this->energy_.start_month);
+    float month_value = total - this->energy_.start_month;
+    this->energy_month_->publish_state(month_value);
+    ESP_LOGD(TAG, "Updated energy_month: %.5f (start_month: %.5f)", month_value, this->energy_.start_month);
   }
 
   if (this->energy_year_ && !std::isnan(this->energy_.start_year)) {
-    this->energy_year_->publish_state(total - this->energy_.start_year);
-    ESP_LOGD(TAG, "Updated energy_year: %.5f", total - this->energy_.start_year);
+    float year_value = total - this->energy_.start_year;
+    this->energy_year_->publish_state(year_value);
+    ESP_LOGD(TAG, "Updated energy_year: %.5f (start_year: %.5f)", year_value, this->energy_.start_year);
   }
 
   this->save_();
 }
+
 
 void EnergyStatistics::save_() {
   this->pref_.save(&(this->energy_));
