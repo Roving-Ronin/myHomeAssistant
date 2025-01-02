@@ -75,6 +75,7 @@ void EnergyStatistics::loop() {
     return;
   }
 
+  // Track new day transitions
   if (t.day_of_year != this->energy_.current_day_of_year) {
     ESP_LOGD(TAG, "New day detected: %d", t.day_of_year);
 
@@ -82,19 +83,15 @@ void EnergyStatistics::loop() {
     this->energy_.start_today = total;
     this->energy_.current_day_of_year = t.day_of_year;
 
-    // Reset for new week
+    // Check for resets
     if (t.day_of_week == this->energy_week_start_day_) {
       this->energy_.start_week = total;
       ESP_LOGD(TAG, "Weekly reset: start_week set to %.5f", total);
     }
-
-    // Reset for new month
     if (t.day_of_month == this->energy_month_start_day_) {
       this->energy_.start_month = total;
       ESP_LOGD(TAG, "Monthly reset: start_month set to %.5f", total);
     }
-
-    // Reset for new year
     if (t.day_of_year == this->energy_year_start_day_) {
       this->energy_.start_year = total;
       ESP_LOGD(TAG, "Yearly reset: start_year set to %.5f", total);
@@ -103,6 +100,7 @@ void EnergyStatistics::loop() {
 
   this->process_(total);
 }
+
 
 
 void EnergyStatistics::process_(float total) {
