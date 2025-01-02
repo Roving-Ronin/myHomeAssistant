@@ -57,39 +57,46 @@ void EnergyStatistics::setup() {
 void EnergyStatistics::loop() {
   const auto t = this->time_->now();
   if (!t.is_valid()) {
-    // Time is not synced yet
+    ESP_LOGW(TAG, "Time is not valid yet.");
     return;
   }
 
+  ESP_LOGD(TAG, "Current day of year: %d", t.day_of_year);
+  ESP_LOGD(TAG, "Current day of week: %d", t.day_of_week);
+  ESP_LOGD(TAG, "Current day of month: %d", t.day_of_month);
+
   const auto total = this->total_->get_state();
   if (std::isnan(total)) {
-    // Total is not published yet
+    ESP_LOGW(TAG, "Total energy state is NaN.");
     return;
   }
 
   if (t.day_of_year != this->energy_.current_day_of_year) {
+    ESP_LOGD(TAG, "New day detected: %d", t.day_of_year);
+
     this->energy_.start_yesterday = this->energy_.start_today;
     this->energy_.start_today = total;
     this->energy_.current_day_of_year = t.day_of_year;
 
     if (t.day_of_week == this->energy_week_start_day_) {
       this->energy_.start_week = total;
-      ESP_LOGD(TAG, "Weekly reset: start_week updated to %.5f", total);
+      ESP_LOGD(TAG, "Weekly reset: start_week set to %.5f", total);
     }
 
     if (t.day_of_month == this->energy_month_start_day_) {
       this->energy_.start_month = total;
-      ESP_LOGD(TAG, "Monthly reset: start_month updated to %.5f", total);
+      ESP_LOGD(TAG, "Monthly reset: start_month set to %.5f", total);
     }
 
     if (t.day_of_year == this->energy_year_start_day_) {
       this->energy_.start_year = total;
-      ESP_LOGD(TAG, "Yearly reset: start_year updated to %.5f", total);
+      ESP_LOGD(TAG, "Yearly reset: start_year set to %.5f", total);
     }
   }
 
   this->process_(total);
 }
+
 
 void EnergyStatistics::process_(float total) {
   if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
