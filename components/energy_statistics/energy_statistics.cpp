@@ -45,57 +45,84 @@ void EnergyStatistics::setup() {
 void EnergyStatistics::loop() {
   const auto t = this->time_->now();
   if (!t.is_valid()) {
-    // time is not synced yet
+    // Time is not synced yet
     return;
   }
 
   const auto total = this->total_->get_state();
   if (std::isnan(total)) {
-    // total is not published yet
+    // Total is not published yet
     return;
   }
 
-  if (t.day_of_year == this->energy_.current_day_of_year) {
-    // nothing to do
-    return;
+  // Check if the day has changed
+  if (t.day_of_year != this->energy_.current_day_of_year) {
+    // Save the current day's data
+    this->energy_.start_yesterday = this->energy_.start_today;
+    this->energy_.start_today = total;
+    this->energy_.current_day_of_year = t.day_of_year;
   }
 
-  // Save the current day's data
-  this->energy_.start_yesterday = this->energy_.start_today;
-  this->energy_.start_today = total;
+  // Detect start of a new calendar week
+  if (t.day_of_week == this->energy_week_start_day_ && t.hour == 0 && t.minute == 0) {
+    this->energy_.start_week = total;
+    this->energy_.full_week_started = true;
+  }
 
-//  if (this->energy_.current_day_of_year != 0) {
-    // Start the calculations for the week, month, and year immediately
-  this->energy_.start_week = total;  // Start counting the week from current total
-  this->energy_.start_month = total; // Start counting the month from current total
-  this->energy_.start_year = total;  // Start counting the year from current total
-//  }
+  // Detect start of a new calendar month
+  if (t.day_of_month == this->energy_month_start_day_ && t.hour == 0 && t.minute == 0) {
+    this->energy_.start_month = total;
+    this->energy_.full_month_started = true;
+  }
 
-  this->energy_.current_day_of_year = t.day_of_year;
+  // Detect start of a new calendar year
+  if (t.day_of_year == 1 && t.hour == 0 && t.minute == 0) {
+    this->energy_.start_year = total;
+    this->energy_.full_year_started = true;
+  }
 
+  // Process current totals
   this->process_(total);
 }
 
 
+
 void EnergyStatistics::process_(float total) {
+  // Publish daily energy
   if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
     this->energy_today_->publish_state(total - this->energy_.start_today);
   }
 
+  // Publish yesterday energy
   if (this->energy_yesterday_ && !std::isnan(this->energy_.start_yesterday)) {
     this->energy_yesterday_->publish_state(this->energy_.start_today - this->energy_.start_yesterday);
   }
 
+  // Publish week energy
   if (this->energy_week_ && !std::isnan(this->energy_.start_week)) {
-    this->energy_week_->publish_state(total - this->energy_.start_week);
+    if (this->energy_.full_week_started) {
+      this->energy_week_->publish_state(total - this->energy_.start_week);
+    } else {
+      this->energy_week_->publish_state(total - this->energy_.start_week);  // Partial week
+    }
   }
 
+  // Publish month energy
   if (this->energy_month_ && !std::isnan(this->energy_.start_month)) {
-    this->energy_month_->publish_state(total - this->energy_.start_month);
+    if (this->energy_.full_month_started) {
+      this->energy_month_->publish_state(total - this->energy_.start_month);
+    } else {
+      this->energy_month_->publish_state(total - this->energy_.start_month);  // Partial month
+    }
   }
 
+  // Publish year energy
   if (this->energy_year_ && !std::isnan(this->energy_.start_year)) {
-    this->energy_year_->publish_state(total - this->energy_.start_year);
+    if (this->energy_.full_year_started) {
+      this->energy_year_->publish_state(total - this->energy_.start_year);
+    } else {
+      this->energy_year_->publish_state(total - this->energy_.start_year);  // Partial year
+    }
   }
   
   this->save_();
