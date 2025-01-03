@@ -285,6 +285,7 @@ sensor:
         then:
           - lambda: |-
               id(global_energy_today) = x;
+      display: false
       internal: true
 
      # Energy Statistics Components - Adds Energy Yesterday
@@ -295,6 +296,7 @@ sensor:
         then:
           - lambda: |-
               id(global_energy_yesterday) = x;
+      display: false
       internal: true
 
      # Energy Statistics Components - Adds Energy Week
@@ -305,6 +307,7 @@ sensor:
         then:
           - lambda: |-
               id(global_energy_week) = x;
+      display: false
       internal: true
 
      # Energy Statistics Components - Adds Energy Month
@@ -315,6 +318,7 @@ sensor:
         then:
           - lambda: |-
               id(global_energy_month) = x;
+      display: false
       internal: true
 
      # Energy Statistics Components - Adds Energy Year
@@ -325,6 +329,7 @@ sensor:
         then:
           - lambda: |-
               id(global_energy_year) = x;
+      display: false
       internal: true
 
 
