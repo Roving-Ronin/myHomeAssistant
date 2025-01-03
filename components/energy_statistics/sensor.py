@@ -45,6 +45,7 @@ CONFIG_SCHEMA = cv.Schema(
             accuracy_decimals=3,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
+            display=false,
         ),
         cv.Optional(CONF_ENERGY_YESTERDAY): sensor.sensor_schema(
             unit_of_measurement=UNIT_KILOWATT_HOURS,
@@ -52,6 +53,7 @@ CONFIG_SCHEMA = cv.Schema(
             accuracy_decimals=3,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
+            display=false,
         ),
         cv.Optional(CONF_ENERGY_WEEK): sensor.sensor_schema(
             unit_of_measurement=UNIT_KILOWATT_HOURS,
@@ -59,6 +61,7 @@ CONFIG_SCHEMA = cv.Schema(
             accuracy_decimals=3,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
+            display=false,
         ),
         cv.Optional(CONF_ENERGY_MONTH): sensor.sensor_schema(
             unit_of_measurement=UNIT_KILOWATT_HOURS,
@@ -66,6 +69,7 @@ CONFIG_SCHEMA = cv.Schema(
             accuracy_decimals=3,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
+            display=false,
         ),
         cv.Optional(CONF_ENERGY_YEAR): sensor.sensor_schema(
             unit_of_measurement=UNIT_KILOWATT_HOURS,
@@ -73,6 +77,7 @@ CONFIG_SCHEMA = cv.Schema(
             accuracy_decimals=3,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
+            display=false,
         ),
     }
 ).extend(cv.COMPONENT_SCHEMA)
