@@ -8,8 +8,8 @@ namespace energy_statistics {
 static const char *const TAG = "energy_statistics";
 static const char *const GAP = "  ";
 
-//void EnergyStatistics::dump_config() {
-//  ESP_LOGCONFIG(TAG, "Energy statistics sensors");
+void EnergyStatistics::dump_config() {
+  ESP_LOGCONFIG(TAG, "Energy statistics sensors");
   
 //  if (this->energy_today_ && !this->energy_today_->is_internal()) {
     //LOG_SENSOR(GAP, "Energy Today", this->energy_today_);
@@ -26,7 +26,7 @@ static const char *const GAP = "  ";
  // if (this->energy_year_ && !this->energy_year_->is_internal()) {
   //  LOG_SENSOR(GAP, "Energy Year", this->energy_year_);
  // }
-//}
+}
 
 
 void EnergyStatistics::setup() {
