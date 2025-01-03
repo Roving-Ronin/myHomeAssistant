@@ -297,7 +297,7 @@ sensor:
           - lambda: |-
               id(global_energy_yesterday) = x;
       disabled_by_default: true
-      internal: true1
+      internal: true
 
      # Energy Statistics Components - Adds Energy Week
     energy_week:
