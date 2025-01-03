@@ -87,23 +87,23 @@ void WaterStatistics::loop() {
 
 
 void WaterStatistics::process_(float total) {
-  if (this->water_today_ && !std::isnan(this->water_.start_today) {
+  if (this->water_today_ && !std::isnan(this->water_.start_today)) {
     this->water_today_->publish_state(total - this->water_.start_today);
   }
 
-  if (this->water_yesterday_ && !std::isnan(this->water_.start_yesterday) {
+  if (this->water_yesterday_ && !std::isnan(this->water_.start_yesterday)) {
     this->water_yesterday_->publish_state(this->water_.start_today - this->water_.start_yesterday);
   }
 
-  if (this->water_week_ && !std::isnan(this->water_.start_week) {
+  if (this->water_week_ && !std::isnan(this->water_.start_week)) {
     this->water_week_->publish_state(total - this->water_.start_week);
   }
 
-  if (this->water_month_ && !std::isnan(this->water_.start_month) {
+  if (this->water_month_ && !std::isnan(this->water_.start_month)) {
     this->water_month_->publish_state(total - this->water_.start_month);
   }
 
-  if (this->water_year_ && !std::isnan(this->water_.start_year) {
+  if (this->water_year_ && !std::isnan(this->water_.start_year)) {
     this->water_year_->publish_state(total - this->water_.start_year);
   }
   
