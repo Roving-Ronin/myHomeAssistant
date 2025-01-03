@@ -8,25 +8,25 @@ namespace energy_statistics {
 static const char *const TAG = "energy_statistics";
 static const char *const GAP = "  ";
 
-void EnergyStatistics::dump_config() {
-  ESP_LOGCONFIG(TAG, "Energy statistics sensors");
+//void EnergyStatistics::dump_config() {
+//  ESP_LOGCONFIG(TAG, "Energy statistics sensors");
   
-  if (this->energy_today_ && !this->energy_today_->is_internal()) {
-    LOG_SENSOR(GAP, "Energy Today", this->energy_today_);
-  }
-  if (this->energy_yesterday_ && !this->energy_yesterday_->is_internal()) {
-    LOG_SENSOR(GAP, "Energy Yesterday", this->energy_yesterday_);
-  }
-  if (this->energy_week_ && !this->energy_week_->is_internal()) {
-    LOG_SENSOR(GAP, "Energy Week", this->energy_week_);
-  }
-  if (this->energy_month_ && !this->energy_month_->is_internal()) {
-    LOG_SENSOR(GAP, "Energy Month", this->energy_month_);
-  }
-  if (this->energy_year_ && !this->energy_year_->is_internal()) {
-    LOG_SENSOR(GAP, "Energy Year", this->energy_year_);
-  }
-}
+//  if (this->energy_today_ && !this->energy_today_->is_internal()) {
+    //LOG_SENSOR(GAP, "Energy Today", this->energy_today_);
+ // }
+ // if (this->energy_yesterday_ && !this->energy_yesterday_->is_internal()) {
+ //   LOG_SENSOR(GAP, "Energy Yesterday", this->energy_yesterday_);
+ // }
+ // if (this->energy_week_ && !this->energy_week_->is_internal()) {
+ //   LOG_SENSOR(GAP, "Energy Week", this->energy_week_);
+ // }
+ // if (this->energy_month_ && !this->energy_month_->is_internal()) {
+ //   LOG_SENSOR(GAP, "Energy Month", this->energy_month_);
+ // }
+ // if (this->energy_year_ && !this->energy_year_->is_internal()) {
+  //  LOG_SENSOR(GAP, "Energy Year", this->energy_year_);
+ // }
+//}
 
 
 void EnergyStatistics::setup() {
