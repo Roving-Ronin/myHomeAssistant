@@ -10,19 +10,19 @@ static const char *const GAP = "  ";
 
 void GasStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Gas Statistics (m³) - Sensors");
-  if (this->gas_today_) {
+    if (this->gas_today_ && !this->gas_today_->is_internal()) {
     LOG_SENSOR(GAP, "Gas (m³) Today", this->gas_today_);
   }
-  if (this->gas_yesterday_) {
+  if (this->gas_yesterday_ && !this->gas_yesterday_->is_internal()) {
     LOG_SENSOR(GAP, "Gas (m³) Yesterday", this->gas_yesterday_);
   }
-  if (this->gas_week_) {
+  if (this->gas_week_ && !this->gas_week_->is_internal()) {
     LOG_SENSOR(GAP, "Gas (m³) Week", this->gas_week_);
   }
-  if (this->gas_month_) {
+  if (this->gas_month_ && !this->gas_month_->is_internal()) {
     LOG_SENSOR(GAP, "Gas (m³) Month", this->gas_month_);
   }
-  if (this->gas_year_) {
+  if (this->gas_year_ && !this->gas_year_->is_internal()) {
     LOG_SENSOR(GAP, "Gas (m³) Year", this->gas_year_);
   }
 }
@@ -86,23 +86,23 @@ void GasStatistics::loop() {
 
 
 void GasStatistics::process_(float total) {
-  if (this->gas_today_ && !std::isnan(this->gas_.start_today)) {
+  if (this->gas_today_ && !std::isnan(this->gas_.start_today) && !this->gas_today_->is_internal()) {
     this->gas_today_->publish_state(total - this->gas_.start_today);
   }
 
-  if (this->gas_yesterday_ && !std::isnan(this->gas_.start_yesterday)) {
+  if (this->gas_yesterday_ && !std::isnan(this->gas_.start_yesterday) && !this->gas_yesterday_->is_internal()) {
     this->gas_yesterday_->publish_state(this->gas_.start_today - this->gas_.start_yesterday);
   }
 
-  if (this->gas_week_ && !std::isnan(this->gas_.start_week)) {
+  if (this->gas_week_ && !std::isnan(this->gas_.start_week) && !this->gas_week_->is_internal()) {
     this->gas_week_->publish_state(total - this->gas_.start_week);
   }
 
-  if (this->gas_month_ && !std::isnan(this->gas_.start_month)) {
+  if (this->gas_month_ && !std::isnan(this->gas_.start_month) && !this->gas_month_->is_internal()) {
     this->gas_month_->publish_state(total - this->gas_.start_month);
   }
 
-  if (this->gas_year_ && !std::isnan(this->gas_.start_year)) {
+  if (this->gas_year_ && !std::isnan(this->gas_.start_year) && !this->gas_year_->is_internal()) {
     this->gas_year_->publish_state(total - this->gas_.start_year);
   }
   
