@@ -10,19 +10,20 @@ static const char *const GAP = "  ";
 
 void WaterStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Water Statistics (L) - Sensors");
-  if (this->water_today_) {
+  
+  if (this->water_today_ && !this->water_today_->is_internal()) {
     LOG_SENSOR(GAP, "Water (L) Today", this->water_today_);
   }
-  if (this->water_yesterday_) {
+  if (this->water_yesterday_ && !this->water_yesterday_->is_internal()) {
     LOG_SENSOR(GAP, "Water (L) Yesterday", this->water_yesterday_);
   }
-  if (this->water_week_) {
+  if (this->water_week_ && !this->water_week_->is_internal()) {
     LOG_SENSOR(GAP, "Water (L) Week", this->water_week_);
   }
-  if (this->water_month_) {
+  if (this->water_month_ && !this->water_month_->is_internal()) {
     LOG_SENSOR(GAP, "Water (L) Month", this->water_month_);
   }
-  if (this->water_year_) {
+  if (this->water_year_ && !this->water_year_->is_internal()) {
     LOG_SENSOR(GAP, "Water (L) Year", this->water_year_);
   }
 }
@@ -84,29 +85,31 @@ void WaterStatistics::loop() {
   this->process_(total);
 }
 
+
 void WaterStatistics::process_(float total) {
-  if (this->water_today_ && !std::isnan(this->water_.start_today)) {
+  if (this->water_today_ && !std::isnan(this->water_.start_today) && !this->water_today_->is_internal()) {
     this->water_today_->publish_state(total - this->water_.start_today);
   }
 
-  if (this->water_yesterday_ && !std::isnan(this->water_.start_yesterday)) {
+  if (this->water_yesterday_ && !std::isnan(this->water_.start_yesterday) && !this->water_yesterday_->is_internal()) {
     this->water_yesterday_->publish_state(this->water_.start_today - this->water_.start_yesterday);
   }
 
-  if (this->water_week_ && !std::isnan(this->water_.start_week)) {
+  if (this->water_week_ && !std::isnan(this->water_.start_week) && !this->water_week_->is_internal()) {
     this->water_week_->publish_state(total - this->water_.start_week);
   }
 
-  if (this->water_month_ && !std::isnan(this->water_.start_month)) {
+  if (this->water_month_ && !std::isnan(this->water_.start_month) && !this->water_month_->is_internal()) {
     this->water_month_->publish_state(total - this->water_.start_month);
   }
 
-  if (this->water_year_ && !std::isnan(this->water_.start_year)) {
+  if (this->water_year_ && !std::isnan(this->water_.start_year) && !this->water_year_->is_internal()) {
     this->water_year_->publish_state(total - this->water_.start_year);
   }
   
   this->save_();
 }
+
 
 void WaterStatistics::save_() { this->pref_.save(&this->water_); } // Save to flash memory
 
