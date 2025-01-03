@@ -41,10 +41,12 @@ class EnergyStatistics : public Component {
   Sensor *energy_month_{nullptr};
   Sensor *energy_year_{nullptr};
 
-  // Statistics start day configuration
-  int energy_week_start_day_{2};          // start day of week configuration (Monday)
-  int energy_month_start_day_{1};         // start day of month configuration (1st of month)
-  int energy_year_start_day_{1};          // start day of year configuration (1st of year)
+  // start day of week configuration
+  int energy_week_start_day_{2};
+  // start day of month configuration
+  int energy_month_start_day_{1};
+  // start day of year configuration
+  int energy_year_start_day_{1};
 
   struct energy_data_t {
     uint16_t current_day_of_year{0};
@@ -53,9 +55,6 @@ class EnergyStatistics : public Component {
     float start_week{NAN};
     float start_month{NAN};
     float start_year{NAN};
-    bool full_week_started{false};
-    bool full_month_started{false};
-    bool full_year_started{false};
   } energy_;
 
   void process_(float total);
