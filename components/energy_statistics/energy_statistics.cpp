@@ -14,16 +14,16 @@ void EnergyStatistics::dump_config() {
     LOG_SENSOR(GAP, "Energy Today", this->energy_today_);
   }
   if (this->energy_yesterday_) {
-    ESP_LOGV(GAP, "Energy Yesterday", this->energy_yesterday_);
+    LOG_SENSOR(GAP, "Energy Yesterday", this->energy_yesterday_);
   }
   if (this->energy_week_) {
-    ESP_LOGV(GAP, "Energy Week", this->energy_week_);
+    LOG_SENSOR(GAP, "Energy Week", this->energy_week_);
   }
   if (this->energy_month_) {
-    ESP_LOGV(GAP, "Energy Month", this->energy_month_);
+    LOG_SENSOR(GAP, "Energy Month", this->energy_month_);
   }
   if (this->energy_year_) {
-    ESP_LOGV(GAP, "Energy Year", this->energy_year_);
+    LOG_SENSOR(GAP, "Energy Year", this->energy_year_);
   }
 }
 
