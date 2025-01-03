@@ -53,9 +53,9 @@ class EnergyStatistics : public Component {
     float start_week{NAN};
     float start_month{NAN};
     float start_year{NAN};
-    float start_calendar_week{NAN};
-    float start_calendar_month{NAN};
-    float start_calendar_year{NAN};
+    bool full_week_started{false};
+    bool full_month_started{false};
+    bool full_year_started{false};
   } energy_;
 
   void process_(float total);
