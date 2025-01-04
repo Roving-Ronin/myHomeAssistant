@@ -151,7 +151,13 @@ void EnergyStatistics::process_(float total) {
     // Initialize start_year for the first time
     this->energy_.start_year = total;
     if (this->energy_year_) {
-     
+      this->energy_year_->publish_state(0);  // Publish initial value as 0
+    }
+  }
+
+  // Save the current state
+  this->save_();
+}
 
 
 
