@@ -91,6 +91,12 @@ void EnergyStatistics::process_(float total) {
   // Publish today's energy
   if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
     this->energy_today_->publish_state(total - this->energy_.start_today);
+  } else if (std::isnan(this->energy_.start_today)) {
+    // Initialize today's start value
+    this->energy_.start_today = total;
+    if (this->energy_today_) {
+      this->energy_today_->publish_state(0);  // Publish initial value as 0
+    }
   }
 
   // Publish yesterday's energy
@@ -107,6 +113,12 @@ void EnergyStatistics::process_(float total) {
       // Publish partial week value
       this->energy_week_->publish_state(total - this->energy_.start_week);
     }
+  } else if (std::isnan(this->energy_.start_week)) {
+    // Initialize start_week for the first time
+    this->energy_.start_week = total;
+    if (this->energy_week_) {
+      this->energy_week_->publish_state(0);  // Publish initial value as 0
+    }
   }
 
   // Publish monthly energy (partial or full)
@@ -117,6 +129,12 @@ void EnergyStatistics::process_(float total) {
     } else {
       // Publish partial month value
       this->energy_month_->publish_state(total - this->energy_.start_month);
+    }
+  } else if (std::isnan(this->energy_.start_month)) {
+    // Initialize start_month for the first time
+    this->energy_.start_month = total;
+    if (this->energy_month_) {
+      this->energy_month_->publish_state(0);  // Publish initial value as 0
     }
   }
 
@@ -129,11 +147,12 @@ void EnergyStatistics::process_(float total) {
       // Publish partial year value
       this->energy_year_->publish_state(total - this->energy_.start_year);
     }
-  }
+  } else if (std::isnan(this->energy_.start_year)) {
+    // Initialize start_year for the first time
+    this->energy_.start_year = total;
+    if (this->energy_year_) {
+     
 
-  // Save the current state
-  this->save_();
-}
 
 
 void EnergyStatistics::save_() { this->pref_.save(&(this->energy_)); }  // Save to flash memory
