@@ -10,40 +10,21 @@ static const char *const GAP = "  ";
 
 void EnergyStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Energy Statistics - Sensors");
-
-  if (this->energy_today_) {
-    ESP_LOGD(TAG, "Energy Today - Internal: %s", this->energy_today_->is_internal() ? "true" : "false");
-    if (!this->energy_today_->is_internal()) {
-      LOG_SENSOR(GAP, "Energy Today", this->energy_today_);
-    }
+  
+  if (this->energy_today_ && !this->energy_today_->is_internal()) {
+    LOG_SENSOR(GAP, "Energy Today", this->energy_today_);
   }
-
-  if (this->energy_yesterday_) {
-    ESP_LOGD(TAG, "Energy Yesterday - Internal: %s", this->energy_yesterday_->is_internal() ? "true" : "false");
-    if (!this->energy_yesterday_->is_internal()) {
-      LOG_SENSOR(GAP, "Energy Yesterday", this->energy_yesterday_);
-    }
+  if (this->energy_yesterday_ && !this->energy_yesterday_->is_internal()) {
+    LOG_SENSOR(GAP, "Energy Yesterday", this->energy_yesterday_);
   }
-
-  if (this->energy_week_) {
-    ESP_LOGD(TAG, "Energy Week - Internal: %s", this->energy_week_->is_internal() ? "true" : "false");
-    if (!this->energy_week_->is_internal()) {
-      LOG_SENSOR(GAP, "Energy Week", this->energy_week_);
-    }
+  if (this->energy_week_ && !this->energy_week_->is_internal()) {
+    LOG_SENSOR(GAP, "Energy Week", this->energy_week_);
   }
-
-  if (this->energy_month_) {
-    ESP_LOGD(TAG, "Energy Month - Internal: %s", this->energy_month_->is_internal() ? "true" : "false");
-    if (!this->energy_month_->is_internal()) {
-      LOG_SENSOR(GAP, "Energy Month", this->energy_month_);
-    }
+  if (this->energy_month_ && !this->energy_month_->is_internal()) {
+    LOG_SENSOR(GAP, "Energy Month", this->energy_month_);
   }
-
-  if (this->energy_year_) {
-    ESP_LOGD(TAG, "Energy Year - Internal: %s", this->energy_year_->is_internal() ? "true" : "false");
-    if (!this->energy_year_->is_internal()) {
-      LOG_SENSOR(GAP, "Energy Year", this->energy_year_);
-    }
+  if (this->energy_year_ && !this->energy_year_->is_internal()) {
+    LOG_SENSOR(GAP, "Energy Year", this->energy_year_);
   }
 }
 
