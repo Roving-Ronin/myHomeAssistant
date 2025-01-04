@@ -9,7 +9,7 @@ static const char *const TAG = "energy_statistics";
 static const char *const GAP = "  ";
 
 void EnergyStatistics::dump_config() {
-  ESP_LOGD(TAG, "Energy Statistics - Sensors");
+  ESP_LOGCONFIG(TAG, "Energy Statistics - Sensors");
   if (this->energy_today_) {
     LOG_SENSOR(GAP, "Energy Today", this->energy_today_);
   }
