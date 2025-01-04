@@ -12,7 +12,7 @@ void EnergyStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Energy Statistics - Sensors");
 
   // Check if the log level is VERBOSE before logging
-  if (ESP_LOGLEVEL >= ESP_LOG_VERBOSE) {
+  if (ESP_LOG_LEVEL >= ESP_LOG_VERBOSE) {
     if (this->energy_today_ && !this->energy_today_->is_internal()) {
       LOG_SENSOR(GAP, "Energy Today", this->energy_today_);
     }
