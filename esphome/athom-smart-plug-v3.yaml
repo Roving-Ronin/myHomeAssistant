@@ -15,11 +15,11 @@ substitutions:
    # Project Name
   project_name: "Athom Technology.Smart Plug v3"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "v1.5.1"
+  project_version: "1.5.3"
    # Restore the relay (GPO switch) upon reboot to state:
   relay_restore_mode: RESTORE_DEFAULT_ON      # RESTORE_DEFAULT_ON
    # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
-  log_level: "DEBUG"
+  log_level: "INFO"
   
    # cse7766 Power Monitoring Chip 
    # Current Limit in Amps. AU Plug = 10. IL, BR, EU, UK, US Plug = 16.
@@ -55,7 +55,7 @@ esphome:
 #
 
 dashboard_import:
-  package_import_url: github://roving-ronin/myhomeassistant/esphome/athom-smart-plug-v3.yaml@main
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/athom-smart-plug-v3.yaml@development
   import_full_config: false
 
 packages:

@@ -64,7 +64,7 @@ external_components:
   - source:
       type: git
       url: https://github.com/roving-ronin/myhomeassistant/
-      ref: main
+      ref: development
     refresh: 0s
     components: [ energy_statistics ]
 
@@ -279,47 +279,57 @@ sensor:
     
      # Energy Statistic Components - Adds Energy Today. Persistents if restarted, unlike 'total_daily_energy'
     energy_today:
+      name: 'Internal - Total Energy Today'
       id: total_energy_today_sensor
       on_value:
         then:
           - lambda: |-
               id(global_energy_today) = x;
+      disabled_by_default: true
       internal: true
 
      # Energy Statistics Components - Adds Energy Yesterday
     energy_yesterday:
+      name: 'Internal - Total Energy Yesterday'
       id: total_energy_yesterday_sensor
       on_value:
         then:
           - lambda: |-
               id(global_energy_yesterday) = x;
+      disabled_by_default: true
       internal: true
 
      # Energy Statistics Components - Adds Energy Week
     energy_week:
+      name: 'Internal - Total Energy Week'
       id: total_energy_week_sensor
       on_value:
         then:
           - lambda: |-
               id(global_energy_week) = x;
+      disabled_by_default: true
       internal: true
 
      # Energy Statistics Components - Adds Energy Month
     energy_month:
+      name: 'Internal - Total Energy Month'
       id: total_energy_month_sensor
       on_value:
         then:
           - lambda: |-
               id(global_energy_month) = x;
+      disabled_by_default: true
       internal: true
 
      # Energy Statistics Components - Adds Energy Year
     energy_year:
+      name: 'Internal - Total Energy Year'
       id: total_energy_year_sensor
       on_value:
         then:
           - lambda: |-
               id(global_energy_year) = x;
+      disabled_by_default: true
       internal: true
 
 
