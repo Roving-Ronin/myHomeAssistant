@@ -9,7 +9,7 @@ static const char *const TAG = "energy_statistics";
 static const char *const GAP = "  ";
 
 void EnergyStatistics::dump_config() {
-  ESP_LOGCONFIG(TAG, "Energy statistics sensors");
+  ESP_LOGCONFIG(TAG, "Energy Statistics - Sensors");
   
   if (this->energy_today_ && !this->energy_today_->is_internal()) {
     LOG_SENSOR(GAP, "Energy Today", this->energy_today_);
@@ -27,7 +27,6 @@ void EnergyStatistics::dump_config() {
     LOG_SENSOR(GAP, "Energy Year", this->energy_year_);
   }
 }
-
 
 void EnergyStatistics::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
@@ -47,7 +46,7 @@ void EnergyStatistics::setup() {
 void EnergyStatistics::loop() {
   const auto t = this->time_->now();
   if (!t.is_valid()) {
-    // time is not synced yet
+    // time is not sync yet
     return;
   }
 
@@ -62,16 +61,24 @@ void EnergyStatistics::loop() {
     return;
   }
 
-  // Save the current day's data
+    // Save the current day's data
   this->energy_.start_yesterday = this->energy_.start_today;
   this->energy_.start_today = total;
 
-//  if (this->energy_.current_day_of_year != 0) {
-    // Start the calculations for the week, month, and year immediately
-  this->energy_.start_week = total;  // Start counting the week from current total
-  this->energy_.start_month = total; // Start counting the month from current total
-  this->energy_.start_year = total;  // Start counting the year from current total
-//  }
+  if (this->energy_.current_day_of_year != 0) {
+    // at specified day of week we start a new week calculation
+    if (t.day_of_week == this->energy_week_start_day_) {
+      this->energy_.start_week = total;
+    }
+    // at first day of month we start a new month calculation
+    if (t.day_of_month == 1) {
+      this->energy_.start_month = total;
+    }
+    // at first day of year we start a new year calculation
+    if (t.day_of_year == 1) {
+      this->energy_.start_year = total;
+    }
+  }
 
   this->energy_.current_day_of_year = t.day_of_year;
 
@@ -79,30 +86,54 @@ void EnergyStatistics::loop() {
 }
 
 
+
 void EnergyStatistics::process_(float total) {
+  // Publish today's energy
   if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
     this->energy_today_->publish_state(total - this->energy_.start_today);
   }
 
+  // Publish yesterday's energy
   if (this->energy_yesterday_ && !std::isnan(this->energy_.start_yesterday)) {
     this->energy_yesterday_->publish_state(this->energy_.start_today - this->energy_.start_yesterday);
   }
 
+  // Publish weekly energy (partial or full)
   if (this->energy_week_ && !std::isnan(this->energy_.start_week)) {
-    this->energy_week_->publish_state(total - this->energy_.start_week);
+    if (this->energy_.full_week_started) {
+      // Publish full calendar week value
+      this->energy_week_->publish_state(total - this->energy_.start_week);
+    } else {
+      // Publish partial week value
+      this->energy_week_->publish_state(total - this->energy_.start_week);
+    }
   }
 
+  // Publish monthly energy (partial or full)
   if (this->energy_month_ && !std::isnan(this->energy_.start_month)) {
-    this->energy_month_->publish_state(total - this->energy_.start_month);
+    if (this->energy_.full_month_started) {
+      // Publish full calendar month value
+      this->energy_month_->publish_state(total - this->energy_.start_month);
+    } else {
+      // Publish partial month value
+      this->energy_month_->publish_state(total - this->energy_.start_month);
+    }
   }
 
+  // Publish yearly energy (partial or full)
   if (this->energy_year_ && !std::isnan(this->energy_.start_year)) {
-    this->energy_year_->publish_state(total - this->energy_.start_year);
+    if (this->energy_.full_year_started) {
+      // Publish full calendar year value
+      this->energy_year_->publish_state(total - this->energy_.start_year);
+    } else {
+      // Publish partial year value
+      this->energy_year_->publish_state(total - this->energy_.start_year);
+    }
   }
 
+  // Save the current state
   this->save_();
 }
-
 
 
 void EnergyStatistics::save_() { this->pref_.save(&(this->energy_)); }  // Save to flash memory
