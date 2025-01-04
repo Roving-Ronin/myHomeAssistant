@@ -56,7 +56,10 @@ protected:
     float start_week{NAN};
     float start_month{NAN};
     float start_year{NAN};
-  } gas_;
+    bool full_week_started{false};    // Added
+    bool full_month_started{false};  // Added
+    bool full_year_started{false};   // Added  
+} gas_;
 
   void process_(float total);
   void save_();
