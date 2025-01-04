@@ -11,24 +11,12 @@ static const char *const GAP = "  ";
 void EnergyStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Energy Statistics - Sensors");
 
-  // Check if the log level is VERBOSE before logging
-  if (ESP_LOG_LEVEL >= ESP_LOG_VERBOSE) {
-    if (this->energy_today_ && !this->energy_today_->is_internal()) {
-      LOG_SENSOR(GAP, "Energy Today", this->energy_today_);
-    }
-    if (this->energy_yesterday_ && !this->energy_yesterday_->is_internal()) {
-      LOG_SENSOR(GAP, "Energy Yesterday", this->energy_yesterday_);
-    }
-    if (this->energy_week_ && !this->energy_week_->is_internal()) {
-      LOG_SENSOR(GAP, "Energy Week", this->energy_week_);
-    }
-    if (this->energy_month_ && !this->energy_month_->is_internal()) {
-      LOG_SENSOR(GAP, "Energy Month", this->energy_month_);
-    }
-    if (this->energy_year_ && !this->energy_year_->is_internal()) {
-      LOG_SENSOR(GAP, "Energy Year", this->energy_year_);
-    }
-  }
+  // Use ESP_LOGV (verbose logging) instead of checking the log level
+  ESP_LOGV(TAG, "Energy Today: %s", (this->energy_today_ && !this->energy_today_->is_internal()) ? this->energy_today_->state : "Not configured");
+  ESP_LOGV(TAG, "Energy Yesterday: %s", (this->energy_yesterday_ && !this->energy_yesterday_->is_internal()) ? this->energy_yesterday_->state : "Not configured");
+  ESP_LOGV(TAG, "Energy Week: %s", (this->energy_week_ && !this->energy_week_->is_internal()) ? this->energy_week_->state : "Not configured");
+  ESP_LOGV(TAG, "Energy Month: %s", (this->energy_month_ && !this->energy_month_->is_internal()) ? this->energy_month_->state : "Not configured");
+  ESP_LOGV(TAG, "Energy Year: %s", (this->energy_year_ && !this->energy_year_->is_internal()) ? this->energy_year_->state : "Not configured");
 }
 
 
