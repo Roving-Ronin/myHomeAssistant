@@ -10,19 +10,19 @@ static const char *const GAP = "  ";
 
 void GasStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Gas Statistics (m³) - Sensors");
-  if (this->gas_today_) {
+    if (this->gas_today_ && !this->gas_today_->is_internal()) {
     LOG_SENSOR(GAP, "Gas (m³) Today", this->gas_today_);
   }
-  if (this->gas_yesterday_) {
+  if (this->gas_yesterday_ && !this->gas_yesterday_->is_internal()) {
     LOG_SENSOR(GAP, "Gas (m³) Yesterday", this->gas_yesterday_);
   }
-  if (this->gas_week_) {
+  if (this->gas_week_ && !this->gas_week_->is_internal()) {
     LOG_SENSOR(GAP, "Gas (m³) Week", this->gas_week_);
   }
-  if (this->gas_month_) {
+  if (this->gas_month_ && !this->gas_month_->is_internal()) {
     LOG_SENSOR(GAP, "Gas (m³) Month", this->gas_month_);
   }
-  if (this->gas_year_) {
+  if (this->gas_year_ && !this->gas_year_->is_internal()) {
     LOG_SENSOR(GAP, "Gas (m³) Year", this->gas_year_);
   }
 }

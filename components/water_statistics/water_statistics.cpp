@@ -10,19 +10,20 @@ static const char *const GAP = "  ";
 
 void WaterStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Water Statistics (L) - Sensors");
-  if (this->water_today_) {
+  
+  if (this->water_today_ && !this->water_today_->is_internal()) {
     LOG_SENSOR(GAP, "Water (L) Today", this->water_today_);
   }
-  if (this->water_yesterday_) {
+  if (this->water_yesterday_ && !this->water_yesterday_->is_internal()) {
     LOG_SENSOR(GAP, "Water (L) Yesterday", this->water_yesterday_);
   }
-  if (this->water_week_) {
+  if (this->water_week_ && !this->water_week_->is_internal()) {
     LOG_SENSOR(GAP, "Water (L) Week", this->water_week_);
   }
-  if (this->water_month_) {
+  if (this->water_month_ && !this->water_month_->is_internal()) {
     LOG_SENSOR(GAP, "Water (L) Month", this->water_month_);
   }
-  if (this->water_year_) {
+  if (this->water_year_ && !this->water_year_->is_internal()) {
     LOG_SENSOR(GAP, "Water (L) Year", this->water_year_);
   }
 }
@@ -156,6 +157,7 @@ void WaterStatistics::process_(float total) {
   // Save the current state
   this->save_();
 }
+
 
 void WaterStatistics::save_() { this->pref_.save(&this->water_); } // Save to flash memory
 
