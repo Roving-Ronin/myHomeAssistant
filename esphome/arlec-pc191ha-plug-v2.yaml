@@ -15,7 +15,7 @@ substitutions:
    # Project Name
   project_name: "Arlec.Smart Plug (PC191HA v2)"
    # Project Version
-  project_version: "1.5.3"
+  project_version: "1.6.0"
    # Restore the relay (GPO switch) upon reboot to state:
   relay_restore_mode: RESTORE_DEFAULT_ON   # RESTORE_DEFAULT_ON
    # Set the update interval for sensors
@@ -153,29 +153,6 @@ globals:
     restore_value: yes
     initial_value: "1"    # Default to "Always On"
 
-############ Store Energy Component Readings #############
-    
-  - id: global_energy_today
-    type: float
-    restore_value: yes
-
-  - id: global_energy_yesterday
-    type: float
-    restore_value: yes
-
-  - id: global_energy_week
-    type: float
-    restore_value: yes
-
-  - id: global_energy_month
-    type: float
-    restore_value: yes
-
-  - id: global_energy_year
-    type: float
-    restore_value: yes
-
-    
 #####################################################################
 #
 # Select - To allow setting power on state from the GUI
@@ -334,133 +311,55 @@ sensor:
     id: energy_statistics_component
     total: energy_total_sensor
     
-     # Energy Statistic Components - Adds Energy Today. Persistents if restarted, unlike 'total_daily_energy'
+     # Dentra Components - Adds Energy Today. Persistents if restarted, unlike 'total_daily_energy'
     energy_today:
+      name: "Energy Today"
       id: total_energy_today_sensor
-      on_value:
-        then:
-          - lambda: |-
-              id(global_energy_today) = x;
-      internal: true
+      accuracy_decimals: 3
+      icon: "mdi:hours-24"
+      web_server:
+        sorting_group_id: group_energy
+        sorting_weight: 1
 
-     # Energy Statistics Components - Adds Energy Yesterday
+     # Dentra Components - Adds Energy Yesterday
     energy_yesterday:
+      name: "Energy Yesterday"
       id: total_energy_yesterday_sensor
-      on_value:
-        then:
-          - lambda: |-
-              id(global_energy_yesterday) = x;
-      internal: true
+      accuracy_decimals: 3
+      icon: "mdi:calendar-today"
+      web_server:
+        sorting_group_id: group_energy
+        sorting_weight: 2
 
-     # Energy Statistics Components - Adds Energy Week
+     # Dentra Components - Adds Energy Week
     energy_week:
+      name: "Energy Week"
       id: total_energy_week_sensor
-      on_value:
-        then:
-          - lambda: |-
-              id(global_energy_week) = x;
-      internal: true
+      accuracy_decimals: 3
+      icon: "mdi:calendar-week"
+      web_server:
+        sorting_group_id: group_energy
+        sorting_weight: 3
 
-     # Energy Statistics Components - Adds Energy Month
+     # Dentra Components - Adds Energy Month
     energy_month:
+      name: "Energy Month"
       id: total_energy_month_sensor
-      on_value:
-        then:
-          - lambda: |-
-              id(global_energy_month) = x;
-      internal: true
+      accuracy_decimals: 3
+      icon: "mdi:calendar-month"
+      web_server:
+        sorting_group_id: group_energy
+        sorting_weight: 4
 
-     # Energy Statistics Components - Adds Energy Year
     energy_year:
+      name: "Energy Year"
       id: total_energy_year_sensor
-      on_value:
-        then:
-          - lambda: |-
-              id(global_energy_year) = x;
-      internal: true
+      accuracy_decimals: 3
+      icon: "mdi:calendar-text"
+      web_server:
+        sorting_group_id: group_energy
+        sorting_weight: 5
 
-
-  ################################################################################
-  #
-  #  Publishes the above sensors, by calling the readings stored in the Globals
-  #
-
-  # Energy Statistic Sensors
-
-  - platform: template
-    name: "Energy - Today"
-    id: energy_today
-    unit_of_measurement: kWh
-    device_class: "energy"
-    state_class: total_increasing
-    accuracy_decimals: 3
-    icon: "mdi:hours-24"
-    lambda: |-
-      return id(global_energy_today);
-    update_interval: 10s
-    web_server:
-      sorting_group_id: group_energy
-      sorting_weight: 1
-        
-  - platform: template
-    name: "Energy - Yesterday"
-    id: energy_yesterday
-    unit_of_measurement: kWh
-    device_class: "energy"
-    state_class: total_increasing
-    accuracy_decimals: 3
-    icon: "mdi:calendar-today"
-    lambda: |-
-      return id(global_energy_yesterday);
-    update_interval: 10s
-    web_server:
-      sorting_group_id: group_energy
-      sorting_weight: 2
-
-  - platform: template
-    name: "Energy - Week"
-    id: energy_week
-    unit_of_measurement: kWh
-    device_class: "energy"
-    state_class: total_increasing
-    accuracy_decimals: 3
-    icon: "mdi:calendar-week"
-    lambda: |-
-      return id(global_energy_week);
-    update_interval: 10s
-    web_server:
-      sorting_group_id: group_energy
-      sorting_weight: 3
-
-  - platform: template
-    name: "Energy - Month"
-    id: energy_month
-    unit_of_measurement: kWh
-    device_class: "energy"
-    state_class: total_increasing
-    accuracy_decimals: 3
-    icon: "mdi:calendar-month"
-    lambda: |-
-      return id(global_energy_month);
-    update_interval: 10s
-    web_server:
-      sorting_group_id: group_energy
-      sorting_weight: 4
-
-  - platform: template
-    name: "Energy - Year"
-    id: energy_year
-    unit_of_measurement: kWh
-    device_class: "energy"
-    state_class: total_increasing
-    accuracy_decimals: 3
-    icon: "mdi:calendar-text"
-    lambda: |-
-      return id(global_energy_year);
-    update_interval: 10s
-    web_server:
-      sorting_group_id: group_energy
-      sorting_weight: 5
 
 #########################################################################
 
