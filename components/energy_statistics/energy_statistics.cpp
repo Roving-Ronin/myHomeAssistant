@@ -34,79 +34,96 @@ void EnergyStatistics::setup() {
 
   this->pref_ = global_preferences->make_preference<energy_data_t>(fnv1_hash(PREF_V2));
   bool loaded = this->pref_.load(&this->energy_);
+  // Check for prior data or perform migration from older formats
   if (!loaded) {
-    // migrating from v1 data
+    // Attempt to load data from older version (v1)
     loaded = global_preferences->make_preference<energy_data_v1_t>(fnv1_hash(PREF_V1)).load(&this->energy_);
     if (loaded) {
+      // Migrate v1 data to v2 format
       this->energy_.start_year = this->energy_.start_month;
-      // save as v2
       this->pref_.save(&this->energy_);
       global_preferences->sync();
     }
   }
-  if (loaded) {
+
+  // Fallback initialization if no prior data exists
+  if (!loaded) {
     auto total = this->total_->get_state();
     if (!std::isnan(total)) {
-      this->process_(total);
+      this->energy_.start_today = total;
+      this->energy_.start_week = total;
+      this->energy_.start_month = total;
+      this->energy_.start_year = total;
+    } else {
+      // Initialize values to NAN if the total sensor hasn't published yet
+      this->energy_.start_today = NAN;
+      this->energy_.start_week = NAN;
+      this->energy_.start_month = NAN;
+      this->energy_.start_year = NAN;
     }
+  }  
+  
+  // Process the current total to initialize sensors if data is available
+  auto total = this->total_->get_state();
+  if (!std::isnan(total)) {
+    this->process_(total);
   }
 }
+
 
 void EnergyStatistics::loop() {
   const auto t = this->time_->now();
   if (!t.is_valid()) {
-    // time is not sync yet
+    // Time is not synced yet
     return;
   }
 
   const auto total = this->total_->get_state();
   if (std::isnan(total)) {
-    // total is not published yet
+    // Total energy value is not published yet
     return;
   }
 
-  // update stats first time or on next day
-  if (t.day_of_year == this->energy_.current_day_of_year) {
-    // nothing to do
-    return;
-  }
+  // Check if a new day has started
+  if (t.day_of_year != this->energy_.current_day_of_year) {
+    // Shift yesterday's start value and update today
+    this->energy_.start_yesterday = this->energy_.start_today;
+    this->energy_.start_today = total;
 
-  this->energy_.start_yesterday = this->energy_.start_today;
-
-  this->energy_.start_today = total;
-
-  if (this->energy_.current_day_of_year != 0) {
-    // at specified day of week we start a new week calculation
-    if (t.day_of_week == this->energy_week_start_day_) {
-      this->energy_.start_week = total;
+    // Handle weekly, monthly, and yearly resets
+    if (this->energy_.current_day_of_year != 0) {
+      if (t.day_of_week == this->energy_week_start_day_) {
+        this->energy_.start_week = total;
+      }
+      if (t.day_of_month == 1) {
+        this->energy_.start_month = total;
+      }
+      if (t.day_of_year == 1) {
+        this->energy_.start_year = total;
+      }
     }
-    // at first day of month we start a new month calculation
-    if (t.day_of_month == 1) {
-      this->energy_.start_month = total;
+
+    // Ensure initialization of all sensors
+    if (this->energy_week_ && std::isnan(this->energy_.start_week)) {
+      this->energy_.start_week = this->energy_.start_yesterday;
     }
-    // at first day of year we start a new year calculation
-    if (t.day_of_year == 1) {
-      this->energy_.start_year = total;
-    }    
+    if (this->energy_month_ && std::isnan(this->energy_.start_month)) {
+      this->energy_.start_month = this->energy_.start_yesterday;
+    }
+    if (this->energy_year_ && std::isnan(this->energy_.start_year)) {
+      this->energy_.start_year = this->energy_.start_yesterday;
+    }
+
+    this->energy_.current_day_of_year = t.day_of_year;
   }
 
-  // Intitialize all sensors start values if not already set. https://github.com/dentra/esphome-components/issues/65
-  if (std::isnan(this->energy_.start_week)) {
-    this->energy_.start_week = total;
-  }
-  if (std::isnan(this->energy_.start_month)) {
-    this->energy_.start_month = total;
-  }
-  if (std::isnan(this->energy_.start_year)) {
-    this->energy_.start_year = total;
-  }
-  
-  this->energy_.current_day_of_year = t.day_of_year;
-
+  // Process the latest total energy value
   this->process_(total);
 }
 
+
 void EnergyStatistics::process_(float total) {
+  // Calculate and publish daily, weekly, monthly, and yearly energy values
   if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
     this->energy_today_->publish_state(total - this->energy_.start_today);
   }
