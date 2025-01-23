@@ -32,30 +32,6 @@ globals:
     restore_value: yes
 #    initial_value: '0.0'  # When Factory Reset, return this value to '0.0'
 
-  - id: global_town_water_today
-    type: float
-    restore_value: true
-#    initial_value: '0.0'
-
-  - id: global_town_water_yesterday
-    type: float
-    restore_value: true
-#    initial_value: '0.0'
-
-  - id: global_town_water_week
-    type: float
-    restore_value: true
-#    initial_value: '0.0'
-
-  - id: global_town_water_month
-    type: float
-    restore_value: true
-#    initial_value: '0.0'
-
-  - id: global_town_water_year
-    type: float
-    restore_value: true
-#    initial_value: '0.0'
 
 ################################################################################
 #
@@ -143,125 +119,40 @@ sensor:
     total: town_water_total
 
     water_today:
-      id: town_water_today_sensor
-      on_value:
-        then:
-          - lambda: |-
-              id(global_town_water_today) = x;
-      internal: true
+      name: "Town Water - Today"
+      id: town_water_today
+      web_server:
+        sorting_group_id: group_town_water_sensors
+        sorting_weight: 1
     
     water_yesterday:
-      id: town_water_yesterday_sensor
-      on_value:
-        then:
-          - lambda: |-
-              id(global_town_water_yesterday) = x;
-      internal: true
+      name: "Town Water - Yesterday"
+      id: town_water_yesterday
+      web_server:
+        sorting_group_id: group_town_water_sensors
+        sorting_weight: 2
 
     water_week:
-      id: town_water_week_sensor
-      on_value:
-        then:
-          - lambda: |-
-              id(global_town_water_week) = x;
-      internal: true
+      name: "Town Water - Week"
+      id: town_water_week
+      web_server:
+        sorting_group_id: group_town_water_sensors
+        sorting_weight: 3
     
     water_month:
-      id: town_water_month_sensor
-      on_value:
-        then:
-          - lambda: |-
-              id(global_town_water_month) = x;
-      internal: true
+      name: "Town Water - Month"
+      id: town_water_month
+      web_server:
+        sorting_group_id: group_town_water_sensors
+        sorting_weight: 4
 
     water_year:
-      id: town_water_year_sensor
-      on_value:
-        then:
-          - lambda: |-
-              id(global_town_water_year) = x;
-      internal: true
+      name: "Town Water - Year"
+      id: town_water_year
+      web_server:
+        sorting_group_id: group_town_water_sensors
+        sorting_weight: 5
 
-
-  ################################################################################
-  #
-  #  Publishes the above sensors, by calling the readings stored in the Globals
-  #
-# Town Water
-  - platform: template
-    name: "Town Water - Today"
-    id: town_water_today
-    unit_of_measurement: L
-    icon: "mdi:hours-24"
-    accuracy_decimals: 0
-    device_class: water
-    state_class: total_increasing
-    lambda: |-
-      return id(global_town_water_today);
-    update_interval: ${water_sensor_update_interval}
-    web_server:
-      sorting_group_id: group_town_water_sensors
-      sorting_weight: 1
-        
-  - platform: template
-    name: "Town Water - Yesterday"
-    id: town_water_yesterday
-    unit_of_measurement: L
-    icon: "mdi:calendar-today-outline"
-    accuracy_decimals: 0
-    device_class: water
-    state_class: total_increasing
-    lambda: |-
-      return id(global_town_water_yesterday);
-    update_interval: ${water_sensor_update_interval}
-    web_server:
-      sorting_group_id: group_town_water_sensors
-      sorting_weight: 2
-
-  - platform: template
-    name: "Town Water - Week"
-    id: town_water_week
-    unit_of_measurement: L
-    icon: "mdi:calendar-week"
-    accuracy_decimals: 0
-    device_class: water
-    state_class: total_increasing
-    lambda: |-
-      return id(global_town_water_week);
-    update_interval: ${water_sensor_update_interval}
-    web_server:
-      sorting_group_id: group_town_water_sensors
-      sorting_weight: 3
-
-  - platform: template
-    name: "Town Water - Month"
-    id: town_water_month
-    unit_of_measurement: L
-    icon: "mdi:calendar"
-    accuracy_decimals: 0
-    device_class: water
-    state_class: total_increasing
-    lambda: |-
-      return id(global_town_water_month);
-    update_interval: ${water_sensor_update_interval}
-    web_server:
-      sorting_group_id: group_town_water_sensors
-      sorting_weight: 4
-
-  - platform: template
-    name: "Town Water - Year"
-    id: town_water_year
-    unit_of_measurement: L
-    icon: "mdi:calendar-text"
-    accuracy_decimals: 0
-    device_class: water
-    state_class: total_increasing
-    lambda: |-
-      return id(global_town_water_year);
-    update_interval: ${water_sensor_update_interval}
-    web_server:
-      sorting_group_id: group_town_water_sensors
-      sorting_weight: 5
 
   ################################################################################
   #
