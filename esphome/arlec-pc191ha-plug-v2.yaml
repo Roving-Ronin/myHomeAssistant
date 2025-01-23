@@ -4,6 +4,12 @@
 # Reflash from Tuya to ESPHome with CloudCutter prior to using this code
 #
 
+##########################################################################
+# VERSION UPATES:
+#
+# v1.7.0 - Upate to Dentra v2 energy_statistics with publish yesterday = 0
+#
+
    # Provides substitutions or variables that are then called elsewhere multiple times in the config
 substitutions:
    # Default name 
@@ -15,7 +21,7 @@ substitutions:
    # Project Name
   project_name: "Arlec.Smart Plug (PC191HA v2)"
    # Project Version
-  project_version: "1.6.1"
+  project_version: "1.7.0"
    # Restore the relay (GPO switch) upon reboot to state:
   relay_restore_mode: RESTORE_DEFAULT_ON   # RESTORE_DEFAULT_ON
    # Set the update interval for sensors
