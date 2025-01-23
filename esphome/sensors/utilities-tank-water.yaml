@@ -1,0 +1,175 @@
+ #########################################################################
+#
+# Utility - Tank Water Sensors
+# 
+# Used to monitor water consumption from a meter attached to the
+# tank used to store (typically) rainwater.
+#
+
+substitutions:
+
+
+########################## End of Substitutions #########################
+#
+# Web_server v3 Sort Groups - These substitutes are applied to overwrite the default ones supplied by the 
+# sensor specific template file, in this case the /sensors/hc-sr04-ultrasonic.yaml file.
+#
+
+web_server:
+  sorting_groups:
+    - id: group_tank_water_sensors
+      name: "Tank Water Sensors"
+      sorting_weight: -39
+
+#######################################################################################
+
+globals:
+
+  #  Globals for use with pulse meter, to allow storing and setting a base reading for water meter
+  - id: global_tank_water_total
+    type: float
+    restore_value: yes
+#    initial_value: '0.0'  # When Factory Reset, return this value to '0.0'
+
+
+################################################################################
+#
+#  Sensors
+#
+
+sensor:
+  ################################################################################
+  #
+  # GPIO 17
+  # Utility - Water Meter
+  #
+
+  - platform: pulse_counter
+    name: "Tank Water - Pulse Counter"
+    id: tank_water_pulse_counter
+    pin:
+      number: ${gpio_water_pin}
+      allow_other_uses: true
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    filters:
+      - multiply: 5.0  # Convert pulse count to liters
+    web_server:
+      sorting_group_id: group_utility_meter_sensors
+      sorting_weight: 2
+
+
+  - platform: pulse_meter
+    name: "Tank Water - Flow Rate"
+    id: tank_water_flow_rate
+    unit_of_measurement: "L/min"
+    state_class: measurement
+    device_class: water
+    icon: "mdi:pump"
+    accuracy_decimals: 2
+    pin:
+      number: ${gpio_water_pin}
+      allow_other_uses: true
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    internal_filter_mode: PULSE
+    internal_filter: 100ms
+    timeout: 3min
+    filters:
+      - multiply: 5.0  # Each pulse equals 5 liters. The water counter 'helper' in Home Assistant must still be set to 'step size' = 5.
+    web_server:
+      sorting_group_id: group_utility_meter_sensors
+      sorting_weight: 1
+
+    #  Uses the above pulse_meter and adds sensor and calculations for tracking current litres
+    total:
+      name: 'Tank Water - Consumed Calculation'
+      id: tank_water_consumed_calculation
+      unit_of_measurement: "L"
+      icon: "mdi:water"
+      state_class: "total_increasing"
+      device_class: water
+      accuracy_decimals: 2
+      filters:
+        - multiply: 5.0  # Each pulse equals 5 liters
+    #  Adds the calculation for 'Reading Total' 
+      on_value: 
+        then:
+          - lambda: |-
+              static float previous_tank_water_used_litres_value = 0.0;
+              float current_tank_water_used_litres_value = id(tank_water_consumed_calculation).state;
+              id(global_tank_water_total) += current_tank_water_used_litres_value - previous_tank_water_used_litres_value;
+              previous_tank_water_used_litres_value = current_tank_water_used_litres_value;
+              id(tank_water_total).update();
+      internal: true
+
+  ################################################################################
+  #
+  # Custom Component - Water (Consumption) Statistics in Litres
+  # These sensors are hidden as the publish their data into the globals, that stores them
+  #
+
+  - platform: "water_statistics"
+    id: tank_water_statistics_component
+    total: tank_water_total
+
+    water_today:
+      name: "Tank Water - Today"
+      id: tank_water_today
+      web_server:
+        sorting_group_id: group_tank_water_sensors
+        sorting_weight: 1
+    
+    water_yesterday:
+      name: "Tank Water - Yesterday"
+      id: tank_water_yesterday
+      web_server:
+        sorting_group_id: group_tank_water_sensors
+        sorting_weight: 2
+
+    water_week:
+      name: "Tank Water - Week"
+      id: tank_water_week
+      web_server:
+        sorting_group_id: group_tank_water_sensors
+        sorting_weight: 3
+    
+    water_month:
+      name: "Tank Water - Month"
+      id: tank_water_month
+      web_server:
+        sorting_group_id: group_tank_water_sensors
+        sorting_weight: 4
+
+    water_year:
+      name: "Tank Water - Year"
+      id: tank_water_year
+      web_server:
+        sorting_group_id: group_tank_water_sensors
+        sorting_weight: 5
+
+
+  ################################################################################
+  #
+  #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
+  #
+  - platform: template
+    name: "Tank Water - Total"
+    id: tank_water_total
+    unit_of_measurement: "L"
+    device_class: water
+    state_class: "total_increasing"
+    icon: "mdi:counter"
+    accuracy_decimals: 0                              # As water meter only registers every 10L / whole litres
+    update_interval: ${water_sensor_update_interval}  # Set interval that updates are sent to HA instance
+    lambda: |-
+          return id(global_tank_water_total);
+    web_server:
+      sorting_group_id: group_tank_water_sensors
+      sorting_weight: 6
+
+  ################################################################################
