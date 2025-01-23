@@ -27,7 +27,7 @@ class GasStatisticsMJ : public Component {
   void set_gas_month(Sensor *sensor) { this->gas_month_ = sensor; }
   void set_gas_year(Sensor *sensor) { this->gas_year_ = sensor; }
 
-protected:
+ protected:
   ESPPreferenceObject pref_;
   time::RealTimeClock *time_;
 
@@ -48,21 +48,19 @@ protected:
   // start day of year configuration
   int gas_year_start_day_{1};
 
-  // Structure for storing gas statistics in MJ
-  struct gas_data_mj_t {
+  struct gas_mj_data_v1_t {
     uint16_t current_day_of_year{0};
     float start_today{NAN};
     float start_yesterday{NAN};
     float start_week{NAN};
     float start_month{NAN};
+  };
+
+  struct gas_mj_data_t : public gas_mj_data_v1_t {
     float start_year{NAN};
-    bool full_week_started{false};    // Added
-    bool full_month_started{false};  // Added
-    bool full_year_started{false};   // Added  
-} gas_;
+  } gas_;
 
   void process_(float total);
-  void save_();
 };  // class GasStatisticsMJ
 
 }  // namespace gas_statistics_mj
