@@ -1,8 +1,8 @@
  #########################################################################
 #
-# Utility - Gas Sensors
+# Utility - Town Water Sensors
 # 
-# Used to monitor mains feed gas, with a reed sensor connected to the gas
+# Used to monitor town water supply, with a reed sensor connected to the
 # meter, that has a rotating dial with a magnet inside that can be monitored.
 #
 
