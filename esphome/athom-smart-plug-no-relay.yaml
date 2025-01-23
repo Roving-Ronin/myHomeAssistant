@@ -4,6 +4,13 @@
 # providing power and energy monitoring sensors.
 #
 
+
+##########################################################################
+# VERSION UPATES:
+#
+# v1.7.0 - Upate to Dentra v2 energy_statistics with publish yesterday = 0
+#
+
    # Provides substitutions or variables that are then called elsewhere multiple times in the config
 substitutions:
    # Default name
@@ -15,7 +22,7 @@ substitutions:
    # Project Name
   project_name: "Athom Technology.Smart Plug (No Relay)"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
-  project_version: "1.6.1"
+  project_version: "1.7.0"
    # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
   log_level: "DEBUG"
 
