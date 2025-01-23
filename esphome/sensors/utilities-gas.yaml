@@ -63,59 +63,6 @@ globals:
     restore_value: yes
 #    initial_value: '0.0'
 
-###################################
-
-  - id: global_gas_m3_today
-    type: float
-    restore_value: true
-#    initial_value: '0.0'
-
-  - id: global_gas_m3_yesterday
-    type: float
-    restore_value: true
-#    initial_value: '0.0'
-
-  - id: global_gas_m3_week
-    type: float
-    restore_value: true
-#    initial_value: '0.0'
-
-  - id: global_gas_m3_month
-    type: float
-    restore_value: true
-#    initial_value: '0.0'
-
-  - id: global_gas_m3_year
-    type: float
-    restore_value: true
-#    initial_value: '0.0'
-
-###################################
-
-  - id: global_gas_mj_today
-    type: float
-    restore_value: true
-#    initial_value: '0.0'
-
-  - id: global_gas_mj_yesterday
-    type: float
-    restore_value: true
-#    initial_value: '0.0'
-
-  - id: global_gas_mj_week
-    type: float
-    restore_value: true
-#    initial_value: '0.0'
-
-  - id: global_gas_mj_month
-    type: float
-    restore_value: true
-#    initial_value: '0.0'
-
-  - id: global_gas_mj_year
-    type: float
-    restore_value: true
-#    initial_value: '0.0'
 
 #######################################################################################
 #
