@@ -90,17 +90,17 @@ void EnergyStatistics::loop() {
     }    
   }
 
-  // Intitialize all sensors. https://github.com/dentra/esphome-components/issues/65
-  if (this->energy_week_ && std::isnan(this->energy_.start_week)) {
-    this->energy_.start_week = this->energy_.start_yesterday;
+  // Intitialize all sensors start values if not already set. https://github.com/dentra/esphome-components/issues/65
+  if (std::isnan(this->energy_.start_week)) {
+    this->energy_.start_week = total;
   }
-  if (this->energy_month_ && std::isnan(this->energy_.start_month)) {
-    this->energy_.start_month = this->energy_.start_yesterday;
+  if (std::isnan(this->energy_.start_month)) {
+    this->energy_.start_month = total;
   }
-  if (this->energy_year_ && std::isnan(this->energy_.start_year)) {
-    this->energy_.start_year = this->energy_.start_yesterday;
+  if (std::isnan(this->energy_.start_year)) {
+    this->energy_.start_year = total;
   }
-
+  
   this->energy_.current_day_of_year = t.day_of_year;
 
   this->process_(total);
