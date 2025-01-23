@@ -117,19 +117,28 @@ void EnergyStatistics::process_(float total) {
     // If there's no value for yesterday (NaN), publish 0
     this->energy_yesterday_->publish_state(0);
   }
-  
+
   if (this->energy_week_ && !std::isnan(this->energy_.start_week)) {
     this->energy_week_->publish_state(total - this->energy_.start_week);
+  } else if (this->energy_week_) {
+    // If there's no value for week (NaN), publish 0
+    this->energy_week_->publish_state(0);
   }
 
   if (this->energy_month_ && !std::isnan(this->energy_.start_month)) {
     this->energy_month_->publish_state(total - this->energy_.start_month);
+  } else if (this->energy_month_) {
+    // If there's no value for month (NaN), publish 0
+    this->energy_month_->publish_state(0);
   }
 
   if (this->energy_year_ && !std::isnan(this->energy_.start_year)) {
     this->energy_year_->publish_state(total - this->energy_.start_year);
+  } else if (this->energy_year_) {
+    // If there's no value for year (NaN), publish 0
+    this->energy_year_->publish_state(0);
   }
-  
+
   this->pref_.save(&this->energy_);
 }
 
