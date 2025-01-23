@@ -64,30 +64,6 @@ globals:
     restore_value: yes
 #    initial_value: '0.0'   # When Factory Reset, return this value to '0.0'
 
-  - id: global_town_water_today
-    type: float
-    restore_value: true
-    initial_value: 0.0
-
-  - id: global_town_water_yesterday
-    type: float
-    restore_value: true
-    initial_value: 0.0
-
-  - id: global_town_water_week
-    type: float
-    restore_value: true
-    initial_value: 0.0
-
-  - id: global_town_water_momth
-    type: float
-    restore_value: true
-    initial_value: 0.0
-
-  - id: global_town_water_year
-    type: float
-    restore_value: true
-    
 
 ################################################################################
 #
