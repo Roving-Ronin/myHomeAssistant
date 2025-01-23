@@ -8,7 +8,9 @@
 
 substitutions:
 
+  water_sensor_update_interval: 15s
 
+  
 ########################## End of Substitutions #########################
 #
 # Web_server v3 Sort Groups - These substitutes are applied to overwrite the default ones supplied by the 
