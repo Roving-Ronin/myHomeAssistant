@@ -17,7 +17,7 @@ substitutions:
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
   project_version: "1.6.1"
    # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
-  log_level: "INFO"
+  log_level: "DEBUG"
 
    # DO NOT CHANGE THESE SETTINGS. They are specific to the Plug Hardware Version, as defined by Athom.
   power_button_pin:   "5"
