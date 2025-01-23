@@ -106,64 +106,27 @@ void EnergyStatistics::loop() {
   this->process_(total);
 }
 
-
 void EnergyStatistics::process_(float total) {
-  // Today energy calculation
-  if (this->energy_today_) {
-    if (std::isnan(this->energy_.start_today)) {
-      // Initialize start_today for the first time
-      this->energy_.start_today = total;
-      this->energy_today_->publish_state(0);  // Publish initial value as 0
-    } else {
-      this->energy_today_->publish_state(total - this->energy_.start_today);
-    }
+  if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
+    this->energy_today_->publish_state(total - this->energy_.start_today);
   }
 
-  // Yesterday energy calculation
-  if (this->energy_yesterday_) {
-    if (std::isnan(this->energy_.start_yesterday)) {
-      // Initialize start_yesterday for the first time
-      this->energy_.start_yesterday = total;
-      this->energy_yesterday_->publish_state(0);  // Publish initial value as 0
-    } else {
-      this->energy_yesterday_->publish_state(this->energy_.start_today - this->energy_.start_yesterday);
-    }
+  if (this->energy_yesterday_ && !std::isnan(this->energy_.start_yesterday)) {
+    this->energy_yesterday_->publish_state(this->energy_.start_today - this->energy_.start_yesterday);
   }
 
-  // Weekly energy calculation
-  if (this->energy_week_) {
-    if (std::isnan(this->energy_.start_week)) {
-      // Initialize start_week for the first time
-      this->energy_.start_week = total;
-      this->energy_week_->publish_state(0);  // Publish initial value as 0
-    } else {
-      this->energy_week_->publish_state(total - this->energy_.start_week);
-    }
+  if (this->energy_week_ && !std::isnan(this->energy_.start_week)) {
+    this->energy_week_->publish_state(total - this->energy_.start_week);
   }
 
-  // Monthly energy calculation
-  if (this->energy_month_) {
-    if (std::isnan(this->energy_.start_month)) {
-      // Initialize start_month for the first time
-      this->energy_.start_month = total;
-      this->energy_month_->publish_state(0);  // Publish initial value as 0
-    } else {
-      this->energy_month_->publish_state(total - this->energy_.start_month);
-    }
+  if (this->energy_month_ && !std::isnan(this->energy_.start_month)) {
+    this->energy_month_->publish_state(total - this->energy_.start_month);
   }
-
-  // Yearly energy calculation
-  if (this->energy_year_) {
-    if (std::isnan(this->energy_.start_year)) {
-      // Initialize start_year for the first time
-      this->energy_.start_year = total;
-      this->energy_year_->publish_state(0);  // Publish initial value as 0
-    } else {
-      this->energy_year_->publish_state(total - this->energy_.start_year);
-    }
+  
+  if (this->energy_year_ && !std::isnan(this->energy_.start_year)) {
+    this->energy_year_->publish_state(total - this->energy_.start_year);
   }
-
-  // Save updated energy stats to preferences
+  
   this->pref_.save(&this->energy_);
 }
 
