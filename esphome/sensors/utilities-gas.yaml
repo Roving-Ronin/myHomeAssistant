@@ -7,7 +7,7 @@
 #
 
 substitutions:
-
+  gas_sensor_update_interval: 15s
 
 ########################## End of Substitutions #########################
 #
