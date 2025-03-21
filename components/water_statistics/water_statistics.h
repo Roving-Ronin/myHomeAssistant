@@ -49,20 +49,19 @@ protected:
   int water_year_start_day_{1};
 
   // Structure for storing water statistics in Litres
-  struct water_data_t {
+  struct water_data_v1_t {
     uint16_t current_day_of_year{0};
     float start_today{NAN};
     float start_yesterday{NAN};
     float start_week{NAN};
     float start_month{NAN};
+  };
+
+  struct water_data_t : public water_data_v1_t {
     float start_year{NAN};
-    bool full_week_started{false};    // Added
-    bool full_month_started{false};  // Added
-    bool full_year_started{false};   // Added
   } water_;
 
   void process_(float total);
-  void save_();
 };  // class WaterStatistics
 
 }  // namespace water_statistics
