@@ -6,7 +6,9 @@ namespace esphome {
 namespace water_statistics {
 
 static const char *const TAG = "water_statistics";
-static const char *const GAP = "  ";
+
+static const char *const PREF_V1 = "water_statistics";
+static const char *const PREF_V2 = "water_statistics_v2";
 
 void WaterStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Water Statistics (L) - Sensors");
@@ -30,11 +32,19 @@ void WaterStatistics::dump_config() {
 void WaterStatistics::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
   
-  this->pref_ = global_preferences->make_preference<water_data_t>(fnv1_hash(TAG));
-
-  water_data_t loaded{};
-  if (this->pref_.load(&loaded)) {
-    this->water_ = loaded;
+  this->pref_ = global_preferences->make_preference<water_data_t>(fnv1_hash(PREF_V2));
+  bool loaded = this->pref_.load(&this->water_);
+  if (!loaded) {
+    // migrating from v1 data
+    loaded = global_preferences->make_preference<water_data_v1_t>(fnv1_hash(PREF_V1)).load(&this->water_);
+    if (loaded) {
+      this->water_.start_year = this->water_.start_month;
+      // save as v2
+      this->pref_.save(&this->water_);
+      global_preferences->sync();
+    }
+  }
+  if (loaded) {
     auto total = this->total_->get_state();
     if (!std::isnan(total)) {
       this->process_(total);
@@ -55,6 +65,7 @@ void WaterStatistics::loop() {
     return;
   }
 
+  // update stats first time or on next day
   if (t.day_of_year == this->water_.current_day_of_year) {
     // nothing to do
     return;
@@ -62,6 +73,7 @@ void WaterStatistics::loop() {
 
   // Save the current day's data
   this->water_.start_yesterday = this->water_.start_today;
+  
   this->water_.start_today = total;
 
   if (this->water_.current_day_of_year != 0) {
@@ -79,6 +91,17 @@ void WaterStatistics::loop() {
     }
   }
 
+  // Intitialize all sensors. https://github.com/dentra/esphome-components/issues/65
+  if (this->water_week_ && std::isnan(this->water_.start_week)) {
+    this->water_.start_week = this->water_.start_yesterday;
+  }
+  if (this->water_month_ && std::isnan(this->water_.start_month)) {
+    this->water_.start_month = this->water_.start_yesterday;
+  }
+  if (this->water_year_ && std::isnan(this->water_.start_year)) {
+    this->water_.start_year = this->water_.start_yesterday;
+  }
+
   this->water_.current_day_of_year = t.day_of_year;
 
   this->process_(total);
@@ -89,75 +112,45 @@ void WaterStatistics::process_(float total) {
   // Publish today's water
   if (this->water_today_ && !std::isnan(this->water_.start_today)) {
     this->water_today_->publish_state(total - this->water_.start_today);
-  } else if (std::isnan(this->water_.start_today)) {
-    // Initialize today's start value
-    this->water_.start_today = total;
-    if (this->water_today_) {
-      this->water_today_->publish_state(0);  // Publish initial value as 0
-    }
+  } else if (this->water_today_) {
+    // If there's no value for today (NaN), publish 0
+    this->water_today_->publish_state(0);
   }
-
+  
   // Publish yesterday's water
   if (this->water_yesterday_ && !std::isnan(this->water_.start_yesterday)) {
     this->water_yesterday_->publish_state(this->water_.start_today - this->water_.start_yesterday);
+  } else if (this->water_yesterday_) {
+    // If there's no value for yesterday (NaN), publish 0
+    this->water_yesterday_->publish_state(0);
   }
 
-  // Publish weekly water (partial or full)
+  // Publish weekly water
   if (this->water_week_ && !std::isnan(this->water_.start_week)) {
-    if (this->water_.full_week_started) {
-      // Publish full calendar week value
-      this->water_week_->publish_state(total - this->water_.start_week);
-    } else {
-      // Publish partial week value
-      this->water_week_->publish_state(total - this->water_.start_week);
-    }
-  } else if (std::isnan(this->water_.start_week)) {
-    // Initialize start_week for the first time
-    this->water_.start_week = total;
-    if (this->water_week_) {
-      this->water_week_->publish_state(0);  // Publish initial value as 0
-    }
+    this->water_week_->publish_state(total - this->water_.start_week);
+  } else if (this->water_week_) {
+    // If there's no value for week (NaN), publish 0
+    this->water_week_->publish_state(0);
   }
 
   // Publish monthly water (partial or full)
   if (this->water_month_ && !std::isnan(this->water_.start_month)) {
-    if (this->water_.full_month_started) {
-      // Publish full calendar month value
-      this->water_month_->publish_state(total - this->water_.start_month);
-    } else {
-      // Publish partial month value
-      this->water_month_->publish_state(total - this->water_.start_month);
-    }
-  } else if (std::isnan(this->water_.start_month)) {
-    // Initialize start_month for the first time
-    this->water_.start_month = total;
-    if (this->water_month_) {
-      this->water_month_->publish_state(0);  // Publish initial value as 0
-    }
+    this->water_month_->publish_state(total - this->water_.start_month);
+  } else if (this->water_month_) {
+    // If there's no value for month (NaN), publish 0
+    this->water_month_->publish_state(0);
   }
 
   // Publish yearly water (partial or full)
   if (this->water_year_ && !std::isnan(this->water_.start_year)) {
-    if (this->water_.full_year_started) {
-      // Publish full calendar year value
-      this->water_year_->publish_state(total - this->water_.start_year);
-    } else {
-      // Publish partial year value
-      this->water_year_->publish_state(total - this->water_.start_year);
-    }
-  } else if (std::isnan(this->water_.start_year)) {
-    // Initialize start_year for the first time
-    this->water_.start_year = total;
-    if (this->water_year_) {
-      this->water_year_->publish_state(0);  // Publish initial value as 0
-    }
+    this->water_year_->publish_state(total - this->water_.start_year);
+  } else if (this->water_year_) {
+    // If there's no value for year (NaN), publish 0
+    this->water_year_->publish_state(0);
   }
 
-  // Save the current state
-  this->save_();
+  this->pref_.save(&this->water_);
 }
-
-void WaterStatistics::save_() { this->pref_.save(&this->water_); } // Save to flash memory
 
 }  // namespace water_statistics
 }  // namespace esphome
