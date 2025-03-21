@@ -4,7 +4,6 @@ from esphome.components import sensor, time
 from esphome.const import (
     CONF_ID,
     CONF_TIME_ID,
-#    CONF_POWER,
     CONF_TOTAL,
     DEVICE_CLASS_GAS,
     STATE_CLASS_TOTAL_INCREASING,
@@ -105,7 +104,6 @@ async def to_code(config):
     await setup_input(config, CONF_TIME_ID, var.set_time)
 
     # input sensors CHECK JBH
-#    await setup_input(config, CONF_POWER, var.set_power)
     await setup_input(config, CONF_TOTAL, var.set_total)
 
     # exposed sensors
