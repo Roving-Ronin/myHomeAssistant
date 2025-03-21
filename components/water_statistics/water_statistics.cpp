@@ -13,19 +13,19 @@ static const char *const PREF_V2 = "water_statistics_v2";
 void WaterStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Water Statistics (L) - Sensors");
   if (this->water_today_) {
-    LOG_SENSOR(GAP, "Water (L) Today", this->water_today_);
+    LOG_SENSOR("  ", "Water (L) Today", this->water_today_);
   }
   if (this->water_yesterday_) {
-    LOG_SENSOR(GAP, "Water (L) Yesterday", this->water_yesterday_);
+    LOG_SENSOR("  ", "Water (L) Yesterday", this->water_yesterday_);
   }
   if (this->water_week_) {
-    LOG_SENSOR(GAP, "Water (L) Week", this->water_week_);
+    LOG_SENSOR("  ", "Water (L) Week", this->water_week_);
   }
   if (this->water_month_) {
-    LOG_SENSOR(GAP, "Water (L) Month", this->water_month_);
+    LOG_SENSOR("  ", "Water (L) Month", this->water_month_);
   }
   if (this->water_year_) {
-    LOG_SENSOR(GAP, "Water (L) Year", this->water_year_);
+    LOG_SENSOR("  ", "Water (L) Year", this->water_year_);
   }
 }
 
