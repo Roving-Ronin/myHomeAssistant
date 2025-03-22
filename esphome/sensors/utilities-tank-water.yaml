@@ -9,7 +9,9 @@
 substitutions:
 
   water_sensor_update_interval: 15s
-
+  # Multiplier used in the flow rate calculation. Set to the number of litres 1 rotation of the meter equals.
+  tank_water_litres_per_pulse: 5.0 
+  
 ########################## End of Substitutions #########################
 #
 # Web_server v3 Sort Groups - These substitutes are applied to overwrite the default ones supplied by the 
@@ -56,7 +58,7 @@ sensor:
         input: true
         pullup: true
     filters:
-      - multiply: 5.0  # Convert pulse count to liters
+      - multiply: ${tank_water_litres_per_pulse}  # Convert pulse count to liters
     web_server:
       sorting_group_id: group_utility_meter_sensors
       sorting_weight: 2
@@ -81,7 +83,7 @@ sensor:
     internal_filter: 100ms
     timeout: 3min
     filters:
-      - multiply: 5.0  # Each pulse equals 5 liters. The water counter 'helper' in Home Assistant must still be set to 'step size' = 5.
+      - multiply: ${tank_water_litres_per_pulse}  # Each pulse equals 5 liters. The water counter 'helper' in Home Assistant must still be set to 'step size' = 5.
     web_server:
       sorting_group_id: group_utility_meter_sensors
       sorting_weight: 1
@@ -96,7 +98,7 @@ sensor:
       device_class: water
       accuracy_decimals: 2
       filters:
-        - multiply: 5.0  # Each pulse equals 5 liters
+        - multiply: ${tank_water_litres_per_pulse}  # Each pulse equals 5 liters
     #  Adds the calculation for 'Reading Total' 
       on_value: 
         then:
