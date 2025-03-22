@@ -112,9 +112,6 @@ void WaterStatistics::process_(float total) {
   // Publish today's water
   if (this->water_today_ && !std::isnan(this->water_.start_today)) {
     this->water_today_->publish_state(total - this->water_.start_today);
-  } else if (this->water_today_) {
-    // If there's no value for today (NaN), publish 0
-    this->water_today_->publish_state(0);
   }
   
   // Publish yesterday's water
@@ -133,7 +130,7 @@ void WaterStatistics::process_(float total) {
     this->water_week_->publish_state(0);
   }
 
-  // Publish monthly water (partial or full)
+  // Publish monthly water
   if (this->water_month_ && !std::isnan(this->water_.start_month)) {
     this->water_month_->publish_state(total - this->water_.start_month);
   } else if (this->water_month_) {
@@ -141,7 +138,7 @@ void WaterStatistics::process_(float total) {
     this->water_month_->publish_state(0);
   }
 
-  // Publish yearly water (partial or full)
+  // Publish yearly water
   if (this->water_year_ && !std::isnan(this->water_.start_year)) {
     this->water_year_->publish_state(total - this->water_.start_year);
   } else if (this->water_year_) {
