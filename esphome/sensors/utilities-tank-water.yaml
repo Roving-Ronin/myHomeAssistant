@@ -10,7 +10,7 @@ substitutions:
 
   water_sensor_update_interval: 15s
   # Multiplier used in the flow rate calculation. Set to the number of litres 1 rotation of the meter equals.
-  tank_water_litres_per_pulse: 5.0 
+  tank_water_litres_per_pulse: "5.0"
   
 ########################## End of Substitutions #########################
 #
