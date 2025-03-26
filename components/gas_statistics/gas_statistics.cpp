@@ -47,7 +47,7 @@ void GasStatistics::setup() {
   }
   if (loaded) {
     float total = this->total_->state;
-    int retries = 50; // Wait up to 5 seconds (your preference)
+    int retries = 20; // Wait up to 2 seconds (your preference)
     while ((std::isnan(total) || total <= 0.0f) && retries > 0) {
       ESP_LOGD(TAG, "Waiting for valid total: %f, retries: %d", total, retries);
       delay(100);
