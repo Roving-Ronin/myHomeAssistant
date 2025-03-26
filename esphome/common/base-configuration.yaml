@@ -39,7 +39,7 @@ substitutions:
    # Set the update interval for sensors  
   sensor_update_interval: 10s   
    # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
-  log_level: "INFO"
+  log_level: "DEBUG"
 
 ###############################
 # Network Settings - Static IP
