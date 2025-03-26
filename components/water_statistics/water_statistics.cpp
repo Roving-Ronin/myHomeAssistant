@@ -45,22 +45,20 @@ void WaterStatistics::setup() {
     }
   }
   if (loaded) {
-    float total = this->total_->state; // Use state directly
-    int retries = 50; // Wait up to 1 second
-    while ((std::isnan(total) || total == 0.0f) && retries > 0) {
-      ESP_LOGD(TAG, "Waiting for valid total: %f, retries left: %d", total, retries);
+    float total = this->total_->state;
+    int retries = 50; // Wait up to 5 seconds (your preference)
+    while ((std::isnan(total) || total <= 0.0f) && retries > 0) {
+      ESP_LOGD(TAG, "Waiting for valid total: %f, retries: %d", total, retries);
       delay(100);
       total = this->total_->state;
       retries--;
     }
-    if (!std::isnan(total) && total != 0.0f) {
-      ESP_LOGD(TAG, "Loaded total: %f, processing...", total);
+    if (!std::isnan(total) && total > 0.0f) {
+      ESP_LOGD(TAG, "Processing restored total: %f", total);
       this->process_(total);
     } else {
-      ESP_LOGW(TAG, "Total still invalid after wait: %f, skipping initial process", total);
+      ESP_LOGW(TAG, "Total invalid after 5s: %f, retaining prior stats", total);
     }
-  } else {
-    ESP_LOGW(TAG, "No previous data loaded from NVS");
   }
 }
 
