@@ -31,6 +31,10 @@ protected:
   ESPPreferenceObject pref_;
   time::RealTimeClock *time_;
 
+  // Non block approach to check and load NVS
+  int initial_total_retries_{0};
+  bool has_loaded_nvs_{false};
+
   // input sensors
   Sensor *total_{nullptr};
 
