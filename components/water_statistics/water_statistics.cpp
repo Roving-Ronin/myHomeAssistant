@@ -45,25 +45,34 @@ void WaterStatistics::setup() {
     }
   }
   if (loaded) {
-    float total = this->total_->state;
-    int retries = 20; // Wait up to 5 seconds (your preference)
-    while ((std::isnan(total) || total <= 0.0f) && retries > 0) {
-      ESP_LOGD(TAG, "Waiting for valid total: %f, retries: %d", total, retries);
-      delay(100);
-      total = this->total_->state;
-      retries--;
-    }
-    if (!std::isnan(total) && total > 0.0f) {
-      ESP_LOGD(TAG, "Processing restored total: %f", total);
-      this->process_(total);
-    } else {
-      ESP_LOGW(TAG, "Total invalid after 5s: %f, retaining prior stats", total);
-    }
+    this->initial_total_retries_ = 40; // Try for 5 seconds (checked in loop)
+    this->has_loaded_nvs_ = true;
+  } else {
+    ESP_LOGW(TAG, "No previous data loaded from NVS");
   }
 }
 
 
 void WaterStatistics::loop() {
+// Handle initial total check non-blocking
+  if (this->has_loaded_nvs_ && this->initial_total_retries_ > 0) {
+    float total = this->total_->state;
+    if (!std::isnan(total) && total > 0.0f) {
+      ESP_LOGD(TAG, "Processing restored total: %f", total);
+      this->process_(total);
+      this->initial_total_retries_ = 0; // Done
+      this->has_loaded_nvs_ = false;
+    } else {
+      ESP_LOGD(TAG, "Waiting for valid total: %f, retries: %d", total, this->initial_total_retries_);
+      this->initial_total_retries_--;
+      if (this->initial_total_retries_ == 0) {
+        ESP_LOGW(TAG, "Total invalid after 5s: %f, retaining prior stats", total);
+        this->has_loaded_nvs_ = false;
+      }
+      return; // Yield to avoid blocking
+    }
+  }  
+  
   const auto t = this->time_->now();
   if (!t.is_valid()) {
     // time is not sync yet
