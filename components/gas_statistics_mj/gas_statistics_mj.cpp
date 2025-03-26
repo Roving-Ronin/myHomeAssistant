@@ -46,10 +46,22 @@ void GasStatisticsMJ::setup() {
     }
   }
   if (loaded) {
-    auto total = this->total_->get_state();
-    if (!std::isnan(total)) {
-      this->process_(total);
+    float total = this->total_->state; // Use state directly
+    int retries = 10; // Wait up to 1 second
+    while ((std::isnan(total) || total == 0.0f) && retries > 0) {
+      ESP_LOGD(TAG, "Waiting for valid total: %f, retries left: %d", total, retries);
+      delay(100);
+      total = this->total_->state;
+      retries--;
     }
+    if (!std::isnan(total) && total != 0.0f) {
+      ESP_LOGD(TAG, "Loaded total: %f, processing...", total);
+      this->process_(total);
+    } else {
+      ESP_LOGW(TAG, "Total still invalid after wait: %f, skipping initial process", total);
+    }
+  } else {
+    ESP_LOGW(TAG, "No previous data loaded from NVS");
   }
 }
 
