@@ -45,12 +45,70 @@ void WaterStatistics::setup() {
     }
   }
   if (loaded) {
-    auto total = this->total_->get_state();
-    if (!std::isnan(total)) {
-      this->process_(total);
+    float total = this->total_->state; // Use state directly
+    int retries = 10; // Wait up to 1 second
+    while ((std::isnan(total) || total == 0.0f) && retries > 0) {
+      ESP_LOGD(TAG, "Waiting for valid total: %f, retries left: %d", total, retries);
+      delay(100);
+      total = this->total_->state;
+      retries--;
     }
+    if (!std::isnan(total) && total != 0.0f) {
+      ESP_LOGD(TAG, "Loaded total: %f, processing...", total);
+      this->process_(total);
+    } else {
+      ESP_LOGW(TAG, "Total still invalid after wait: %f, skipping initial process", total);
+    }
+  } else {
+    ESP_LOGW(TAG, "No previous data loaded from NVS");
   }
 }
+
+
+void WaterStatistics::setup() {
+  this->total_->add_on_state_callback([this](float state) { this->process_(state); });
+
+  this->pref_ = global_preferences->make_preference<water_data_t>(fnv1_hash("water_statistics_v2"));
+  bool loaded = this->pref_.load(&this->water_);
+  if (!loaded) {
+    // Migrating from v1 data
+    loaded = global_preferences->make_preference<water_data_v1_t>(fnv1_hash("water_statistics_v1")).load(&this->water_);
+    if (loaded) {
+      this->water_.start_year = this->water_.start_month;
+      // Save as v2
+      this->pref_.save(&this->water_);
+      global_preferences->sync();
+    }
+  }
+  if (loaded) {
+    float total = this->total_->state; // Use state directly
+    int retries = 10; // Wait up to 1 second
+    while ((std::isnan(total) || total == 0.0f) && retries > 0) {
+      ESP_LOGD(TAG, "Waiting for valid total: %f, retries left: %d", total, retries);
+      delay(100);
+      total = this->total_->state;
+      retries--;
+    }
+    if (!std::isnan(total) && total != 0.0f) {
+      ESP_LOGD(TAG, "Loaded total: %f, processing...", total);
+      this->process_(total);
+    } else {
+      ESP_LOGW(TAG, "Total still invalid after wait: %f, skipping initial process", total);
+    }
+  } else {
+    ESP_LOGW(TAG, "No previous data loaded from NVS");
+  }
+}
+
+
+
+
+
+
+
+
+
+
 
 void WaterStatistics::loop() {
   const auto t = this->time_->now();
