@@ -21,7 +21,7 @@ substitutions:
   my_latitude: "-34.73503534407444"
   my_longitude: "149.72998380661014"
    # From: https://esphome.io/components/output/ledc.html
-  frequency_rgb: "100Hz"
+  frequency_rgb: "1220Hz"
   frequency_cw: "1220Hz"
   frequency_ww: "1220Hz"
    # Set the default colour temperature desired (min. 2700 K / max. 65000 K). 3000 K = Warm White, 4000 K = Cool White, 5000 K = Daylight, 6500 K = Cool Daylight.
