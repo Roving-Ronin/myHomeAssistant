@@ -1,0 +1,47 @@
+#binary_sensor:
+#  - platform: workday
+#    name: Workday Sensor
+#    country: AU
+#    province: NSW
+#    workdays: [mon, tue, wed, thu, fri, holiday]
+#    excludes: [sat, sun]
+#    remove_holidays:
+#      - "Bank Holiday"
+
+sensor:
+  - platform: time_date
+    display_options:
+      - "date"
+
+template:
+  - sensor:
+      - name: Days Remaining in Month
+        unique_id: days_remaining_in_month
+        state: >
+          {% set this = now().replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0) %}
+          {% set next = this.month + 1 if this.month + 1 <= 12 else 1 %}
+          {% set last = this.replace(year=this.year + 1, month=1, day=1) if now().month == 12 else this.replace(month=next, day=1) %}
+          {{ (last.date() - this.date()).days - 1 }}
+
+      - name: Days Passed in Month
+        unique_id: days_passed_in_month
+        state: >
+          {% set this = now().replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0) %}
+          {% set next = this.month + 1 if this.month + 1 <= 12 else 1 %}
+          {% set first = this.replace(day=1) %}
+          {{ (this.date() - first.date()).days }}
+
+      - name: Days Remaining in Year
+        unique_id: days_remaining_in_year
+        state: >
+          {% set this = now().replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0) %}
+          {% set next = this.year + 1 %}
+          {% set last = this.replace(year=next, month=1, day=1) %}
+          {{ (last.date() - this.date()).days }}
+
+      - name: Days Passed in Year
+        unique_id: days_passed_in_year
+        state: >
+          {% set this = now().replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0) %}
+          {% set first = this.replace(month=1, day=1) %}
+          {{ (this.date() - first.date()).days }}

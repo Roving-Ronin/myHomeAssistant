@@ -1,0 +1,52 @@
+# Refer to https://pvoutput.org/help/api_specification.html        
+rest_command:
+  update_pvoutput:
+    url: https://pvoutput.org/service/r2/addstatus.jsp
+    method: post
+    content_type: "application/x-www-form-urlencoded"
+    headers:
+      X-Pvoutput-Apikey: !secret pvoutput_api_key
+      X-Pvoutput-SystemId: !secret pvoutput_system_id
+    payload: >-
+      d={{now().strftime("%Y%m%d")}}                                           {#- date -#}
+      &t={{now().strftime("%H:%M")}}                                           {#- time -#}
+      &v1={{states('sensor.inverters_total_yield')|float * 1000}}              {#- energy generation (Wh) -#}
+      &v2={{states('sensor.inverters_input_power') | float }}                  {#- power generation (W) -#}
+      &v3={{states('sensor.house_consumption_energy') }}                       {#- energy consumption (Wh) -#}
+      &v4={{states('sensor.house_consumption_power')}}                         {#- power consumption (W) -#}
+      &v5={{states('sensor.goulburn_temp')}}                                   {#- temperature celsius -#}
+      &v6={{states('sensor.power_meter_voltage')|float|round(1)}}              {#- voltage -#}
+      &v7={{states('sensor.inverter_internal_temperature')}}                   {#- Inverter 1 Internal Temperature -#}
+      &v8={{states('sensor.inverter_internal_temperature_2')}}                 {#- Inverter 2 Internal Temperature -#}
+      &v11={{(states('sensor.electricity_price') | float * 100)}}              {#- electricity price -#}
+      &v12={{(states('sensor.electricity_fit') | float * 100) | round(2)}}     {#- fit export rate in cents -#}      
+
+
+
+#      &c1=1                                                                    {#- cumulative energy mode -#}
+#      &n=1                                                                     {#- Net Data mode. 1 = Net -#}
+#      &v1={{states('sensor.inverters_daily_yield')|float * 1000}}              {#- energy generation (Wh) -#}
+#      &v3={{states('sensor.house_consumption_energy') }}                       {#- energy consumption (Wh) -#}
+#      &v9={{states('sensor.battery_state_of_capacity')}}                       {#- battery soc -#}
+#      &v10={{states('sensor.battery_charge_discharge_power')}}                 {#- battery charge/discharge (W) -#}
+
+
+
+      d={{now().strftime("%Y%m%d")}}                                           {#- date -#}
+      &t={{now().strftime("%H:%M")}}                                           {#- time -#}
+      &c1=1                                                                    {#- cumulative flag -#}
+      &v1={{states('sensor.inverters_total_yield')|float * 1000}}              {#- energy generation (Wh) -#}
+      &v2={{states('sensor.inverters_input_power') | float }}                  {#- power generation (W) -#}
+      &v3={{states('sensor.house_consumption_energy') }}                       {#- energy consumption (Wh) 
+      &v4={{states('sensor.house_consumption_power')}}                         {#- power consumption (W) -#}
+      &v5={{states('sensor.inverter_internal_temperature')}}                   {#- temperature celsius -#}
+      &v6={{states('sensor.power_meter_voltage')|float|round(1)}}              {#- voltage -#}
+      &v7={{states('sensor.inverter_internal_temperature')}}                   {#- Inverter 1 Internal Temperature -#}
+      &v8={{states('sensor.inverter_internal_temperature_2')}}                 {#- Inverter 2 Internal Temperature -#}
+      &v9={{states('sensor.battery_state_of_capacity')}}                       {#- battery soc -#}
+      &v10={{states('sensor.battery_charge_discharge_power')}}                 {#- battery charge/discharge (W) -#}
+      &v11={{(states('sensor.electricity_price') | float * 100)}}              {#- electricity price -#}
+      &v12={{(states('sensor.electricity_fit') | float * 100) | round(2)}}     {#- fit export rate in cents -#} 
+
+
+    payload: 'd={{now().strftime("%Y%m%d")}}&t={{now().strftime("%H:%M")}}&v1={{states.sensor.inverters_total_yield.state|float(0)*1000}}&v2={{states.sensor.inverters_input_power.state|float(0)}}&v3={{states.sensor.house_consumption_energy.state|float(0)}}&v4={{states.sensor.house_consumption_power.state|float(0)}}&v5={{states.sensor.goulburn_temp.state|float(0)}}&v6={{states.sensor.power_meter_voltage.state|float(0)|round(1)}}&v7={{states.sensor.inverter_internal_temperature.state|float(0)}}&v8={{states.sensor.inverter_internal_temperature_2.state|float(0)}}&v11={{states.sensor.electricity_price.state|float(0)*100}}&v12={{states.sensor.electricity_fit.state|float(0)*100|round(1)}}&c1=1'

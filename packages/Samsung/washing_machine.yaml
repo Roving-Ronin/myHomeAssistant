@@ -1,0 +1,25 @@
+template:
+  - sensor:
+    - name: "Washing Machine - Remaining Time"
+      unique_id: washing_machine_remaining_time
+#      state: >-
+#        {% set rem_h = (as_timestamp(states.sensor.washing_machine_completion_time.state) - as_timestamp(now())) | timestamp_custom('%-H', false) %}
+#        {% set rem_m = (as_timestamp(states.sensor.washing_machine_completion_time.state) - as_timestamp(now())) | timestamp_custom('%-M', false) %}
+#        {% if int(rem_h) > 0.9 %} {{ rem_h }} hour(s) and {{ rem_m }} minute(s)  {% else %} {{ rem_m }} minute(s) {% endif %}
+#
+#
+      state: >-
+        {% set completion_time = as_timestamp(states.sensor.washing_machine_completion_time.state) %}
+        {% set current_time = as_timestamp(now()) %}
+        {% if completion_time > current_time %}
+          {% set remaining_time = completion_time - current_time %}
+          {% set rem_h = (remaining_time / 3600) | int %}
+          {% set rem_m = ((remaining_time % 3600) / 60) | int %}
+          {% if rem_h > 0 %}
+            {{ rem_h }} hour(s) and {{ rem_m }} minute(s)
+          {% else %}
+            {{ rem_m }} minute(s)
+          {% endif %}
+        {% else %}
+          Machine already finished
+        {% endif %}

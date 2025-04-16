@@ -1,0 +1,24 @@
+template:
+  - sensor:
+      - name: Time of Day
+        state: >
+          {% set a = today_at("05:00")%}
+          {% set b = today_at("07:00")%}
+          {% set c = today_at("10:00")%}
+          {% set d = today_at("12:00")%}
+          {% set e = today_at("15:00")%}
+          {% set f = today_at("18:00")%}
+          {% set g = today_at("20:00")%}
+          {% set h = today_at("01:00")%}
+          {% set map = {
+          a < now() <= b: 'Early Morning',
+          b < now() <= c: 'Morning',
+          c < now() <= d: 'Mid Morning',
+          d < now() <= e: 'Midday',
+          e < now() <= f: 'Afternoon',
+          f < now() <= g: 'Evening',
+          g < now() < h + timedelta(days=1): 'Night',
+          today_at() < now() <= f: 'Night',
+          h < now() <= a: 'Late Night'
+          } %}
+          {{ map.get(True) }}

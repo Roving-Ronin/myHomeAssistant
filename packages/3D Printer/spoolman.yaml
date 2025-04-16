@@ -1,0 +1,14 @@
+rest_command:
+  update_spool:
+    url: "http://10.0.0.40:7912/spool"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+    payload: >
+      {
+        "name": "{{ name }}",
+        "material": "{{ material }}",
+        "tagUid": "{{ tag_uid }}",
+        "usedWeight": {{ used_weight }},
+        "color": "{{ color }}"
+      }

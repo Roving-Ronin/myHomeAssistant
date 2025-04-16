@@ -1,0 +1,12 @@
+# Example configuration.yaml entry
+
+sensor:
+  - platform: optimal_humidity
+    sensors:
+      house_optimal_humidity:
+        name: "House - Optimal Humidity"
+        type: optimal_humidity
+        indoor_temp_sensor: sensor.izone_current_temperature
+        indoor_humidity_sensor: sensor.house_humidity_median
+        indoor_pressure_sensor: sensor.house_pressure_median
+        critical_temp_sensor: sensor.izone_bedroom_3_temperature # iZone - Alishia's Room

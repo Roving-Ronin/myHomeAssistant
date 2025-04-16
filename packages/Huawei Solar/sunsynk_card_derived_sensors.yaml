@@ -1,0 +1,124 @@
+template:
+
+
+#
+#  TESTING SENSORS FOR SUNSYNK FLOWS and WLCRS v1.4.0
+#
+
+  - sensor:
+    - name: "Grid - Power - 169"
+      unique_id: grid_power_169
+      unit_of_measurement: "W"
+      device_class: "power"
+      state_class: measurement
+      state: >-
+        {{ ((states('sensor.power_meter_active_power')|float + states('sensor.sunsynk_card_non_essential_active_power')|float) * -1) }}
+      availability: >-
+        {{ (states('sensor.power_meter_active_power')|is_number) and 
+           (states('sensor.sunsynk_card_non_essential_active_power')|is_number) }}
+
+
+
+  # Sensor to show the House Active Power Consumption less the sunsynk_card_aux_active_power and non_essential_active_power sensors.
+  # Max 0 has been added, as delays in other sensors updating can mean this sensor suddenly returns a negative output for a short time.
+  # Used by card entry: essential_power
+  - sensor:
+    - name: "House Consumption - Power - Less Non-Essential"
+      unique_id: house_consumption_power_less_non_essential
+      unit_of_measurement: "W"
+      device_class: "power"
+      state_class: measurement
+      state: >-
+        {{ max(0, (states('sensor.house_consumption_power')|float -
+            states('sensor.sunsynk_card_non_essential_active_power')|float) | round(2)) }}
+      availability: >-
+        {{ (states('sensor.house_consumption_power')|is_number) and
+           (states('sensor.sunsynk_card_non_essential_active_power')|is_number) }}
+
+
+
+#############################
+#   
+#   Sunsynk Power Flow Card - https://github.com/slipx06/sunsynk-power-flow-card
+#   Derived sensors that are used upon the card
+#
+#############################
+#   
+#   WLCRS - Huawei Solar Integration (FOR VERSION 1.4.0+ ) - Combines multiple inverter values
+#   See: https://github.com/wlcrs/huawei_solar/wiki/Connecting-to-daisy-chained-inverters
+#
+#   Note: To use this you MUST install the Energy_Meter integration using HACS.
+#   See:  https://github.com/zeronounours/HA-custom-component-energy-meter
+#
+#   If your HA instance has a /homeasssistant/packages directory configured, this may be deployed by saving this text into a file
+#   in that location. i.e.   /homeasssistant/packages/huawei_derived_sensors.yaml
+#
+
+
+  # Sensor to show the House Active Power Consumption less the sunsynk_power_flow  aux_active_power and non_essential_active_power sensors.
+  # Used by card entry: essential_power
+  - sensor:
+    - name: "House Consumption - Power - Less AUX Non-Essential"
+      unique_id: house_consumption_power_less_aux_non_essential
+      unit_of_measurement: "W"
+      device_class: "power"
+      state_class: measurement
+      state: >-
+        {{ max(0, (states('sensor.house_consumption_power')|float -
+            states('sensor.sunsynk_card_aux_active_power')|float -
+            states('sensor.sunsynk_card_non_essential_active_power')|float) | round(2)) }}
+      availability: >-
+        {{ (states('sensor.house_consumption_power')|is_number)
+              and (states('sensor.sunsynk_card_aux_active_power')|is_number) 
+                and (states('sensor.sunsynk_card_non_essential_active_power')|is_number) | round(2) }}
+
+
+  # Sensor to show the Active Power for all the GPO's in the house, less the Network Rack and Fan, Servers and Study UPS sensors.
+  # Used card entry: essential_load2
+  - sensor:
+    - name: "GPO ALL - Active Power Less Known"
+      unique_id: gpo_all_active_power_less_known
+      unit_of_measurement: "W"
+      device_class: "power"
+      state_class: measurement
+      state: >-
+        {% set gpo_total_active_power = states('sensor.gpo_total')|float(0) %}
+        {% set all_it_active_power = states('sensor.it_hardware_active_power')|float(0) %}
+        {% set laundry = states('sensor.gpo_laundry_power')|float(0) %}
+        {% set clothes_dryer = states('sensor.gpo_clothes_dryer_active_power')|float(0) %}
+        {{ max(0, (gpo_total_active_power - ( all_it_active_power + clothes_dryer ))|float(0)|round(0)) }}
+
+      availability: >-
+        {{ (states('sensor.gpo_total')|is_number)
+            and (states('sensor.it_hardware_active_power')|is_number) 
+              and (states('sensor.gpo_laundry_power')|is_number) }}
+
+
+  # Queries the group sensor.sunsynk_power_flow_aux_active_power and if the ouput of that sensor is >0 (showing power being used) 
+  # then outputs 'on', else 'off'
+  # Used card entry: aux_connected_status
+  - binary_sensor:
+    - name: "Sunsynk Card - AUX - Connected Status"
+      unique_id: sunsynk_card_aux_connected_status
+      device_class: power
+      state: >-
+        {{ 'on' if states('sensor.sunsynk_card_aux_active_power') | float(default=0) > 0 else 'off' }}
+
+
+
+  # Sensor to show the House Active Power Consumption less the sunsynk_card_aux_active_power and non_essential_active_power sensors.
+  # Max 0 has been added, as delays in other sensors updating can mean this sensor suddenly returns a negative output for a short time.
+  # Used by card entry: essential_power
+  - sensor:
+    - name: "House Consumption - Power - Less Non-Essential"
+      unique_id: house_consumption_power_less_non_essential
+      unit_of_measurement: "W"
+      device_class: "power"
+      state_class: measurement
+      state: >-
+        {{ max(0, (states('sensor.house_consumption_power')|float -
+            states('sensor.sunsynk_card_non_essential_active_power')|float) | round(2)) }}
+      availability: >-
+        {{ (states('sensor.house_consumption_power')|is_number) and
+           (states('sensor.sunsynk_card_non_essential_active_power')|is_number) }}
+

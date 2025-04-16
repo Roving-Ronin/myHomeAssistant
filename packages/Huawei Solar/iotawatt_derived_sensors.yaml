@@ -1,0 +1,143 @@
+template:
+
+#############################
+#   Calculates the Active Power consumed by the washing machine (Shelly Mini behind GPO), after deducting:
+#   - Clothes Dryer
+#
+  - sensor:
+    - name: "Washing Machine - Active Power"
+      unique_id: washing_machine_active_power
+      unit_of_measurement: "W"
+      device_class: "power"
+      state_class: measurement
+      state: >
+        {% set laundry_total = states('sensor.gpo_laundry_power') | float(0) %}
+        {% set clothes_dryer = states('sensor.gpo_clothes_dryer_active_power') | float(0) %}
+        {% set difference = laundry_total - clothes_dryer %}
+        {{ 0 if difference <= 0 else difference | round(3) }}
+      availability: >-
+        {{  states('sensor.gpo_laundry_power') | is_number
+         and states('sensor.gpo_clothes_dryer_active_power') | is_number }} 
+
+#############################
+#   Calculates the ENERGY consumed by the washing machine (Shelly Mini behind GPO), after deducting:
+#   - Clothes Dryer
+#
+  - sensor:
+    - name: "Washing Machine - Energy"
+      unique_id: washing_machine_energy
+      unit_of_measurement: "kWh"
+      device_class: "energy"
+      state_class: total
+      state: >
+        {% set laundry_total = states('sensor.gpo_laundry_energy') | float(0) %}
+        {% set clothes_dryer = states('sensor.gpo_clothes_dryer_energy_total') | float(0) %}
+        {% set difference = laundry_total - clothes_dryer %}
+        {{ 0 if difference <= 0 else difference | round(3) }}
+      availability: >-
+        {{  states('sensor.gpo_laundry_energy') | is_number
+         and states('sensor.gpo_clothes_dryer_energy_total') | is_number }} 
+
+
+#############################
+#   Calculates the energy consumed on wall power outlets GPO 2 / Phase A, after deducting:
+#   - Study UPS
+#
+  - sensor:
+    - name: "GPO 2A - Filtered"
+      unique_id: gpo_2a_filtered
+      unit_of_measurement: "kWh"
+      device_class: "energy"
+      state_class: total_increasing
+      state: >
+        {% set total = states('sensor.gpo_2a_wh') | float(0) %}
+        {% set filtered = states('sensor.gpo_ups_study_energy_today') | float(0) %}
+        {% set difference = total - filtered %}
+        {{ 0 if difference <= 0 else difference | round(3) }}
+      availability: >-
+        {{  states('sensor.gpo_2a_wh') | is_number
+         and states('sensor.gpo_ups_study_energy_today') | is_number }} 
+
+
+#############################
+#   Calculates the energy consumed on wall power outlets GPO 3 / Phase B, after deducting:
+#   - Laundry / Clothes Dryer
+#   - 
+#
+  - sensor:
+    - name: "GPO 3B - Filtered"
+      unique_id: gpo_3b_filtered
+      unit_of_measurement: "kWh"
+      device_class: "energy"
+      state_class: total_increasing
+      state: >
+        {% set total = states('sensor.gpo_3b_wh') | float(0) %}
+        {% set filtered = states('sensor.gpo_clothes_dryer_energy_today')| float(0) %}
+        {% set difference = total - filtered %}
+        {{ 0 if difference <= 0 else difference | round(3) }}
+      availability: >-
+        {{  states('sensor.gpo_3b_wh') | is_number 
+         and states('sensor.gpo_clothes_dryer_energy_today') | is_number }} 
+
+
+#############################
+#   Calculates the energy consumed on wall power outlets GPO 1 / Phase C, after deducting:
+#   - Network Rack, Server Rack and Rack Fan Daily Energy sensors
+#   - Dish Washing Machine sensor.dishwasher_energy_daily
+#   - Oven
+#
+
+  - sensor:
+    - name: "GPO 1C - Filtered"
+      unique_id: gpo_1c_filtered
+      unit_of_measurement: "kWh"
+      device_class: "energy"
+      state_class: total_increasing
+      state: >
+        {% set total = states('sensor.gpo_1c_wh') | float(0) %}
+        {% set filtered = ( states('sensor.gpo_rack_fan_energy_today')| float(0) 
+          + states('sensor.gpo_ups_servers_energy_today')| float(0) 
+          + states('sensor.gpo_ups_network_energy_today')| float(0)
+          + states('sensor.oven_c_wh')| float(0) ) %}
+        {% set difference = total - filtered %}
+        {{ 0 if difference <= 0 else difference | round(3) }}
+      availability: >-
+        {{ states('sensor.gpo_1c_wh') | is_number 
+          and states('sensor.gpo_rack_fan_energy_today') | is_number 
+          and states('sensor.gpo_ups_servers_energy_today') | is_number
+          and states('sensor.gpo_ups_network_energy_today') | is_number  
+          and states('sensor.oven_c_wh') | is_number  }}
+
+
+#############################
+#   Calculates the energy consumed by household lights, after deducting:
+#   - IXL 3in1 All Bathroom (that is a sum of sensor containing the sum helpers that add up each bathrooms energy sensors
+#
+
+  - sensor:
+    - name: "Lights - LED"
+      unique_id: lights_a_led
+      unit_of_measurement: "kWh"
+      device_class: "energy"
+      state_class: total_increasing
+      state: >
+        {% set total = states('sensor.lights_a_wh') | float(0) %}
+        {% set filtered = states('sensor.ixl_3in1_meter_daily_kwh')| float(0) %}
+        {% set difference = total - filtered %}
+        {{ 0 if difference <= 0 else difference | round(3) }}
+      availability: >-
+        {{ states('sensor.lights_a_wh') | is_number and 
+           states('sensor.ixl_3in1_meter_daily_kwh') | is_number  }}
+
+
+#############################
+#   Conversion for IoTaWatt to sensors to a new sensor in kWh.
+#   The new sensor.lights_a_wh_to_kwh is then used in derived sensor derived_lights_kwh, to calculate kWh usage for lights.
+#   Required as original WH sensor from IoTaWatt when set to kWh output, provides a negative output in Energy Dashboard
+#
+
+
+
+
+
+#############################
