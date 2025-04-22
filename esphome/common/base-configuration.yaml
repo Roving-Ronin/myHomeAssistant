@@ -168,7 +168,7 @@ sensor:
     id: uptime_seconds
     entity_category: diagnostic
     update_interval: 10s
-    internal: True
+    internal: true
 
 ##########################################################################
 #
