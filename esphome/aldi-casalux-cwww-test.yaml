@@ -162,6 +162,9 @@ binary_sensor:
     id: downlight_state
     lambda: |-
       return id(downlight).current_values.is_on();
+    filters:
+      - delayed_on: 0.5s  # Wait 0.5s before reporting ON
+      - delayed_off: 0.5s  # Wait 0.5s before reporting OFF
     internal: true
 
 #########################################################################
