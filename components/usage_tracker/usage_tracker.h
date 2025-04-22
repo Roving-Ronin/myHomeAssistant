@@ -27,6 +27,7 @@ class UsageTracker : public Component {
   float total_lifetime_use_{0};
 
   ESPPreferenceObject lifetime_use_pref_;
+  uint32_t last_save_time_{0};
 };
 
 }  // namespace usage_tracker
