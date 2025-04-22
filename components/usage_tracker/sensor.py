@@ -40,7 +40,7 @@ CONFIG_SCHEMA = cv.Schema(
             icon=ICON_LAST_USE,
             accuracy_decimals=0,
             device_class=DEVICE_CLASS_DURATION,
-            state_class=STATE_CLASS_TOTAL_INCREASING,
+            state_class=STATE_CLASS_MEASUREMENT,
         ),
         cv.Required(CONF_LIFETIME_USE): sensor.sensor_schema(
             unit_of_measurement=UNIT_SECOND,
