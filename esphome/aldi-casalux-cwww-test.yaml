@@ -179,13 +179,13 @@ sensor:
       id: usage_tracker_last_use
       filters:
         - delta : 1.0                  # Only send the result if the difference with the last sent result is higher than this
-#    internal: true
+    internal: true
 
     lifetime_use:
       id: usage_tracker_lifetime_use
       filters:
         - delta : 1.0                  # Only send the result if the difference with the last sent result is higher than this
-#    internal: true
+    internal: true
 
 ##########################################################################
 #
@@ -245,24 +245,43 @@ text_sensor:
     name: "Light - Lifetime Use"
     icon: mdi:chart-bell-curve-cumulative
     lambda: |-
-      int seconds = (id(usage_tracker_lifetime_use).state);
+      // Check if the sensor has a valid state
+      if (!id(usage_tracker_last_use).has_state()) {
+        return std::string("Unknown");
+      }
+
+      int seconds = id(usage_tracker_last_use).state;
+      if (seconds < 0) {
+        return std::string("Unknown");
+      }
+
+      // Format the duration
       int days = seconds / (24 * 3600);
       seconds = seconds % (24 * 3600);
       int hours = seconds / 3600;
       seconds = seconds % 3600;
-      int minutes = seconds /  60;
+      int minutes = seconds / 60;
       seconds = seconds % 60;
-      if ( days > 3650 ) {
-        return { "Starting up" };
-      } else if ( days ) {
-        return { (String(days) +"d " + String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
-      } else if ( hours ) {
-        return { (String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
-      } else if ( minutes ) {
-        return { (String(minutes) +"m "+ String(seconds) +"s").c_str() };
+
+      std::string new_value;
+      if (days > 3650) {
+        new_value = "Starting up";
+      } else if (days) {
+        new_value = to_string(days) + "d " + to_string(hours) + "h " + to_string(minutes) + "m " + to_string(seconds) + "s";
+      } else if (hours) {
+        new_value = to_string(hours) + "h " + to_string(minutes) + "m " + to_string(seconds) + "s";
+      } else if (minutes) {
+        new_value = to_string(minutes) + "m " + to_string(seconds) + "s";
       } else {
-        return { (String(seconds) +"s").c_str() };
+        new_value = to_string(seconds) + "s";
       }
+
+      // Only return a new value if it differs from the previous one
+      if (new_value != id(last_formatted_duration)) {
+        id(last_formatted_duration) = new_value;
+        return new_value;
+      }
+      return {};
 #    update_interval: ${sensor_update_interval}
     web_server:
       sorting_group_id: group_light_usage
