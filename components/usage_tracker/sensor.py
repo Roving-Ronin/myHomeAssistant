@@ -24,7 +24,7 @@ CODEOWNERS = ["@roving-ronin"]
 DEPENDENCIES = ["time"]
 
 CONF_ON_OFF_SENSOR = "on_off_sensor"
-CONF_LAST_ON_DURATION = "last_on_duration"
+CONF_LAST_USE = "last_use"
 CONF_LIFETIME_USE = "lifetime_use"
 
 usage_tracker_ns = cg.esphome_ns.namespace("usage_tracker")
@@ -35,7 +35,7 @@ CONFIG_SCHEMA = cv.Schema(
         cv.GenerateID(): cv.declare_id(UsageTracker),
         cv.GenerateID(CONF_TIME_ID): cv.use_id(time.RealTimeClock),
         cv.Required(CONF_ON_OFF_SENSOR): cv.use_id(binary_sensor.BinarySensor),
-        cv.Required(CONF_LAST_ON_DURATION): sensor.sensor_schema(
+        cv.Required(CONF_LAST_USE): sensor.sensor_schema(
             unit_of_measurement=UNIT_SECOND,
             icon=ICON_LAST_USE,
             accuracy_decimals=0,
@@ -59,8 +59,8 @@ async def to_code(config):
     sens = await cg.get_variable(config[CONF_ON_OFF_SENSOR])
     cg.add(var.set_sensor(sens))
 
-    last_on = await sensor.new_sensor(config[CONF_LAST_ON_DURATION])
-    cg.add(var.set_last_on_duration_sensor(last_on))
+    last_on = await sensor.new_sensor(config[CONF_LAST_USE])
+    cg.add(var.set_last_use_sensor(last_on))
 
     lifetime = await sensor.new_sensor(config[CONF_LIFETIME_USE])
     cg.add(var.set_lifetime_use_sensor(lifetime))
