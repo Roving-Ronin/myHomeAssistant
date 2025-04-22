@@ -22,11 +22,11 @@ sensor:
     id: usage_tracker_component
     on_off_sensor: state_device_such_as_light_switch
 
-    last_runtime:
-      name: "$name Last Runtime"
+    last_use:
+      name: "$name Last Use Duration"
 
-    lifetime_runtime:
-      name: "$name Lifetime Runtime"
+    lifetime_use:
+      name: "$name Lifetime Use Duration"
 
 ```
 
