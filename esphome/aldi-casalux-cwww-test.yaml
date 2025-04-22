@@ -149,12 +149,12 @@ sensor:
     last_use:
 #      name: "LED - Last Use Duration"
       id: usage_tracker_last_use
-    internal: true
+#    internal: true
 
     lifetime_use:
-      name: "LED - Lifetime Use Duration"
+#      name: "LED - Lifetime Use Duration"
       id: usage_tracker_lifetime_use
-    internal: true
+#    internal: true
 
 ##########################################################################
 #
