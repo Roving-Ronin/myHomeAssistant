@@ -200,33 +200,33 @@ text_sensor:
     lambda: |-
       // Check if the sensor has a valid state
       if (!id(usage_tracker_last_use).has_state()) {
-        return "Unknown";
+        return std::string("Unknown");
       }
 
       int seconds = id(usage_tracker_last_use).state;
       if (seconds < 0) {
-        return "Unknown";
+        return std::string("Unknown");
       }
-      
+
       // Format the duration
       int days = seconds / (24 * 3600);
       seconds = seconds % (24 * 3600);
       int hours = seconds / 3600;
       seconds = seconds % 3600;
-      int minutes = seconds /  60;
+      int minutes = seconds / 60;
       seconds = seconds % 60;
 
       std::string new_value;
       if (days > 3650) {
         new_value = "Starting up";
       } else if (days) {
-        new_value = String(days) + "d " + String(hours) + "h " + String(minutes) + "m " + String(seconds) + "s";
+        new_value = to_string(days) + "d " + to_string(hours) + "h " + to_string(minutes) + "m " + to_string(seconds) + "s";
       } else if (hours) {
-        new_value = String(hours) + "h " + String(minutes) + "m " + String(seconds) + "s";
+        new_value = to_string(hours) + "h " + to_string(minutes) + "m " + to_string(seconds) + "s";
       } else if (minutes) {
-        new_value = String(minutes) + "m " + String(seconds) + "s";
+        new_value = to_string(minutes) + "m " + to_string(seconds) + "s";
       } else {
-        new_value = String(seconds) + "s";
+        new_value = to_string(seconds) + "s";
       }
 
       // Only return a new value if it differs from the previous one
