@@ -21,7 +21,7 @@ from .const import (
 )
 
 CODEOWNERS = ["@roving-ronin"]
-DEPENDENCIES = ["time"]
+DEPENDENCIES = ["time", "binary_sensor"]
 
 CONF_ON_OFF_SENSOR = "on_off_sensor"
 CONF_LAST_USE = "last_use"
