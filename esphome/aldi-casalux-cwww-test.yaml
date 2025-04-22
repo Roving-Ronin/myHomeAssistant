@@ -137,6 +137,88 @@ light:
 
 #########################################################################
 #
+# Define the sensors that publish the Last Use & Lifetime Use duration of the LED.
+# See: https://github.com/Roving-Ronin/myHomeAssistant/tree/main/components/usage_tracker
+#
+
+sensor:
+  - platform: "usage_tracker"
+    id: usage_tracker_component
+    on_off_sensor: downlight
+
+    last_use:
+#      name: "LED - Last Use Duration"
+      id: usage_tracker_last_use
+    internal: true
+
+    lifetime_use:
+      name: "LED - Lifetime Use Duration"
+      id: usage_tracker_lifetime_use
+    internal: true
+
+##########################################################################
+#
+# Text Sensors
+#
+
+text_sensor:
+   # Creates a sensor of the Usage Tracker sensors, in formatted days, hours, minutes and seconds
+  - platform: template
+    name: "LED - Last Use Duration"
+    lambda: |-
+      int seconds = (id(usage_tracker_last_use).state);
+      int days = seconds / (24 * 3600);
+      seconds = seconds % (24 * 3600);
+      int hours = seconds / 3600;
+      seconds = seconds % 3600;
+      int minutes = seconds /  60;
+      seconds = seconds % 60;
+      if ( days > 3650 ) {
+        return { "Starting up" };
+      } else if ( days ) {
+        return { (String(days) +"d " + String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
+      } else if ( hours ) {
+        return { (String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
+      } else if ( minutes ) {
+        return { (String(minutes) +"m "+ String(seconds) +"s").c_str() };
+      } else {
+        return { (String(seconds) +"s").c_str() };
+      }
+    update_interval: ${sensor_update_interval}
+    icon: mdi:timer-outline
+    web_server:
+      sorting_weight: 10
+
+
+  - platform: template
+    name: "LED - Lifetime Use Duration"
+    lambda: |-
+      int seconds = (id(usage_tracker_lifetime_use).state);
+      int days = seconds / (24 * 3600);
+      seconds = seconds % (24 * 3600);
+      int hours = seconds / 3600;
+      seconds = seconds % 3600;
+      int minutes = seconds /  60;
+      seconds = seconds % 60;
+      if ( days > 3650 ) {
+        return { "Starting up" };
+      } else if ( days ) {
+        return { (String(days) +"d " + String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
+      } else if ( hours ) {
+        return { (String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
+      } else if ( minutes ) {
+        return { (String(minutes) +"m "+ String(seconds) +"s").c_str() };
+      } else {
+        return { (String(seconds) +"s").c_str() };
+      }
+    update_interval: ${sensor_update_interval}
+    icon: mdi:chart-bell-curve-cumulative
+    web_server:
+      sorting_weight: 11
+
+
+#########################################################################
+#
 # Define LAT & LONG, allowing local checking triggers such as:
 # Event on_sunrise / on_sunset etc, see: https://esphome.io/components/sun.html
 #
