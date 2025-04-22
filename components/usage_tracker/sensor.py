@@ -3,7 +3,15 @@ import esphome.codegen as cg
 from esphome import automation
 from esphome.components import sensor, binary_sensor
 from esphome.components import sensor, time
-from esphome.const import CONF_ID, CONF_SENSOR
+from esphome.const import (
+    CONF_ID,
+    CONF_SENSOR,
+    CONF_TIME_ID,
+    CONF_TOTAL,
+    DEVICE_CLASS_DURATION,
+    STATE_CLASS_TOTAL_INCREASING,
+    UNIT_SECOND,
+)
 
 # Import your custom ICONS from const.py
 from .const import (
