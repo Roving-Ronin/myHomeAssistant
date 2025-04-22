@@ -99,6 +99,10 @@ web_server:
     - id: group_light_controls
       name: "Light Controls"
       sorting_weight: -30
+      
+    - id: group_light_usage
+      name: "Light Usage"
+      sorting_weight: -20
 
 #########################################################################
 #
@@ -161,12 +165,10 @@ sensor:
     on_off_sensor: downlight_state
 
     last_use:
-#      name: "LED - Last Use Duration"
       id: usage_tracker_last_use
 #    internal: true
 
     lifetime_use:
-#      name: "LED - Lifetime Use Duration"
       id: usage_tracker_lifetime_use
 #    internal: true
 
@@ -178,7 +180,7 @@ sensor:
 text_sensor:
    # Creates a sensor of the Usage Tracker sensors, in formatted days, hours, minutes and seconds
   - platform: template
-    name: "LED - Last Use Duration"
+    name: "Light - Last Use"
     lambda: |-
       int seconds = (id(usage_tracker_last_use).state);
       int days = seconds / (24 * 3600);
@@ -198,14 +200,15 @@ text_sensor:
       } else {
         return { (String(seconds) +"s").c_str() };
       }
-    update_interval: ${sensor_update_interval}
+#    update_interval: ${sensor_update_interval}
     icon: mdi:timer-outline
     web_server:
-      sorting_weight: 10
+      sorting_group_id: group_light_usage
+      sorting_weight: 1
 
 
   - platform: template
-    name: "LED - Lifetime Use Duration"
+    name: "Light - Lifetime Use"
     lambda: |-
       int seconds = (id(usage_tracker_lifetime_use).state);
       int days = seconds / (24 * 3600);
@@ -225,11 +228,11 @@ text_sensor:
       } else {
         return { (String(seconds) +"s").c_str() };
       }
-    update_interval: ${sensor_update_interval}
+#    update_interval: ${sensor_update_interval}
     icon: mdi:chart-bell-curve-cumulative
     web_server:
-      sorting_weight: 11
-
+      sorting_group_id: group_light_usage
+      sorting_weight: 2
 
 #########################################################################
 #
