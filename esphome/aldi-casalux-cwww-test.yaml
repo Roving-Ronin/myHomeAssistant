@@ -181,6 +181,7 @@ text_sensor:
    # Creates a sensor of the Usage Tracker sensors, in formatted days, hours, minutes and seconds
   - platform: template
     name: "Light - Last Use"
+    icon: mdi:timer-outline
     lambda: |-
       int seconds = (id(usage_tracker_last_use).state);
       int days = seconds / (24 * 3600);
@@ -201,7 +202,8 @@ text_sensor:
         return { (String(seconds) +"s").c_str() };
       }
 #    update_interval: ${sensor_update_interval}
-    icon: mdi:timer-outline
+    filters:
+      - delta : 1.0                  # Only send the result if the difference with the last sent result is higher than this
     web_server:
       sorting_group_id: group_light_usage
       sorting_weight: 1
@@ -209,6 +211,7 @@ text_sensor:
 
   - platform: template
     name: "Light - Lifetime Use"
+    icon: mdi:chart-bell-curve-cumulative
     lambda: |-
       int seconds = (id(usage_tracker_lifetime_use).state);
       int days = seconds / (24 * 3600);
@@ -229,7 +232,8 @@ text_sensor:
         return { (String(seconds) +"s").c_str() };
       }
 #    update_interval: ${sensor_update_interval}
-    icon: mdi:chart-bell-curve-cumulative
+    filters:
+      - delta : 1.0                  # Only send the result if the difference with the last sent result is higher than this
     web_server:
       sorting_group_id: group_light_usage
       sorting_weight: 2
