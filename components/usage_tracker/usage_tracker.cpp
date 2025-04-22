@@ -40,8 +40,15 @@ void UsageTracker::setup() {
   this->last_save_time_ = millis();
 }
 
+
 void UsageTracker::loop() {
   const uint32_t now = millis();
+
+  if (this->sensor_ == nullptr) {
+    ESP_LOGE(TAG, "Usage Tracker - No sensor configured!");
+    return;
+  }
+
   bool is_on = this->sensor_->state;
 
   // Detect transition ON -> OFF
