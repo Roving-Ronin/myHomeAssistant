@@ -28,14 +28,14 @@ CONFIG_SCHEMA = cv.Schema(
         cv.GenerateID(CONF_TIME_ID): cv.use_id(time.RealTimeClock),
         cv.Required(CONF_ON_OFF_SENSOR): cv.use_id(binary_sensor.BinarySensor),
         cv.Required(CONF_LAST_ON_DURATION): sensor.sensor_schema(
-            unit_of_measurement=SECONDS,
+            unit_of_measurement=UNIT_SECOND,
             icon=ICON_LAST_USE,
             accuracy_decimals=0,
             device_class=DEVICE_CLASS_DURATION,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Required(CONF_LIFETIME_USE): sensor.sensor_schema(
-            unit_of_measurement=SECONDS,
+            unit_of_measurement=UNIT_SECOND,
             icon=ICON_LIFETIME_USE,
             accuracy_decimals=0,
             device_class=DEVICE_CLASS_DURATION,
