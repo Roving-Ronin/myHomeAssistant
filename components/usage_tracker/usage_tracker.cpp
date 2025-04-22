@@ -1,58 +1,69 @@
 #include "usage_tracker.h"
 #include "esphome/core/log.h"
+#include "esphome/core/application.h"
 
 namespace esphome {
 namespace usage_tracker {
 
 static const char *const TAG = "usage_tracker";
 
-static const uint32_t SAVE_INTERVAL_MS = 5 * 60 * 1000;  // 5 minutes
-
 void UsageTracker::setup() {
-  // Restore previous total lifetime usage
-  lifetime_use_pref_ = global_preferences.make_preference<float>(this->get_object_id_hash());
-  lifetime_use_pref_.load(&total_lifetime_use_);
-  ESP_LOGD(TAG, "Restored lifetime use: %.1f seconds", total_lifetime_use_);
+  ESP_LOGCONFIG(TAG, "Setting up Usage Tracker...");
 
-  this->was_on_ = this->sensor_->state;
-  if (this->was_on_) {
-    this->on_start_time_ = millis();
-    ESP_LOGD(TAG, "Initial sensor state is ON");
+  this->lifetime_use_pref_ = global_preferences->make_preference<float>(fnv1_hash("usage_tracker_lifetime"));
+  if (!this->lifetime_use_pref_.load(&this->total_lifetime_use_)) {
+    ESP_LOGI(TAG, "Usage Tracker - No saved lifetime use found, starting at 0");
+    this->total_lifetime_use_ = 0;
+  } else {
+    ESP_LOGI(TAG, "Usage Tracker - Loaded lifetime use: %.0f s", this->total_lifetime_use_);
+  }
+
+  // Publish restored value after boot
+  if (this->lifetime_use_sensor_ != nullptr) {
+    this->lifetime_use_sensor_->publish_state(this->total_lifetime_use_);
   }
 
   this->last_save_time_ = millis();
 }
 
 void UsageTracker::loop() {
-  uint32_t now = millis();
+  const uint32_t now = millis();
+
   bool is_on = this->sensor_->state;
 
-  // Handle state transition
-  if (is_on && !this->was_on_) {
-    this->on_start_time_ = now;
-    this->was_on_ = true;
-    ESP_LOGD(TAG, "Sensor turned ON");
-  } else if (!is_on && this->was_on_) {
-    float duration = (now - this->on_start_time_) / 1000.0f;
+  // Detect transition ON -> OFF
+  if (this->was_on_ && !is_on) {
+    this->was_on_ = false;
+    uint32_t duration = (now - this->on_start_time_) / 1000;
 
-    if (this->last_on_duration_sensor_ != nullptr)
+    ESP_LOGD(TAG, "Usage Tracker - Sensor OFF, last on duration: %u s", duration);
+
+    if (this->last_on_duration_sensor_ != nullptr) {
       this->last_on_duration_sensor_->publish_state(duration);
+    }
 
     this->total_lifetime_use_ += duration;
-    ESP_LOGD(TAG, "Sensor was ON for %.1f seconds. Total: %.1f", duration, total_lifetime_use_);
 
-    if (this->lifetime_use_sensor_ != nullptr)
-      this->lifetime_use_sensor_->publish_state(total_lifetime_use_);
-
-    this->was_on_ = false;
+    if (this->lifetime_use_sensor_ != nullptr) {
+      this->lifetime_use_sensor_->publish_state(this->total_lifetime_use_);
+    }
   }
 
-  // Save to NVS every 5 minutes if there's been any usage
-  if ((now - this->last_save_time_) >= SAVE_INTERVAL_MS) {
-    this->lifetime_use_pref_.save(&total_lifetime_use_);
+  // Detect transition OFF -> ON
+  if (!this->was_on_ && is_on) {
+    this->was_on_ = true;
+    this->on_start_time_ = now;
+
+    ESP_LOGD(TAG, "Usage Tracker - Source sensor turned ON");
+  }
+
+  // Periodic save to NVS
+  if ((now - this->last_save_time_) > 300000) {  // 5 minutes
     this->last_save_time_ = now;
-    ESP_LOGD(TAG, "Saved lifetime use to NVS: %.1f seconds", total_lifetime_use_);
+    this->lifetime_use_pref_.save(&this->total_lifetime_use_);
+    ESP_LOGD(TAG, "Usage Tracker - Saved lifetime use to NVS: %.0f s", this->total_lifetime_use_);
   }
 }
+
 }  // namespace usage_tracker
 }  // namespace esphome
