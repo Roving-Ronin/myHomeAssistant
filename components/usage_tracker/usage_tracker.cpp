@@ -1,42 +1,52 @@
-#include "usage_timer.h"
+#include "usage_tracker.h"
 #include "esphome/core/log.h"
 
 namespace esphome {
-namespace usage_timer {
+namespace usage_tracker {
 
-static const char *const TAG = "usage_timer";
+static const char *const TAG = "usage_tracker";
 
-void UsageTimer::setup() {
+void UsageTracker::setup() {
+  // Restore previous total lifetime usage
+  lifetime_use_pref_ = global_preferences.make_preference<float>(this->get_object_id_hash());
+  lifetime_use_pref_.load(&total_lifetime_use_);
+  ESP_LOGD(TAG, "Restored lifetime use: %.1f seconds", total_lifetime_use_);
+
+  // Initialize state
   this->was_on_ = this->sensor_->state;
   if (this->was_on_) {
     this->on_start_time_ = millis();
+    ESP_LOGD(TAG, "Initial sensor state is ON");
   }
 }
 
-void UsageTimer::loop() {
+void UsageTracker::loop() {
   bool is_on = this->sensor_->state;
 
-  if (is_on && !was_on_) {
-    // Just turned on
-    on_start_time_ = millis();
-    was_on_ = true;
+  if (is_on && !this->was_on_) {
+    // Turned ON
+    this->on_start_time_ = millis();
+    this->was_on_ = true;
     ESP_LOGD(TAG, "Sensor turned ON");
-  } else if (!is_on && was_on_) {
-    // Just turned off
-    uint32_t duration = millis() - on_start_time_;
-    float seconds = duration / 1000.0f;
-    ESP_LOGD(TAG, "Sensor turned OFF after %.1fs", seconds);
+  } else if (!is_on && this->was_on_) {
+    // Turned OFF
+    uint32_t now = millis();
+    float duration = (now - this->on_start_time_) / 1000.0f;
 
-    if (last_on_duration_sensor_ != nullptr)
-      last_on_duration_sensor_->publish_state(seconds);
+    if (this->last_on_duration_sensor_ != nullptr)
+      this->last_on_duration_sensor_->publish_state(duration);
 
-    total_lifetime_use_sec_ += seconds;
-    if (lifetime_use_sensor_ != nullptr)
-      lifetime_use_sensor_->publish_state(total_lifetime_use_sec_);
+    this->total_lifetime_use_ += duration;
+    ESP_LOGD(TAG, "Sensor was ON for %.1f seconds. Total: %.1f", duration, total_lifetime_use_);
 
-    was_on_ = false;
+    // Save and publish
+    if (this->lifetime_use_sensor_ != nullptr)
+      this->lifetime_use_sensor_->publish_state(total_lifetime_use_);
+    this->lifetime_use_pref_.save(&total_lifetime_use_);
+
+    this->was_on_ = false;
   }
 }
 
-}  // namespace usage_timer
+}  // namespace usage_tracker
 }  // namespace esphome
