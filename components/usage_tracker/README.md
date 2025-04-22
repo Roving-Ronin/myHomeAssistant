@@ -11,12 +11,12 @@ Gather statistics for, how long a device such as a light or a shower was:
 
 ```yaml
 # Example configuration entry
-...
+
 external_components:
   - source: github://roving-ronin/myhomeassistant/components
     components: [usage_tracker]
     refresh: 0s
-...
+
 sensor:
   - platform: "usage_tracker"
     id: usage_tracker_component
