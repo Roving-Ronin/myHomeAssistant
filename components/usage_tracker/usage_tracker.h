@@ -19,13 +19,13 @@ class UsageTracker : public Component {
 
   // Setters
   void set_sensor(binary_sensor::BinarySensor *sensor) { this->sensor_ = sensor; }
-  void set_last_on_duration_sensor(sensor::Sensor *sensor) { this->last_on_duration_sensor_ = sensor; }
+  void set_last_use_sensor(sensor::Sensor *sensor) { this->last_use_sensor_ = sensor; }
   void set_lifetime_use_sensor(sensor::Sensor *sensor) { this->lifetime_use_sensor_ = sensor; }
 
  protected:
   // Sensors
   binary_sensor::BinarySensor *sensor_{nullptr};
-  sensor::Sensor *last_on_duration_sensor_{nullptr};
+  sensor::Sensor *last_use_sensor_{nullptr};
   sensor::Sensor *lifetime_use_sensor_{nullptr};
 
   // Internal state
