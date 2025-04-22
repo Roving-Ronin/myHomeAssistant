@@ -137,6 +137,20 @@ light:
 
 #########################################################################
 #
+# Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
+# This is used by the usage_tracker as its source sensor.
+#
+
+binary_sensor:
+  - platform: template
+    name: "Downlight State"
+    id: downlight_state
+    lambda: |-
+      return id(downlight).current_values.is_on();
+    internal: true
+
+#########################################################################
+#
 # Define the sensors that publish the Last Use & Lifetime Use duration of the LED.
 # See: https://github.com/Roving-Ronin/myHomeAssistant/tree/main/components/usage_tracker
 #
@@ -144,7 +158,7 @@ light:
 sensor:
   - platform: "usage_tracker"
     id: usage_tracker_component
-    on_off_sensor: downlight
+    on_off_sensor: downlight_state
 
     last_use:
 #      name: "LED - Last Use Duration"
