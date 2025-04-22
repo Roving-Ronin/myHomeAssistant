@@ -56,9 +56,15 @@ async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
 
+    # Link time component
+    time_ = await cg.get_variable(config[CONF_TIME_ID])
+    cg.add(var.set_time(time_))
+
+    # Link binary sensor
     sens = await cg.get_variable(config[CONF_ON_OFF_SENSOR])
     cg.add(var.set_sensor(sens))
 
+    # Link sensors
     last_on = await sensor.new_sensor(config[CONF_LAST_USE])
     cg.add(var.set_last_use_sensor(last_on))
 
