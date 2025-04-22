@@ -162,7 +162,6 @@ binary_sensor:
     id: downlight_state
     lambda: |-
       return id(downlight).current_values.is_on();
-    update_interval: 1s
     internal: true
 
 #########################################################################
