@@ -7,6 +7,20 @@ namespace usage_tracker {
 
 static const char *const TAG = "usage_tracker";
 
+void UsageTracker::dump_config() {
+  ESP_LOGCONFIG(TAG, "Usage Tracker:");
+  if (this->sensor_ != nullptr) {
+    ESP_LOGCONFIG(TAG, "  Watched binary sensor: %s", this->sensor_->get_name().c_str());
+  }
+  if (this->last_on_duration_sensor_ != nullptr) {
+    ESP_LOGCONFIG(TAG, "  Last ON duration sensor: %s", this->last_on_duration_sensor_->get_name().c_str());
+  }
+  if (this->lifetime_use_sensor_ != nullptr) {
+    ESP_LOGCONFIG(TAG, "  Lifetime use sensor: %s", this->lifetime_use_sensor_->get_name().c_str());
+    ESP_LOGCONFIG(TAG, "  Current lifetime total: %.0f s", this->total_lifetime_use_);
+  }
+}
+
 void UsageTracker::setup() {
   ESP_LOGCONFIG(TAG, "Setting up Usage Tracker...");
 
