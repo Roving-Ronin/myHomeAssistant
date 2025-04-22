@@ -115,8 +115,6 @@ globals:
     restore_value: no
     initial_value: '""'
 
-
-
 #########################################################################
 #
 # Define the RGBW Lights and their GPIO PINS to control them.
@@ -165,8 +163,6 @@ binary_sensor:
     lambda: |-
       return id(downlight).current_values.is_on();
     update_interval: 1s
-    filters:
-      - debounce: 0.5s  # Optional: ignore rapid toggling
     internal: true
 
 #########################################################################
