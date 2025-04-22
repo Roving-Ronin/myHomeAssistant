@@ -42,14 +42,16 @@ void UsageTracker::setup() {
 
 void UsageTracker::loop() {
   const uint32_t now = millis();
-
   bool is_on = this->sensor_->state;
 
   // Detect transition ON -> OFF
   if (this->was_on_ && !is_on) {
     this->was_on_ = false;
     uint32_t duration = (now - this->on_start_time_) / 1000;
-
+    // Handle potential millis overflow
+    //uint32_t duration = (now >= this->on_start_time_)
+    //                       ? (now - this->on_start_time_) / 1000
+    //                       : (0xFFFFFFFF - this->on_start_time_ + now + 1) / 1000;
     ESP_LOGD(TAG, "Usage Tracker - Sensor OFF, last on duration: %u s", duration);
 
     if (this->last_use_sensor_ != nullptr) {
@@ -67,7 +69,6 @@ void UsageTracker::loop() {
   if (!this->was_on_ && is_on) {
     this->was_on_ = true;
     this->on_start_time_ = now;
-
     ESP_LOGD(TAG, "Usage Tracker - Source sensor turned ON");
   }
 
