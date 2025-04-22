@@ -14,27 +14,20 @@ Gather statistics for, how long a device such as a light or a shower was:
 ...
 external_components:
   - source: github://roving-ronin/myhomeassistant/components
+    components: [usage_tracker]
     refresh: 0s
 ...
 sensor:
-  - platform: "energy_statistics"
-    id: energy_statistics_component
-    total: total
+  - platform: "usage_tracker"
+    id: usage_tracker_component
+    on_off_sensor: state_device_such_as_light_switch
 
-    energy_today:
-      name: "$name Energy Today"
+    last_runtime:
+      name: "$name Last Runtime"
 
-    energy_yesterday:
-      name: "$name Energy Yesterday"
+    lifetime_runtime:
+      name: "$name Lifetime Runtime"
 
-    energy_week:
-      name: "$name Energy Week"
-
-    energy_month:
-      name: "$name Energy Month"
-
-    energy_year:
-      name: "$name Energy Year"
 ```
 
 ## Configuration variables:
