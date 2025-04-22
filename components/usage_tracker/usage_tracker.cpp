@@ -12,8 +12,8 @@ void UsageTracker::dump_config() {
   if (this->sensor_ != nullptr) {
     ESP_LOGCONFIG(TAG, "  Watched binary sensor: %s", this->sensor_->get_name().c_str());
   }
-  if (this->last_on_duration_sensor_ != nullptr) {
-    ESP_LOGCONFIG(TAG, "  Last ON duration sensor: %s", this->last_on_duration_sensor_->get_name().c_str());
+  if (this->last_use_sensor_ != nullptr) {
+    ESP_LOGCONFIG(TAG, "  Last ON duration sensor: %s", this->last_use_sensor_->get_name().c_str());
   }
   if (this->lifetime_use_sensor_ != nullptr) {
     ESP_LOGCONFIG(TAG, "  Lifetime use sensor: %s", this->lifetime_use_sensor_->get_name().c_str());
@@ -52,8 +52,8 @@ void UsageTracker::loop() {
 
     ESP_LOGD(TAG, "Usage Tracker - Sensor OFF, last on duration: %u s", duration);
 
-    if (this->last_on_duration_sensor_ != nullptr) {
-      this->last_on_duration_sensor_->publish_state(duration);
+    if (this->last_use_sensor_ != nullptr) {
+      this->last_use_sensor_->publish_state(duration);
     }
 
     this->total_lifetime_use_ += duration;
