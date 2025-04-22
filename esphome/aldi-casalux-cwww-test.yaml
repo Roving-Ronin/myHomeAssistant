@@ -76,7 +76,7 @@ external_components:
       url: https://github.com/roving-ronin/myhomeassistant/
       ref: main
     refresh: 0s
-    components: [ usage_timer ]
+    components: [ usage_tracker ]
 
 #########################################################################
 #
