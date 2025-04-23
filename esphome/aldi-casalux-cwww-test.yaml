@@ -170,7 +170,10 @@ sensor:
   - platform: "usage_tracker"
     id: usage_tracker_component
     on_off_sensor: downlight_state
-
+    web_server:
+      sorting_group_id: group_light_usage
+      sorting_weight: 1
+      
     last_use:
       id: usage_tracker_last_use
       unit_of_measurement: h
@@ -179,9 +182,7 @@ sensor:
         - lambda: |-
             return x / 3600.0;         # Convert seconds to hours
         - delta: 0.001                 # Only publish if value changes by at least 0.001 hours
-    web_server:
-      sorting_group_id: group_light_usage
-      sorting_weight: 1
+
 
     lifetime_use:
       id: usage_tracker_lifetime_use
@@ -191,9 +192,7 @@ sensor:
         - lambda: |-
             return x / 3600.0;         # Convert seconds to hours
         - delta: 0.001                 # Only publish if value changes by at least 0.001 hours
-    web_server:
-      sorting_group_id: group_light_usage
-      sorting_weight: 2
+
 
 #########################################################################
 #
