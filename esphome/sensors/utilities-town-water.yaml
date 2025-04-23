@@ -51,7 +51,7 @@ binary_sensor:
     name: "Town Water - Tap State Sensor"
     id: town_water_tap_state_sensor
     lambda: |-
-      if (id(town_water_flow_rate).state > 0.01)
+      return id(town_water_flow_rate).state > 0.01;
     on_press:
       then:
         - text_sensor.template.publish:
@@ -64,6 +64,7 @@ binary_sensor:
             state: "CLOSED"
     internal: true
 
+
 ################################################################################
 #
 #  Text Sensor - Used to publish if the tap is On
@@ -74,7 +75,7 @@ text_sensor:
     name: "Town Water - Tap State"
     id: town_water_tap_state
     icon: |-
-      if (id(tap_status_text).state == "OPEN") {
+      if (id(town_water_tap_state).state == "OPEN") {
         return "mdi:water-pump";
       } else {
         return "mdi:water-pump-off";
