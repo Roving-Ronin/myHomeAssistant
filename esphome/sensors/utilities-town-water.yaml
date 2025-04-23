@@ -242,6 +242,7 @@ sensor:
 
     last_use:
       name: "Town Water - Last Use Duration"
+      id: town_water_last_use_duration
       unit_of_measurement: "min"
       accuracy_decimals: 1
       filters:
@@ -255,6 +256,7 @@ sensor:
     # Don't want to show this sensor, but the custom_component requires that both sensors are used.
     lifetime_use:
       name: "Town Water - Lifetime Use Duration"
+      id: town_water_lifetime_use_duration
       unit_of_measurement: "min"
       accuracy_decimals: 1
       filters:
