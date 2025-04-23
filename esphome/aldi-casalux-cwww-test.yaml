@@ -177,8 +177,8 @@ sensor:
       accuracy_decimals: 3
       filters:
         - lambda: |-
-            return x / 3600.0;         # Convert seconds to hours
-        - delta: 0.001                 # Only publish if value changes by at least 0.001 hours
+            return x / 3600.0;
+        - delta: 0.001
 
 
     lifetime_use:
@@ -187,8 +187,8 @@ sensor:
       accuracy_decimals: 3
       filters:
         - lambda: |-
-            return x / 3600.0;         # Convert seconds to hours
-        - delta: 0.001                 # Only publish if value changes by at least 0.001 hours
+            return x / 3600.0;
+        - delta: 0.001
       web_server:
         sorting_group_id: group_light_usage
 
