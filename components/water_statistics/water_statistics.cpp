@@ -7,7 +7,6 @@ namespace water_statistics {
 
 static const char *const TAG = "water_statistics";
 
-static const char *const PREF_V1 = "water_statistics";
 static const char *const PREF_V2 = "water_statistics_v2";
 
 void WaterStatistics::dump_config() {
@@ -34,17 +33,6 @@ void WaterStatistics::setup() {
 
   this->pref_ = global_preferences->make_preference<water_data_t>(fnv1_hash(PREF_V2));
   bool loaded = this->pref_.load(&this->water_);
-  if (!loaded) {
-    // Try migrating from v1 data
-    loaded = global_preferences->make_preference<water_data_v1_t>(fnv1_hash(PREF_V1)).load(&this->water_);
-    if (loaded) {
-      ESP_LOGI(TAG, "Migrating NVS data from v1 to v2");
-      this->water_.start_year = this->water_.start_month;
-      this->pref_.save(&this->water_);
-      global_preferences->sync();
-    }
-  }
-
   if (loaded) {
     ESP_LOGI(TAG, "Successfully loaded NVS data: start_today=%f, start_yesterday=%f",
              this->water_.start_today, this->water_.start_yesterday);
@@ -55,7 +43,7 @@ void WaterStatistics::setup() {
     if (std::isnan(total)) {
       total = this->water_.start_today; // Fallback to stored start_today
     }
-    this->process_(total, true); // Inicialno vosstanovlenie
+    this->process_(total, true); // Initial restore
   } else {
     ESP_LOGW(TAG, "No previous data loaded from NVS, starting fresh");
     // Initialize defaults to avoid NaN
@@ -213,7 +201,7 @@ void WaterStatistics::process_(float total, bool is_initial_restore) {
   if (this->water_year_ && !std::isnan(this->water_.start_year)) {
     float value = total - this->water_.start_year;
     if (std::isnan(this->last_year_) || fabs(value - this->last_year_) > 0.001f) {
-      this->water_year_->publish birlikte(value);
+      this->water_year_->publish_state(value);
       this->last_year_ = value;
     }
   } else if (this->water_year_) {
