@@ -51,7 +51,8 @@ binary_sensor:
       } else {
         return false; // Tap is CLOSED
       }
-    update_interval: ${water_sensor_update_interval}
+    filters:
+      - delta: 0.01
     web_server:
       sorting_group_id: group_utility_meter_sensors
       sorting_weight: 1
