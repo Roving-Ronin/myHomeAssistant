@@ -52,15 +52,12 @@ class WaterStatistics : public Component {
   int water_year_start_day_{1};
 
   // Structure for storing water statistics in Litres
-  struct water_data_v1_t {
+  struct water_data_t {
     uint16_t current_day_of_year{0};
     float start_today{NAN};
     float start_yesterday{NAN};
     float start_week{NAN};
     float start_month{NAN};
-  };
-
-  struct water_data_t : public water_data_v1_t {
     float start_year{NAN};
   } water_;
 
