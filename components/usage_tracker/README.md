@@ -9,9 +9,6 @@ Gather statistics for, how long a device such as a light or a shower was:
 
 > You can take a look at sample of usage of the component in configuartion for the Aldi Casalux Smart LED (CWWWW or RGBW) Athom Plug devices in the: [aldi-casalux-smart-led-rgbw.yaml](../../esphome/sensors/aldi-casalux-smart-led-rgbw.yaml)
 > in this, these sensors are used to show how long the light was last on for and the total runtime the light has had, to allow tracking for predicted failure as compared to manufacturers published x,000 hour lifespan.
->
-> As the manufactuers always publish the anticipated lifetime in hours, the last_use and lifetime_use sensors have a lambda that converts the seconds output into hours, with 3 decimal places, whilst also filtering the sensor to only update when used
- 
 
 ```yaml
 # Example configuration entry
@@ -33,6 +30,58 @@ sensor:
       name: "Duration Lifetime Use"
 
 ```
+
+> As the manufactuers always publish the anticipated lifetime in hours, the last_use and lifetime_use sensors have a lambda that converts the seconds output into hours, with 3 decimal places, whilst also filtering the sensor to only update when used. This is shown below:
+
+```yaml
+# Example configuration entry for use with lights
+
+external_components:
+  - source: github://roving-ronin/myhomeassistant/components
+    components: [usage_tracker]
+    refresh: 0s
+
+binary_sensor:
+  - platform: template
+    name: "Downlight State"
+    id: downlight_state
+    lambda: |-
+      return id(downlight).current_values.is_on();
+    internal: true
+
+sensor:
+  - platform: "usage_tracker"
+    id: usage_tracker_component
+    on_off_sensor: downlight_state
+
+    last_use:
+      name: "Duration Last Use"
+      id: duration_last_use
+      unit_of_measurement: h
+      accuracy_decimals: 3
+      filters:
+        - lambda: |-
+            return x / 3600.0;
+        - delta: 0.001
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 1
+
+    lifetime_use:
+      name: "Duration Lifetime Use"
+      id: duration_lifetime_use
+      unit_of_measurement: h
+      accuracy_decimals: 3
+      filters:
+        - lambda: |-
+            return x / 3600.0;
+        - delta: 0.001
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 2
+
+```
+
 
 ## Configuration variables:
 * **id** (*Optional*, [ID](https://esphome.io/guides/configuration-types.html#config-id)): Manually specify the ID used for code generation.
