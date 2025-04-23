@@ -74,6 +74,19 @@ packages:
  # Remove Network section (IPv6), as not supported on this chipset
 network: !remove
 
+#########################################################################
+#
+# Custom Components to be utilised - For Light Last/Lifetime usage
+#
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/roving-ronin/myhomeassistant/
+      ref: main
+    refresh: 0s
+    components: [ usage_tracker ]
+    
 #####################################################################
 #
 # Combined with web_server settings in /common/base-configuration to
@@ -87,6 +100,10 @@ web_server:
       name: "Light Controls"
       sorting_weight: -30
 
+    - id: group_light_usage
+      name: "Light Statistics"
+      sorting_weight: -20
+      
 #########################################################################
 #
 # Define the RGBW Lights and their GPIO PINS to control them.
@@ -121,6 +138,58 @@ light:
     web_server:
       sorting_group_id: group_light_controls
       sorting_weight: 1
+
+
+#########################################################################
+#
+# Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
+# This is used by the usage_tracker as its source sensor.
+#
+
+binary_sensor:
+  - platform: template
+    name: "Downlight State"
+    id: downlight_state
+    lambda: |-
+      return id(downlight).current_values.is_on();
+    internal: true
+
+#########################################################################
+#
+# Define the sensors that publish the Last Use & Lifetime Use duration of the LED.
+# See: https://github.com/Roving-Ronin/myHomeAssistant/tree/main/components/usage_tracker
+#
+
+sensor:
+  - platform: "usage_tracker"
+    id: usage_tracker_component
+    on_off_sensor: downlight_state
+      
+    last_use:
+      name: "Duration Last Use"
+      id: duration_last_use
+      unit_of_measurement: h
+      accuracy_decimals: 3
+      filters:
+        - lambda: |-
+            return x / 3600.0;
+        - delta: 0.001
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 1
+
+    lifetime_use:
+      name: "Duration Lifetime Use"
+      id: duration_lifetime_use
+      unit_of_measurement: h
+      accuracy_decimals: 3
+      filters:
+        - lambda: |-
+            return x / 3600.0;
+        - delta: 0.001
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 2
 
 #########################################################################
 #
