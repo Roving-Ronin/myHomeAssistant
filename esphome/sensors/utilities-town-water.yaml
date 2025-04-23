@@ -36,7 +36,7 @@ globals:
 #    initial_value: '0.0'  # When Factory Reset, return this value to '0.0'
 
   # Used by the text_sensor to reformat the Last Used Duration into hours/minutes/seconds.
-  - id: last_formatted_duration
+  - id: last_formatted_duration_town_water
     type: std::string
     restore_value: no
     initial_value: '""'
@@ -123,8 +123,8 @@ text_sensor:
         new_value = to_string(seconds) + "s";
       }
       // Only return a new value if it differs from the previous one
-      if (new_value != id(last_formatted_duration)) {
-        id(last_formatted_duration) = new_value;
+      if (new_value != id(last_formatted_duration_town_water)) {
+        id(last_formatted_duration_town_water) = new_value;
         return new_value;
       }
       return {};
