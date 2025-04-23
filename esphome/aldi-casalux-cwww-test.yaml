@@ -189,8 +189,8 @@ sensor:
         - lambda: |-
             return x / 3600.0;         # Convert seconds to hours
         - delta: 0.001                 # Only publish if value changes by at least 0.001 hours
-    web_server:
-      sorting_group_id: group_light_usage
+      web_server:
+        sorting_group_id: group_light_usage
 
 #########################################################################
 #
