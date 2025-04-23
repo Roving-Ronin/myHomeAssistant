@@ -74,12 +74,7 @@ text_sensor:
   - platform: template
     name: "Town Water - Tap State"
     id: town_water_tap_state
-    icon: |-
-      if (id(town_water_tap_state).state == "OPEN") {
-        return "mdi:water-pump";
-      } else {
-        return "mdi:water-pump-off";
-      }
+    icon: "mdi:water-pump"
     update_interval: never
     web_server:
       sorting_group_id: group_utility_meter_sensors
