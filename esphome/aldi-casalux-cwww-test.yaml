@@ -180,7 +180,9 @@ sensor:
         - lambda: |-
             return x / 3600.0;
         - delta: 0.001
-
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 1
 
     lifetime_use:
       name: "Light - Lifetime Use"
@@ -191,8 +193,9 @@ sensor:
         - lambda: |-
             return x / 3600.0;
         - delta: 0.001
-    web_server:
-      sorting_group_id: group_light_usage
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 2
 
 #########################################################################
 #
