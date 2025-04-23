@@ -132,7 +132,7 @@ sensor:
         pullup: true
     web_server:
       sorting_group_id: group_utility_meter_sensors
-      sorting_weight: 9
+      sorting_weight: 11
 
 
   - platform: pulse_meter
