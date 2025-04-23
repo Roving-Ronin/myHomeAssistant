@@ -45,7 +45,7 @@ void GasStatistics::setup() {
     }
     this->process_(total, true); // Initial restore
   } else {
-    ESP_LOGW(TAG, "No previous data loaded from NVS, starting fresh");
+    ESP_LOGW(TAG, "Gas (m³) no previous data loaded from NVS, starting fresh");
     // Initialize defaults to avoid NaN
     this->gas_.start_today = 0.0f;
     this->gas_.start_yesterday = 0.0f;
