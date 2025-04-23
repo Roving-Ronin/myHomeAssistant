@@ -172,6 +172,7 @@ sensor:
     on_off_sensor: downlight_state
       
     last_use:
+      name: "Light - Last Use"
       id: usage_tracker_last_use
       unit_of_measurement: h
       accuracy_decimals: 3
@@ -182,6 +183,7 @@ sensor:
 
 
     lifetime_use:
+      name: "Light - Lifetime Use"
       id: usage_tracker_lifetime_use
       unit_of_measurement: h
       accuracy_decimals: 3
@@ -189,7 +191,8 @@ sensor:
         - lambda: |-
             return x / 3600.0;
         - delta: 0.001
-
+    web_server:
+      sorting_group_id: group_light_usage
 
 #########################################################################
 #
