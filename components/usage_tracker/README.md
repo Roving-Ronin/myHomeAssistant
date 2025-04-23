@@ -7,7 +7,7 @@ Gather statistics for, how long a device such as a light or a shower was:
 * used for in its lifetime (accumulated across reboots)
 
 
-> You can take a look at sample of usage of the component in configuartion for the Aldi Casalux Smart LED (CWWWW or RGBW) Athom Plug devices in the: [aldi-casalux-smart-led-rgbw.yaml](../../esphome/sensors/aldi-casalux-smart-led-rgbw.yaml)
+> You can take a look at sample of usage of the component in configuartion for the Aldi Casalux Smart LED (CWWWW or RGBW): [aldi-casalux-smart-led-rgbw.yaml](../../esphome/aldi-casalux-smart-led-rgbw.yaml)
 > in this, these sensors are used to show how long the light was last on for and the total runtime the light has had, to allow tracking for predicted failure as compared to manufacturers published x,000 hour lifespan.
 
 ```yaml
@@ -91,4 +91,4 @@ sensor:
 * **lifetime_use** (*Optional*, Sensor):
   * Any options from [Sensor](https://esphome.io/components/sensor/index.html#config-sensor).
 
-Note: To reduce wear on the ESP devices flash memory, so as to increase the devices lifespan, the readings are only written to flash every 5 minutes. To change this edit the value of "if (millis() - this->last_save_time_ > 300000) {" in usage_tracker.h
+Note: To reduce wear on the ESP devices flash memory, so as to increase the devices lifespan, the readings are only written to flash every 5 minutes. To change this edit the value of "if (millis() - this->last_save_time_ > 300000) {" in [usage_tracker.h](../../components/usage_tracker/usage_tracker.h)
