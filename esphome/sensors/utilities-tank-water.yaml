@@ -11,6 +11,7 @@ substitutions:
   water_sensor_update_interval: 15s
   # Multiplier used in the flow rate calculation. Set to the number of litres 1 rotation of the meter equals.
   tank_water_litres_per_pulse: "5.0"
+
   
 ########################## End of Substitutions #########################
 #
@@ -34,11 +35,103 @@ globals:
     restore_value: yes
 #    initial_value: '0.0'  # When Factory Reset, return this value to '0.0'
 
+  # Used by the text_sensor to reformat the Last Used Duration into hours/minutes/seconds.
+  - id: last_formatted_duration_tank_water
+    type: std::string
+    restore_value: no
+    initial_value: '""'
 
 ################################################################################
 #
 #  Sensors
 #
+
+
+################################################################################
+#
+#  Binary Sensor - Used to internally determine if the tap is ON/OFF.
+#
+
+binary_sensor:
+  - platform: template
+    name: "Tank Water - Tap State Sensor"
+    id: tank_water_tap_state_sensor
+    lambda: |-
+      return id(tank_water_flow_rate).state > 0.01;
+    on_press:
+      then:
+        - text_sensor.template.publish:
+            id: tank_water_tap_state
+            state: "OPEN"
+    on_release:
+      then:
+        - text_sensor.template.publish:
+            id: tank_water_tap_state
+            state: "CLOSED"
+    internal: true
+
+
+################################################################################
+#
+#  Text Sensor - Used to publish if the tap is On
+#
+
+text_sensor:
+  - platform: template
+    name: "Tank Water - Tap State"
+    id: tank_water_tap_state
+    icon: "mdi:water-pump"
+    update_interval: never
+    web_server:
+      sorting_group_id: group_utility_meter_sensors
+      sorting_weight: 6
+
+
+  - platform: template
+    name: "Tank Water - Last Use Duration"
+    id: tank_water_last_use_duration
+    icon: mdi:timer-outline
+    lambda: |-
+      // Check if the sensor has a valid state
+      if (!id(tank_water_last_use_sensor).has_state()) {
+        return std::string("Unknown");
+      }
+
+      int seconds = id(tank_water_last_use_sensor).state;
+      if (seconds < 0) {
+        return std::string("Unknown");
+      }
+
+      // Format the duration
+      int days = seconds / (24 * 3600);
+      seconds = seconds % (24 * 3600);
+      int hours = seconds / 3600;
+      seconds = seconds % 3600;
+      int minutes = seconds / 60;
+      seconds = seconds % 60;
+
+      std::string new_value;
+      if (days > 3650) {
+        new_value = "Starting up";
+      } else if (days) {
+        new_value = to_string(days) + "d " + to_string(hours) + "h " + to_string(minutes) + "m " + to_string(seconds) + "s";
+      } else if (hours) {
+        new_value = to_string(hours) + "h " + to_string(minutes) + "m " + to_string(seconds) + "s";
+      } else if (minutes) {
+        new_value = to_string(minutes) + "m " + to_string(seconds) + "s";
+      } else {
+        new_value = to_string(seconds) + "s";
+      }
+      // Only return a new value if it differs from the previous one
+      if (new_value != id(last_formatted_duration_tank_water)) {
+        id(last_formatted_duration_tank_water) = new_value;
+        return new_value;
+      }
+      return {};
+#    update_interval: 10s
+    web_server:
+      sorting_group_id: group_utility_meter_sensors
+      sorting_weight: 9
 
 sensor:
   ################################################################################
@@ -61,7 +154,7 @@ sensor:
       - multiply: ${tank_water_litres_per_pulse}  # Convert pulse count to liters
     web_server:
       sorting_group_id: group_utility_meter_sensors
-      sorting_weight: 7
+      sorting_weight: 8
 
 
   - platform: pulse_meter
@@ -86,7 +179,7 @@ sensor:
       - multiply: ${tank_water_litres_per_pulse}  # Each pulse equals 5 liters. The water counter 'helper' in Home Assistant must still be set to 'step size' = 5.
     web_server:
       sorting_group_id: group_utility_meter_sensors
-      sorting_weight: 6
+      sorting_weight: 7
 
     #  Uses the above pulse_meter and adds sensor and calculations for tracking current litres
     total:
@@ -175,4 +268,37 @@ sensor:
       sorting_group_id: group_tank_water_sensors
       sorting_weight: 9
 
+  
+  ################################################################################
+  #
+  #  Uses the Usage_Tracker custom component to publish duration of last tap OPEN.
+  #
+
+  - platform: usage_tracker
+    on_off_sensor: tank_water_tap_state_sensor
+
+    # This is internal as we use a text_sensor above to reformat the output into days/hours/min/sec.
+    last_use:
+      name: "Tank Water - Last Use Sensor"
+      id: tank_water_last_use_sensor
+      accuracy_decimals: 1
+      filters:
+        - delta: 0.1         # Only update if change is ≥ 0.1 min
+      internal: true
+
+    # Don't want to show this sensor, but the custom_component requires that both sensors are used.
+    lifetime_use:
+      name: "Tank Water - Lifetime Use Duration"
+      id: tank_water_lifetime_use_sensor
+      unit_of_measurement: "min"
+      accuracy_decimals: 1
+      filters:
+        - lambda: |-
+            return x / 60.0;
+        - delta: 0.1         # Only update if change is ≥ 0.1 min
+      web_server:
+        sorting_group_id: group_utility_meter_sensors
+        sorting_weight: 10
+      internal: true
+      
   ################################################################################
