@@ -26,7 +26,7 @@ substitutions:
   # Project Name
   project_name: "DIY.Utilities Monitor"
   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "1.5.1"
+  project_version: "1.5.2"
   # The phase in the locations power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C).
   # Used to populate a Text Sensor with this information, that may be used to loadshed in future, or trace outages to electrical faults.
   power_circuit: "TBA"
