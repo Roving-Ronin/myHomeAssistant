@@ -7,7 +7,6 @@ namespace gas_statistics_mj {
 
 static const char *const TAG = "gas_statistics_mj";
 
-static const char *const PREF_V1 = "gas_statistics_mj";
 static const char *const PREF_V2 = "gas_statistics_mj_v2";
 
 void GasStatisticsMJ::dump_config() {
@@ -29,80 +28,93 @@ void GasStatisticsMJ::dump_config() {
   }
 }
 
-
 void GasStatisticsMJ::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
 
   this->pref_ = global_preferences->make_preference<gas_mj_data_t>(fnv1_hash(PREF_V2));
   bool loaded = this->pref_.load(&this->gas_);
-  if (!loaded) {
-    // migrating from v1 data
-    loaded = global_preferences->make_preference<gas_mj_data_v1_t>(fnv1_hash(PREF_V1)).load(&this->gas_);
-    if (loaded) {
-      this->gas_.start_year = this->gas_.start_month;
-      // save as v2
-      this->pref_.save(&this->gas_);
-      global_preferences->sync();
-    }
-  }
   if (loaded) {
+    ESP_LOGI(TAG, "Gas (MJ) successfully loaded NVS data: start_today=%f, start_yesterday=%f",
+             this->gas_.start_today, this->gas_.start_yesterday);
+    this->initial_total_retries_ = 40; // Try for 5 seconds to get valid total
+    this->has_loaded_nvs_ = true;
+    // Process stored values immediately for initial restoration
     float total = this->total_->state;
-    int retries = 20; // Wait up to 5 seconds (your preference)
-    while ((std::isnan(total) || total <= 0.0f) && retries > 0) {
-      ESP_LOGD(TAG, "Waiting for valid total: %f, retries: %d", total, retries);
-      delay(100);
-      total = this->total_->state;
-      retries--;
+    if (std::isnan(total)) {
+      total = this->gas_.start_today; // Fallback to stored start_today
     }
-    if (!std::isnan(total) && total > 0.0f) {
-      ESP_LOGD(TAG, "Processing restored total: %f", total);
-      this->process_(total);
-    } else {
-      ESP_LOGW(TAG, "Total invalid after 5s: %f, retaining prior stats", total);
-    }
+    this->process_(total, true); // Initial restore
+  } else {
+    ESP_LOGW(TAG, "Gas (MJ) no previous data loaded from NVS, starting fresh");
+    // Initialize defaults to avoid NaN
+    this->gas_.start_today = 0.0f;
+    this->gas_.start_yesterday = 0.0f;
+    this->gas_.start_week = 0.0f;
+    this->gas_.start_month = 0.0f;
+    this->gas_.start_year = 0.0f;
+    this->pref_.save(&this->gas_);
+    this->process_(0.0f, true); // Initial restore with zero
   }
 }
 
-
 void GasStatisticsMJ::loop() {
+  // Handle initial total check non-blocking
+  if (this->has_loaded_nvs_ && this->initial_total_retries_ > 0) {
+    float total = this->total_->state;
+    if (!std::isnan(total) && total >= 0.0f) {
+      ESP_LOGD(TAG, "Gas (MJ) processing restored total: %f", total);
+      this->process_(total);
+      this->initial_total_retries_ = 0; // Done
+      this->has_loaded_nvs_ = false;
+    } else {
+      ESP_LOGD(TAG, "Gas (MJ) waiting for valid total: %f, retries: %d", total, this->initial_total_retries_);
+      this->initial_total_retries_--;
+      if (this->initial_total_retries_ == 0) {
+        ESP_LOGW(TAG, "Gas (MJ) total invalid after 5s: %f, retaining prior stats", total);
+        this->has_loaded_nvs_ = false;
+      }
+      return; // Yield to avoid blocking
+    }
+  }
+
   const auto t = this->time_->now();
   if (!t.is_valid()) {
-    // time is not sync yet
+    // Time is not synced yet
     return;
   }
 
   const auto total = this->total_->get_state();
   if (std::isnan(total)) {
-    // total is not published yet
+    // Total is not published yet
     return;
   }
 
-  // update stats first time or on next day
+  // Update stats on first run or when day changes
   if (t.day_of_year == this->gas_.current_day_of_year) {
-    // nothing to do
+    // Nothing to do
     return;
   }
 
+  // Save the current day's data
   this->gas_.start_yesterday = this->gas_.start_today;
-
   this->gas_.start_today = total;
 
   if (this->gas_.current_day_of_year != 0) {
-    // at specified day of week we start a new week calculation
+    // At specified day of week, start a new week calculation
     if (t.day_of_week == this->gas_week_start_day_) {
       this->gas_.start_week = total;
     }
-    // at first day of month we start a new month calculation
+    // At first day of month, start a new month calculation
     if (t.day_of_month == 1) {
       this->gas_.start_month = total;
     }
-    // at first day of year we start a new year calculation
+    // At first day of year, start a new year calculation
     if (t.day_of_year == 1) {
       this->gas_.start_year = total;
     }
   }
 
-  // Intitialize all sensors. https://github.com/dentra/esphome-components/issues/65
+  // Initialize all sensors (fix for issue #65)
   if (this->gas_week_ && std::isnan(this->gas_.start_week)) {
     this->gas_.start_week = this->gas_.start_yesterday;
   }
@@ -112,48 +124,101 @@ void GasStatisticsMJ::loop() {
   if (this->gas_year_ && std::isnan(this->gas_.start_year)) {
     this->gas_.start_year = this->gas_.start_yesterday;
   }
-  
+
   this->gas_.current_day_of_year = t.day_of_year;
 
   this->process_(total);
 }
 
+void GasStatisticsMJ::process_(float total, bool is_initial_restore) {
+  bool data_changed = false;
 
-void GasStatisticsMJ::process_(float total) {
+  // Use stored start_today as fallback for initial restore if total is invalid
+  if (is_initial_restore && std::isnan(total)) {
+    total = this->gas_.start_today;
+    if (std::isnan(total)) {
+      total = 0.0f; // Ultimate fallback
+    }
+  }
+
+  // Calculate and publish today's gas
   if (this->gas_today_ && !std::isnan(this->gas_.start_today)) {
-    this->gas_today_->publish_state(total - this->gas_.start_today);
+    float value = total - this->gas_.start_today;
+    if (std::isnan(this->last_today_) || fabs(value - this->last_today_) > 0.001f) {
+      this->gas_today_->publish_state(value);
+      this->last_today_ = value;
+    }
+  } else if (this->gas_today_) {
+    if (std::isnan(this->last_today_) || fabs(0.0f - this->last_today_) > 0.001f) {
+      this->gas_today_->publish_state(0);
+      this->last_today_ = 0.0f;
+    }
   }
 
+  // Calculate and publish yesterday's gas
   if (this->gas_yesterday_ && !std::isnan(this->gas_.start_yesterday)) {
-    this->gas_yesterday_->publish_state(this->gas_.start_today - this->gas_.start_yesterday);
+    float value = this->gas_.start_today - this->gas_.start_yesterday;
+    if (std::isnan(this->last_yesterday_) || fabs(value - this->last_yesterday_) > 0.001f) {
+      this->gas_yesterday_->publish_state(value);
+      this->last_yesterday_ = value;
+    }
   } else if (this->gas_yesterday_) {
-    // If there's no value for yesterday (NaN), publish 0
-    this->gas_yesterday_->publish_state(0);
+    if (std::isnan(this->last_yesterday_) || fabs(0.0f - this->last_yesterday_) > 0.001f) {
+      this->gas_yesterday_->publish_state(0);
+      this->last_yesterday_ = 0.0f;
+    }
   }
 
+  // Calculate and publish weekly gas
   if (this->gas_week_ && !std::isnan(this->gas_.start_week)) {
-    this->gas_week_->publish_state(total - this->gas_.start_week);
+    float value = total - this->gas_.start_week;
+    if (std::isnan(this->last_week_) || fabs(value - this->last_week_) > 0.001f) {
+      this->gas_week_->publish_state(value);
+      this->last_week_ = value;
+    }
   } else if (this->gas_week_) {
-    // If there's no value for week (NaN), publish 0
-    this->gas_week_->publish_state(0);
+    if (std::isnan(this->last_week_) || fabs(0.0f - this->last_week_) > 0.001f) {
+      this->gas_week_->publish_state(0);
+      this->last_week_ = 0.0f;
+    }
   }
 
+  // Calculate and publish monthly gas
   if (this->gas_month_ && !std::isnan(this->gas_.start_month)) {
-    this->gas_month_->publish_state(total - this->gas_.start_month);
+    float value = total - this->gas_.start_month;
+    if (std::isnan(this->last_month_) || fabs(value - this->last_month_) > 0.001f) {
+      this->gas_month_->publish_state(value);
+      this->last_month_ = value;
+    }
   } else if (this->gas_month_) {
-    // If there's no value for month (NaN), publish 0
-    this->gas_month_->publish_state(0);
+    if (std::isnan(this->last_month_) || fabs(0.0f - this->last_month_) > 0.001f) {
+      this->gas_month_->publish_state(0);
+      this->last_month_ = 0.0f;
+    }
   }
 
+  // Calculate and publish yearly gas
   if (this->gas_year_ && !std::isnan(this->gas_.start_year)) {
-    this->gas_year_->publish_state(total - this->gas_.start_year);
+    float value = total - this->gas_.start_year;
+    if (std::isnan(this->last_year_) || fabs(value - this->last_year_) > 0.001f) {
+      this->gas_year_->publish_state(value);
+      this->last_year_ = value;
+    }
   } else if (this->gas_year_) {
-    // If there's no value for year (NaN), publish 0
-    this->gas_year_->publish_state(0);
+    if (std::isnan(this->last_year_) || fabs(0.0f - this->last_year_) > 0.001f) {
+      this->gas_year_->publish_state(0);
+      this->last_year_ = 0.0f;
+    }
   }
 
-  this->pref_.save(&this->gas_);
+  // Save to NVS only if data has changed (e.g., new day or initial restore)
+  if (this->gas_.current_day_of_year != this->time_->now().day_of_year ||
+      is_initial_restore || this->has_loaded_nvs_) {
+    this->pref_.save(&this->gas_);
+    ESP_LOGD(TAG, "Gas (MJ) saved NVS data: start_today=%f, start_yesterday=%f",
+             this->gas_.start_today, this->gas_.start_yesterday);
+  }
 }
 
-}  // namespace gas_statistics
+}  // namespace gas_statistics_mj
 }  // namespace esphome
