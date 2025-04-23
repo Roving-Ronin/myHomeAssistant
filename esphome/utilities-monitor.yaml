@@ -84,7 +84,7 @@ external_components:
   - source:
       type: git
       url: https://github.com/roving-ronin/myhomeassistant/
-      ref: development
+      ref: main
     refresh: 0s
     components: [ gas_statistics, gas_statistics_mj, water_statistics, usage_tracker ]
 
