@@ -125,35 +125,35 @@ sensor:
       id: tank_water_today
       web_server:
         sorting_group_id: group_tank_water_sensors
-        sorting_weight: 1
+        sorting_weight: 4
     
     water_yesterday:
       name: "Tank Water - Yesterday"
       id: tank_water_yesterday
       web_server:
         sorting_group_id: group_tank_water_sensors
-        sorting_weight: 2
+        sorting_weight: 5
 
     water_week:
       name: "Tank Water - Week"
       id: tank_water_week
       web_server:
         sorting_group_id: group_tank_water_sensors
-        sorting_weight: 3
+        sorting_weight: 6
     
     water_month:
       name: "Tank Water - Month"
       id: tank_water_month
       web_server:
         sorting_group_id: group_tank_water_sensors
-        sorting_weight: 4
+        sorting_weight: 7
 
     water_year:
       name: "Tank Water - Year"
       id: tank_water_year
       web_server:
         sorting_group_id: group_tank_water_sensors
-        sorting_weight: 5
+        sorting_weight: 8
 
 
   ################################################################################
@@ -173,6 +173,6 @@ sensor:
           return id(global_tank_water_total);
     web_server:
       sorting_group_id: group_tank_water_sensors
-      sorting_weight: 6
+      sorting_weight: 9
 
   ################################################################################
