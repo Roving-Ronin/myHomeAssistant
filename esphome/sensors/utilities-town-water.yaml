@@ -256,4 +256,19 @@ sensor:
       web_server:
         sorting_group_id: group_utility_meter_sensors
         sorting_weight: 4
+
+    # Don't want to show this sensor, but the custom_component requires that both sensors are used.
+    lifetime_use:
+      name: "Town Water - Lifetime Use Duration"
+      unit_of_measurement: "min"
+      accuracy_decimals: 1
+      filters:
+        - lambda: |-
+            return x / 60.0;
+        - delta: 0.1         # Only update if change is ≥ 0.1 min
+      web_server:
+        sorting_group_id: group_utility_meter_sensors
+        sorting_weight: 5
+      internal: true
+      
   ################################################################################
