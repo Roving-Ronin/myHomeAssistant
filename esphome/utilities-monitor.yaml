@@ -95,6 +95,8 @@ external_components:
 #
 
 web_server:
+  css_url: https://raw.githubusercontent.com/Roving-Ronin/myHomeAssistant/main/esphome/custom_dashboard/tabs.css
+  js_url: https://raw.githubusercontent.com/Roving-Ronin/myHomeAssistant/main/esphome/custom_dashboard/utilities-monitor.js
   sorting_groups:
       # This sort group is used by both the Water and Gas Meter senors (flow rate / pulse counter), so must be in at this level, not in the water vs gas sensor yaml
     - id: group_utility_meter_sensors
