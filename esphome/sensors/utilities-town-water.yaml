@@ -35,32 +35,68 @@ globals:
     restore_value: yes
 #    initial_value: '0.0'  # When Factory Reset, return this value to '0.0'
 
-
-################################################################################
-#
-#  Binary Sensor - Used to publish if the tap is On
-#
-
-binary_sensor:
-  - platform: template
-    name: "Town Water - Tap State"
-    id: town_water_tap_state
-    lambda: |-
-      if (id(town_water_flow_rate).state > 0.01) {
-        return true;  // Tap is OPEN
-      } else {
-        return false; // Tap is CLOSED
-      }
-    filters:
-      - delta: 0.01
-    web_server:
-      sorting_group_id: group_utility_meter_sensors
-      sorting_weight: 1
-
 ################################################################################
 #
 #  Sensors
 #
+
+
+################################################################################
+#
+#  Binary Sensor - Used to internally determine if the tap is ON/OFF.
+#
+
+binary_sensor:
+  - platform: template
+    name: "Town Water - Tap State Sensor"
+    id: town_water_tap_state_sensor
+    lambda: |-
+      if (id(town_water_flow_rate).state > 0.01)
+    on_press:
+      then:
+        - text_sensor.template.publish:
+            id: town_water_tap_state
+            state: "OPEN"
+    on_release:
+      then:
+        - text_sensor.template.publish:
+            id: town_water_tap_state
+            state: "CLOSED"
+    internal: true
+
+################################################################################
+#
+#  Text Sensor - Used to publish if the tap is On
+#
+
+text_sensor:
+  - platform: template
+    name: "Town Water - Tap State"
+    id: town_water_tap_state
+    icon: |-
+      if (id(tap_status_text).state == "OPEN") {
+        return "mdi:water-pump";
+      } else {
+        return "mdi:water-pump-off";
+      }
+    update_interval: never
+    web_server:
+      sorting_group_id: group_utility_meter_sensors
+      sorting_weight: 1
+
+
+  - platform: template
+    name: "Town Water Last Use Formatted"
+    lambda: |-
+      int total_seconds = int(id(town_water_last_use_duration).state);
+      int hours = total_seconds / 3600;
+      int minutes = (total_seconds % 3600) / 60;
+      int seconds = total_seconds % 60;
+      char buffer[20];
+      sprintf(buffer, "%02d:%02d:%02d", hours, minutes, seconds);
+      return std::string(buffer);
+    update_interval: 10s
+
 
 
 sensor:
@@ -206,7 +242,7 @@ sensor:
   #
 
   - platform: usage_tracker
-    on_off_sensor: town_water_tap_state
+    on_off_sensor: town_water_tap_state_sensor
 
     last_use:
       name: "Town Water - Last Use Duration"
