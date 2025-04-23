@@ -175,7 +175,7 @@ sensor:
         pullup: true
     internal_filter_mode: PULSE
     internal_filter: 100ms
-    timeout: 3min
+    timeout: 90s #3min
     filters:
       - multiply: ${town_water_litres_per_pulse}  # Each pulse equals 5 liters. The water counter 'helper' in Home Assistant must still be set to 'step size' = 5.
     web_server:
