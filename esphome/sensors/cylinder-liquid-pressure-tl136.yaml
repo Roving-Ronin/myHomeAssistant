@@ -36,9 +36,9 @@ substitutions:
 
 web_server:
   sorting_groups:
-    - id: group_water_tank_sensors
-      name: "Water Tank Sensors"
-      sorting_weight: -40
+    - id: group_tank_water_sensors
+      name: "Tank Water Sensors"
+      sorting_weight: -39
 
 
 ###########################################################################
@@ -149,7 +149,7 @@ sensor:
     filters:
       - delta : 0.001     # Only send the result if the difference with the last sent result is higher than this
     web_server:
-      sorting_group_id: group_water_tank_sensors
+      sorting_group_id: group_tank_water_sensors
       sorting_weight: 1
 
 ################################################################################
@@ -171,7 +171,7 @@ sensor:
     filters:
       - delta : 0.1 #only send the result if the difference with the last sent result is higher than this
     web_server:
-      sorting_group_id: group_water_tank_sensors
+      sorting_group_id: group_tank_water_sensors
       sorting_weight: 2
 
 ################################################################################
@@ -202,7 +202,7 @@ sensor:
     filters:
       - delta : 0.001 #only send the result if the difference with the last sent result is higher than this
     web_server:
-      sorting_group_id: group_water_tank_sensors
+      sorting_group_id: group_tank_water_sensors
       sorting_weight: 2
 
 ## 655.4 m or 2150.3 feet Location :-34.72 , 149.72
