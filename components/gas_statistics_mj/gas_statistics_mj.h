@@ -35,6 +35,7 @@ class GasStatisticsMJ : public Component {
   int initial_total_retries_{0};
   bool has_loaded_nvs_{false};
   bool initial_processing_started_{false};
+  int sntp_retries_{0};
 
   // Input sensors
   Sensor *total_{nullptr};
@@ -53,8 +54,8 @@ class GasStatisticsMJ : public Component {
   // Start day of year configuration
   int gas_year_start_day_{1};
 
-  // Structure for storing gas statistics in Litres
-  struct gas_data_t {
+  // Structure for storing gas statistics in megajoules
+  struct gas_mj_data_t {
     uint16_t current_day_of_year{0};
     float start_today{NAN};
     float start_yesterday{NAN};
@@ -71,6 +72,7 @@ class GasStatisticsMJ : public Component {
   float last_year_{NAN};
 
   void process_(float total, bool is_initial_restore = false);
+  void retry_sntp_sync_();
 };
 
 }  // namespace gas_statistics_mj
