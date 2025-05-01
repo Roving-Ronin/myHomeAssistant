@@ -31,10 +31,10 @@ void GasStatisticsMJ::dump_config() {
 void GasStatisticsMJ::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
 
-  this->pref_ = global_preferences->make_preference<gas_mj_data_t>(fnv1_hash(PREF_V2));
+  this->pref_ = global_preferences->make_preference<gas_data_t>(fnv1_hash(PREF_V2));
   bool loaded = this->pref_.load(&this->gas_);
   if (loaded) {
-    ESP_LOGI(TAG, "Gas (MJ) successfully loaded NVS data: start_today=%f, start_yesterday=%f",
+    ESP_LOGI(TAG, "Successfully loaded NVS data: start_today=%f, start_yesterday=%f",
              this->gas_.start_today, this->gas_.start_yesterday);
     this->initial_total_retries_ = 40; // Try for 5 seconds to get valid total
     this->has_loaded_nvs_ = true;
@@ -55,22 +55,37 @@ void GasStatisticsMJ::setup() {
     this->pref_.save(&this->gas_);
     this->process_(0.0f, true); // Initial restore with zero
   }
+
+  // Register shutdown hook to save NVS data
+  this->add_shutdown_hook([this]() {
+    this->pref_.save(&this->gas_);
+    ESP_LOGD(TAG, "Saved NVS data on shutdown: start_today=%f, start_yesterday=%f",
+             this->gas_.start_today, this->gas_.start_yesterday);
+  });
+
+  // Delay initial loop processing until time sync
+  this->set_timeout(15000, [this]() { this->initial_processing_started_ = true; });
 }
 
+
 void GasStatisticsMJ::loop() {
+  // Skip processing until initial delay for time sync
+  if (!this->initial_processing_started_) {
+    return;
+  }
   // Handle initial total check non-blocking
   if (this->has_loaded_nvs_ && this->initial_total_retries_ > 0) {
     float total = this->total_->state;
     if (!std::isnan(total) && total >= 0.0f) {
-      ESP_LOGD(TAG, "Gas (MJ) processing restored total: %f", total);
+      ESP_LOGD(TAG, "Processing restored total: %f", total);
       this->process_(total);
       this->initial_total_retries_ = 0; // Done
       this->has_loaded_nvs_ = false;
     } else {
-      ESP_LOGD(TAG, "Gas (MJ) waiting for valid total: %f, retries: %d", total, this->initial_total_retries_);
+      ESP_LOGD(TAG, "Waiting for valid total: %f, retries: %d", total, this->initial_total_retries_);
       this->initial_total_retries_--;
       if (this->initial_total_retries_ == 0) {
-        ESP_LOGW(TAG, "Gas (MJ) total invalid after 5s: %f, retaining prior stats", total);
+        ESP_LOGW(TAG, "Total invalid after 5s: %f, retaining prior stats", total);
         this->has_loaded_nvs_ = false;
       }
       return; // Yield to avoid blocking
@@ -128,7 +143,11 @@ void GasStatisticsMJ::loop() {
   this->gas_.current_day_of_year = t.day_of_year;
 
   this->process_(total);
+  this->pref_.save(&this->gas_);
+  ESP_LOGD(TAG, "Saved NVS data on day change: start_today=%f, start_yesterday=%f",
+           this->gas_.start_today, this->gas_.start_yesterday);
 }
+
 
 void GasStatisticsMJ::process_(float total, bool is_initial_restore) {
   bool data_changed = false;
@@ -211,11 +230,10 @@ void GasStatisticsMJ::process_(float total, bool is_initial_restore) {
     }
   }
 
-  // Save to NVS only if data has changed (e.g., new day or initial restore)
-  if (this->gas_.current_day_of_year != this->time_->now().day_of_year ||
-      is_initial_restore || this->has_loaded_nvs_) {
+  // Save to NVS only if data has changed or during initial restore
+  if (is_initial_restore || this->has_loaded_nvs_ || this->gas_.current_day_of_year != this->time_->now().day_of_year) {
     this->pref_.save(&this->gas_);
-    ESP_LOGD(TAG, "Gas (MJ) saved NVS data: start_today=%f, start_yesterday=%f",
+    ESP_LOGD(TAG, "Saved NVS data: start_today=%f, start_yesterday=%f",
              this->gas_.start_today, this->gas_.start_yesterday);
   }
 }
