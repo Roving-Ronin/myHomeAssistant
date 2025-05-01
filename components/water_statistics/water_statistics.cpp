@@ -56,15 +56,14 @@ void WaterStatistics::setup() {
     this->process_(0.0f, true); // Initial restore with zero
   }
 
-  // Register shutdown hook to save NVS data
-  this->add_shutdown_hook([this]() {
-    this->pref_.save(&this->water_);
-    ESP_LOGD(TAG, "Saved NVS data on shutdown: start_today=%f, start_yesterday=%f",
-             this->water_.start_today, this->water_.start_yesterday);
-  });
-
   // Delay initial loop processing until time sync
-  this->set_timeout(15000, [this]() { this->initial_processing_started_ = true; });
+  this->set_timeout(10000, [this]() { this->initial_processing_started_ = true; });
+}
+
+void WaterStatistics::on_shutdown() {
+  this->pref_.save(&this->water_);
+  ESP_LOGD(TAG, "Saved NVS data on shutdown: start_today=%f, start_yesterday=%f",
+           this->water_.start_today, this->water_.start_yesterday);
 }
 
 void WaterStatistics::loop() {
