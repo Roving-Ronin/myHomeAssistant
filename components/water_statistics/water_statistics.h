@@ -35,6 +35,7 @@ class WaterStatistics : public Component {
   int initial_total_retries_{0};
   bool has_loaded_nvs_{false};
   bool initial_processing_started_{false};
+  int sntp_retries_{0};
 
   // Input sensors
   Sensor *total_{nullptr};
@@ -71,6 +72,7 @@ class WaterStatistics : public Component {
   float last_year_{NAN};
 
   void process_(float total, bool is_initial_restore = false);
+  void retry_sntp_sync_();
 };
 
 }  // namespace water_statistics
