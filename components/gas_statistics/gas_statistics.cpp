@@ -34,7 +34,7 @@ void GasStatistics::setup() {
   this->pref_ = global_preferences->make_preference<gas_data_t>(fnv1_hash(PREF_V2));
   bool loaded = this->pref_.load(&this->gas_);
   if (loaded) {
-    ESP_LOGI(TAG, "Loaded Gas NVS: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
+    ESP_LOGI(TAG, "Loaded Gas (m³) NVS: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
              this->gas_.start_today, this->gas_.start_yesterday, this->gas_.start_week,
              this->gas_.start_month, this->gas_.start_year);
     this->initial_total_retries_ = 40; // Try for 5 seconds to get valid total
@@ -46,7 +46,7 @@ void GasStatistics::setup() {
     }
     this->process_(total, true); // Initial restore
   } else {
-    ESP_LOGW(TAG, "No Gas NVS data loaded, starting fresh");
+    ESP_LOGW(TAG, "No Gas (m³) NVS data loaded, starting fresh");
     // Initialize defaults
     this->gas_.start_today = 0.0f;
     this->gas_.start_yesterday = 0.0f;
@@ -54,7 +54,7 @@ void GasStatistics::setup() {
     this->gas_.start_month = 0.0f;
     this->gas_.start_year = 0.0f;
     this->pref_.save(&this->gas_);
-    ESP_LOGD(TAG, "Saved initial Gas NVS: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
+    ESP_LOGD(TAG, "Saved initial Gas (m³) NVS: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
              this->gas_.start_today, this->gas_.start_yesterday, this->gas_.start_week,
              this->gas_.start_month, this->gas_.start_year);
     this->process_(0.0f, true); // Initial restore with zero
@@ -66,6 +66,19 @@ void GasStatistics::setup() {
     if (!this->time_->now().is_valid()) {
       ESP_LOGW(TAG, "SNTP not synced after 15s, scheduling retry");
       this->set_timeout(5000, [this]() { this->retry_sntp_sync_(); });
+    }
+  });
+
+  // Periodic NVS save every 5 minutes if values changed
+  this->set_interval(300000, [this]() {
+    if (this->has_value_changed_) {
+      this->pref_.save(&this->gas_);
+      ESP_LOGD(TAG, "Saved Gas (m³) NVS after 5min interval (value changed): today=%f, yesterday=%f, week=%f, month=%f, year=%f",
+               this->gas_.start_today, this->gas_.start_yesterday, this->gas_.start_week,
+               this->gas_.start_month, this->gas_.start_year);
+      this->has_value_changed_ = false;
+    } else {
+      ESP_LOGV(TAG, "Skipped Gas (m³) NVS save after 5min interval (no value change)");
     }
   });
 }
@@ -86,7 +99,7 @@ void GasStatistics::retry_sntp_sync_() {
 
 void GasStatistics::on_shutdown() {
   this->pref_.save(&this->gas_);
-  ESP_LOGD(TAG, "Saved Gas NVS on shutdown: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
+  ESP_LOGD(TAG, "Saved Gas (m³) NVS on shutdown: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
            this->gas_.start_today, this->gas_.start_yesterday, this->gas_.start_week,
            this->gas_.start_month, this->gas_.start_year);
 }
@@ -101,15 +114,15 @@ void GasStatistics::loop() {
   if (this->has_loaded_nvs_ && this->initial_total_retries_ > 0) {
     float total = this->total_->state;
     if (!std::isnan(total) && total >= 0.0f) {
-      ESP_LOGD(TAG, "Processing restored Gas total: %f", total);
+      ESP_LOGD(TAG, "Processing Gas (m³) restored total: %f", total);
       this->process_(total);
       this->initial_total_retries_ = 0; // Done
       this->has_loaded_nvs_ = false;
     } else {
-      ESP_LOGD(TAG, "Waiting for valid Gas total: %f, retries: %d", total, this->initial_total_retries_);
+      ESP_LOGD(TAG, "Waiting for valid Gas (m³) total: %f, retries: %d", total, this->initial_total_retries_);
       this->initial_total_retries_--;
       if (this->initial_total_retries_ == 0) {
-        ESP_LOGW(TAG, "Total invalid after 5s: %f, retaining prior stats", total);
+        ESP_LOGW(TAG, "Total Gas (m³) invalid after 5s: %f, retaining prior stats", total);
         this->has_loaded_nvs_ = false;
       }
       return; // Yield to avoid blocking
@@ -124,7 +137,7 @@ void GasStatistics::loop() {
 
   const auto total = this->total_->get_state();
   if (std::isnan(total)) {
-    ESP_LOGD(TAG, "Gas total not published yet, skipping");
+    ESP_LOGD(TAG, "Total Gas (m³) not published yet, skipping");
     return;
   }
 
@@ -167,7 +180,7 @@ void GasStatistics::loop() {
 
   this->process_(total);
   this->pref_.save(&this->gas_);
-  ESP_LOGD(TAG, "Saved Gas NVS on day change: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
+  ESP_LOGD(TAG, "Saved Gas (m³) NVS on day change: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
            this->gas_.start_today, this->gas_.start_yesterday, this->gas_.start_week,
            this->gas_.start_month, this->gas_.start_year);
 }
@@ -187,15 +200,15 @@ void GasStatistics::process_(float total, bool is_initial_restore) {
     if (std::isnan(this->last_today_) || fabs(value - this->last_today_) > 0.001f) {
       this->gas_today_->publish_state(value);
       this->last_today_ = value;
-      this->pref_.save(&this->gas_);
-      ESP_LOGD(TAG, "Saved Gas NVS after today update: today=%f", this->gas_.start_today);
+      this->has_value_changed_ = true;
+      ESP_LOGD(TAG, "Gas (m³) Today value changed: %f", value);
     }
   } else if (this->gas_today_) {
     if (std::isnan(this->last_today_) || fabs(0.0f - this->last_today_) > 0.001f) {
       this->gas_today_->publish_state(0);
       this->last_today_ = 0.0f;
-      this->pref_.save(&this->gas_);
-      ESP_LOGD(TAG, "Saved Gas NVS after today zero: today=%f", this->gas_.start_today);
+      this->has_value_changed_ = true;
+      ESP_LOGD(TAG, "Gas (m³) Today value changed to zero");
     }
   }
 
@@ -205,15 +218,15 @@ void GasStatistics::process_(float total, bool is_initial_restore) {
     if (std::isnan(this->last_yesterday_) || fabs(value - this->last_yesterday_) > 0.001f) {
       this->gas_yesterday_->publish_state(value);
       this->last_yesterday_ = value;
-      this->pref_.save(&this->gas_);
-      ESP_LOGD(TAG, "Saved Gas NVS after yesterday update: yesterday=%f", this->gas_.start_yesterday);
+      this->has_value_changed_ = true;
+      ESP_LOGD(TAG, "Gas (m³) Yesterday value changed: %f", value);
     }
   } else if (this->gas_yesterday_) {
     if (std::isnan(this->last_yesterday_) || fabs(0.0f - this->last_yesterday_) > 0.001f) {
       this->gas_yesterday_->publish_state(0);
       this->last_yesterday_ = 0.0f;
-      this->pref_.save(&this->gas_);
-      ESP_LOGD(TAG, "Saved Gas NVS after yesterday zero: yesterday=%f", this->gas_.start_yesterday);
+      this->has_value_changed_ = true;
+      ESP_LOGD(TAG, "Gas (m³) Yesterday value changed to zero");
     }
   }
 
@@ -223,15 +236,15 @@ void GasStatistics::process_(float total, bool is_initial_restore) {
     if (std::isnan(this->last_week_) || fabs(value - this->last_week_) > 0.001f) {
       this->gas_week_->publish_state(value);
       this->last_week_ = value;
-      this->pref_.save(&this->gas_);
-      ESP_LOGD(TAG, "Saved Gas NVS after week update: week=%f", this->gas_.start_week);
+      this->has_value_changed_ = true;
+      ESP_LOGD(TAG, "Gas (m³) Week value changed: %f", value);
     }
   } else if (this->gas_week_) {
     if (std::isnan(this->last_week_) || fabs(0.0f - this->last_week_) > 0.001f) {
       this->gas_week_->publish_state(0);
       this->last_week_ = 0.0f;
-      this->pref_.save(&this->gas_);
-      ESP_LOGD(TAG, "Saved Gas NVS after week zero: week=%f", this->gas_.start_week);
+      this->has_value_changed_ = true;
+      ESP_LOGD(TAG, "Gas (m³) Week value changed to zero");
     }
   }
 
@@ -241,15 +254,15 @@ void GasStatistics::process_(float total, bool is_initial_restore) {
     if (std::isnan(this->last_month_) || fabs(value - this->last_month_) > 0.001f) {
       this->gas_month_->publish_state(value);
       this->last_month_ = value;
-      this->pref_.save(&this->gas_);
-      ESP_LOGD(TAG, "Saved Gas NVS after month update: month=%f", this->gas_.start_month);
+      this->has_value_changed_ = true;
+      ESP_LOGD(TAG, "Gas (m³) Month value changed: %f", value);
     }
   } else if (this->gas_month_) {
     if (std::isnan(this->last_month_) || fabs(0.0f - this->last_month_) > 0.001f) {
       this->gas_month_->publish_state(0);
       this->last_month_ = 0.0f;
-      this->pref_.save(&this->gas_);
-      ESP_LOGD(TAG, "Saved Gas NVS after month zero: month=%f", this->gas_.start_month);
+      this->has_value_changed_ = true;
+      ESP_LOGD(TAG, "Gas (m³) Month value changed to zero");
     }
   }
 
@@ -259,24 +272,25 @@ void GasStatistics::process_(float total, bool is_initial_restore) {
     if (std::isnan(this->last_year_) || fabs(value - this->last_year_) > 0.001f) {
       this->gas_year_->publish_state(value);
       this->last_year_ = value;
-      this->pref_.save(&this->gas_);
-      ESP_LOGD(TAG, "Saved Gas NVS after year update: year=%f", this->gas_.start_year);
+      this->has_value_changed_ = true;
+      ESP_LOGD(TAG, "Gas (m³) Year value changed: %f", value);
     }
   } else if (this->gas_year_) {
     if (std::isnan(this->last_year_) || fabs(0.0f - this->last_year_) > 0.001f) {
       this->gas_year_->publish_state(0);
       this->last_year_ = 0.0f;
-      this->pref_.save(&this->gas_);
-      ESP_LOGD(TAG, "Saved Gas NVS after year zero: year=%f", this->gas_.start_year);
+      this->has_value_changed_ = true;
+      ESP_LOGD(TAG, "Gas (m³) Year value changed to zero");
     }
   }
 
-  // Save to NVS on initial restore or state change
-  if (is_initial_restore || this->has_loaded_nvs_ || this->gas_.current_day_of_year != this->time_->now().day_of_year) {
+  // Save to NVS on initial restore
+  if (is_initial_restore) {
     this->pref_.save(&this->gas_);
-    ESP_LOGD(TAG, "Saved Gas NVS: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
+    ESP_LOGD(TAG, "Saved Gas (m³) NVS on initial restore: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
              this->gas_.start_today, this->gas_.start_yesterday, this->gas_.start_week,
              this->gas_.start_month, this->gas_.start_year);
+    this->has_value_changed_ = false;
   }
 }
 
