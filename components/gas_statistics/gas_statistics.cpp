@@ -10,7 +10,7 @@ static const char *const TAG = "gas_statistics";
 static const char *const PREF_V2 = "gas_statistics_v2";
 
 void GasStatistics::dump_config() {
-  ESP_LOGCONFIG(TAG, "Gas Statistics (L) - Sensors");
+  ESP_LOGCONFIG(TAG, "Gas Statistics (m³) - Sensors");
   if (this->gas_today_) {
     LOG_SENSOR("  ", "Gas (m³) Today", this->gas_today_);
   }
@@ -67,12 +67,12 @@ void GasStatistics::setup() {
   this->set_timeout(15000, [this]() { this->initial_processing_started_ = true; });
 }
 
-
 void GasStatistics::loop() {
   // Skip processing until initial delay for time sync
   if (!this->initial_processing_started_) {
     return;
   }
+
   // Handle initial total check non-blocking
   if (this->has_loaded_nvs_ && this->initial_total_retries_ > 0) {
     float total = this->total_->state;
@@ -94,20 +94,19 @@ void GasStatistics::loop() {
 
   const auto t = this->time_->now();
   if (!t.is_valid()) {
-    // Time is not synced yet
+    ESP_LOGW(TAG, "Time not synchronized, skipping update");
     return;
   }
 
   const auto total = this->total_->get_state();
   if (std::isnan(total)) {
-    // Total is not published yet
+    ESP_LOGD(TAG, "Total not published yet, skipping");
     return;
   }
 
   // Update stats on first run or when day changes
-  if (t.day_of_year == this->gas_.current_day_of_year) {
-    // Nothing to do
-    return;
+  if (t.day_of_year == this->gas_.current_day_of_year && this->gas_.current_day_of_year != 0) {
+    return; // No day change, skip
   }
 
   // Save the current day's data
@@ -147,7 +146,6 @@ void GasStatistics::loop() {
   ESP_LOGD(TAG, "Saved NVS data on day change: start_today=%f, start_yesterday=%f",
            this->gas_.start_today, this->gas_.start_yesterday);
 }
-
 
 void GasStatistics::process_(float total, bool is_initial_restore) {
   bool data_changed = false;
