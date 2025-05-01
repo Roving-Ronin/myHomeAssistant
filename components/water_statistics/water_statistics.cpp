@@ -1,6 +1,5 @@
 #include "esphome/core/log.h"
 #include "esphome/core/hal.h"
-#include "esphome/components/ota/ota_backend.h"
 #include "water_statistics.h"
 
 namespace esphome {
@@ -67,16 +66,6 @@ void WaterStatistics::setup() {
     if (!this->time_->now().is_valid()) {
       ESP_LOGW(TAG, "SNTP not synced after 15s, scheduling retry");
       this->set_timeout(5000, [this]() { this->retry_sntp_sync_(); });
-    }
-  });
-
-  // Register OTA callback to save NVS before OTA
-  ota::global_ota_component->add_on_state_callback([this](ota::OTAState state, float progress, uint8_t error) {
-    if (state == ota::OTA_STARTED) {
-      this->pref_.save(&this->water_);
-      ESP_LOGD(TAG, "Saved Water NVS before OTA: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
-               this->water_.start_today, this->water_.start_yesterday, this->water_.start_week,
-               this->water_.start_month, this->water_.start_year);
     }
   });
 }
@@ -198,11 +187,15 @@ void WaterStatistics::process_(float total, bool is_initial_restore) {
     if (std::isnan(this->last_today_) || fabs(value - this->last_today_) > 0.001f) {
       this->water_today_->publish_state(value);
       this->last_today_ = value;
+      this->pref_.save(&this->water_);
+      ESP_LOGD(TAG, "Saved Water NVS after today update: today=%f", this->water_.start_today);
     }
   } else if (this->water_today_) {
     if (std::isnan(this->last_today_) || fabs(0.0f - this->last_today_) > 0.001f) {
       this->water_today_->publish_state(0);
       this->last_today_ = 0.0f;
+      this->pref_.save(&this->water_);
+      ESP_LOGD(TAG, "Saved Water NVS after today zero: today=%f", this->water_.start_today);
     }
   }
 
@@ -212,11 +205,15 @@ void WaterStatistics::process_(float total, bool is_initial_restore) {
     if (std::isnan(this->last_yesterday_) || fabs(value - this->last_yesterday_) > 0.001f) {
       this->water_yesterday_->publish_state(value);
       this->last_yesterday_ = value;
+      this->pref_.save(&this->water_);
+      ESP_LOGD(TAG, "Saved Water NVS after yesterday update: yesterday=%f", this->water_.start_yesterday);
     }
   } else if (this->water_yesterday_) {
     if (std::isnan(this->last_yesterday_) || fabs(0.0f - this->last_yesterday_) > 0.001f) {
       this->water_yesterday_->publish_state(0);
       this->last_yesterday_ = 0.0f;
+      this->pref_.save(&this->water_);
+      ESP_LOGD(TAG, "Saved Water NVS after yesterday zero: yesterday=%f", this->water_.start_yesterday);
     }
   }
 
@@ -226,11 +223,15 @@ void WaterStatistics::process_(float total, bool is_initial_restore) {
     if (std::isnan(this->last_week_) || fabs(value - this->last_week_) > 0.001f) {
       this->water_week_->publish_state(value);
       this->last_week_ = value;
+      this->pref_.save(&this->water_);
+      ESP_LOGD(TAG, "Saved Water NVS after week update: week=%f", this->water_.start_week);
     }
   } else if (this->water_week_) {
     if (std::isnan(this->last_week_) || fabs(0.0f - this->last_week_) > 0.001f) {
       this->water_week_->publish_state(0);
       this->last_week_ = 0.0f;
+      this->pref_.save(&this->water_);
+      ESP_LOGD(TAG, "Saved Water NVS after week zero: week=%f", this->water_.start_week);
     }
   }
 
@@ -240,11 +241,15 @@ void WaterStatistics::process_(float total, bool is_initial_restore) {
     if (std::isnan(this->last_month_) || fabs(value - this->last_month_) > 0.001f) {
       this->water_month_->publish_state(value);
       this->last_month_ = value;
+      this->pref_.save(&this->water_);
+      ESP_LOGD(TAG, "Saved Water NVS after month update: month=%f", this->water_.start_month);
     }
   } else if (this->water_month_) {
     if (std::isnan(this->last_month_) || fabs(0.0f - this->last_month_) > 0.001f) {
       this->water_month_->publish_state(0);
       this->last_month_ = 0.0f;
+      this->pref_.save(&this->water_);
+      ESP_LOGD(TAG, "Saved Water NVS after month zero: month=%f", this->water_.start_month);
     }
   }
 
@@ -254,11 +259,15 @@ void WaterStatistics::process_(float total, bool is_initial_restore) {
     if (std::isnan(this->last_year_) || fabs(value - this->last_year_) > 0.001f) {
       this->water_year_->publish_state(value);
       this->last_year_ = value;
+      this->pref_.save(&this->water_);
+      ESP_LOGD(TAG, "Saved Water NVS after year update: year=%f", this->water_.start_year);
     }
   } else if (this->water_year_) {
     if (std::isnan(this->last_year_) || fabs(0.0f - this->last_year_) > 0.001f) {
       this->water_year_->publish_state(0);
       this->last_year_ = 0.0f;
+      this->pref_.save(&this->water_);
+      ESP_LOGD(TAG, "Saved Water NVS after year zero: year=%f", this->water_.start_year);
     }
   }
 
