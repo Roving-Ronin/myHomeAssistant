@@ -117,10 +117,10 @@ void WaterStatistics::loop() {
       this->initial_total_retries_ = 0; // Done
       this->has_loaded_nvs_ = false;
     } else {
-      ESP_LOGD(TAG, "Waiting for valid total: %f, retries: %d", total, this->initial_total_retries_);
+      ESP_LOGD(TAG, "Waiting for valid Water total: %f, retries: %d", total, this->initial_total_retries_);
       this->initial_total_retries_--;
       if (this->initial_total_retries_ == 0) {
-        ESP_LOGW(TAG, "Total invalid after 5s: %f, retaining prior stats", total);
+        ESP_LOGW(TAG, "Water total invalid after 5s: %f, retaining prior stats", total);
         this->has_loaded_nvs_ = false;
       }
       return; // Yield to avoid blocking
@@ -178,7 +178,7 @@ void WaterStatistics::loop() {
 
   this->process_(total);
   this->pref_.save(&this->water_);
-  ESP_LOGD(TAG, "Saved NVS on day change: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
+  ESP_LOGD(TAG, "Saved Water NVS on day change: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
            this->water_.start_today, this->water_.start_yesterday, this->water_.start_week,
            this->water_.start_month, this->water_.start_year);
 }
@@ -265,7 +265,7 @@ void WaterStatistics::process_(float total, bool is_initial_restore) {
   // Save to NVS on initial restore or state change
   if (is_initial_restore || this->has_loaded_nvs_ || this->water_.current_day_of_year != this->time_->now().day_of_year) {
     this->pref_.save(&this->water_);
-    ESP_LOGD(TAG, "Saved NVS: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
+    ESP_LOGD(TAG, "Saved Water NVS: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
              this->water_.start_today, this->water_.start_yesterday, this->water_.start_week,
              this->water_.start_month, this->water_.start_year);
   }
