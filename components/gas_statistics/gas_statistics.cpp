@@ -1,5 +1,6 @@
 #include "esphome/core/log.h"
 #include "esphome/core/hal.h"
+#include "esphome/components/ota/ota_component.h"
 #include "gas_statistics.h"
 
 namespace esphome {
@@ -34,40 +35,75 @@ void GasStatistics::setup() {
   this->pref_ = global_preferences->make_preference<gas_data_t>(fnv1_hash(PREF_V2));
   bool loaded = this->pref_.load(&this->gas_);
   if (loaded) {
-    ESP_LOGI(TAG, "Successfully loaded NVS data: start_today=%f, start_yesterday=%f",
-             this->gas_.start_today, this->gas_.start_yesterday);
+    ESP_LOGI(TAG, "Loaded Gas NVS: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
+             this->gas_.start_today, this->gas_.start_yesterday, this->gas_.start_week,
+             this->gas_.start_month, this->gas_.start_year);
     this->initial_total_retries_ = 40; // Try for 5 seconds to get valid total
     this->has_loaded_nvs_ = true;
-    // Process stored values immediately for initial restoration
+    // Process stored values for initial restoration
     float total = this->total_->state;
     if (std::isnan(total)) {
       total = this->gas_.start_today; // Fallback to stored start_today
     }
     this->process_(total, true); // Initial restore
   } else {
-    ESP_LOGW(TAG, "Gas (m³) no previous data loaded from NVS, starting fresh");
-    // Initialize defaults to avoid NaN
+    ESP_LOGW(TAG, "No Gas NVS data loaded, starting fresh");
+    // Initialize defaults
     this->gas_.start_today = 0.0f;
     this->gas_.start_yesterday = 0.0f;
     this->gas_.start_week = 0.0f;
     this->gas_.start_month = 0.0f;
     this->gas_.start_year = 0.0f;
     this->pref_.save(&this->gas_);
+    ESP_LOGD(TAG, "Saved initial Gas NVS: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
+             this->gas_.start_today, this->gas_.start_yesterday, this->gas_.start_week,
+             this->gas_.start_month, this->gas_.start_year);
     this->process_(0.0f, true); // Initial restore with zero
   }
 
-  // Delay initial loop processing until time sync
-  this->set_timeout(15000, [this]() { this->initial_processing_started_ = true; });
+  // Delay processing until SNTP sync
+  this->set_timeout(15000, [this]() {
+    this->initial_processing_started_ = true;
+    if (!this->time_->now().is_valid()) {
+      ESP_LOGW(TAG, "SNTP not synced after 15s, scheduling retry");
+      this->set_timeout(5000, [this]() { this->retry_sntp_sync_(); });
+    }
+  });
+
+  // Register OTA callback to save NVS before OTA
+  ota::global_ota_component->add_on_state_callback([this](ota::OTAState state, float progress, uint8_t error) {
+    if (state == ota::OTA_STARTED) {
+      this->pref_.save(&this->gas_);
+      ESP_LOGD(TAG, "Saved NVS before OTA: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
+               this->gas_.start_today, this->gas_.start_yesterday, this->gas_.start_week,
+               this->gas_.start_month, this->gas_.start_year);
+    }
+  });
+}
+
+void GasStatistics::retry_sntp_sync_() {
+  if (this->time_->now().is_valid()) {
+    ESP_LOGD(TAG, "SNTP synced on retry");
+    this->initial_processing_started_ = true;
+  } else if (this->sntp_retries_ < 3) {
+    ESP_LOGW(TAG, "SNTP retry %d/3 failed, scheduling next retry", this->sntp_retries_ + 1);
+    this->sntp_retries_++;
+    this->set_timeout(5000, [this]() { this->retry_sntp_sync_(); });
+  } else {
+    ESP_LOGE(TAG, "SNTP sync failed after 3 retries, proceeding with caution");
+    this->initial_processing_started_ = true;
+  }
 }
 
 void GasStatistics::on_shutdown() {
   this->pref_.save(&this->gas_);
-  ESP_LOGD(TAG, "Saved NVS data on shutdown: start_today=%f, start_yesterday=%f",
-           this->gas_.start_today, this->gas_.start_yesterday);
+  ESP_LOGD(TAG, "Saved Gas NVS on shutdown: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
+           this->gas_.start_today, this->gas_.start_yesterday, this->gas_.start_week,
+           this->gas_.start_month, this->gas_.start_year);
 }
 
 void GasStatistics::loop() {
-  // Skip processing until initial delay for time sync
+  // Skip processing until SNTP sync delay
   if (!this->initial_processing_started_) {
     return;
   }
@@ -81,7 +117,7 @@ void GasStatistics::loop() {
       this->initial_total_retries_ = 0; // Done
       this->has_loaded_nvs_ = false;
     } else {
-      ESP_LOGD(TAG, "Waiting for valid total: %f, retries: %d", total, this->initial_total_retries_);
+      ESP_LOGD(TAG, "Waiting for valid Gas total: %f, retries: %d", total, this->initial_total_retries_);
       this->initial_total_retries_--;
       if (this->initial_total_retries_ == 0) {
         ESP_LOGW(TAG, "Total invalid after 5s: %f, retaining prior stats", total);
@@ -99,7 +135,7 @@ void GasStatistics::loop() {
 
   const auto total = this->total_->get_state();
   if (std::isnan(total)) {
-    ESP_LOGD(TAG, "Total not published yet, skipping");
+    ESP_LOGD(TAG, "Gas total not published yet, skipping");
     return;
   }
 
@@ -142,13 +178,12 @@ void GasStatistics::loop() {
 
   this->process_(total);
   this->pref_.save(&this->gas_);
-  ESP_LOGD(TAG, "Saved NVS data on day change: start_today=%f, start_yesterday=%f",
-           this->gas_.start_today, this->gas_.start_yesterday);
+  ESP_LOGD(TAG, "Saved Gas NVS on day change: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
+           this->gas_.start_today, this->gas_.start_yesterday, this->gas_.start_week,
+           this->gas_.start_month, this->gas_.start_year);
 }
 
 void GasStatistics::process_(float total, bool is_initial_restore) {
-  bool data_changed = false;
-
   // Use stored start_today as fallback for initial restore if total is invalid
   if (is_initial_restore && std::isnan(total)) {
     total = this->gas_.start_today;
@@ -227,11 +262,12 @@ void GasStatistics::process_(float total, bool is_initial_restore) {
     }
   }
 
-  // Save to NVS only if data has changed or during initial restore
+  // Save to NVS on initial restore or state change
   if (is_initial_restore || this->has_loaded_nvs_ || this->gas_.current_day_of_year != this->time_->now().day_of_year) {
     this->pref_.save(&this->gas_);
-    ESP_LOGD(TAG, "Saved NVS data: start_today=%f, start_yesterday=%f",
-             this->gas_.start_today, this->gas_.start_yesterday);
+    ESP_LOGD(TAG, "Saved NVS: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
+             this->gas_.start_today, this->gas_.start_yesterday, this->gas_.start_week,
+             this->gas_.start_month, this->gas_.start_year);
   }
 }
 
