@@ -55,9 +55,24 @@ void WaterStatistics::setup() {
     this->pref_.save(&this->water_);
     this->process_(0.0f, true); // Initial restore with zero
   }
+
+  // Register shutdown hook to save NVS data
+  this->add_shutdown_hook([this]() {
+    this->pref_.save(&this->water_);
+    ESP_LOGD(TAG, "Saved NVS data on shutdown: start_today=%f, start_yesterday=%f",
+             this->water_.start_today, this->water_.start_yesterday);
+  });
+
+  // Delay initial loop processing until time sync
+  this->set_timeout(15000, [this]() { this->initial_processing_started_ = true; });
 }
 
+
 void WaterStatistics::loop() {
+  // Skip processing until initial delay for time sync
+  if (!this->initial_processing_started_) {
+    return;
+  }
   // Handle initial total check non-blocking
   if (this->has_loaded_nvs_ && this->initial_total_retries_ > 0) {
     float total = this->total_->state;
@@ -128,7 +143,11 @@ void WaterStatistics::loop() {
   this->water_.current_day_of_year = t.day_of_year;
 
   this->process_(total);
+  this->pref_.save(&this->water_);
+  ESP_LOGD(TAG, "Saved NVS data on day change: start_today=%f, start_yesterday=%f",
+           this->water_.start_today, this->water_.start_yesterday);
 }
+
 
 void WaterStatistics::process_(float total, bool is_initial_restore) {
   bool data_changed = false;
@@ -211,9 +230,8 @@ void WaterStatistics::process_(float total, bool is_initial_restore) {
     }
   }
 
-  // Save to NVS only if data has changed (e.g., new day or initial restore)
-  if (this->water_.current_day_of_year != this->time_->now().day_of_year ||
-      is_initial_restore || this->has_loaded_nvs_) {
+  // Save to NVS only if data has changed or during initial restore
+  if (is_initial_restore || this->has_loaded_nvs_ || this->water_.current_day_of_year != this->time_->now().day_of_year) {
     this->pref_.save(&this->water_);
     ESP_LOGD(TAG, "Saved NVS data: start_today=%f, start_yesterday=%f",
              this->water_.start_today, this->water_.start_yesterday);
