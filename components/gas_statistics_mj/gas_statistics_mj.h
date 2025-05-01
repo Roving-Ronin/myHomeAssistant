@@ -54,7 +54,7 @@ class GasStatisticsMJ : public Component {
   int gas_year_start_day_{1};
 
   // Structure for storing gas statistics in Litres
-  struct gas_mj_data_t {
+  struct gas_data_t {
     uint16_t current_day_of_year{0};
     float start_today{NAN};
     float start_yesterday{NAN};
