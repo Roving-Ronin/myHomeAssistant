@@ -56,15 +56,14 @@ void GasStatistics::setup() {
     this->process_(0.0f, true); // Initial restore with zero
   }
 
-  // Register shutdown hook to save NVS data
-  this->add_shutdown_hook([this]() {
-    this->pref_.save(&this->gas_);
-    ESP_LOGD(TAG, "Saved NVS data on shutdown: start_today=%f, start_yesterday=%f",
-             this->gas_.start_today, this->gas_.start_yesterday);
-  });
-
   // Delay initial loop processing until time sync
-  this->set_timeout(15000, [this]() { this->initial_processing_started_ = true; });
+  this->set_timeout(10000, [this]() { this->initial_processing_started_ = true; });
+}
+
+void GasStatistics::on_shutdown() {
+  this->pref_.save(&this->gas_);
+  ESP_LOGD(TAG, "Saved NVS data on shutdown: start_today=%f, start_yesterday=%f",
+           this->gas_.start_today, this->gas_.start_yesterday);
 }
 
 void GasStatistics::loop() {
@@ -128,7 +127,7 @@ void GasStatistics::loop() {
     }
   }
 
-  // Initialize all sensors (fix for issue #65)
+  // Initialize all sensors
   if (this->gas_week_ && std::isnan(this->gas_.start_week)) {
     this->gas_.start_week = this->gas_.start_yesterday;
   }
