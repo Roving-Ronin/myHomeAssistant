@@ -2,7 +2,6 @@
 
 #include "esphome/core/component.h"
 #include "esphome/core/preferences.h"
-
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/time/real_time_clock.h"
 
@@ -17,6 +16,7 @@ class WaterStatistics : public Component {
   void dump_config() override;
   void setup() override;
   void loop() override;
+  void on_shutdown() override;
 
   void set_time(time::RealTimeClock *time) { this->time_ = time; }
   void set_total(Sensor *sensor) { this->total_ = sensor; }
@@ -27,46 +27,53 @@ class WaterStatistics : public Component {
   void set_water_month(Sensor *sensor) { this->water_month_ = sensor; }
   void set_water_year(Sensor *sensor) { this->water_year_ = sensor; }
 
-protected:
+ protected:
   ESPPreferenceObject pref_;
   time::RealTimeClock *time_;
 
-  // Non block approach to check and load NVS
+  // Non-blocking approach to check and load NVS
   int initial_total_retries_{0};
   bool has_loaded_nvs_{false};
+  bool initial_processing_started_{false};
+  int sntp_retries_{0};
 
-  // input sensors
+  // Input sensors
   Sensor *total_{nullptr};
 
-  // exposed sensors
+  // Exposed sensors
   Sensor *water_today_{nullptr};
   Sensor *water_yesterday_{nullptr};
   Sensor *water_week_{nullptr};
   Sensor *water_month_{nullptr};
   Sensor *water_year_{nullptr};
 
-  // start day of week configuration
+  // Start day of week configuration
   int water_week_start_day_{2};
-  // start day of month configuration
+  // Start day of month configuration
   int water_month_start_day_{1};
-  // start day of year configuration
+  // Start day of year configuration
   int water_year_start_day_{1};
 
   // Structure for storing water statistics in Litres
-  struct water_data_v1_t {
+  struct water_data_t {
     uint16_t current_day_of_year{0};
     float start_today{NAN};
     float start_yesterday{NAN};
     float start_week{NAN};
     float start_month{NAN};
-  };
-
-  struct water_data_t : public water_data_v1_t {
     float start_year{NAN};
   } water_;
 
-  void process_(float total);
-};  // class WaterStatistics
+  // Store last published values for change detection
+  float last_today_{NAN};
+  float last_yesterday_{NAN};
+  float last_week_{NAN};
+  float last_month_{NAN};
+  float last_year_{NAN};
+
+  void process_(float total, bool is_initial_restore = false);
+  void retry_sntp_sync_();
+};
 
 }  // namespace water_statistics
 }  // namespace esphome

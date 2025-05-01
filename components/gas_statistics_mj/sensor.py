@@ -7,7 +7,6 @@ from esphome.const import (
     CONF_TOTAL,
     DEVICE_CLASS_ENERGY,
     STATE_CLASS_TOTAL_INCREASING,
-    UNIT_MEGAJOULE,
 )
 
 # Import your custom ICONS from const.py
@@ -18,6 +17,9 @@ from .const import (
     ICON_MONTH,
     ICON_YEAR,
 )
+
+# Import your custom UNIT_MEGAJOULE from const.py
+from .const import UNIT_MEGAJOULE
 
 CODEOWNERS = ["@roving-ronin"]
 

@@ -19,7 +19,7 @@ from .const import (
     ICON_YEAR,
 )
 
-CODEOWNERS = ["@dentra", "@roving-ronin"]
+CODEOWNERS = ["@roving-ronin"]
 
 DEPENDENCIES = ["time"]
 
