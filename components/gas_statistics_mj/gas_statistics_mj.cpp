@@ -135,7 +135,7 @@ void GasStatisticsMJ::loop() {
 
   const auto total = this->total_->get_state();
   if (std::isnan(total)) {
-    ESP_LOGD(TAG, "Total not published yet, skipping");
+    ESP_LOGD(TAG, "Total Gas (MJ) not published yet, skipping");
     return;
   }
 
