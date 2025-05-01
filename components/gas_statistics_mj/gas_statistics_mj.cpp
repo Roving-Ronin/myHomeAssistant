@@ -31,7 +31,7 @@ void GasStatisticsMJ::dump_config() {
 void GasStatisticsMJ::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
 
-  this->pref_ = global_preferences->make_preference<gas_data_t>(fnv1_hash(PREF_V2));
+  this->pref_ = global_preferences->make_preference<gas_mj_data_t>(fnv1_hash(PREF_V2));
   bool loaded = this->pref_.load(&this->gas_);
   if (loaded) {
     ESP_LOGI(TAG, "Successfully loaded NVS data: start_today=%f, start_yesterday=%f",
