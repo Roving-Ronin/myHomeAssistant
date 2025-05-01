@@ -1,6 +1,6 @@
 #include "esphome/core/log.h"
 #include "esphome/core/hal.h"
-#include "esphome/components/ota/ota_component.h"
+#include "esphome/components/ota/ota_backend.h"
 #include "water_statistics.h"
 
 namespace esphome {
