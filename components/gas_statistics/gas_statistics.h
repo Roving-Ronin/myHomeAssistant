@@ -33,6 +33,7 @@ class GasStatistics : public Component {
   // Non-blocking approach to check and load NVS
   int initial_total_retries_{0};
   bool has_loaded_nvs_{false};
+  bool initial_processing_started_{false};
 
   // Input sensors
   Sensor *total_{nullptr};
