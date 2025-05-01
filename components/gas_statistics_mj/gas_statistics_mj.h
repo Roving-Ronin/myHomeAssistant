@@ -16,6 +16,7 @@ class GasStatisticsMJ : public Component {
   void dump_config() override;
   void setup() override;
   void loop() override;
+  void on_shutdown() override;
 
   void set_time(time::RealTimeClock *time) { this->time_ = time; }
   void set_total(Sensor *sensor) { this->total_ = sensor; }
