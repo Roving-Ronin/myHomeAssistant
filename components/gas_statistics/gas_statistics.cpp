@@ -265,7 +265,7 @@ void GasStatistics::process_(float total, bool is_initial_restore) {
   // Save to NVS on initial restore or state change
   if (is_initial_restore || this->has_loaded_nvs_ || this->gas_.current_day_of_year != this->time_->now().day_of_year) {
     this->pref_.save(&this->gas_);
-    ESP_LOGD(TAG, "Saved NVS: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
+    ESP_LOGD(TAG, "Saved Gas NVS: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
              this->gas_.start_today, this->gas_.start_yesterday, this->gas_.start_week,
              this->gas_.start_month, this->gas_.start_year);
   }
