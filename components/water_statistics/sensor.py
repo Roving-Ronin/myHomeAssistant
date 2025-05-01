@@ -22,7 +22,7 @@ from .const import (
 # Import your custom UNIT_LITRE from const.py
 #from .const import UNIT_LITRE   - No longer needed with ESPHome 2024.9.0 - https://github.com/esphome/esphome/pull/7317/files
 
-CODEOWNERS = ["@dentra", "@roving-ronin"]
+CODEOWNERS = ["@roving-ronin"]
 
 DEPENDENCIES = ["time"]
 
