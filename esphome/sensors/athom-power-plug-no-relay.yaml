@@ -22,7 +22,7 @@ web_server:
 #####################################################################
 #
 # This file contains all the common sensors that are used by
-# Athom v2 and v3 Power Plugs.
+# Athom v2 (Relay and No Relay) and v3 Power Plugs.
 #
 
 #####################################################################
@@ -31,11 +31,9 @@ web_server:
 #
 
 # Dentra Components - Adds 'Platform - Energy Statistics'
-# https://github.com/dentra/esphome-components/tree/master/components/energy_statistics
+# https://github.com/Roving-Ronin/myHomeAssistant/tree/main/components/energy_statistics
 
 external_components:
-#  - source: github://roving-ronin/myhomeassistant/components@statistics-partial-times
-#    refresh: 0s
   - source:
       type: git
       url: https://github.com/roving-ronin/myhomeassistant/

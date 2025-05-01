@@ -26,7 +26,7 @@ substitutions:
   # Project Name
   project_name: "DIY.Utilities Monitor"
   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "1.5.1"
+  project_version: "1.6.0"
   # The phase in the locations power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C).
   # Used to populate a Text Sensor with this information, that may be used to loadshed in future, or trace outages to electrical faults.
   power_circuit: "TBA"
@@ -79,14 +79,12 @@ packages:
 #
 
 external_components:
-#  - source: github://roving-ronin/myhomeassistant/components@statistics-partial-times
-#    refresh: 0s
   - source:
       type: git
       url: https://github.com/roving-ronin/myhomeassistant/
       ref: main
     refresh: 0s
-    components: [ gas_statistics, gas_statistics_mj, water_statistics ]
+    components: [ gas_statistics, gas_statistics_mj, water_statistics, usage_tracker ]
 
 #########################################################################
 #
@@ -95,6 +93,8 @@ external_components:
 #
 
 web_server:
+#  css_url: https://raw.githubusercontent.com/Roving-Ronin/myHomeAssistant/main/esphome/custom_dashboard/tabs.css
+#  js_url: https://raw.githubusercontent.com/Roving-Ronin/myHomeAssistant/main/esphome/custom_dashboard/utilities-monitor.js
   sorting_groups:
       # This sort group is used by both the Water and Gas Meter senors (flow rate / pulse counter), so must be in at this level, not in the water vs gas sensor yaml
     - id: group_utility_meter_sensors

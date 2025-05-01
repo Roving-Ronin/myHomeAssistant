@@ -23,7 +23,7 @@ web_server:
   sorting_groups:
     - id: group_town_water_sensors
       name: "Town Water Sensors"
-      sorting_weight: -39
+      sorting_weight: -40
 
 #######################################################################################
 
@@ -35,11 +35,104 @@ globals:
     restore_value: yes
 #    initial_value: '0.0'  # When Factory Reset, return this value to '0.0'
 
+  # Used by the text_sensor to reformat the Last Used Duration into hours/minutes/seconds.
+  - id: last_formatted_duration_town_water
+    type: std::string
+    restore_value: no
+    initial_value: '""'
 
 ################################################################################
 #
 #  Sensors
 #
+
+
+################################################################################
+#
+#  Binary Sensor - Used to internally determine if the tap is ON/OFF.
+#
+
+binary_sensor:
+  - platform: template
+    name: "Town Water - Tap State Sensor"
+    id: town_water_tap_state_sensor
+    lambda: |-
+      return id(town_water_flow_rate).state > 0.01;
+    on_press:
+      then:
+        - text_sensor.template.publish:
+            id: town_water_tap_state
+            state: "OPEN"
+    on_release:
+      then:
+        - text_sensor.template.publish:
+            id: town_water_tap_state
+            state: "CLOSED"
+    internal: true
+
+
+################################################################################
+#
+#  Text Sensor - Used to publish if the tap is On
+#
+
+text_sensor:
+  - platform: template
+    name: "Town Water - Tap State"
+    id: town_water_tap_state
+    icon: "mdi:water-pump"
+    update_interval: never
+    web_server:
+      sorting_group_id: group_utility_meter_sensors
+      sorting_weight: 1
+
+
+  - platform: template
+    name: "Town Water - Last Use Duration"
+    id: town_water_last_use_duration
+    icon: mdi:timer-outline
+    lambda: |-
+      // Check if the sensor has a valid state
+      if (!id(town_water_last_use_sensor).has_state()) {
+        return std::string("Unknown");
+      }
+
+      int seconds = id(town_water_last_use_sensor).state;
+      if (seconds < 0) {
+        return std::string("Unknown");
+      }
+
+      // Format the duration
+      int days = seconds / (24 * 3600);
+      seconds = seconds % (24 * 3600);
+      int hours = seconds / 3600;
+      seconds = seconds % 3600;
+      int minutes = seconds / 60;
+      seconds = seconds % 60;
+
+      std::string new_value;
+      if (days > 3650) {
+        new_value = "Starting up";
+      } else if (days) {
+        new_value = to_string(days) + "d " + to_string(hours) + "h " + to_string(minutes) + "m " + to_string(seconds) + "s";
+      } else if (hours) {
+        new_value = to_string(hours) + "h " + to_string(minutes) + "m " + to_string(seconds) + "s";
+      } else if (minutes) {
+        new_value = to_string(minutes) + "m " + to_string(seconds) + "s";
+      } else {
+        new_value = to_string(seconds) + "s";
+      }
+      // Only return a new value if it differs from the previous one
+      if (new_value != id(last_formatted_duration_town_water)) {
+        id(last_formatted_duration_town_water) = new_value;
+        return new_value;
+      }
+      return {};
+#    update_interval: 10s
+    web_server:
+      sorting_group_id: group_utility_meter_sensors
+      sorting_weight: 4
+
 
 sensor:
   ################################################################################
@@ -62,7 +155,7 @@ sensor:
       - multiply: ${town_water_litres_per_pulse} # Convert pulse count to liters
     web_server:
       sorting_group_id: group_utility_meter_sensors
-      sorting_weight: 2
+      sorting_weight: 3
 
 
   - platform: pulse_meter
@@ -82,12 +175,12 @@ sensor:
         pullup: true
     internal_filter_mode: PULSE
     internal_filter: 100ms
-    timeout: 3min
+    timeout: 90s #3min
     filters:
       - multiply: ${town_water_litres_per_pulse}  # Each pulse equals 5 liters. The water counter 'helper' in Home Assistant must still be set to 'step size' = 5.
     web_server:
       sorting_group_id: group_utility_meter_sensors
-      sorting_weight: 1
+      sorting_weight: 2
 
     #  Uses the above pulse_meter and adds sensor and calculations for tracking current litres
     total:
@@ -110,6 +203,7 @@ sensor:
               previous_town_water_used_litres_value = current_town_water_used_litres_value;
               id(town_water_total).update();
       internal: true
+
 
   ################################################################################
   #
@@ -176,4 +270,37 @@ sensor:
       sorting_group_id: group_town_water_sensors
       sorting_weight: 6
 
+
+  ################################################################################
+  #
+  #  Uses the Usage_Tracker custom component to publish duration of last tap OPEN.
+  #
+
+  - platform: usage_tracker
+    on_off_sensor: town_water_tap_state_sensor
+
+    # This is internal as we use a text_sensor above to reformat the output into days/hours/min/sec.
+    last_use:
+      name: "Town Water - Last Use Sensor"
+      id: town_water_last_use_sensor
+      accuracy_decimals: 1
+      filters:
+        - delta: 0.1         # Only update if change is ≥ 0.1 min
+      internal: true
+
+    # Don't want to show this sensor, but the custom_component requires that both sensors are used.
+    lifetime_use:
+      name: "Town Water - Lifetime Use Duration"
+      id: town_water_lifetime_use_sensor
+      unit_of_measurement: "min"
+      accuracy_decimals: 1
+      filters:
+        - lambda: |-
+            return x / 60.0;
+        - delta: 0.1         # Only update if change is ≥ 0.1 min
+      web_server:
+        sorting_group_id: group_utility_meter_sensors
+        sorting_weight: 5
+      internal: true
+      
   ################################################################################
