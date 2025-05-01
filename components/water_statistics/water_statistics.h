@@ -36,6 +36,7 @@ class WaterStatistics : public Component {
   bool has_loaded_nvs_{false};
   bool initial_processing_started_{false};
   int sntp_retries_{0};
+  bool has_value_changed_{false}; // Tracks if any sensor value changed
 
   // Input sensors
   Sensor *total_{nullptr};
