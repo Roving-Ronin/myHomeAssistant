@@ -68,6 +68,19 @@ void WaterStatistics::setup() {
       this->set_timeout(5000, [this]() { this->retry_sntp_sync_(); });
     }
   });
+
+  // Periodic NVS save every 5 minutes if values changed
+  this->set_interval(300000, [this]() {
+    if (this->has_value_changed_) {
+      this->pref_.save(&this->water_);
+      ESP_LOGD(TAG, "Saved Water NVS after 5min interval (value changed): today=%f, yesterday=%f, week=%f, month=%f, year=%f",
+               this->water_.start_today, this->water_.start_yesterday, this->water_.start_week,
+               this->water_.start_month, this->water_.start_year);
+      this->has_value_changed_ = false;
+    } else {
+      ESP_LOGV(TAG, "Skipped Water NVS save after 5min interval (no value change)");
+    }
+  });
 }
 
 void WaterStatistics::retry_sntp_sync_() {
@@ -101,7 +114,7 @@ void WaterStatistics::loop() {
   if (this->has_loaded_nvs_ && this->initial_total_retries_ > 0) {
     float total = this->total_->state;
     if (!std::isnan(total) && total >= 0.0f) {
-      ESP_LOGD(TAG, "Processing restored Water total: %f", total);
+      ESP_LOGD(TAG, "Processing Water restored total: %f", total);
       this->process_(total);
       this->initial_total_retries_ = 0; // Done
       this->has_loaded_nvs_ = false;
@@ -109,7 +122,7 @@ void WaterStatistics::loop() {
       ESP_LOGD(TAG, "Waiting for valid Water total: %f, retries: %d", total, this->initial_total_retries_);
       this->initial_total_retries_--;
       if (this->initial_total_retries_ == 0) {
-        ESP_LOGW(TAG, "Water total invalid after 5s: %f, retaining prior stats", total);
+        ESP_LOGW(TAG, "Total Water invalid after 5s: %f, retaining prior stats", total);
         this->has_loaded_nvs_ = false;
       }
       return; // Yield to avoid blocking
@@ -187,15 +200,15 @@ void WaterStatistics::process_(float total, bool is_initial_restore) {
     if (std::isnan(this->last_today_) || fabs(value - this->last_today_) > 0.001f) {
       this->water_today_->publish_state(value);
       this->last_today_ = value;
-      this->pref_.save(&this->water_);
-      ESP_LOGD(TAG, "Saved Water NVS after today update: today=%f", this->water_.start_today);
+      this->has_value_changed_ = true;
+      ESP_LOGD(TAG, "Water Today value changed: %f", value);
     }
   } else if (this->water_today_) {
     if (std::isnan(this->last_today_) || fabs(0.0f - this->last_today_) > 0.001f) {
       this->water_today_->publish_state(0);
       this->last_today_ = 0.0f;
-      this->pref_.save(&this->water_);
-      ESP_LOGD(TAG, "Saved Water NVS after today zero: today=%f", this->water_.start_today);
+      this->has_value_changed_ = true;
+      ESP_LOGD(TAG, "Water Today value changed to zero");
     }
   }
 
@@ -205,15 +218,15 @@ void WaterStatistics::process_(float total, bool is_initial_restore) {
     if (std::isnan(this->last_yesterday_) || fabs(value - this->last_yesterday_) > 0.001f) {
       this->water_yesterday_->publish_state(value);
       this->last_yesterday_ = value;
-      this->pref_.save(&this->water_);
-      ESP_LOGD(TAG, "Saved Water NVS after yesterday update: yesterday=%f", this->water_.start_yesterday);
+      this->has_value_changed_ = true;
+      ESP_LOGD(TAG, "Water Yesterday value changed: %f", value);
     }
   } else if (this->water_yesterday_) {
     if (std::isnan(this->last_yesterday_) || fabs(0.0f - this->last_yesterday_) > 0.001f) {
       this->water_yesterday_->publish_state(0);
       this->last_yesterday_ = 0.0f;
-      this->pref_.save(&this->water_);
-      ESP_LOGD(TAG, "Saved Water NVS after yesterday zero: yesterday=%f", this->water_.start_yesterday);
+      this->has_value_changed_ = true;
+      ESP_LOGD(TAG, "Water Yesterday value changed to zero");
     }
   }
 
@@ -223,15 +236,15 @@ void WaterStatistics::process_(float total, bool is_initial_restore) {
     if (std::isnan(this->last_week_) || fabs(value - this->last_week_) > 0.001f) {
       this->water_week_->publish_state(value);
       this->last_week_ = value;
-      this->pref_.save(&this->water_);
-      ESP_LOGD(TAG, "Saved Water NVS after week update: week=%f", this->water_.start_week);
+      this->has_value_changed_ = true;
+      ESP_LOGD(TAG, "Water Week value changed: %f", value);
     }
   } else if (this->water_week_) {
     if (std::isnan(this->last_week_) || fabs(0.0f - this->last_week_) > 0.001f) {
       this->water_week_->publish_state(0);
       this->last_week_ = 0.0f;
-      this->pref_.save(&this->water_);
-      ESP_LOGD(TAG, "Saved Water NVS after week zero: week=%f", this->water_.start_week);
+      this->has_value_changed_ = true;
+      ESP_LOGD(TAG, "Water Week value changed to zero");
     }
   }
 
@@ -241,15 +254,15 @@ void WaterStatistics::process_(float total, bool is_initial_restore) {
     if (std::isnan(this->last_month_) || fabs(value - this->last_month_) > 0.001f) {
       this->water_month_->publish_state(value);
       this->last_month_ = value;
-      this->pref_.save(&this->water_);
-      ESP_LOGD(TAG, "Saved Water NVS after month update: month=%f", this->water_.start_month);
+      this->has_value_changed_ = true;
+      ESP_LOGD(TAG, "Water Month value changed: %f", value);
     }
   } else if (this->water_month_) {
     if (std::isnan(this->last_month_) || fabs(0.0f - this->last_month_) > 0.001f) {
       this->water_month_->publish_state(0);
       this->last_month_ = 0.0f;
-      this->pref_.save(&this->water_);
-      ESP_LOGD(TAG, "Saved Water NVS after month zero: month=%f", this->water_.start_month);
+      this->has_value_changed_ = true;
+      ESP_LOGD(TAG, "Water Month value changed to zero");
     }
   }
 
@@ -259,24 +272,25 @@ void WaterStatistics::process_(float total, bool is_initial_restore) {
     if (std::isnan(this->last_year_) || fabs(value - this->last_year_) > 0.001f) {
       this->water_year_->publish_state(value);
       this->last_year_ = value;
-      this->pref_.save(&this->water_);
-      ESP_LOGD(TAG, "Saved Water NVS after year update: year=%f", this->water_.start_year);
+      this->has_value_changed_ = true;
+      ESP_LOGD(TAG, "Water Year value changed: %f", value);
     }
   } else if (this->water_year_) {
     if (std::isnan(this->last_year_) || fabs(0.0f - this->last_year_) > 0.001f) {
       this->water_year_->publish_state(0);
       this->last_year_ = 0.0f;
-      this->pref_.save(&this->water_);
-      ESP_LOGD(TAG, "Saved Water NVS after year zero: year=%f", this->water_.start_year);
+      this->has_value_changed_ = true;
+      ESP_LOGD(TAG, "Water Year value changed to zero");
     }
   }
 
-  // Save to NVS on initial restore or state change
-  if (is_initial_restore || this->has_loaded_nvs_ || this->water_.current_day_of_year != this->time_->now().day_of_year) {
+  // Save to NVS on initial restore
+  if (is_initial_restore) {
     this->pref_.save(&this->water_);
-    ESP_LOGD(TAG, "Saved Water NVS: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
+    ESP_LOGD(TAG, "Saved Water NVS on initial restore: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
              this->water_.start_today, this->water_.start_yesterday, this->water_.start_week,
              this->water_.start_month, this->water_.start_year);
+    this->has_value_changed_ = false;
   }
 }
 
