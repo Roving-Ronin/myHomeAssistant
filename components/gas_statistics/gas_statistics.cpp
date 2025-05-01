@@ -74,7 +74,7 @@ void GasStatistics::setup() {
   ota::global_ota_component->add_on_state_callback([this](ota::OTAState state, float progress, uint8_t error) {
     if (state == ota::OTA_STARTED) {
       this->pref_.save(&this->gas_);
-      ESP_LOGD(TAG, "Saved NVS before OTA: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
+      ESP_LOGD(TAG, "Saved Gas NVS before OTA: today=%f, yesterday=%f, week=%f, month=%f, year=%f",
                this->gas_.start_today, this->gas_.start_yesterday, this->gas_.start_week,
                this->gas_.start_month, this->gas_.start_year);
     }
