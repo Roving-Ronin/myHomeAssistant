@@ -1,6 +1,5 @@
 #include "esphome/core/log.h"
 #include "esphome/core/hal.h"
-#include "esphome/components/ota/ota_backend.h"
 #include "gas_statistics_mj.h"
 
 namespace esphome {
