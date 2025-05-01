@@ -57,7 +57,7 @@ void WaterStatistics::setup() {
   }
 
   // Delay initial loop processing until time sync
-  this->set_timeout(10000, [this]() { this->initial_processing_started_ = true; });
+  this->set_timeout(15000, [this]() { this->initial_processing_started_ = true; });
 }
 
 void WaterStatistics::on_shutdown() {
