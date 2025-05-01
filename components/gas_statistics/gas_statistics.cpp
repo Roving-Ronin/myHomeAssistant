@@ -112,7 +112,7 @@ void GasStatistics::loop() {
   if (this->has_loaded_nvs_ && this->initial_total_retries_ > 0) {
     float total = this->total_->state;
     if (!std::isnan(total) && total >= 0.0f) {
-      ESP_LOGD(TAG, "Processing restored total: %f", total);
+      ESP_LOGD(TAG, "Processing restored Gas total: %f", total);
       this->process_(total);
       this->initial_total_retries_ = 0; // Done
       this->has_loaded_nvs_ = false;
