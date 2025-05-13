@@ -62,7 +62,7 @@ globals:
     restore_value: yes
 
   # Used by the text_sensor to reformat the Last Used Duration into hours/minutes/seconds.
-  - id: last_formatted_duration_town_water
+  - id: last_formatted_duration_gas
     type: std::string
     restore_value: no
     initial_value: '""'
