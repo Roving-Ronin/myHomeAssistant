@@ -132,7 +132,7 @@ binary_sensor:
     on_release:
       then:
         - text_sensor.template.publish:
-            id: gas_vavle_state
+            id: gas_valve_state
             state: "CLOSED"
     internal: true
 
