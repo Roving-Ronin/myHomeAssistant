@@ -141,21 +141,21 @@ sensor:
   # Utility - Water Meter
   #
 
-  - platform: pulse_counter
-    name: "Town Water - Pulse Counter"
-    id: town_water_pulse_counter
-    pin:
-      number: ${gpio_water_pin}
-      allow_other_uses: true
-      inverted: true
-      mode:
-        input: true
-        pullup: true
-    filters:
-      - multiply: ${town_water_litres_per_pulse} # Convert pulse count to liters
-    web_server:
-      sorting_group_id: group_utility_meter_sensors
-      sorting_weight: 3
+#  - platform: pulse_counter
+#    name: "Town Water - Pulse Counter"
+#    id: town_water_pulse_counter
+#    pin:
+#      number: ${gpio_water_pin}
+#      allow_other_uses: true
+#      inverted: true
+#      mode:
+#        input: true
+#        pullup: true
+#    filters:
+#      - multiply: ${town_water_litres_per_pulse} # Convert pulse count to liters
+#    web_server:
+#      sorting_group_id: group_utility_meter_sensors
+#      sorting_weight: 3
 
 
   - platform: pulse_meter
