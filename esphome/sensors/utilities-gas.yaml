@@ -144,7 +144,7 @@ binary_sensor:
 
 text_sensor:
   - platform: template
-    name: "Gas - Flow State"
+    name: "Gas - Valve State"
     id: gas_valve_state
     icon: "mdi:meter-gas"
     update_interval: never
