@@ -229,11 +229,11 @@ text_sensor:
           return new_value;
         }
         return {};
-      on_value:
-        then:
-          - sensor.template.publish:
-              id: power_circuit
-              state: !lambda 'return x;'    
+        on_value:
+         then:
+            - sensor.template.publish:
+                id: power_circuit
+                state: !lambda 'return x;'    
     web_server:
       sorting_weight: 38
 
