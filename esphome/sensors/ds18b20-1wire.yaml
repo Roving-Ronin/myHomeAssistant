@@ -1,9 +1,13 @@
 #########################################################################
 #
+# Pacakge to configure the use of a device with a DS18B20 1 Wire Sensor
+#
+
+#########################################################################
+#
 # Substitutions
 #
 substitutions:
-   
    # Enable logs to DEBUG and determine the ds18b20 address and paste below
   ds18b20_address: ""
 
@@ -12,6 +16,17 @@ substitutions:
   ds18b20_sensor_location: ""
    # Calibrate the outpute of the temperature sensor(s).
   ds18b20_temperature_offset: "0.0"
+
+#####################################################################
+#
+# Combined with web_server settings in /common/base-configuration to
+# define a network information group
+#
+web_server:
+  sorting_groups:
+    - id: group_environmental_sensors
+      name: "Environmental Sensors"
+      sorting_weight: -45  
 
 #########################################################################
 #
@@ -29,11 +44,14 @@ sensor:
 
   - platform: dallas_temp
     name: "${ds18b20_sensor_location}Temperature"
-#    address: ${ds18b20_address}
+    address: ${ds18b20_address}
     accuracy_decimals: 1
     filters:
       offset: ${ds18b20_temperature_offset}
     icon: "mdi:temperature-celsius"
     update_interval: 120s
+    web_server:
+      sorting_group_id: group_environmental_sensors
+      sorting_weight: 10
 
 ##########################################################################
