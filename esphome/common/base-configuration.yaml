@@ -101,19 +101,6 @@ web_server:
 network:
   enable_ipv6: ${ipv6_enable}
 
-#########################################################################
-#
-# Remote Packages to be utilised
-#
-
-# dashboard_import:
-#  package_import_url: github://roving-ronin/myhomeassistant/esphome/common/base-configuration.yaml@main
-#  import_full_config: false
-
-#packages:
-#  device_base: !include common/base-configuration-wifi.yaml
-#  device_version: !include common/everything-presence-one-sen0395-stable.yaml
-#  sen0395_base: !include common/sen0395-common.yaml
 
 ##########################################################################
 #
