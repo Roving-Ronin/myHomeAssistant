@@ -212,6 +212,7 @@ sensor:
   # Utility - Gas Meter
   #
 
+  # Used to update the COUNTER helper, that is triggered by an automation watching the pulse_counter
   - platform: pulse_counter
     name: "Gas - Pulse Counter"
     id: gas_pulse_counter
