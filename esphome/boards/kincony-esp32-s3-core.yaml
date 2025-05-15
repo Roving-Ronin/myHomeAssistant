@@ -139,6 +139,15 @@ sensor:
 #    filters:
 #      - multiply: 5
 
+#  - platform: adc
+#    pin: 7
+#    name: "Analog Port 1"
+#    update_interval: 2s
+#    unit_of_measurement: V
+#    attenuation: 12db
+#    filters:
+#      - multiply: 5
+
 
 ##########################################################################
 #
