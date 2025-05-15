@@ -63,29 +63,15 @@ dashboard_import:
   import_full_config: false
 
 packages:
-  remote_package_files:
-    url: https://github.com/roving-ronin/myhomeassistant/
-    files: [ esphome/common/base-configuration.yaml, esphome/common/network-ethernet-w5500.yaml, esphome/sensors/bme280-bus-a.yaml, esphome/sensors/cylinder-liquid-pressure-tl136.yaml, esphome/sensors/utilities-gas.yaml, esphome/sensors/utilities-town-water.yaml,  esphome/boards/kincony-esp32-s3-core.yaml ]  # optional; if not specified, all files will be included
-    ref: main  # optional
-    refresh: 0s  # optional
-    # base-configuration.yaml               - Base configuration applied to all ESPHome device\
-    # network-ethernet-w5500.yaml           - Configure Ethernet port on this system board
-    # bme280-bus-a.yaml                     - Temperature, Humidity, Pressure sensor probe
-    # kincony-esp32-s3-core.yaml            - Model of ESP Board being used. This is Kincony S3 Core with JAComms add-on HAT board.
-    # cylinder-liquid-pressure-tl136.yaml   - Pressure sensor to monitor water tank
-    # utilities-gas.yaml                    - Sensors to monitor and calculate gas usage
-    # utilities-town-water.yaml             - Sensors to monitor and calculate town water usage
-    # kincony-esp32-s3-core.yaml            - Model of ESP Board being used. This is Kincony S3 Core with JAComms add-on HAT board.
-
-#  base-config:             !include common/base-configuration.yaml              # Base configuration applied to all ESPHome devices
-#  network-config:          !include common/network-ethernet-w5500.yaml          # Configure Ethernet port on this system board
-#  bme280a-sensors:         !include sensors/bme280-bus-a.yaml                   # Temperature, Humidity, Pressure sensor probe
-#  water-tank-sensors:      !include sensors/cylinder-liquid-pressure-tl136.yaml # Pressure sensor to monitor water tank  
-##  ds18b20-sensors:       !include sensors/ds18b20-1wire.yaml
-#  consumption-gas:         !include sensors/utilities-gas.yaml                  # Sensors to monitor and calculate gas usage
-#  consumption-town-water:  !include sensors/utilities-town-water.yaml           # Sensors to monitor and calculate town water usage
-##  consumption-tank-water:  !include sensors/utilities-tank-water.yaml          # Sensors to monitor and calculate tank water usage
-#  esp32-system-board:      !include boards/kincony-esp32-s3-core.yaml           # Model of ESP Board being used. This is Kincony S3 Core with JAComms add-on HAT board.
+  base-config:             !include common/base-configuration.yaml              # Base configuration applied to all ESPHome devices
+  network-config:          !include common/network-ethernet-w5500.yaml          # Configure Ethernet port on this system board
+  bme280a-sensors:         !include sensors/bme280-bus-a.yaml                   # Temperature, Humidity, Pressure sensor probe
+  water-tank-sensors:      !include sensors/cylinder-liquid-pressure-tl136.yaml # Pressure sensor to monitor water tank  
+#  ds18b20-sensors:       !include sensors/ds18b20-1wire.yaml
+  consumption-gas:         !include sensors/utilities-gas.yaml                  # Sensors to monitor and calculate gas usage
+  consumption-town-water:  !include sensors/utilities-town-water.yaml           # Sensors to monitor and calculate town water usage
+#  consumption-tank-water:  !include sensors/utilities-tank-water.yaml          # Sensors to monitor and calculate tank water usage
+  esp32-system-board:      !include boards/kincony-esp32-s3-core.yaml           # Model of ESP Board being used. This is Kincony S3 Core with JAComms add-on HAT board.
 
 #########################################################################
 #
