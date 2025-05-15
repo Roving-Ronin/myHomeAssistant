@@ -64,7 +64,7 @@ dashboard_import:
 
 packages:
   remote_package_files:
-    url: https://github.com/roving-ronin/myhomeassistant/
+    url: https://github.com/roving-ronin/myhomeassistant/esphome/
     files: [ common/base-configuration.yaml, common/network-ethernet-w5500.yaml, sensors/bme280-bus-a.yaml, sensors/cylinder-liquid-pressure-tl136.yaml, sensors/utilities-gas.yaml, sensors/utilities-town-water.yaml,  boards/kincony-esp32-s3-core.yaml ]  # optional; if not specified, all files will be included
     ref: main  # optional
     refresh: 0s  # optional
