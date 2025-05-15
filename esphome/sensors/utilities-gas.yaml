@@ -222,7 +222,7 @@ sensor:
       mode:
         input: true
         pullup: true
-    internal: true
+    internal: false
     web_server:
       sorting_group_id: group_utility_meter_sensors
       sorting_weight: 12
