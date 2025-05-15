@@ -65,7 +65,7 @@ dashboard_import:
 packages:
   remote_package_files:
     url: https://github.com/roving-ronin/myhomeassistant/
-    files: [ base-configuration.yaml, network-ethernet-w5500.yaml, bme280-bus-a.yaml, cylinder-liquid-pressure-tl136.yaml, utilities-gas.yaml, utilities-town-water.yaml, kincony-esp32-s3-core.yaml ]  # optional; if not specified, all files will be included
+    files: [ common/base-configuration.yaml, common/network-ethernet-w5500.yaml, sensors/bme280-bus-a.yaml, sensors/cylinder-liquid-pressure-tl136.yaml, sensors/utilities-gas.yaml, sensors/utilities-town-water.yaml,  boards/kincony-esp32-s3-core.yaml ]  # optional; if not specified, all files will be included
     ref: main  # optional
     refresh: 0s  # optional
     # base-configuration.yaml               - Base configuration applied to all ESPHome device\
