@@ -215,7 +215,6 @@ text_sensor:
     web_server:
       sorting_weight: 37
 
-
   #  Creates a sensor showing power circuit / phase of the device
   - platform: template
     name: 'Power Circuit'
@@ -223,21 +222,10 @@ text_sensor:
     icon: "mdi:electric-switch"
     entity_category: diagnostic
     lambda: |-
-      static String last_value = "";
-      String new_value = "${power_circuit}";
-      if (last_value != new_value) {
-        last_value = new_value;
-        return new_value;
-      }
-      return std::string();
-    on_value:
-      then:
-        - text_sensor.template.publish:
-            id: power_circuit
-            state: !lambda 'return x;'
+      return {"${power_circuit}"};
+    update_interval: 1h
     web_server:
       sorting_weight: 38
-
 
    # Creates a sensor of the name of installed project
   - platform: template
@@ -246,18 +234,8 @@ text_sensor:
     icon: "mdi:label-outline"
     entity_category: diagnostic
     lambda: |-
-      static String last_value = "";
-      String new_value = "${project_name}";
-      if (last_value != new_value) {
-        last_value = new_value;
-        return new_value;
-      }
-      return std::string();
-    on_value:
-      then:
-        - text_sensor.template.publish:
-            id: project_name
-            state: !lambda 'return x;'
+      return {"${project_name}"};
+    update_interval: 1h
     web_server:
       sorting_weight: 39
 
@@ -268,18 +246,8 @@ text_sensor:
     icon: "mdi:label-outline"
     entity_category: diagnostic
     lambda: |-
-      static String last_value = "";
-      String new_value = "${project_version}";
-      if (last_value != new_value) {
-        last_value = new_value;
-        return new_value;
-      }
-      return std::string();
-    on_value:
-      then:
-        - text_sensor.template.publish:
-            id: project_version
-            state: !lambda 'return x;'    
+      return {"${project_version}"};
+    update_interval: 1h
     web_server:
       sorting_weight: 40
 
