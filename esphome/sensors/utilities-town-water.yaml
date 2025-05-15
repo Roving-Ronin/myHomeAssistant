@@ -141,6 +141,7 @@ sensor:
   # Utility - Water Meter
   #
 
+  # Used to update the COUNTER helper, that is triggered by an automation watching the pulse_counter
   - platform: pulse_counter
     name: "Town Water - Pulse Counter"
     id: town_water_pulse_counter
@@ -153,7 +154,7 @@ sensor:
         pullup: true
     filters:
       - multiply: ${town_water_litres_per_pulse} # Convert pulse count to liters
-    internal: true
+    internal: false
     web_server:
       sorting_group_id: group_utility_meter_sensors
       sorting_weight: 3
