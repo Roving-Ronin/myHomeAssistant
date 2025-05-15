@@ -228,14 +228,15 @@ text_sensor:
           last_value = new_value;
           return new_value;
         }
-        return {};
-        on_value:
-         then:
-            - sensor.template.publish:
-                id: power_circuit
-                state: !lambda 'return x;'    
+        return std::string();  # Return an empty string instead of {}
+      on_value:
+        then:
+          - sensor.template.publish:
+              id: power_circuit
+              state: !lambda 'return x;'
     web_server:
       sorting_weight: 38
+
 
    # Creates a sensor of the name of installed project
   - platform: template
@@ -250,7 +251,7 @@ text_sensor:
           last_value = new_value;
           return new_value;
         }
-        return {};
+        return std::string();  # Return an empty string instead of {}
       on_value:
         then:
           - sensor.template.publish:
@@ -272,7 +273,7 @@ text_sensor:
           last_value = new_value;
           return new_value;
         }
-        return {};
+        return std::string();  # Return an empty string instead of {}
       on_value:
         then:
           - sensor.template.publish:
