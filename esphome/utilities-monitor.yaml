@@ -68,10 +68,10 @@ packages:
   bme280a-sensors:         !include sensors/bme280-bus-a.yaml                   # Temperature, Humidity, Pressure sensor probe
   water-tank-sensors:      !include sensors/cylinder-liquid-pressure-tl136.yaml # Pressure sensor to monitor water tank  
 #  ds18b20-sensors:       !include sensors/ds18b20-1wire.yaml
-  consumption-gas:         !include sensors/utilities-gas.yaml                    # Sensors to monitor and calculate gas usage
-  consumption-town-water:  !include sensors/utilities-town-water.yaml             # Sensors to monitor and calculate gas usage
-#  consumption-tank-water:  !include sensors/utilities-tank-water.yaml             # Sensors to monitor and calculate gas usage
-  esp32-system-board:      !include boards/jacomms-esp32-s3-core.yaml           # Model of ESP Board being used. This is Kincony S3 Core with JAComms HAT.
+  consumption-gas:         !include sensors/utilities-gas.yaml                  # Sensors to monitor and calculate gas usage
+  consumption-town-water:  !include sensors/utilities-town-water.yaml           # Sensors to monitor and calculate gas usage
+#  consumption-tank-water:  !include sensors/utilities-tank-water.yaml          # Sensors to monitor and calculate gas usage
+  esp32-system-board:      !include boards/kincony-esp32-s3-core.yaml           # Model of ESP Board being used. This is Kincony S3 Core with JAComms add-on HAT board.
 
 #########################################################################
 #
