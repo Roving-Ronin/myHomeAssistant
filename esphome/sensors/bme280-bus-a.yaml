@@ -45,7 +45,7 @@ sensor:
     temperature:
       name: "${bme_sensor1_location}Temperature"
       id: bme280a_temperature
-      icon: 'mdi:thermometer'
+      icon: 'mdi:temperature-celsius'
       accuracy_decimals: 1
       filters:
         offset: ${temperature_1_offset}
