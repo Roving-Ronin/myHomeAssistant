@@ -232,7 +232,7 @@ text_sensor:
       return std::string();
     on_value:
       then:
-        - sensor.template.publish:
+        - text_sensor.template.publish:
             id: power_circuit
             state: !lambda 'return x;'
     web_server:
@@ -255,7 +255,7 @@ text_sensor:
       return std::string();  # Return an empty string instead of {}
     on_value:
       then:
-        - sensor.template.publish:
+        - text_sensor.template.publish:
             id: project_name
             state: !lambda 'return x;'
     web_server:
@@ -277,7 +277,7 @@ text_sensor:
       return std::string();  # Return an empty string instead of {}
     on_value:
       then:
-        - sensor.template.publish:
+        - text_sensor.template.publish:
             id: project_version
             state: !lambda 'return x;'    
     web_server:
