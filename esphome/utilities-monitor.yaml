@@ -61,7 +61,6 @@ substitutions:
 dashboard_import:
   package_import_url: github://roving-ronin/myhomeassistant/esphome/utilities-monitor.yaml@main
   import_full_config: false
-  refresh: 0s
 
 packages:
   base-config:             !include common/base-configuration.yaml              # Base configuration applied to all ESPHome devices
