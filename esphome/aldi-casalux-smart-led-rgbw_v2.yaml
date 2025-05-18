@@ -1,0 +1,113 @@
+#  Aldi CasaLux RGBW Lights sold from May 2025 onwards have switched to using a KP18058 / KP18068 LED Driver
+#  this YAML is for those v2 lights, using the PR7177
+#
+#  Documentation (not merged into ESPHome) - https://deploy-preview-4402--esphome.netlify.app/components/output/kp18058.html
+#
+#  Credit to https://community.home-assistant.io/u/gaz99 for getting this working.
+
+DRAFT - TO BE UPDATED / MERGE WITH v1 TEMPLATE
+
+# Casalux RGB V2 downlight - CBCL5
+# Use ext component for KP18065 LED driver
+# V1a - initial Libretiny flash
+# V1b -  add sensors
+# V1c - add id to kp18058 platform, add external component for kp18058 and i2c_soft
+# V1c - reduce hotspot name length
+# V1d - fix colours, add initial conditions on boot 
+
+
+
+substitutions:
+  name: "casa-dl-v2-rgb-1"
+
+esphome:
+  name: "${name}"
+  
+  on_boot:
+    priority: 600
+    then:
+      - light.turn_on: 
+          id: light_rgbww
+          brightness: 35%
+          color_temperature: 3000K
+      - delay: 2.5s
+
+bk72xx:
+  board: cblc5
+  
+external_components:
+  - source: github://pr#7701
+    components: [ kp18058 ]
+  - source: github://pr#7701
+    components: [ i2c_soft ]
+
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  - platform: esphome
+    password: ""
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "${name} Hotspot"
+    password: ""
+
+
+kp18058:
+   id: kp18058a
+   data_pin: P24  
+   clock_pin: P26
+   cw_current: 8
+   rgb_current: 8
+
+
+output:
+  - platform: kp18058
+    id: output_red
+    channel: 1
+  - platform: kp18058
+    id: output_green
+    channel: 2
+  - platform: kp18058
+    id: output_blue
+    channel: 3
+  - platform: kp18058
+    id: output_warm
+    channel: 4
+  - platform: kp18058
+    id: output_cold
+    channel: 5
+
+
+light:
+  - platform: rgbww
+    id: light_rgbww
+    name: "${name}light"
+    color_interlock: true
+    cold_white_color_temperature: 6500 K
+    warm_white_color_temperature: 2700 K
+    red: output_red
+    green: output_green
+    blue: output_blue
+    cold_white: output_cold
+    warm_white: output_warm
+
+ 
+switch:
+  - platform: restart
+    name: "${name} Restart"
+   
+  
+sensor:
+  - platform: wifi_signal
+    name: "${name}  WiFi"
+    update_interval: 60s
