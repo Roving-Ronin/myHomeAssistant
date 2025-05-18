@@ -41,27 +41,6 @@ external_components:
   - source: github://pr#7701
     components: [ i2c_soft ]
 
-
-# Enable logging
-logger:
-
-# Enable Home Assistant API
-api:
-
-ota:
-  - platform: esphome
-    password: ""
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
-  ap:
-    ssid: "${name} Hotspot"
-    password: ""
-
-
 kp18058:
    id: kp18058a
    data_pin: P24  
@@ -88,26 +67,254 @@ output:
     channel: 5
 
 
+
+
+#########################################################################
+#
+# Aldi Casalux - LED Downlight with RGBW template
+#
+
+   # Provides substitutions or variables that are then called elsewhere multiple times in the config
+substitutions:
+   # Default name 
+  name: "aldi-casalux-led-downlight"
+   # Default friendly name 
+  friendly_name: "Aldi - Casalux - LED Downlight"
+   # Description as appears in ESPHome & top of webserver page
+  device_description: "Aldi Casalux Smart LED Downlight - 8W CW/WW & RGB"
+   # Project Name
+  project_name: "Aldi Casalux.Smart LED Downlight RGBW"
+   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
+  project_version: "1.2.0"
+   # Restore the relay (Light switch) upon reboot to state:
+  light_restore_mode: RESTORE_DEFAULT_OFF
+   # Set your locations latitude and longitude. Useful if you want to use the sun and its location in relation to the horizon to on/off (or as a condition) to control lights.
+  my_latitude: "-34.73503534407444"
+  my_longitude: "149.72998380661014"
+   # From: https://esphome.io/components/output/ledc.html
+  frequency_rgb: "1220Hz"
+  frequency_cw: "1220Hz"
+  frequency_ww: "1220Hz"
+   # Set the default colour temperature desired (min. 2700 K / max. 65000 K). 3000 K = Warm White, 4000 K = Cool White, 5000 K = Daylight, 6500 K = Cool Daylight.
+   # Normally this can be left at '6500 K' and is defined in Home Assistant Automation / Blueprints, where they can be varied per automation/blueprint used.
+  default_colour_temperature: "6500 K"
+  
+########################## End of Substitutions #########################
+
+esphome:
+  on_boot:
+    priority: 600.0
+    then:
+      - light.turn_on: 
+          id: downlight
+          brightness: 100%
+          color_temperature: 6500K
+          color_mode: COLOR_TEMPERATURE
+      - delay: 2.5s
+      - light.turn_off:
+          id: downlight
+
+#########################################################################
+#
+# Defines the bk72xx chip that is a cheaper alternative to an ESP828x
+#
+
+bk72xx:
+  board: generic-bk7231t-qfn32-tuya
+
+#########################################################################
+#
+# Remote Packages to be utilised
+#
+
+dashboard_import:
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/aldi-casalux-smart-led-rgbw.yaml@main
+  import_full_config: false
+
+packages:
+  base-config: !include common/base-configuration.yaml
+  wifi-config: !include common/network-wifi.yaml
+
+#########################################################################
+#
+# Custom Components to be utilised - For Light Last/Lifetime usage
+#
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/roving-ronin/myhomeassistant/
+      ref: main
+    refresh: 0s
+    components: [ usage_tracker ]
+
+#########################################################################
+#
+# Components and sensors defined in base-configuration.yaml that are
+# to be to be disabled, as not compatible or needed with this device.
+#
+
+ # Remove Network section (IPv6), as not supported on this chipset
+network: !remove
+
+#####################################################################
+#
+# Combined with web_server settings in /common/base-configuration to
+# define a network information group
+#
+
+web_server:
+  version: 3
+  sorting_groups:
+    - id: group_light_controls
+      name: "Light Controls"
+      sorting_weight: -30
+
+    - id: group_light_usage
+      name: "Light Statistics"
+      sorting_weight: -20
+
+#########################################################################
+#
+# Define the RGBW Lights and their GPIO PINS to control them.
+#
+
+output:
+  - platform: libretiny_pwm
+    id: output_red
+    pin: P26
+    max_power: 100%
+    frequency: ${frequency_rgb}
+
+  - platform: libretiny_pwm
+    id: output_green
+    pin: P24
+    max_power: 100%
+    frequency: ${frequency_rgb}
+
+  - platform: libretiny_pwm
+    id: output_blue
+    pin: P6
+    max_power: 100%
+    frequency: ${frequency_rgb}
+
+  - platform: libretiny_pwm
+    id: output_cold_white
+    max_power: 100%
+    frequency: ${frequency_cw}
+    pin: P7
+    inverted: True
+
+  - platform: libretiny_pwm
+    id: output_warm_white
+    pin: P8
+    max_power: 100%
+    frequency: ${frequency_ww}
+
+#########################################################################
+#
+# Define the RGBW LEDs as a device type 'Light'.
+#
+
 light:
-  - platform: rgbww
-    id: light_rgbww
-    name: "${name}light"
-    color_interlock: true
-    cold_white_color_temperature: 6500 K
-    warm_white_color_temperature: 2700 K
+  - platform: rgbct
+    name: "Downlight"
+    id: downlight
+    icon: mdi:lightbulb-on
     red: output_red
     green: output_green
     blue: output_blue
-    cold_white: output_cold
-    warm_white: output_warm
+    color_temperature: output_cold_white
+    white_brightness: output_warm_white
+    cold_white_color_temperature: 6500 K
+    warm_white_color_temperature: 2700 K
+    gamma_correct: 2.8
+    default_transition_length: 0.5s
+    restore_mode: ${light_restore_mode}
+     # When enabled, this will prevent white leds being on at the same time as RGB leds.
+    color_interlock: true
+     # Reset the light to a predefined state each time it is turned on
+    on_turn_on: 
+      then:
+        - light.control:
+            id: downlight
+            color_temperature: "${default_colour_temperature}"
+            color_mode: COLOR_TEMPERATURE
+    web_server:
+      sorting_group_id: group_light_controls
+      sorting_weight: 1
 
- 
-switch:
-  - platform: restart
-    name: "${name} Restart"
-   
-  
+#########################################################################
+#
+# Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
+# This is used by the usage_tracker as its source sensor.
+#
+
+binary_sensor:
+  - platform: template
+    name: "Downlight State"
+    id: downlight_state
+    lambda: |-
+      return id(downlight).current_values.is_on();
+    internal: true
+
+#########################################################################
+#
+# Define the sensors that publish the Last Use & Lifetime Use duration of the LED.
+# See: https://github.com/Roving-Ronin/myHomeAssistant/tree/main/components/usage_tracker
+#
+
 sensor:
-  - platform: wifi_signal
-    name: "${name}  WiFi"
-    update_interval: 60s
+  - platform: "usage_tracker"
+    id: usage_tracker_component
+    on_off_sensor: downlight_state
+      
+    last_use:
+      name: "Duration Last Use"
+      id: duration_last_use
+      unit_of_measurement: h
+      accuracy_decimals: 3
+      filters:
+        - lambda: |-
+            return x / 3600.0;
+        - delta: 0.001
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 1
+
+    lifetime_use:
+      name: "Duration Lifetime Use"
+      id: duration_lifetime_use
+      unit_of_measurement: h
+      accuracy_decimals: 3
+      filters:
+        - lambda: |-
+            return x / 3600.0;
+        - delta: 0.001
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 2
+      
+#########################################################################
+#
+# Define LAT & LONG, allowing local checking triggers such as:
+# Event on_sunrise / on_sunset etc, see: https://esphome.io/components/sun.html
+#
+
+sun:
+  latitude: "${my_latitude}"
+  longitude: "${my_longitude}"
+  id: sun_home
+
+#########################################################################
+#
+# Text Sensors - Specific to the Aldi Casalux LED
+#
+
+#text_sensor:
+#  - platform: libretiny
+#    id: libretiny_version  
+#    version:
+#      name: LibreTiny Version
+      
+#########################################################################
