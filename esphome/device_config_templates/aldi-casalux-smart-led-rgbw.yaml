@@ -1,0 +1,20 @@
+substitutions:
+  name: "light-location"
+  friendly_name: "Light - Location_Name"
+  device_description: "Aldi Casalux - 8W LED Downlight at Location_Name"
+  location: ""
+  # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)
+  power_circuit: "Lights"     
+
+packages:
+  remote_package:
+    url: https://github.com/Roving-Ronin/myHomeAssistant/
+    ref: main 
+    files: [esphome/aldi-casalux-smart-led-rgbw.yaml]
+    refresh: 5s # optional
+
+esphome:
+  name_add_mac_suffix: false
+
+bk72xx:
+  board: generic-bk7231t-qfn32-tuya
