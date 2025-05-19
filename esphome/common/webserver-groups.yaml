@@ -1,0 +1,101 @@
+#
+#
+#
+web_server:
+  sorting_groups:
+
+    # Used by : bme280-bus-a.yaml
+    - id: group_environmental_sensors
+      name: "Environmental Sensors"
+      sorting_weight: -48
+
+    # Used by : bme280-bus-b.yaml
+    # TO DO - MERGE and Nunmber Bus A from 1 to 19 and Bus B from 20 to 39
+    - id: group_environmental_sensors_2
+      name: "Environmental Sensors"
+      sorting_weight: -46
+
+      # Used by: athom-power-plug-no-relay.yaml and athom-power-plugs.yaml
+    - id: group_electricity
+      name: "Electricity Sensors"
+      sorting_weight: -44
+
+    # # Used by: athom-power-plug-no-relay.yaml and athom-power-plugs.yaml
+    - id: group_energy
+      name: "Energy Sensors"
+      sorting_weight: -42
+
+#####################################################
+
+    - id: group_utility_meter_sensors
+      name: "Gas & Water Meter Sensors"
+      sorting_weight: -40
+
+    - id: group_town_water_sensors
+      name: "Town Water Sensors"
+      sorting_weight: -38
+
+    # Used by: cylinder-liquid-pressure-tl136.yaml
+    - id: group_tank_water_sensors
+      name: "Tank Water Sensors"
+      sorting_weight: -36
+      
+    - id: group_gas_mj_sensors
+      name: "Gas Sensors (MJ)"
+      sorting_weight: -34
+
+    - id: group_gas_m3_sensors
+      name: "Gas Sensors (m³)"
+      sorting_weight: -32
+
+    # Used by: athom-power-plugs.yaml for the light and GPO Switch or Power on State on Athom Plugs
+    - id: group_controls
+      name: "Controls"
+      sorting_weight: -30
+
+################################################## 
+#
+#  Used in ATHOM x6 Energy Meter
+#
+
+    - id: group_electricity_sensors
+      name: "Electricity Sensors"
+      sorting_weight: -28
+
+    - id: group_energy_import_sensors
+      name: "Energy Sensors - Grid Import"
+      sorting_weight: -26
+
+    - id: group_energy_export_sensors
+      name: "Energy Sensors - Grid Export"
+      sorting_weight: -24
+
+    - id: group_electricity_sensors_phase
+      name: "Electricity Sensors by Phase"
+      sorting_weight: -22
+
+    - id: group_consumption_ct_sensor_4
+      name: "Consumption - ${ct_sensor_4_name}"
+      sorting_weight: -20
+
+    - id: group_consumption_ct_sensor_5
+      name: "Consumption - ${ct_sensor_5_name}"
+      sorting_weight: -18
+
+    - id: group_consumption_ct_sensor_6
+      name: "Consumption - ${ct_sensor_6_name}"
+      sorting_weight: -16
+
+    - id: group_light_controls
+      name: "Light Controls"
+      sorting_weight: -14
+
+##################################################
+
+
+##################################################
+
+
+    - id: group_network_info
+      name: "Network Information"
+      sorting_weight: 40
