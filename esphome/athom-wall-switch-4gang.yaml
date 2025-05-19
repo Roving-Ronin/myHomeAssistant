@@ -11,18 +11,20 @@
 
 substitutions:
   # Default name
-  name: "athom-4gang-switch"
+  name: "light-switch-4gang"
   # Default friendly name
-  friendly_name: "4Gang Switch"
-  # Allows ESP device to be automatically linked to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc
-  room: ""
+  friendly_name: "Light Switch - 4 Gang"
   # Description as appears in ESPHome & top of webserver page
-  device_description: "athom 4gang switch"
+  device_description: "Athom  - Light Switch 4 Gang"
   # Project Name
-  project_name: "Athom Technology.4Gang Switch"
+  project_name: "Athom Technology.Wall Switch 4 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
   project_version: "v0.1.0"
-   # Restore the relay (GPO switch) upon reboot to state:
+  # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
+  location: ""
+  # The phase in the home power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)  
+  power_circuit: "TBA"  
+  # Restore the relay (GPO switch) upon reboot to state:
   light1_restore_mode: RESTORE_DEFAULT_OFF
   light2_restore_mode: RESTORE_DEFAULT_OFF
   light3_restore_mode: RESTORE_DEFAULT_OFF
@@ -46,13 +48,44 @@ esp8266:
 #
 # Remote Packages to be utilised
 #
+
 dashboard_import:
-  package_import_url: github://roving-ronin/myhomeassistant/esphome/athom-sw04.yaml@main
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/athom-wall-switch-4gang.yaml.yaml@main
   import_full_config: false
 
+
 packages:
-  base-config:         !include common/base-configuration.yaml
-  wifi-config:         !include common/network-wifi.yaml
+  base-config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/base-configuration.yaml]
+    refresh: 1h
+    
+  network_config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/network-wifi.yaml]
+    refresh: 1h
+
+  webserver_groups:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/webserver-groups.yaml]
+    refresh: 5s
+
+
+#####################################################################
+#
+# Combined with web_server settings in /common/base-configuration to
+# define a network information group
+#
+
+web_server:
+  sorting_groups:
+    
+    - id: group_light_switches
+      name: "Light Switches"
+      sorting_weight: -30
 
 
 #####################################################################
@@ -95,11 +128,8 @@ logger:
 
 #########################################################################
 #
-# Remote Packages to be utilised
+# Globals to save values to NVS RAM
 #
-
-dashboard_import:
-  package_import_url: github://athom-tech/athom-configs/athom-sw04.yaml
 
 globals:
   - id: restore_mode
@@ -107,11 +137,17 @@ globals:
     restore_value: yes
     initial_value: "3"
 
+#########################################################################
+#
+# Select action to set default power on state
+#
+
 select:
   - platform: template
     name: "Power On State"
     id: "power_mode"
     optimistic: true
+    icon: "mdi:electric-switch"
     options:
       - Always Off
       - Always On
@@ -120,6 +156,7 @@ select:
       then:
         - lambda: |-
             id(restore_mode)=i+1;
+    entity_category:  config
 
 
 #########################################################################
@@ -210,15 +247,7 @@ output:
 #
 # Lights
 #
-
 light:
-  # ESP PCB Light
-  - platform: status_led
-    name: "Status LED"
-    disabled_by_default: true
-    pin:
-      number: GPIO0
-      inverted: true
 
   # Relays
   - platform: binary
@@ -226,24 +255,54 @@ light:
     id: light1
     output: relay1
     restore_mode: ${light1_restore_mode}
-    
+    icon: "mdi:lightbulb-outline"
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 1
+      
   - platform: binary
     name: "Light2"
     id: light2
     output: relay2
     restore_mode: ${light2_restore_mode}
+    icon: "mdi:lightbulb-outline"
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 2
     
   - platform: binary
     name: "Light3"
     id: light3
     output: relay3
     restore_mode: ${light3_restore_mode}
+    icon: "mdi:lightbulb-outline"
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 3
     
   - platform: binary
     name: "Light4"
     id: light4
     output: relay4
     restore_mode: ${light4_restore_mode}
+    icon: "mdi:lightbulb-outline"
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 4
+
+
+  # ESP PCB Light
+  - platform: status_led
+    name: "Status LED"
+    disabled_by_default: true
+    pin:
+      number: GPIO0
+      inverted: true
+    icon: "mdi:lightbulb-outline"
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 5
 
 
 ##########################################################################
+
