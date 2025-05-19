@@ -1,0 +1,24 @@
+substitutions:
+  name: "gpo-ups-servers"
+  friendly_name: "UPS - Server Rack"
+  device_description: "Athom Plug (No Relay) - Phase X / GPO X - Server Rack"
+  # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc
+  location: "Network Rack"
+  # The phase in the home power supply, upon which this plug is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO1 = Phase C, GPO2 = Phase A, GPO3 = Phase B)
+  power_circuit: "GPO X"  
+
+esphome:
+  name_add_mac_suffix: false
+
+esp8266:
+  board: esp8285
+  restore_from_flash: true
+
+packages:
+  remote_package:
+    url: https://github.com/Roving-Ronin/myHomeAssistant/
+    ref: main 
+    files: [esphome/athom-smart-plug-no-relay.yaml]
+    refresh: 5s # optional
+
+api:
