@@ -153,6 +153,7 @@ select:
   - platform: template
     name: "Power On State"
     id: "power_mode"
+    icon: 'mdi:electric-switch'
     optimistic: true
     options:
       - Always Off
