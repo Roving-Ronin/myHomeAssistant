@@ -181,6 +181,7 @@ binary_sensor:
         pullup: true
     name: "Button"
     id: button1
+    icon: 'mdi:gesture-tap-button'
     disabled_by_default: true
     on_multi_click:
       - timing:
@@ -232,6 +233,7 @@ output:
 light:
   - platform: status_led
     name: "Status LED"
+    icon: mdi:led-on'
     disabled_by_default: true
     pin:
       number: GPIO0
@@ -244,6 +246,7 @@ light:
   - platform: binary
     name: "Light"
     id: light1
+    icon: 'mdi:lightbulb'
     output: relay1
     restore_mode: ${light_restore_mode}
     on_turn_on:
@@ -257,6 +260,7 @@ light:
   # Button LED
   - platform: monochromatic
     name: "Panel Backlight LED"
+    icon: 'mdi:wifi-alert'
     disabled_by_default: true
     id: led1
     output: button_led1
@@ -286,7 +290,7 @@ sensor:
             return x / 3600.0;
         - delta: 0.001
       web_server:
-        sorting_group_id: group_light_switches
+        sorting_group_id: group_light_usage
         sorting_weight: 1
 
     lifetime_use:
