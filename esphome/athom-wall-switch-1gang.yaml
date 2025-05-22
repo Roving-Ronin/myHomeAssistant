@@ -14,7 +14,7 @@ substitutions:
   # Default friendly name
   friendly_name: "Light Switch - 1 Gang"
   # Description as appears in ESPHome & top of webserver page
-  device_description: "Athom  - Light Switch 1 Gang"
+  device_description: "Athom - Light Switch 1 Gang"
   # Project Name
   project_name: "Athom Technology.Wall Switch 1 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
@@ -162,7 +162,9 @@ select:
       then:
         - lambda: |-
             id(restore_mode)=i+1;
-
+      web_server:
+        sorting_group_id: group_light_switches
+        sorting_weight: 2
 
 #########################################################################
 #
@@ -234,6 +236,9 @@ light:
     pin:
       number: GPIO0
       inverted: true
+      web_server:
+        sorting_group_id: group_light_switches
+        sorting_weight: 3
 
   # Relay
   - platform: binary
@@ -245,14 +250,18 @@ light:
       - light.turn_on: led1
     on_turn_off:
       - light.turn_off: led1
+      web_server:
+        sorting_group_id: group_electricity
+        sorting_weight: 2
 
   # Button LED
   - platform: monochromatic
-    name: "LED"
+    name: "Panel Backlight LED"
     disabled_by_default: true
     id: led1
     output: button_led1
     default_transition_length: 500ms
+    entity_category: config
 
 
 #########################################################################
@@ -276,7 +285,7 @@ sensor:
             return x / 3600.0;
         - delta: 0.001
       web_server:
-        sorting_group_id: group_light_usage
+        sorting_group_id: group_light_switches
         sorting_weight: 1
 
     lifetime_use:
