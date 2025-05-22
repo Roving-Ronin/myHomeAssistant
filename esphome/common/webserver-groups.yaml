@@ -95,7 +95,3 @@ web_server:
 
 ##################################################
 
-
-    - id: group_network_info
-      name: "Network Information"
-      sorting_weight: 40
