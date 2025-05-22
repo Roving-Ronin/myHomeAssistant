@@ -18,7 +18,7 @@ substitutions:
   # Project Name
   project_name: "Athom Technology.Wall Switch 1 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "v0.1.2"
+  project_version: "v0.2.0"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   location: ""
   # The phase in the home power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)  
@@ -234,7 +234,7 @@ output:
 light:
   - platform: status_led
     name: "Status LED"
-    icon: 'mdi:led-on'
+    icon: 'mdi:wifi-alert'
     disabled_by_default: true
     pin:
       number: GPIO0
@@ -261,7 +261,7 @@ light:
   # Button LED
   - platform: monochromatic
     name: "Panel Backlight LED"
-    icon: 'mdi:wifi-alert'
+    icon: 'mdi:led-on'
     disabled_by_default: true
     id: led1
     output: button_led1
