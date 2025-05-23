@@ -19,7 +19,7 @@ substitutions:
   # Project Name
   project_name: "Athom Technology.Light Switch 4 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "v0.3.0"
+  project_version: "v0.3.1"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   location: ""
   # The phase in the home power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)  
@@ -332,7 +332,7 @@ light:
 
   # Relays
   - platform: binary
-    name: "Light1"
+    name: ${button1_assignment}
     id: light1
     output: relay1
     restore_mode: ${light1_restore_mode}
@@ -342,7 +342,7 @@ light:
       sorting_weight: 1
       
   - platform: binary
-    name: "Light2"
+    name: ${button2_assignment}
     id: light2
     output: relay2
     restore_mode: ${light2_restore_mode}
@@ -352,7 +352,7 @@ light:
       sorting_weight: 2
     
   - platform: binary
-    name: "Light3"
+    name: ${button3_assignment}
     id: light3
     output: relay3
     restore_mode: ${light3_restore_mode}
@@ -362,7 +362,7 @@ light:
       sorting_weight: 3
     
   - platform: binary
-    name: "Light4"
+    name: ${button4_assignment}
     id: light4
     output: relay4
     restore_mode: ${light4_restore_mode}
