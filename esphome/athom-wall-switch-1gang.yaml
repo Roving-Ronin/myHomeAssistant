@@ -235,16 +235,6 @@ output:
 #
 
 light:
-  - platform: status_led
-    name: "Status LED"
-    icon: 'mdi:wifi-alert'
-    disabled_by_default: true
-    pin:
-      number: GPIO0
-      inverted: true
-    web_server:
-      sorting_group_id: group_light_switches
-      sorting_weight: 3
 
   # Relay
   - platform: binary
@@ -272,6 +262,18 @@ light:
     web_server:
       sorting_group_id: group_light_switches
       sorting_weight: 2
+
+
+  - platform: status_led
+    name: "Status LED"
+    icon: 'mdi:wifi-alert'
+    disabled_by_default: true
+    pin:
+      number: GPIO0
+      inverted: true
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 3
 
 #########################################################################
 #
