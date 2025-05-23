@@ -29,7 +29,7 @@ substitutions:
   light2_restore_mode: RESTORE_DEFAULT_OFF
   light3_restore_mode: RESTORE_DEFAULT_OFF
   light4_restore_mode: RESTORE_DEFAULT_OFF
-
+  # Button Label Names
   button1_assignment: "Button 1"
   button2_assignment: "Button 2"
   button3_assignment: "Button 3"
