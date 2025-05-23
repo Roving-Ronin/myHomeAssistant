@@ -40,6 +40,9 @@ esp8266:
 logger:
   baud_rate: 115200
 
+preferences:
+   # Enable to allow storing of 'Read Total' between reboots and flashing.
+  flash_write_interval: 30min
 
 #########################################################################
 #
@@ -131,6 +134,7 @@ esphome:
                       break;
                             }
               }
+
 
 
 #########################################################################
