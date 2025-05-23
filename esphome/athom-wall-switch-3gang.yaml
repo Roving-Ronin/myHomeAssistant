@@ -332,6 +332,9 @@ light:
       - light.turn_on: led1
     on_turn_off:
       - light.turn_off: led1
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 1
 
   - platform: binary
     name: "Light 2"
@@ -342,6 +345,10 @@ light:
       - light.turn_on: led2
     on_turn_off:
       - light.turn_off: led2
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 2
+
 
   - platform: binary
     name: "Light 3"
@@ -352,7 +359,9 @@ light:
       - light.turn_on: led3
     on_turn_off:
       - light.turn_off: led3
-
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 3
 
   - platform: status_led
     name: "Status LED"
@@ -363,7 +372,7 @@ light:
       inverted: true
     web_server:
       sorting_group_id: group_light_switches
-      sorting_weight: 4
+      sorting_weight: 7
 
 
 ############################
@@ -378,7 +387,7 @@ light:
     default_transition_length: 500ms
     web_server:
       sorting_group_id: group_light_switches
-      sorting_weight: 
+      sorting_weight: 4
 
 
   - platform: monochromatic
@@ -390,7 +399,7 @@ light:
     default_transition_length: 500ms
     web_server:
       sorting_group_id: group_light_switches
-      sorting_weight: 
+      sorting_weight: 5
 
       
   - platform: monochromatic
@@ -402,5 +411,113 @@ light:
     default_transition_length: 500ms
     web_server:
       sorting_group_id: group_light_switches
-      sorting_weight: 
+      sorting_weight: 6
 
+
+#########################################################################
+#
+# Define the sensors that publish the Last Use & Lifetime Use duration of the LED.
+# See: https://github.com/Roving-Ronin/myHomeAssistant/tree/main/components/usage_tracker
+#
+
+sensor:
+    # Light 1
+  - platform: "usage_tracker"
+    id: light1_usage_tracker
+    on_off_sensor: light1_state
+      
+    last_use:
+      name: "Light 1 - Duration Last Use"
+      id: light1_duration_last_use
+      unit_of_measurement: h
+      accuracy_decimals: 3
+      filters:
+        - lambda: |-
+            return x / 3600.0;
+        - delta: 0.001
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 1
+
+    lifetime_use:
+      name: "Light 1 - Duration Lifetime Use"
+      id: light1_duration_lifetime_use
+      unit_of_measurement: h
+      accuracy_decimals: 3
+      filters:
+        - lambda: |-
+            return x / 3600.0;
+        - delta: 0.001
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 2
+
+##########################
+
+    # Light 2
+  - platform: "usage_tracker"
+    id: light2_usage_tracker
+    on_off_sensor: light2_state
+      
+    last_use:
+      name: "Light 2 - Duration Last Use"
+      id: light2_duration_last_use
+      unit_of_measurement: h
+      accuracy_decimals: 3
+      filters:
+        - lambda: |-
+            return x / 3600.0;
+        - delta: 0.001
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 3
+
+    lifetime_use:
+      name: "Light 2 - Duration Lifetime Use"
+      id: light2_duration_lifetime_use
+      unit_of_measurement: h
+      accuracy_decimals: 3
+      filters:
+        - lambda: |-
+            return x / 3600.0;
+        - delta: 0.001
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 4
+
+
+##########################
+
+    # Light 3
+  - platform: "usage_tracker"
+    id: light3_usage_tracker
+    on_off_sensor: light3_state
+      
+    last_use:
+      name: "Light 3 - Duration Last Use"
+      id: light3_duration_last_use
+      unit_of_measurement: h
+      accuracy_decimals: 3
+      filters:
+        - lambda: |-
+            return x / 3600.0;
+        - delta: 0.001
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 5
+
+    lifetime_use:
+      name: "Light 3 - Duration Lifetime Use"
+      id: light3_duration_lifetime_use
+      unit_of_measurement: h
+      accuracy_decimals: 3
+      filters:
+        - lambda: |-
+            return x / 3600.0;
+        - delta: 0.001
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 6
+
+
+##########################################################################
