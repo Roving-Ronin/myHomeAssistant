@@ -379,7 +379,6 @@ light:
     pin:
       number: GPIO0
       inverted: true
-    icon: "mdi:lightbulb-outline"
     web_server:
       sorting_group_id: group_light_switches
       sorting_weight: 5
