@@ -11,9 +11,9 @@
 #
 substitutions:
   # Default name
-  name: "light-switch-1gang"
+  name: "switch-1gang"
   # Default friendly name
-  friendly_name: "Light Switch - 1 Gang"
+  friendly_name: "Switch - 1 Gang"
   # Description as appears in ESPHome & top of webserver page
   device_description: "Athom - Light Switch 1 Gang"
   # Project Name
