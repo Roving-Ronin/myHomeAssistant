@@ -32,7 +32,6 @@ substitutions:
   button1_assignment: "Button 1"
   button2_assignment: "Button 2"
   button3_assignment: "Button 3"
-  button4_assignment: "Button 4"
 
 
 ########################## End of Substitutions #########################
@@ -179,6 +178,7 @@ select:
       then:
         - lambda: |-
             id(restore_mode)=i+1;
+    entity_category: config
 
 
 
@@ -324,8 +324,9 @@ light:
 
   # Relays
   - platform: binary
-    name: "Light 1"
+    name: ${button1_assignment}
     id: light1
+    icon: 'mdi:lightbulb'
     output: relay1
     restore_mode: ${light1_restore_mode}
     on_turn_on:
@@ -337,8 +338,9 @@ light:
       sorting_weight: 1
 
   - platform: binary
-    name: "Light 2"
+    name: ${button2_assignment}
     id: light2
+    icon: 'mdi:lightbulb'
     output: relay2
     restore_mode: ${light2_restore_mode}
     on_turn_on:
@@ -351,8 +353,9 @@ light:
 
 
   - platform: binary
-    name: "Light 3"
+    name: ${button3_assignment}
     id: light3
+    icon: 'mdi:lightbulb'
     output: relay3
     restore_mode: ${light3_restore_mode}
     on_turn_on:
