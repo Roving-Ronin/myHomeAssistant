@@ -1,50 +1,127 @@
+#########################################################################
+#
+# Device configuration for Athom Wall Switch, with neutral (ESP8285)
+#
 
-
+##########################################################################
+# VERSION UPATES:
+#
+# v0.1.0 - Upate to use Roving Ronin base configurations
+#
 
 substitutions:
   # Default name
-  name: "athom-3gang-switch"
+  name: "switch-3gang"
   # Default friendly name
-  friendly_name: "3Gang Switch"
-  # Allows ESP device to be automatically linked to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc
-  room: ""
+  friendly_name: "Switch - 3 Gang"
   # Description as appears in ESPHome & top of webserver page
-  device_description: "athom 3gang switch"
+  device_description: "Athom  - Light Switch 3 Gang"
   # Project Name
-  project_name: "Athom Technology.3Gang Switch"
+  project_name: "Athom Technology.Light Switch 3 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "v1.1.3"
+  project_version: "v0.1.0"
+  # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
+  location: ""
+  # The phase in the home power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)  
+  power_circuit: "Lights"
   # Restore the relay (GPO switch) upon reboot to state:
   light1_restore_mode: RESTORE_DEFAULT_OFF
   light2_restore_mode: RESTORE_DEFAULT_OFF
   light3_restore_mode: RESTORE_DEFAULT_OFF
-  # Define a domain for this device to use. i.e. iot.home.lan (so device will appear as athom-smart-plug-v2.iot.home.lan in DNS/DHCP logs)
-  dns_domain: ".local"
-  # Set timezone of the smart plug. Useful if the plug is in a location different to the HA server. Can be entered in unix Country/Area format (i.e. "Australia/Sydney")
-  timezone: ""
-  # Set the duration between the sntp service polling ntp.org servers for an update
-  sntp_update_interval: 6h
-  # Network time servers for your region, enter from lowest to highest priority. To use local servers update as per zones or countries at: https://www.ntppool.org/zone/@
-  sntp_server_1: "0.pool.ntp.org"
-  sntp_server_2: "1.pool.ntp.org"
-  sntp_server_3: "2.pool.ntp.org"
-  # Enables faster network connections, with last connected SSID being connected to and no full scan for SSID being undertaken
-  wifi_fast_connect: "false"
-  # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
-  log_level: "DEBUG"
-  # Enable or disable the use of IPv6 networking on the device
-  ipv6_enable: "false"
+  # Button Label Names
+  button1_assignment: "Button 1"
+  button2_assignment: "Button 2"
+  button3_assignment: "Button 3"
+  button4_assignment: "Button 4"
+
+
+########################## End of Substitutions #########################
+#
+# Defines the type of ESP chip used on the device
+#
+
+esp8266:
+  board: esp8285
+  restore_from_flash: true
+
+logger:
+  baud_rate: 115200
+
+preferences:
+   # Enable to allow storing of 'Read Total' between reboots and flashing.
+  flash_write_interval: 30min
+  
+
+#########################################################################
+#
+# Remote Packages to be utilised
+#
+
+dashboard_import:
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/athom-wall-switch-4gang.yaml.yaml@main
+  import_full_config: false
+
+
+packages:
+  base-config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/base-configuration.yaml]
+    refresh: 1h
+    
+  network_config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/network-wifi.yaml]
+    refresh: 1h
+
+  webserver_groups:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/webserver-groups.yaml]
+    refresh: 5s
+
+#####################################################################
+#
+# External Components
+#
+
+# Dentra Components - Adds 'Platform - Energy Statistics'
+# https://github.com/Roving-Ronin/myHomeAssistant/tree/main/components/energy_statistics
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/roving-ronin/myhomeassistant/
+      ref: main
+    refresh: 1h
+    components: [ usage_tracker ]
+
+
+#####################################################################
+#
+# Combined with web_server settings in /common/base-configuration to
+# define a network information group
+#
+
+web_server:
+  sorting_groups:
+    
+    - id: group_light_switches
+      name: "Light Switches"
+      sorting_weight: -30
+
+    - id: group_light_usage
+      name: "Light Statistics"
+      sorting_weight: -20
+
+
+#####################################################################
+#
+#
+#
 
 esphome:
-  name: "${name}"
-  friendly_name: "${friendly_name}"
-  comment: "${device_description}"
-  area: "${room}"
-  name_add_mac_suffix: true
-  min_version: 2024.6.0
-  project:
-    name: "${project_name}"
-    version: "${project_version}"
   on_boot:
     - priority: 600
       then:
@@ -72,49 +149,22 @@ esphome:
                             }
               }
 
-esp8266:
-  board: esp8285
-  restore_from_flash: true
-
-preferences:
-  flash_write_interval: 1min
-
-api:
-
-ota:
-  - platform: esphome
-
-logger:
-  level: ${log_level}
-  baud_rate: 115200
-
-mdns:
-  disabled: false
-
-web_server:
-  port: 80
-
-network:
-  enable_ipv6: ${ipv6_enable}
-
-wifi:
-  # This spawns an AP with the device name and mac address with no password.
-  ap: {}
-  # Allow rapid re-connection to previously connect WiFi SSID, skipping scan of all SSID
-  fast_connect: "${wifi_fast_connect}"
-  # Define dns domain / suffix to add to hostname
-  domain: "${dns_domain}"
-
-captive_portal:
-
-dashboard_import:
-  package_import_url: github://athom-tech/athom-configs/athom-sw03.yaml
+#########################################################################
+#
+# Globals to save values to NVS RAM
+#
 
 globals:
   - id: restore_mode
     type: int
     restore_value: yes
     initial_value: "3"
+
+
+#########################################################################
+#
+# Select action to set default power on state
+#
 
 select:
   - platform: template
@@ -130,12 +180,16 @@ select:
         - lambda: |-
             id(restore_mode)=i+1;
 
-binary_sensor:
-  - platform: status
-    name: "Status"
-    entity_category: diagnostic
 
-  # Touch Buttons
+
+#########################################################################
+#
+# Binary Sensors
+#
+
+binary_sensor:
+
+  # Touch Button 1
   - platform: gpio
     pin:
       inverted: true
@@ -143,8 +197,9 @@ binary_sensor:
       mode:
         input: true
         pullup: true
-    name: "Button1"
+    name: ${button1_assignment}
     id: button1
+    icon: 'mdi:gesture-tap-button'
     disabled_by_default: true
     on_multi_click:
       - timing:
@@ -156,7 +211,9 @@ binary_sensor:
           - ON for at least 4s
         then:
           - button.press: Reset
+    internal: false            # TRUE  
 
+  # Touch Button 2
   - platform: gpio
     pin:
       inverted: true
@@ -164,14 +221,18 @@ binary_sensor:
       mode:
         input: true
         pullup: true
-    name: "Button2"
+    name: ${button2_assignment}
     id: button2
+    icon: 'mdi:gesture-tap-button'
     disabled_by_default: true
     on_click:
       max_length: 0.5s
       then:
         - light.toggle: light2
+    internal: false            # TRUE  
 
+
+  # Touch Button 3
   - platform: gpio
     pin:
       inverted: true
@@ -179,59 +240,60 @@ binary_sensor:
       mode:
         input: true
         pullup: true
-    name: "Button3"
+    name: ${button3_assignment}
     id: button3
+    icon: 'mdi:gesture-tap-button'
     disabled_by_default: true
     on_click:
       max_length: 0.5s
       then:
         - light.toggle: light3
+    internal: false            # TRUE  
 
-sensor:
-  - platform: uptime
-    name: "Uptime Sensor"
-    id: uptime_sensor
-    entity_category: diagnostic
+
+    # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
+    # This is used by the usage_tracker as its source sensor.
+  - platform: template
+    name: "Light 1 - State"
+    id: light1_state
+    lambda: |-
+      return id(light1).current_values.is_on();
     internal: true
 
-  - platform: wifi_signal
-    name: "WiFi Signal dB"
-    id: wifi_signal_db
-    update_interval: 60s
-    entity_category: "diagnostic"
+    # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
+    # This is used by the usage_tracker as its source sensor.
+  - platform: template
+    name: "Light 2 - State"
+    id: light2_state
+    lambda: |-
+      return id(light2).current_values.is_on();
+    internal: true
 
-  - platform: copy
-    source_id: wifi_signal_db
-    name: "WiFi Signal Percent"
-    filters:
-      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
-    unit_of_measurement: "Signal %"
-    entity_category: "diagnostic"
-    device_class: ""
+    # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
+    # This is used by the usage_tracker as its source sensor.
+  - platform: template
+    name: "Light 3 - State"
+    id: light3_state
+    lambda: |-
+      return id(light3).current_values.is_on();
+    internal: true
 
-button:
-  - platform: restart
-    name: "Restart"
-    entity_category: config
 
-  - platform: factory_reset
-    name: "Factory Reset"
-    id: Reset
-    entity_category: config
-
-  - platform: safe_mode
-    name: "Safe Mode"
-    internal: false
-    entity_category: config
+##########################################################################
+#
+# Relays
+#
 
 output:
   # Relays
   - platform: gpio
     pin: GPIO13
     id: relay1
+
   - platform: gpio
     pin: GPIO4
     id: relay2
+
   - platform: gpio
     pin: GPIO15
     id: relay3
@@ -241,26 +303,28 @@ output:
     pin: GPIO16
     inverted: true
     id: button_led1
+    
   - platform: esp8266_pwm
     pin: GPIO14
     inverted: true
     id: button_led2
+    
   - platform: esp8266_pwm
     pin: GPIO1
     inverted: true
     id: button_led3
 
+
+##########################################################################
+#
+# Lights
+#
+
 light:
-  - platform: status_led
-    name: "Status LED"
-    disabled_by_default: true
-    pin:
-      number: GPIO0
-      inverted: true
 
   # Relays
   - platform: binary
-    name: "Light1"
+    name: "Light 1"
     id: light1
     output: relay1
     restore_mode: ${light1_restore_mode}
@@ -270,7 +334,7 @@ light:
       - light.turn_off: led1
 
   - platform: binary
-    name: "Light2"
+    name: "Light 2"
     id: light2
     output: relay2
     restore_mode: ${light2_restore_mode}
@@ -280,7 +344,7 @@ light:
       - light.turn_off: led2
 
   - platform: binary
-    name: "Light3"
+    name: "Light 3"
     id: light3
     output: relay3
     restore_mode: ${light3_restore_mode}
@@ -289,91 +353,54 @@ light:
     on_turn_off:
       - light.turn_off: led3
 
+
+  - platform: status_led
+    name: "Status LED"
+    icon: 'mdi:wifi-alert'
+    disabled_by_default: true
+    pin:
+      number: GPIO0
+      inverted: true
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 4
+
+
+############################
+
   # Button LEDs
   - platform: monochromatic
-    name: "LED1"
+    name: "Backlight 1"
+    icon: 'mdi:led-on'
     disabled_by_default: true
     id: led1
     output: button_led1
     default_transition_length: 500ms
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 
+
+
   - platform: monochromatic
-    name: "LED2"
+    name: "Backlight 2"
+    icon: 'mdi:led-on'
     disabled_by_default: true
     id: led2
     output: button_led2
     default_transition_length: 500ms
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 
+
+      
   - platform: monochromatic
-    name: "LED3"
+    name: "Backlight 3"
+    icon: 'mdi:led-on'
     disabled_by_default: true
     id: led3
     output: button_led3
     default_transition_length: 500ms
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 
 
-text_sensor:
-  - platform: wifi_info
-    ip_address:
-      name: "IP Address"
-      entity_category: diagnostic
-    ssid:
-      name: "Connected SSID"
-      entity_category: diagnostic
-    mac_address:
-      name: "Mac Address"
-      entity_category: diagnostic
-
-  #  Creates a sensor showing when the device was last restarted
-  - platform: template
-    name: 'Last Restart'
-    id: device_last_restart
-    icon: mdi:clock
-    entity_category: diagnostic
-#    device_class: timestamp
-
-  #  Creates a sensor of the uptime of the device, in formatted days, hours, minutes and seconds
-  - platform: template
-    name: "Uptime"
-    entity_category: diagnostic
-    lambda: |-
-      int seconds = (id(uptime_sensor).state);
-      int days = seconds / (24 * 3600);
-      seconds = seconds % (24 * 3600);
-      int hours = seconds / 3600;
-      seconds = seconds % 3600;
-      int minutes = seconds /  60;
-      seconds = seconds % 60;
-      if ( days > 3650 ) {
-        return { "Starting up" };
-      } else if ( days ) {
-        return { (String(days) +"d " + String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
-      } else if ( hours ) {
-        return { (String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
-      } else if ( minutes ) {
-        return { (String(minutes) +"m "+ String(seconds) +"s").c_str() };
-      } else {
-        return { (String(seconds) +"s").c_str() };
-      }
-    icon: mdi:clock-start
-
-time:
-  - platform: sntp
-    id: sntp_time
-  # Define the timezone of the device
-    timezone: "${timezone}"
-  # Change sync interval from default 5min to 6 hours (or as set in substitutions)
-    update_interval: ${sntp_update_interval}
-  # Set specific sntp servers to use
-    servers:
-      - "${sntp_server_1}"
-      - "${sntp_server_2}"
-      - "${sntp_server_3}"
-  # Publish the time the device was last restarted
-    on_time_sync:
-      then:
-        # Update last restart time, but only once.
-        - if:
-            condition:
-              lambda: 'return id(device_last_restart).state == "";'
-            then:
-              - text_sensor.template.publish:
-                  id: device_last_restart
-                  state: !lambda 'return id(sntp_time).now().strftime("%a %d %b %Y - %I:%M:%S %p");'
