@@ -386,7 +386,7 @@ light:
 
   # Button LEDs
   - platform: monochromatic
-    name: "Backlight - "${backlight1_assignment}
+    name: "Backlight - ${backlight1_assignment}"
     icon: 'mdi:led-on'
     disabled_by_default: true
     id: led1
@@ -398,7 +398,7 @@ light:
 
 
   - platform: monochromatic
-    name: "Backlight - "${backlight2_assignment}
+    name: "Backlight - ${backlight2_assignment}"
     icon: 'mdi:led-on'
     disabled_by_default: true
     id: led2
@@ -410,7 +410,7 @@ light:
 
       
   - platform: monochromatic
-    name: "Backlight - "${backlight3_assignment}
+    name: "Backlight - ${backlight3_assignment}"
     icon: 'mdi:led-on'
     disabled_by_default: true
     id: led3
