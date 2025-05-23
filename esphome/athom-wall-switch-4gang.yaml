@@ -216,7 +216,7 @@ binary_sensor:
           - ON for at least 4s
         then:
           - button.press: Reset
-    internal: false            # TRUE  
+    internal: true 
 
   # Touch Button 2
   - platform: gpio
@@ -231,7 +231,7 @@ binary_sensor:
       max_length: 0.5s
       then:
         - light.toggle: light2
-    internal: false            # TRUE  
+    internal: true
 
   # Touch Button 3  
   - platform: gpio
@@ -246,7 +246,7 @@ binary_sensor:
       max_length: 0.5s
       then:
         - light.toggle: light3
-    internal: false            # TRUE  
+    internal: true
 
   # Touch Button 4
   - platform: gpio
@@ -261,7 +261,7 @@ binary_sensor:
       max_length: 0.5s
       then:
         - light.toggle: light4
-    internal: false            # TRUE  
+    internal: true
 
 
     # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
