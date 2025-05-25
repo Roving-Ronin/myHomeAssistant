@@ -224,7 +224,7 @@ output:
 
   # Button LED (1.0 = Blue / 0.0 = Red)
   - platform: esp8266_pwm
-    pin: GPIO16
+    pin: GPIO14                        # v2 = 16
     inverted: true
     id: button_led1
 
