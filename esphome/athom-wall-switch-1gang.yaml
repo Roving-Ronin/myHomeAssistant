@@ -253,7 +253,7 @@ light:
 
   # Button LED
   - platform: monochromatic
-    name: "Panel Backlight LED"
+    name: "Backlight LED"
     icon: 'mdi:led-on'
     disabled_by_default: true
     id: led1
