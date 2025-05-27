@@ -119,10 +119,10 @@ device_groups:
   - group_name: "hallway-light"   # Tasmota device group name
     send_mask: 0xFFFFFFFF         # Optional, defaults to 0xFFFFFFFF (send everything).  Can be integer or hex
     receive_mask: 0xFFFFFFFF      # Optional, defaults to 0xFFFFFFFF (receive everything).  Can be integer or hex
-    switches:
-      - light3                    # ESPHome entity id
-#    lights:
-#      - light_rgbww1              # ESPHome entity id
+#    switches:
+#      - light3                    # ESPHome entity id
+    lights:
+      - light3                     # ESPHome entity id
 
 
 #####################################################################
