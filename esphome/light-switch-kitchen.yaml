@@ -31,7 +31,7 @@ substitutions:
   # Button Label Names
   button1_assignment: "Bench Lights"
   button2_assignment: "Ceiling Lights"
-  button3_assignment: "Hallway Lights"
+  button3_assignment: "Hallway Light"
 
   # Backlight LED Name:
   backlight1_assignment: "Bench"
