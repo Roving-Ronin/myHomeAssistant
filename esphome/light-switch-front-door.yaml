@@ -355,8 +355,8 @@ binary_sensor:
 #
 output:
   # Relays
-  - platform: template # gpio
-#    pin: GPIO13
+  - platform: gpio
+    pin: GPIO13
     id: relay1
 
   - platform: gpio
