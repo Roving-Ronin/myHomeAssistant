@@ -242,20 +242,6 @@ binary_sensor:
           - button.press: Reset
     internal: true
 
-  # Use UDP to Sync State with Switch-Front-Door
-  - platform: template
-    id: hallway_state_sync
-    internal: true
-    lambda: |-
-      return id(light3).current_values.is_on();
-    on_state:
-      - packet_transport.send:
-          destination: switch_front_door
-          data:
-            id: hallway_state
-            state: !lambda 'return x;'
-
-
 
   # Touch Button 2
   - platform: gpio
@@ -293,6 +279,20 @@ binary_sensor:
       then:
         - light.toggle: light3
     internal: true
+
+
+  # Use UDP to Sync State with Switch-Front-Door
+  - platform: template
+    id: hallway_state_sync
+    internal: true
+    lambda: |-
+      return id(light3).current_values.is_on();
+    on_state:
+      - packet_transport.send:
+          destination: switch_front_door
+          data:
+            id: hallway_state
+            state: !lambda 'return x;'
 
 
     # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
