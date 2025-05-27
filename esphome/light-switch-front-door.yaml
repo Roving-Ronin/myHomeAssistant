@@ -174,27 +174,6 @@ globals:
 
 #########################################################################
 #
-# Select action to set default power on state
-#
-
-select:
-  - platform: template
-    name: "Power On State"
-    id: "power_mode"
-    optimistic: true
-    icon: 'mdi:electric-switch'
-    options:
-      - Always Off
-      - Always On
-      - Restore Power Off State
-    on_value:
-      then:
-        - lambda: |-
-            id(restore_mode)=i+1;
-    entity_category:  config
-
-#########################################################################
-#
 # UDP / Packet Transport
 #
 
@@ -223,7 +202,30 @@ packet_transport.receiver:
   on_packet:
     - id: toggle_hallway
       then:
-        - light.toggle: hallway_light
+        - light.toggle: light3
+
+
+#########################################################################
+#
+# Select action to set default power on state
+#
+
+select:
+  - platform: template
+    name: "Power On State"
+    id: "power_mode"
+    optimistic: true
+    icon: 'mdi:electric-switch'
+    options:
+      - Always Off
+      - Always On
+      - Restore Power Off State
+    on_value:
+      then:
+        - lambda: |-
+            id(restore_mode)=i+1;
+    entity_category:  config
+
 
 #########################################################################
 #
