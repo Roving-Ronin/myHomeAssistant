@@ -108,6 +108,33 @@ external_components:
     components: [ usage_tracker ]
 
 
+  - source:
+      type: git
+      url: https://github.com/Cossid/TasmotaDeviceGroupsForESPHome
+      ref: main
+    refresh: 1h
+    components: [ device_groups ]
+
+
+#####################################################################
+#
+# Tasmota Device Groups for ESPHome
+#
+device_groups:
+  - group_name: "hallway-light"   # Tasmota device group name
+    send_mask: 0xFFFFFFFF         # Optional, defaults to 0xFFFFFFFF (send everything).  Can be integer or hex
+    receive_mask: 0xFFFFFFFF      # Optional, defaults to 0xFFFFFFFF (receive everything).  Can be integer or hex
+    switches:
+      - gpio_switch               # ESPHome entity id
+      - template_switch           # ESPHome entity id
+    lights:
+      - light_rgbww1              # ESPHome entity id
+      - light_rgbww2              # ESPHome entity id
+  - group_name: "testgroup2"      # Tasmota device group name
+    switches:
+      - gpio_switch2              # ESPHome entity id
+
+
 #####################################################################
 #
 # Combined with web_server settings in /common/base-configuration to
@@ -322,8 +349,8 @@ output:
     pin: GPIO15
     id: relay3
 
-  - platform: gpio
-    pin: GPIO14
+  - platform: template       #gpio
+#    pin: GPIO14
     id: relay4
 
 
