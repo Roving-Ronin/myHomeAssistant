@@ -293,6 +293,10 @@ binary_sensor:
     id: light1_state
     lambda: |-
       return id(light1).current_values.is_on();
+    on_state:
+      - packet_transport.send:
+          id: switch_kitchen
+          data: "toggle_hallway"
     internal: true
 
     # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
