@@ -225,14 +225,14 @@ select:
 #
 switch:
   - platform: template
-    name: "Virtual - Hallway Light"
-    id: virtual_switch_hallway_light
+    name: "Virtual - Relay1"
+    id: virtual_relay1
     lambda: |-
-      return id(virtual_switch_hallway_light).state;
+      return id(virtual_relay1).state;
     turn_on_action:
-      - switch.turn_on: virtual_switch_hallway_light
+      - switch.turn_on: virtual_relay1
     turn_off_action:
-      - switch.turn_off: virtual_switch_hallway_light
+      - switch.turn_off: virtual_relay1
 
 
 #########################################################################
@@ -255,8 +255,8 @@ binary_sensor:
           - ON for at most 0.5s
           - OFF for at least 0.2s
         then:
+          - switch.toggle: virtual_relay1
 #          - light.toggle: light1
-          - switch.toggle: virtual_switch_hallway_light
       - timing:
           - ON for at least 4s
         then:
@@ -302,13 +302,10 @@ binary_sensor:
     id: button4
     icon: 'mdi:gesture-tap-button'
     disabled_by_default: true
-#    on_click:
-#      max_length: 0.5s
-#      then:
-#        - light.toggle: light4
-    on_press:
+    on_click:
+      max_length: 0.5s
       then:
-        - switch.toggle: virtual_switch_hallway_light
+        - light.toggle: light4
     internal: true
 
 
