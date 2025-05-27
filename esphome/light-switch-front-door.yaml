@@ -219,21 +219,6 @@ select:
             id(restore_mode)=i+1;
     entity_category:  config
 
-#########################################################################
-#
-# Virtual Switch for Button/Relay 4 to SYNC
-#
-switch:
-  - platform: template
-    name: "Virtual - Relay1"
-    id: virtual_relay1
-    lambda: |-
-      return id(virtual_relay1).state;
-    turn_on_action:
-      - switch.turn_on: virtual_relay1
-    turn_off_action:
-      - switch.turn_off: virtual_relay1
-
 
 #########################################################################
 #
@@ -366,6 +351,16 @@ output:
   - platform: gpio
     pin: GPIO14
     id: relay4
+
+ # Virtual Relay to replace the relay1 that isn't wired to anything
+  - platform: template
+    id: virtual_relay1
+    type: binary
+    write_action:
+      lambda: |-
+        ESP_LOGD("virtual_relay1", "Virtual output state changed to %s", state ? "ON" : "OFF");
+        // Add any custom logic here if needed, e.g., triggering another action
+        // For a purely virtual output, you can leave this minimal
 
 
 ##########################################################################
