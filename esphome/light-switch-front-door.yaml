@@ -187,13 +187,6 @@ udp:
 
 packet_transport:
 
-packet_transport.receiver:
-  id: switch_front_door
-  on_packet:
-    - id: toggle_hallway
-      then:
-        - light.toggle: light3
-
 
 #########################################################################
 #
