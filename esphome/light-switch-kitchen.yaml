@@ -103,6 +103,27 @@ external_components:
     refresh: 1h
     components: [ usage_tracker ]
 
+  - source:
+      type: git
+      url: https://github.com/Cossid/TasmotaDeviceGroupsForESPHome
+      ref: main
+    refresh: 1h
+    components: [ device_groups ]
+
+
+#####################################################################
+#
+# Tasmota Device Groups for ESPHome
+#
+device_groups:
+  - group_name: "hallway-light"   # Tasmota device group name
+    send_mask: 0xFFFFFFFF         # Optional, defaults to 0xFFFFFFFF (send everything).  Can be integer or hex
+    receive_mask: 0xFFFFFFFF      # Optional, defaults to 0xFFFFFFFF (receive everything).  Can be integer or hex
+    switches:
+      - light3                    # ESPHome entity id
+#    lights:
+#      - light_rgbww1              # ESPHome entity id
+
 
 #####################################################################
 #
