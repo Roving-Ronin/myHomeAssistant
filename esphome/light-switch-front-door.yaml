@@ -174,22 +174,6 @@ globals:
 
 #########################################################################
 #
-# UDP / Packet Transport
-#
-
-udp:
-  listen_port: 6053
-  broadcast_port: 6053
-  addresses:
-    - 10.0.5.80    # switch-front-door
-    - 10.0.5.81    # switch-kitchen
-
-
-packet_transport:
-
-
-#########################################################################
-#
 # Select action to set default power on state
 #
 
@@ -220,40 +204,22 @@ binary_sensor:
   - platform: gpio
     pin:
       inverted: true
-      number: GPIO12  # Button 1 GPIO
+      number: GPIO12
     name: ${button1_assignment}
     id: button1
     icon: 'mdi:gesture-tap-button'
     disabled_by_default: true
-    internal: true
     on_multi_click:
       - timing:
           - ON for at most 0.5s
           - OFF for at least 0.2s
         then:
-          - packet_transport.send:
-              destination: switch_kitchen
-              data:
-                id: toggle_hallway
+          - light.toggle: light1
       - timing:
           - ON for at least 4s
         then:
           - button.press: Reset
-
-  # Use UDP to Sync State with Switch-Front-Door
-  - platform: template
-    id: hallway_state_sync
-    internal: true
-    lambda: |-
-      return id(light1).current_values.is_on();
-    on_state:
-      - packet_transport.send:
-          destination: switch_kitchen
-          data:
-            id: hallway_state
-            state: !lambda 'return x;'
-
-
+    internal: true 
 
   # Touch Button 2
   - platform: gpio
@@ -308,10 +274,6 @@ binary_sensor:
     id: light1_state
     lambda: |-
       return id(light1).current_values.is_on();
-    on_state:
-      - packet_transport.send:
-          id: switch_kitchen
-          data: "toggle_hallway"
     internal: true
 
     # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
@@ -348,7 +310,8 @@ binary_sensor:
 #
 output:
   # Relays
-  - platform: template
+  - platform: gpio
+    pin: GPIO13
     id: relay1
 
   - platform: gpio
@@ -563,3 +526,4 @@ sensor:
 
 
 ##########################################################################
+
