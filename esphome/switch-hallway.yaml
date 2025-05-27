@@ -1,0 +1,562 @@
+#########################################################################
+#
+# Device configuration for Athom Wall Switch, with neutral (ESP8285)
+#
+
+##########################################################################
+# VERSION UPATES:
+#
+# v0.1.0 - Upate to use Roving Ronin base configurations
+#
+
+substitutions:
+  # Default name
+  name: "switch-front-door"
+  # Default friendly name
+  friendly_name: "Switch - Front Door"
+  # Description as appears in ESPHome & top of webserver page
+  device_description: "Athom - Light Switch for Front Door, Hallway, Garage and Bedrrom Eave"
+  # Project Name
+  project_name: "Athom Technology.Light Switch 4 Gang"
+  # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
+  project_version: "v0.3.1"
+  # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
+  location: "Front Door"
+  # The phase in the home power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)  
+  power_circuit: "Lights"
+  
+  # Restore the relay (GPO switch) upon reboot to state:
+  light1_restore_mode: RESTORE_DEFAULT_OFF
+  light2_restore_mode: RESTORE_DEFAULT_OFF
+  light3_restore_mode: RESTORE_DEFAULT_OFF
+  light4_restore_mode: RESTORE_DEFAULT_OFF
+  
+  # Button Label Names
+  button1_assignment: "Hallway Light"
+  button2_assignment: "Bedroom Eave Lights"
+  button3_assignment: "Garage Eave Lights"
+  button4_assignment: "Front Door Light"
+
+  # Backlight LED Name:
+  backlight1_assignment: "Hallway"
+  backlight2_assignment: "Bedroom Eave"
+  backlight3_assignment: "Garage Eave"
+  backlight4_assignment: "Front Door"
+
+   # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
+  log_level: "INFO"
+  
+########################## End of Substitutions #########################
+#
+# Defines the type of ESP chip used on the device
+#
+esp8266:
+  board: esp8285
+  restore_from_flash: true
+
+logger:
+  baud_rate: 115200
+
+preferences:
+   # Enable to allow storing of 'Read Total' between reboots and flashing.
+  flash_write_interval: 30min
+
+
+#########################################################################
+#
+# Remote Packages to be utilised
+#
+
+dashboard_import:
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/athom-wall-switch-4gang.yaml.yaml@main
+  import_full_config: false
+
+
+packages:
+  base-config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/base-configuration.yaml]
+    refresh: 1h
+    
+  network_config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/network-wifi.yaml]
+    refresh: 1h
+
+  webserver_groups:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/webserver-groups.yaml]
+    refresh: 5s
+
+#####################################################################
+#
+# External Components
+#
+
+# Dentra Components - Adds 'Platform - Energy Statistics'
+# https://github.com/Roving-Ronin/myHomeAssistant/tree/main/components/energy_statistics
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/roving-ronin/myhomeassistant/
+      ref: main
+    refresh: 1h
+    components: [ usage_tracker ]
+
+
+#####################################################################
+#
+# Combined with web_server settings in /common/base-configuration to
+# define a network information group
+#
+
+web_server:
+  sorting_groups:
+    
+    - id: group_light_switches
+      name: "Light Switches"
+      sorting_weight: -30
+
+    - id: group_light_usage
+      name: "Light Statistics"
+      sorting_weight: -20
+
+
+#####################################################################
+#
+#
+#
+esphome:
+  on_boot:
+    - priority: 600
+      then:
+        - select.set_index:
+            id: power_mode
+            index: !lambda |-
+                    return id(restore_mode)-1;
+        - lambda: |-
+              switch(id(restore_mode))
+              {
+              case 1:{
+                      id(light1).turn_off();
+                      id(light2).turn_off();
+                      id(light3).turn_off();
+                      id(light4).turn_off();
+                      break;
+                            }
+              case 2:{
+                      id(light1).turn_on();
+                      id(light2).turn_on();
+                      id(light3).turn_on();
+                      id(light4).turn_on();
+                      break;
+                            }
+              default:{
+                      break;
+                            }
+              }
+
+
+#########################################################################
+#
+# Globals to save values to NVS RAM
+#
+
+globals:
+  - id: restore_mode
+    type: int
+    restore_value: yes
+    initial_value: "3"
+
+#########################################################################
+#
+# Select action to set default power on state
+#
+
+select:
+  - platform: template
+    name: "Power On State"
+    id: "power_mode"
+    optimistic: true
+    icon: 'mdi:electric-switch'
+    options:
+      - Always Off
+      - Always On
+      - Restore Power Off State
+    on_value:
+      then:
+        - lambda: |-
+            id(restore_mode)=i+1;
+    entity_category:  config
+
+#########################################################################
+#
+# UDP / Packet Transport
+#
+
+udp:
+  - id: udp_front_door
+    addresses: 
+      - 10.0.5.80
+  - id: udp_kitchen
+    addresses: 
+      - 10.0.5.81
+  - id: udp_garage_eave
+    addresses: 
+      - 10.0.5.66
+      - 10.0.5.67
+      - 10.0.5.68
+  - id: udp_bedroom_eave
+    addresses: 
+      - 10.0.5.69
+      - 10.0.5.70
+  - port: 6053  # Must match switch-kitchen
+
+packet_transport:
+
+packet_transport.receiver:
+  id: switch_front_door
+  on_packet:
+    - id: toggle_hallway
+      then:
+        - light.toggle: hallway_light
+
+#########################################################################
+#
+# Binary Sensors
+#
+binary_sensor:
+
+  # Touch Button 1
+  - platform: gpio
+    pin:
+      inverted: true
+      number: GPIO12  # Button 1 GPIO
+    name: ${button1_assignment}
+    id: button1
+    icon: 'mdi:gesture-tap-button'
+    disabled_by_default: true
+    internal: true
+    on_multi_click:
+      - timing:
+          - ON for at most 0.5s
+          - OFF for at least 0.2s
+        then:
+          - packet_transport.send:
+              destination: switch_kitchen
+              data:
+                id: toggle_hallway
+      - timing:
+          - ON for at least 4s
+        then:
+          - button.press: Reset
+
+  # Touch Button 2
+  - platform: gpio
+    pin:
+      inverted: true
+      number: GPIO3
+    name: ${button2_assignment}
+    id: button2
+    icon: 'mdi:gesture-tap-button'
+    disabled_by_default: true
+    on_click:
+      max_length: 0.5s
+      then:
+        - light.toggle: light2
+    internal: true
+
+  # Touch Button 3  
+  - platform: gpio
+    pin:
+      inverted: true
+      number: GPIO5
+    name: ${button3_assignment}
+    id: button3
+    icon: 'mdi:gesture-tap-button'
+    disabled_by_default: true
+    on_click:
+      max_length: 0.5s
+      then:
+        - light.toggle: light3
+    internal: true
+
+  # Touch Button 4
+  - platform: gpio
+    pin:
+      inverted: true
+      number: GPIO16
+    name: ${button4_assignment}
+    id: button4
+    icon: 'mdi:gesture-tap-button'
+    disabled_by_default: true
+    on_click:
+      max_length: 0.5s
+      then:
+        - light.toggle: light4
+    internal: true
+
+
+    # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
+    # This is used by the usage_tracker as its source sensor.
+  - platform: template
+    name: "Light 1 - State"
+    id: light1_state
+    lambda: |-
+      return id(light1).current_values.is_on();
+    internal: true
+
+    # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
+    # This is used by the usage_tracker as its source sensor.
+  - platform: template
+    name: "Light 2 - State"
+    id: light2_state
+    lambda: |-
+      return id(light2).current_values.is_on();
+    internal: true
+
+    # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
+    # This is used by the usage_tracker as its source sensor.
+  - platform: template
+    name: "Light 3 - State"
+    id: light3_state
+    lambda: |-
+      return id(light3).current_values.is_on();
+    internal: true
+
+    # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
+    # This is used by the usage_tracker as its source sensor.
+  - platform: template
+    name: "Light 4 - State"
+    id: light4_state
+    lambda: |-
+      return id(light4).current_values.is_on();
+    internal: true
+
+
+##########################################################################
+#
+# Relays
+#
+output:
+  # Relays
+  - platform: gpio
+    pin: GPIO13
+    id: relay1
+
+  - platform: gpio
+    pin: GPIO4
+    id: relay2
+
+  - platform: gpio
+    pin: GPIO15
+    id: relay3
+
+  - platform: gpio
+    pin: GPIO14
+    id: relay4
+
+
+##########################################################################
+#
+# Lights
+#
+light:
+
+  # Relays
+  - platform: binary
+    name: ${button1_assignment}
+    id: light1
+    output: relay1
+    restore_mode: ${light1_restore_mode}
+    icon: 'mdi:lightbulb'
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 1
+      
+  - platform: binary
+    name: ${button2_assignment}
+    id: light2
+    output: relay2
+    restore_mode: ${light2_restore_mode}
+    icon: 'mdi:lightbulb'
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 2
+    
+  - platform: binary
+    name: ${button3_assignment}
+    id: light3
+    output: relay3
+    restore_mode: ${light3_restore_mode}
+    icon: 'mdi:lightbulb'
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 3
+    
+  - platform: binary
+    name: ${button4_assignment}
+    id: light4
+    output: relay4
+    restore_mode: ${light4_restore_mode}
+    icon: 'mdi:lightbulb'
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 4
+
+  # ESP PCB Light
+  - platform: status_led
+    name: "Status LED"
+    icon: 'mdi:wifi-alert'
+    disabled_by_default: true
+    pin:
+      number: GPIO0
+      inverted: true
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 5
+
+#########################################################################
+#
+# Define the sensors that publish the Last Use & Lifetime Use duration of the LED.
+# See: https://github.com/Roving-Ronin/myHomeAssistant/tree/main/components/usage_tracker
+#
+
+sensor:
+    # Light 1
+  - platform: "usage_tracker"
+    id: light1_usage_tracker
+    on_off_sensor: light1_state
+      
+    last_use:
+      name: "Light 1 - Duration Last Use"
+      id: light1_duration_last_use
+      unit_of_measurement: h
+      accuracy_decimals: 3
+      filters:
+        - lambda: |-
+            return x / 3600.0;
+        - delta: 0.001
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 1
+
+    lifetime_use:
+      name: "Light 1 - Duration Lifetime Use"
+      id: light1_duration_lifetime_use
+      unit_of_measurement: h
+      accuracy_decimals: 3
+      filters:
+        - lambda: |-
+            return x / 3600.0;
+        - delta: 0.001
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 2
+
+##########################
+
+    # Light 2
+  - platform: "usage_tracker"
+    id: light2_usage_tracker
+    on_off_sensor: light2_state
+      
+    last_use:
+      name: "Light 2 - Duration Last Use"
+      id: light2_duration_last_use
+      unit_of_measurement: h
+      accuracy_decimals: 3
+      filters:
+        - lambda: |-
+            return x / 3600.0;
+        - delta: 0.001
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 3
+
+    lifetime_use:
+      name: "Light 2 - Duration Lifetime Use"
+      id: light2_duration_lifetime_use
+      unit_of_measurement: h
+      accuracy_decimals: 3
+      filters:
+        - lambda: |-
+            return x / 3600.0;
+        - delta: 0.001
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 4
+
+
+##########################
+
+    # Light 3
+  - platform: "usage_tracker"
+    id: light3_usage_tracker
+    on_off_sensor: light3_state
+      
+    last_use:
+      name: "Light 3 - Duration Last Use"
+      id: light3_duration_last_use
+      unit_of_measurement: h
+      accuracy_decimals: 3
+      filters:
+        - lambda: |-
+            return x / 3600.0;
+        - delta: 0.001
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 5
+
+    lifetime_use:
+      name: "Light 3 - Duration Lifetime Use"
+      id: light3_duration_lifetime_use
+      unit_of_measurement: h
+      accuracy_decimals: 3
+      filters:
+        - lambda: |-
+            return x / 3600.0;
+        - delta: 0.001
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 6
+
+##########################
+
+    # Light 4
+  - platform: "usage_tracker"
+    id: light4_usage_tracker
+    on_off_sensor: light1_state
+      
+    last_use:
+      name: "Light 4 - Duration Last Use"
+      id: light4_duration_last_use
+      unit_of_measurement: h
+      accuracy_decimals: 3
+      filters:
+        - lambda: |-
+            return x / 3600.0;
+        - delta: 0.001
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 7
+
+    lifetime_use:
+      name: "Light 4 - Duration Lifetime Use"
+      id: light4_duration_lifetime_use
+      unit_of_measurement: h
+      accuracy_decimals: 3
+      filters:
+        - lambda: |-
+            return x / 3600.0;
+        - delta: 0.001
+      web_server:
+        sorting_group_id: group_light_usage
+        sorting_weight: 8
+
+
+##########################################################################
