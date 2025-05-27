@@ -56,7 +56,7 @@ preferences:
 #
 
 dashboard_import:
-  package_import_url: github://roving-ronin/myhomeassistant/esphome/athom-wall-switch-1gang.yaml.yaml@main
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/athom-wall-switch-2gang.yaml@main
   import_full_config: false
 
 
