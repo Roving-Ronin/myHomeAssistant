@@ -121,18 +121,17 @@ external_components:
 # Tasmota Device Groups for ESPHome
 #
 device_groups:
-  - group_name: "hallway-light"   # Tasmota device group name
-    send_mask: 0xFFFFFFFF         # Optional, defaults to 0xFFFFFFFF (send everything).  Can be integer or hex
-    receive_mask: 0xFFFFFFFF      # Optional, defaults to 0xFFFFFFFF (receive everything).  Can be integer or hex
+  - group_name: "hallway-light"        # Tasmota device group name
+    send_mask: 0xFFFFFFFF              # Optional, defaults to 0xFFFFFFFF (send everything).  Can be integer or hex
+    receive_mask: 0xFFFFFFFF           # Optional, defaults to 0xFFFFFFFF (receive everything).  Can be integer or hex
     switches:
-      - gpio_switch               # ESPHome entity id
-      - template_switch           # ESPHome entity id
-    lights:
-      - light_rgbww1              # ESPHome entity id
-      - light_rgbww2              # ESPHome entity id
-  - group_name: "testgroup2"      # Tasmota device group name
-    switches:
-      - gpio_switch2              # ESPHome entity id
+      - virtual_switch_hallway_light   # ESPHome entity id
+#    lights:
+#      - light_rgbww1                  # ESPHome entity id
+
+#  - group_name: "garage-eave-lights"  # Tasmota device group name
+#    switches:
+#      - gpio_switch2                  # ESPHome entity id
 
 
 #####################################################################
@@ -220,6 +219,21 @@ select:
             id(restore_mode)=i+1;
     entity_category:  config
 
+#########################################################################
+#
+# Virtual Switch for Button/Relay 4 to SYNC
+#
+switch:
+  - platform: template
+    name: "Virtual - Hallway Light"
+    id: virtual_switch_hallway_light
+    lambda: |-
+      return id(virtual_switch_hallway_light).state;
+    turn_on_action:
+      - switch.turn_on: virtual_switch_hallway_light
+    turn_off_action:
+      - switch.turn_off: virtual_switch_hallway_light
+
 
 #########################################################################
 #
@@ -287,10 +301,13 @@ binary_sensor:
     id: button4
     icon: 'mdi:gesture-tap-button'
     disabled_by_default: true
-    on_click:
-      max_length: 0.5s
+#    on_click:
+#      max_length: 0.5s
+#      then:
+#        - light.toggle: light4
+    on_press:
       then:
-        - light.toggle: light4
+        - switch.toggle: virtual_switch_hallway_light
     internal: true
 
 
