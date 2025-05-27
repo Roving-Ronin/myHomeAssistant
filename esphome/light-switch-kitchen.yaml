@@ -320,6 +320,13 @@ binary_sensor:
     id: light3_state
     lambda: |-
       return id(light3).current_values.is_on();
+    on_state:
+      - packet_transport.receiver:
+          id: switch_front_door
+          on_packet:
+            - id: toggle_hallway
+              then:
+                - light.toggle: light3
     internal: true
 
 
