@@ -256,7 +256,7 @@ binary_sensor:
           - OFF for at least 0.2s
         then:
 #          - light.toggle: light1
-          - switch.toggle: virtual_switch_front_door
+          - switch.toggle: virtual_switch_hallway_light
       - timing:
           - ON for at least 4s
         then:
