@@ -178,22 +178,12 @@ globals:
 #
 
 udp:
-  - id: udp_front_door
-    addresses: 
-      - 10.0.5.80
-  - id: udp_kitchen
-    addresses: 
-      - 10.0.5.81
-  - id: udp_garage_eave
-    addresses: 
-      - 10.0.5.66
-      - 10.0.5.67
-      - 10.0.5.68
-  - id: udp_bedroom_eave
-    addresses: 
-      - 10.0.5.69
-      - 10.0.5.70
-  - port: 6053  # Must match switch-kitchen
+  listen_port: 6053
+  broadcast_port: 6053
+  addresses:
+    - 10.0.5.80    # switch-front-door
+    - 10.0.5.81    # switch-kitchen
+
 
 packet_transport:
 
