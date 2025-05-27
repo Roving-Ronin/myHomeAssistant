@@ -240,6 +240,21 @@ binary_sensor:
         then:
           - button.press: Reset
 
+  # Use UDP to Sync State with Switch-Front-Door
+  - platform: template
+    id: hallway_state_sync
+    internal: true
+    lambda: |-
+      return id(light1).current_values.is_on();
+    on_state:
+      - packet_transport.send:
+          destination: switch_kitchen
+          data:
+            id: hallway_state
+            state: !lambda 'return x;'
+
+
+
   # Touch Button 2
   - platform: gpio
     pin:
