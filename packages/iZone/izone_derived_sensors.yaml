@@ -1,0 +1,81 @@
+# 
+# https://www.home-assistant.io/integrations/izone/
+#
+template:
+  - sensor:
+    - name: "iZone Control Zone"
+      unique_id: izone_control_zone
+      state: "{{ state_attr('climate.izone_controller_123456789','control_zone_name') }}"
+
+    - name : "iZone Current Temperature"
+      unique_id: izone_current_temperature
+      state: "{{ state_attr('climate.izone_controller_123456789','current_temperature') }}"
+      unit_of_measurement: "°C"
+
+    - name: "iZone Target Temperature"
+      unique_id: izone_target_temperature
+      state: "{{ state_attr('climate.izone_controller_123456789','control_zone_setpoint') }}"
+      unit_of_measurement: "°C"
+
+    - name : "iZone Supply Temperature"
+      unique_id: izone_supply_temperature
+      state: "{{ state_attr('climate.izone_controller_123456789','supply_temperature') }}"
+      unit_of_measurement: "°C"
+
+#    - name : "iZone Maximum Set Temperature"
+#      unique_id: izone_maximum_set_temperature
+#      state: "{{ state_attr('climate.izone_controller_123456789','max_temp') }}"
+#      unit_of_measurement: "°C"
+
+#    - name : "iZone Minimum Set Temperature"
+#      unique_id: izone_minimum_set_temperature
+#      state: "{{ state_attr('climate.izone_controller_123456789','min_temp') }}"
+#      unit_of_measurement: "°C"      
+
+    - name : "iZone HVAC Mode"
+      unique_id: izone_hvac_mode
+      state: "{{ state_attr('climate.izone_controller_123456789','hvac_mode') }}"
+
+    - name : "iZone Fan Mode"
+      unique_id: izone_fan_mode
+      state: "{{ state_attr('climate.izone_controller_123456789','fan_mode') }}"
+
+####################################
+#
+#   Individual Room Temperatures
+#
+
+    - name : "iZone Bedroom 1 Temperature"
+      unique_id: izone_bedroom_1_current_temperature
+      state: "{{ state_attr('climate.master_bedroom','current_temperature') }}"
+      unit_of_measurement: "°C"
+
+    - name : "iZone Bedroom 2 Temperature"
+      unique_id: izone_bedroom_2_current_temperature
+      state: "{{ state_attr('climate.bedroom2','current_temperature') }}"
+      unit_of_measurement: "°C"      
+
+    - name : "iZone Bedroom 3 Temperature"
+      unique_id: izone_bedroom_3_current_temperature
+      state: "{{ state_attr('climate.bedroom3','current_temperature') }}"
+      unit_of_measurement: "°C"
+
+    - name : "iZone Bedroom 4 Temperature"
+      unique_id: izone_bedroom_4_current_temperature
+      state: "{{ state_attr('climate.bedroom4','current_temperature') }}"
+      unit_of_measurement: "°C"      
+
+    - name : "iZone Kitchen Temperature"
+      unique_id: izone_kitchen_current_temperature
+      state: "{{ state_attr('climate.kitchen_dining','current_temperature') }}"
+      unit_of_measurement: "°C"
+
+    - name : "iZone Lounge Room Temperature"
+      unique_id: izone_lounge_current_temperature
+      state: "{{ state_attr('climate.lounge_room','current_temperature') }}"
+      unit_of_measurement: "°C"
+
+    - name : "iZone Study Temperature"
+      unique_id: izone_study_current_temperature
+      state: "{{ state_attr('climate.study','current_temperature') }}"
+      unit_of_measurement: "°C"
