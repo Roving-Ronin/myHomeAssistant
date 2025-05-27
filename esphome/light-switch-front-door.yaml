@@ -255,8 +255,7 @@ binary_sensor:
           - ON for at most 0.5s
           - OFF for at least 0.2s
         then:
-          - switch.toggle: virtual_relay1
-#          - light.toggle: light1
+          - light.toggle: light1
       - timing:
           - ON for at least 4s
         then:
@@ -379,7 +378,7 @@ light:
   - platform: binary
     name: ${button1_assignment}
     id: light1
-    output: relay1
+    output: virtual_relay1      # relay1
     restore_mode: ${light1_restore_mode}
     icon: 'mdi:lightbulb'
     web_server:
@@ -428,144 +427,5 @@ light:
       sorting_group_id: group_light_switches
       sorting_weight: 5
 
-#########################################################################
-#
-# Define the sensors that publish the Last Use & Lifetime Use duration of the LED.
-# See: https://github.com/Roving-Ronin/myHomeAssistant/tree/main/components/usage_tracker
-#
-
-sensor:
-    # Light 1
-  - platform: "usage_tracker"
-    id: light1_usage_tracker
-    on_off_sensor: light1_state
-      
-    last_use:
-      name: "Light 1 - Duration Last Use"
-      id: light1_duration_last_use
-      unit_of_measurement: h
-      accuracy_decimals: 3
-      filters:
-        - lambda: |-
-            return x / 3600.0;
-        - delta: 0.001
-      web_server:
-        sorting_group_id: group_light_usage
-        sorting_weight: 1
-
-    lifetime_use:
-      name: "Light 1 - Duration Lifetime Use"
-      id: light1_duration_lifetime_use
-      unit_of_measurement: h
-      accuracy_decimals: 3
-      filters:
-        - lambda: |-
-            return x / 3600.0;
-        - delta: 0.001
-      web_server:
-        sorting_group_id: group_light_usage
-        sorting_weight: 2
-
-##########################
-
-    # Light 2
-  - platform: "usage_tracker"
-    id: light2_usage_tracker
-    on_off_sensor: light2_state
-      
-    last_use:
-      name: "Light 2 - Duration Last Use"
-      id: light2_duration_last_use
-      unit_of_measurement: h
-      accuracy_decimals: 3
-      filters:
-        - lambda: |-
-            return x / 3600.0;
-        - delta: 0.001
-      web_server:
-        sorting_group_id: group_light_usage
-        sorting_weight: 3
-
-    lifetime_use:
-      name: "Light 2 - Duration Lifetime Use"
-      id: light2_duration_lifetime_use
-      unit_of_measurement: h
-      accuracy_decimals: 3
-      filters:
-        - lambda: |-
-            return x / 3600.0;
-        - delta: 0.001
-      web_server:
-        sorting_group_id: group_light_usage
-        sorting_weight: 4
-
-
-##########################
-
-    # Light 3
-  - platform: "usage_tracker"
-    id: light3_usage_tracker
-    on_off_sensor: light3_state
-      
-    last_use:
-      name: "Light 3 - Duration Last Use"
-      id: light3_duration_last_use
-      unit_of_measurement: h
-      accuracy_decimals: 3
-      filters:
-        - lambda: |-
-            return x / 3600.0;
-        - delta: 0.001
-      web_server:
-        sorting_group_id: group_light_usage
-        sorting_weight: 5
-
-    lifetime_use:
-      name: "Light 3 - Duration Lifetime Use"
-      id: light3_duration_lifetime_use
-      unit_of_measurement: h
-      accuracy_decimals: 3
-      filters:
-        - lambda: |-
-            return x / 3600.0;
-        - delta: 0.001
-      web_server:
-        sorting_group_id: group_light_usage
-        sorting_weight: 6
-
-##########################
-
-    # Light 4
-  - platform: "usage_tracker"
-    id: light4_usage_tracker
-    on_off_sensor: light1_state
-      
-    last_use:
-      name: "Light 4 - Duration Last Use"
-      id: light4_duration_last_use
-      unit_of_measurement: h
-      accuracy_decimals: 3
-      filters:
-        - lambda: |-
-            return x / 3600.0;
-        - delta: 0.001
-      web_server:
-        sorting_group_id: group_light_usage
-        sorting_weight: 7
-
-    lifetime_use:
-      name: "Light 4 - Duration Lifetime Use"
-      id: light4_duration_lifetime_use
-      unit_of_measurement: h
-      accuracy_decimals: 3
-      filters:
-        - lambda: |-
-            return x / 3600.0;
-        - delta: 0.001
-      web_server:
-        sorting_group_id: group_light_usage
-        sorting_weight: 8
-
 
 ##########################################################################
-
