@@ -165,6 +165,34 @@ globals:
 
 #########################################################################
 #
+# UDP / Packet Transport
+#
+
+udp:
+  listen_port: 6053
+  broadcast_port: 6053
+  addresses:
+    - 10.0.5.80    # switch-front-door
+    - 10.0.5.81    # switch-kitchen
+    - 10.0.5.66    # garage-eave-1
+    - 10.0.5.67    # garage-eave-2
+    - 10.0.5.68    # garage-eave-3
+    - 10.0.5.69    # bedroom-eave-1
+    - 10.0.5.70    # bedroom-eave-2
+
+
+packet_transport:
+
+packet_transport.receiver:
+  id: switch_front_door
+  on_packet:
+    - id: toggle_hallway
+      then:
+        - light.toggle: light3
+
+
+#########################################################################
+#
 # Select action to set default power on state
 #
 
@@ -216,6 +244,21 @@ binary_sensor:
         then:
           - button.press: Reset
     internal: true
+
+  # Use UDP to Sync State with Switch-Front-Door
+  - platform: template
+    id: hallway_state_sync
+    internal: true
+    lambda: |-
+      return id(light3).current_values.is_on();
+    on_state:
+      - packet_transport.send:
+          destination: switch_front_door
+          data:
+            id: hallway_state
+            state: !lambda 'return x;'
+
+
 
   # Touch Button 2
   - platform: gpio
