@@ -28,8 +28,8 @@ substitutions:
   # Restore the relay (GPO switch) upon reboot to state:
   light1_restore_mode: RESTORE_DEFAULT_OFF
   light2_restore_mode: RESTORE_DEFAULT_OFF
-  light3_restore_mode: RESTORE_DEFAULT_OFF
-  light4_restore_mode: RESTORE_DEFAULT_OFF
+  light3_restore_mode: RESTORE_DEFAULT_ON
+  light4_restore_mode: RESTORE_DEFAULT_ON
   
   # Button Label Names
   button1_assignment: "Hallway Light"
