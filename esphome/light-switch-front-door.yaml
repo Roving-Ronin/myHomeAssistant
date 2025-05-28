@@ -31,8 +31,7 @@ substitutions:
   switch3_restore_mode: RESTORE_DEFAULT_ON
   switch4_restore_mode: RESTORE_DEFAULT_ON
   
-  
-  # Restore the relay (GPO switch) upon reboot to state:
+  # Restore the Light / Button and VIRTUAL Relays upon reboot to state:
   light1_restore_mode: RESTORE_DEFAULT_OFF
   light2_restore_mode: RESTORE_DEFAULT_OFF
   light3_restore_mode: RESTORE_DEFAULT_OFF
@@ -404,7 +403,7 @@ binary_sensor:
 # Relays - Seperate to Lights and Buttons. Controlled directly by SWITCHES
 #
 
-output:         - Default component used by the Athom 4Gang Switch
+output:      #   - Default component used by the Athom 4Gang Switch
 
   - platform: gpio
 #    name: "Power Switch - Bedroom Eave Lights"
