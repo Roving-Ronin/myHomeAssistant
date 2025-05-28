@@ -427,13 +427,13 @@ switch:
     name: "Power Switch - Garage Eave Lights"
     id: relay3
     pin: GPIO15
-    restore_mode: switch3_restore_mode
+    restore_mode: ${switch3_restore_mode}
 
   - platform: gpio
     name: "Power Switch - Front Door Light"
     id: relay4
     pin: GPIO14
-    restore_mode: switch4_restore_mode
+    restore_mode: ${switch4_restore_mode}
 
 
 ##########################
