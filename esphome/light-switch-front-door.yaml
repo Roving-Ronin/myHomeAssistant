@@ -120,18 +120,36 @@ external_components:
 #
 # Tasmota Device Groups for ESPHome
 #
+
+# Electrical Wiring - NOT CONNECTED - Slave to RELAY 3 on 'Switch Kitchen'
 device_groups:
   - group_name: "hallway-light"        # Tasmota device group name
     send_mask: 0xFFFFFFFF              # Optional, defaults to 0xFFFFFFFF (send everything).  Can be integer or hex
     receive_mask: 0xFFFFFFFF           # Optional, defaults to 0xFFFFFFFF (receive everything).  Can be integer or hex
-#    switches:
-#      - virtual_switch_hallway_light   # ESPHome entity id
     lights:
       - light1                         # ESPHome entity id
 
-#  - group_name: "garage-eave-lights"  # Tasmota device group name
-#    switches:
-#      - gpio_switch2                  # ESPHome entity id
+# Electrical Wiring - RELAY 2 ON 24x7 - Master Bedroom Eave LED Lights
+  - group_name: "bedroom-eave-lights"  # Tasmota device group name
+    send_mask: 0xFFFFFFFF              # Optional, defaults to 0xFFFFFFFF (send everything).  Can be integer or hex
+    receive_mask: 0x0                  # Optional, defaults to 0xFFFFFFFF (receive everything).  Can be integer or hex
+    lights:
+      - light2                         # ESPHome entity id
+
+# Electrical Wiring - RELAY 3 ON 24x7 - Garage Eave LED Lights
+  - group_name: "garage-eave-lights"  # Tasmota device group name
+    send_mask: 0xFFFFFFFF              # Optional, defaults to 0xFFFFFFFF (send everything).  Can be integer or hex
+    receive_mask: 0x0                  # Optional, defaults to 0xFFFFFFFF (receive everything).  Can be integer or hex
+    lights:
+      - light3                         # ESPHome entity id
+
+
+# Electrical Wiring - RELAY 4 ON 24x7 - Patio (Front Door) LED Light
+  - group_name: "front-door-light"  # Tasmota device group name
+    send_mask: 0xFFFFFFFF              # Optional, defaults to 0xFFFFFFFF (send everything).  Can be integer or hex
+    receive_mask: 0x0                  # Optional, defaults to 0xFFFFFFFF (receive everything).  Can be integer or hex
+    lights:
+      - light4                         # ESPHome entity id
 
 
 #####################################################################
@@ -332,27 +350,42 @@ binary_sensor:
 
 ##########################################################################
 #
-# Relays
+# Relays - Seperate to Lights and Buttons. Controlled directly by SWITCHES
 #
-output:
-  # Relays
-  - platform: gpio
-    pin: GPIO13
-    id: relay1
+
+output:         - Default component used by the Athom 4Gang Switch
 
   - platform: gpio
-    pin: GPIO4
+#    name: "Power Switch - Bedroom Eave Lights"
     id: relay2
+    pin: GPIO4
+
+
+###############
+
+switch:
+  # Relays
+
+  # Phyiscally not wired into Power Cicruits
+#  - platform: gpio
+#    name: "Power Switch - Hallway Light"
+#    id: relay1
+#    pin: GPIO13
 
   - platform: gpio
-    pin: GPIO15
+    name: "Power Switch - Garage Eave Lights"
     id: relay3
+    pin: GPIO15
 
   - platform: gpio
-    pin: GPIO14
+    name: "Power Switch - Front Door Light"
     id: relay4
+    pin: GPIO14
 
- # Virtual Relay to replace the relay1 that isn't wired to anything
+
+##########################
+
+ # HALLWAY LIGHT - Virtual Relay to replace the relay1 that isn't wired to anything
   - platform: template
     id: virtual_relay1
     type: binary
@@ -361,6 +394,39 @@ output:
         ESP_LOGD("virtual_relay1", "Virtual output state changed to %s", state ? "ON" : "OFF");
         // Add any custom logic here if needed, e.g., triggering another action
         // For a purely virtual output, you can leave this minimal
+
+
+ # BEDROOM EAVE LIGHTS - Virtual Relay to replace the relay2 that supplies power to the Master Bedroom Eave Lights
+ # that need power 24x7 and the Switch Button 2 sends Tasmota Group On/Off command only
+  - platform: template
+    id: virtual_relay2
+    type: binary
+    write_action:
+      - logger.log:
+          format: "Virtual Relay 2 - Bedroom Eave Lights - state changed to %s"
+          args: ['state ? "ON" : "OFF"']
+
+
+ # GARAGE EAVE LIGHTS - Virtual Relay to replace the relay3 that supplies power to the Master Bedroom Eave Lights
+ # that need power 24x7 and the Switch Button 3 sends Tasmota Group On/Off command only
+  - platform: template
+    id: virtual_relay3
+    type: binary
+    write_action:
+      - logger.log:
+          format: "Virtual Relay 3 - Garage Eave Lights - state changed to %s"
+          args: ['state ? "ON" : "OFF"']
+
+
+ # PARIO LIGHT - Virtual Relay to replace the relay4 that supplies power to the Front Door / Patio Light
+ # that need power 24x7 and the Switch Button 4 sends Tasmota Group On/Off command only
+  - platform: template
+    id: virtual_relay4
+    type: binary
+    write_action:
+      - logger.log:
+          format: "Virtual Relay 4 - Front Door Light - state changed to %s"
+          args: ['state ? "ON" : "OFF"']
 
 
 ##########################################################################
@@ -383,7 +449,7 @@ light:
   - platform: binary
     name: ${button2_assignment}
     id: light2
-    output: relay2
+    output: relay2       # virtual_relay2 - Swap when Aldi Casalux LED installed in Eaves
     restore_mode: ${light2_restore_mode}
     icon: 'mdi:lightbulb'
     web_server:
@@ -393,7 +459,7 @@ light:
   - platform: binary
     name: ${button3_assignment}
     id: light3
-    output: relay3
+    output: virtual_relay3      # relay3
     restore_mode: ${light3_restore_mode}
     icon: 'mdi:lightbulb'
     web_server:
@@ -403,7 +469,7 @@ light:
   - platform: binary
     name: ${button4_assignment}
     id: light4
-    output: relay4
+    output: virtual_relay4      # relay4
     restore_mode: ${light4_restore_mode}
     icon: 'mdi:lightbulb'
     web_server:
