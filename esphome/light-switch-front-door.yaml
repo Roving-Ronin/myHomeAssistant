@@ -19,17 +19,24 @@ substitutions:
   # Project Name
   project_name: "Athom Technology.Light Switch 4 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "v1.1.0"
+  project_version: "v1.2.0"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   location: "Front Door"
   # The phase in the home power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)  
   power_circuit: "Lights"
+
+  # Restore the relay (GPO switch) upon reboot to state:
+  switch1_restore_mode: RESTORE_DEFAULT_OFF
+  switch2_restore_mode: RESTORE_DEFAULT_OFF
+  switch3_restore_mode: RESTORE_DEFAULT_ON
+  switch4_restore_mode: RESTORE_DEFAULT_ON
+  
   
   # Restore the relay (GPO switch) upon reboot to state:
   light1_restore_mode: RESTORE_DEFAULT_OFF
   light2_restore_mode: RESTORE_DEFAULT_OFF
-  light3_restore_mode: RESTORE_DEFAULT_ON
-  light4_restore_mode: RESTORE_DEFAULT_ON
+  light3_restore_mode: RESTORE_DEFAULT_OFF
+  light4_restore_mode: RESTORE_DEFAULT_OFF
   
   # Button Label Names
   button1_assignment: "Hallway Light"
@@ -243,7 +250,6 @@ globals:
     initial_value: "3"
 
 
-
 #########################################################################
 #
 # Select action to set default power on state
@@ -416,16 +422,18 @@ switch:
 #    name: "Power Switch - Hallway Light"
 #    id: relay1
 #    pin: GPIO13
-
+switch:
   - platform: gpio
     name: "Power Switch - Garage Eave Lights"
     id: relay3
     pin: GPIO15
+    restore_mode: switch3_restore_mode
 
   - platform: gpio
     name: "Power Switch - Front Door Light"
     id: relay4
     pin: GPIO14
+    restore_mode: switch4_restore_mode
 
 
 ##########################
