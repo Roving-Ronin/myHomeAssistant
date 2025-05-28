@@ -11,28 +11,28 @@
 #
 substitutions:
   # Default name
-  name: "switch-2gang"
+  name: "switch-study-dining"
   # Default friendly name
-  friendly_name: "Switch - 2 Gang"
+  friendly_name: "Switch - Study & Dining"
   # Description as appears in ESPHome & top of webserver page
-  device_description: "Athom - Light Switch 2 Gang"
+  device_description: "Athom - Light Switch for Study & Dining"
   # Project Name
   project_name: "Athom Technology.Light Switch 2 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
   project_version: "v0.1.0"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
-  location: ""
+  location: "Dining"
   # The phase in the home power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)  
   power_circuit: "Lights"  
   # Restore the relay (GPO switch) upon reboot to state:
   light1_restore_mode: RESTORE_DEFAULT_OFF
   light2_restore_mode: RESTORE_DEFAULT_OFF
   # Button Label Names:
-  button1_assignment: "Button 1"
-  button2_assignment: "Button 2"
+  button1_assignment: "Study Lights"
+  button2_assignment: "Dining Lights"
   # Backlight LED Name:
-  backlight1_assignment: "Backlight 1"
-  backlight2_assignment: "Backlight 2"
+  backlight1_assignment: "Study"
+  backlight2_assignment: "Dining"
 
 ########################## End of Substitutions #########################
 #
@@ -94,6 +94,27 @@ external_components:
       ref: main
     refresh: 1h
     components: [ usage_tracker ]
+
+  - source:
+      type: git
+      url: https://github.com/Cossid/TasmotaDeviceGroupsForESPHome
+      ref: main
+    refresh: 1h
+    components: [ device_groups ]
+
+
+
+#####################################################################
+#
+# Tasmota Device Groups for ESPHome
+#
+device_groups:
+  - group_name: "dining-lights"   # Tasmota device group name
+    send_mask: 0xFFFFFFFF         # Optional, defaults to 0xFFFFFFFF (send everything).  Can be integer or hex
+    receive_mask: 0xFFFFFFFF      # Optional, defaults to 0xFFFFFFFF (receive everything).  Can be integer or hex
+    lights:
+      - light2                     # ESPHome entity id
+
 
 #####################################################################
 #
@@ -192,7 +213,7 @@ binary_sensor:
       mode:
         input: true
         pullup: true
-    name: "Button"
+    name: ${button1_assignment}
     id: button1
     icon: 'mdi:gesture-tap-button'
     disabled_by_default: true
@@ -215,7 +236,7 @@ binary_sensor:
       mode:
         input: true
         pullup: true
-    name: "Button2"
+    name: ${button1_assignment}
     id: button2
     icon: 'mdi:gesture-tap-button'
     disabled_by_default: true
@@ -307,18 +328,6 @@ light:
       sorting_group_id: group_light_switches
       sorting_weight: 2
       
-  # Button LED
-  - platform: monochromatic
-    name: "Panel Backlight LED"
-    icon: 'mdi:led-on'
-    disabled_by_default: true
-    id: led1
-    output: button_led1
-    default_transition_length: 500ms
-    web_server:
-      sorting_group_id: group_light_switches
-      sorting_weight: 2
-
 
   # Button LEDs
   - platform: monochromatic
