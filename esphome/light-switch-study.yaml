@@ -229,6 +229,7 @@ binary_sensor:
           - button.press: Reset
     internal: true
 
+
   - platform: gpio
     pin:
       inverted: true
@@ -236,7 +237,7 @@ binary_sensor:
       mode:
         input: true
         pullup: true
-    name: ${button1_assignment}
+    name: ${button2_assignment}
     id: button2
     icon: 'mdi:gesture-tap-button'
     disabled_by_default: true
