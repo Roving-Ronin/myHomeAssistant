@@ -403,8 +403,9 @@ binary_sensor:
 # Relays - Seperate to Lights and Buttons. Controlled directly by SWITCHES
 #
 
-output:      #   - Default component used by the Athom 4Gang Switch
+#   - Default component used by the Athom 4Gang Switch
 
+output:      
   - platform: gpio
 #    name: "Power Switch - Bedroom Eave Lights"
     id: relay2
@@ -421,7 +422,7 @@ switch:
 #    name: "Power Switch - Hallway Light"
 #    id: relay1
 #    pin: GPIO13
-switch:
+
   - platform: gpio
     name: "Power Switch - Garage Eave Lights"
     id: relay3
