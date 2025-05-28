@@ -15,7 +15,7 @@ substitutions:
   # Default friendly name
   friendly_name: "Switch - Study & Dining"
   # Description as appears in ESPHome & top of webserver page
-  device_description: "Athom - Light Switch for Study & Dining"
+  device_description: "Athom - Light Switch for Study & Dining (Master)"
   # Project Name
   project_name: "Athom Technology.Light Switch 2 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
