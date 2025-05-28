@@ -11,7 +11,7 @@
 #
 substitutions:
   # Default name
-  name: "switch-study-dining"
+  name: "switch-study"
   # Default friendly name
   friendly_name: "Switch - Study & Dining"
   # Description as appears in ESPHome & top of webserver page
@@ -21,7 +21,7 @@ substitutions:
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
   project_version: "v1.0.0"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
-  location: "Dining"
+  location: "Study"
   # The phase in the home power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)  
   power_circuit: "Lights"  
   # Restore the relay (GPO switch) upon reboot to state:
