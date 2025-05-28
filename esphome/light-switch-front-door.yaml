@@ -406,39 +406,8 @@ binary_sensor:
 #   - Default component used by the Athom 4Gang Switch
 
 output:      
-  - platform: gpio
-#    name: "Power Switch - Bedroom Eave Lights"
-    id: relay2
-    pin: GPIO4
 
-
-###############
-
-switch:
-  # Relays
-
-  # Phyiscally not wired into Power Cicruits
-#  - platform: gpio
-#    name: "Power Switch - Hallway Light"
-#    id: relay1
-#    pin: GPIO13
-
-  - platform: gpio
-    name: "Power Switch - Garage Eave Lights"
-    id: relay3
-    pin: GPIO15
-    restore_mode: ${switch3_restore_mode}
-
-  - platform: gpio
-    name: "Power Switch - Front Door Light"
-    id: relay4
-    pin: GPIO14
-    restore_mode: ${switch4_restore_mode}
-
-
-##########################
-
- # HALLWAY LIGHT - Virtual Relay to replace the relay1 that isn't wired to anything
+ # Virtual Relay to replace the relay1 that isn't wired to anything
   - platform: template
     id: virtual_relay1
     type: binary
@@ -449,15 +418,20 @@ switch:
         // For a purely virtual output, you can leave this minimal
 
 
+  - platform: gpio
+#    name: "Power Switch - Bedroom Eave Lights"
+    id: relay2
+    pin: GPIO4
+
  # BEDROOM EAVE LIGHTS - Virtual Relay to replace the relay2 that supplies power to the Master Bedroom Eave Lights
  # that need power 24x7 and the Switch Button 2 sends Tasmota Group On/Off command only
-  - platform: template
-    id: virtual_relay2
-    type: binary
-    write_action:
-      - logger.log:
-          format: "Virtual Relay 2 - Bedroom Eave Lights - state changed to %s"
-          args: ['state ? "ON" : "OFF"']
+#  - platform: template
+#    id: virtual_relay2
+#    type: binary
+#    write_action:
+#      - logger.log:
+#          format: "Virtual Relay 2 - Bedroom Eave Lights - state changed to %s"
+#          args: ['state ? "ON" : "OFF"']
 
 
  # GARAGE EAVE LIGHTS - Virtual Relay to replace the relay3 that supplies power to the Master Bedroom Eave Lights
@@ -480,6 +454,30 @@ switch:
       - logger.log:
           format: "Virtual Relay 4 - Front Door Light - state changed to %s"
           args: ['state ? "ON" : "OFF"']
+
+
+###############
+
+switch:
+  # Relays
+
+  # Phyiscally not wired into Power Cicruits
+#  - platform: gpio
+#    name: "Power Switch - Hallway Light"
+#    id: relay1
+#    pin: GPIO13
+
+  - platform: gpio
+    name: "Power Switch - Garage Eave Lights"
+    id: relay3
+    pin: GPIO15
+    restore_mode: RESTORE_DEFAULT_ON
+
+  - platform: gpio
+    name: "Power Switch - Front Door Light"
+    id: relay4
+    pin: GPIO14
+    restore_mode: RESTORE_DEFAULT_ON
 
 
 ##########################################################################
