@@ -11,9 +11,9 @@
 #
 substitutions:
   # Default name
-  name: "switch-study-dining"
+  name: "switch-dining"
   # Default friendly name
-  friendly_name: "Switch - Study & Dining"
+  friendly_name: "Switch - Dining (Slave)"
   # Description as appears in ESPHome & top of webserver page
   device_description: "Athom - Light Switch for Dining (Slave)"
   # Project Name
