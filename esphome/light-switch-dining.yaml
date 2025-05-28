@@ -26,7 +26,7 @@ substitutions:
   power_circuit: "Lights"  
 
   # Restore the relay (GPO switch) upon reboot to state:
-  light1_restore_mode: RESTORE_DEFAULT_OFF
+  light_restore_mode: RESTORE_DEFAULT_OFF
 
   # Button Label Names:
   button1_assignment: "Lights"
