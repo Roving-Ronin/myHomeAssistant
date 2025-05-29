@@ -64,7 +64,7 @@ preferences:
 #
 
 dashboard_import:
-  package_import_url: github://roving-ronin/myhomeassistant/esphome/light-switch-kitchen.yaml@main
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/mydevices/light-switch-kitchen.yaml@main
   import_full_config: false
 
 
