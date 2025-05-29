@@ -19,7 +19,7 @@ substitutions:
   # Project Name
   project_name: "Athom Technology.Light Switch 4 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "v1.2.0"
+  project_version: "v1.0.1"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   location: "Front Door"
   # The phase in the home power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)  
@@ -171,6 +171,10 @@ web_server:
       name: "Light Switches"
       sorting_weight: -30
 
+    - id: group_power_circuits
+      name: "Power Circuits"
+      sorting_weight: -25
+
     - id: group_light_usage
       name: "Light Statistics"
       sorting_weight: -20
@@ -187,13 +191,13 @@ esphome:
         - select.set_index:
             id: power_mode
             index: !lambda |-
-                    return id(restore_mode)-1;
+                    return id(light_restore_mode)-1;
         - select.set_index:
             id: relay_power_mode
             index: !lambda return id(relay_restore_mode) - 1;
         - lambda: |-
             // Light restore logic
-              switch(id(restore_mode))
+              switch(id(light_restore_mode))
               {
               case 1:{
                       id(light1).turn_off();
@@ -238,7 +242,7 @@ esphome:
 #
 
 globals:
-  - id: restore_mode
+  - id: light_restore_mode
     type: int
     restore_value: yes
     initial_value: "3"
@@ -258,7 +262,7 @@ select:
 
   # Controls the Button / Lights / Virtual Relays
   - platform: template
-    name: "Power On State"
+    name: "Power On State - Lights"
     id: "power_mode"
     optimistic: true
     icon: 'mdi:electric-switch'
@@ -269,12 +273,12 @@ select:
     on_value:
       then:
         - lambda: |-
-            id(restore_mode)=i+1;
+            id(light_restore_mode)=i+1;
     entity_category:  config
 
   # Control the Switches and Physical Relays
   - platform: template
-    name: "Relay Power On State"
+    name: "Power On State - Relays"
     id: "relay_power_mode"
     optimistic: true
     icon: 'mdi:electric-switch'
@@ -412,10 +416,9 @@ output:
     id: virtual_relay1
     type: binary
     write_action:
-      lambda: |-
-        ESP_LOGD("virtual_relay1", "Virtual output state changed to %s", state ? "ON" : "OFF");
-        // Add any custom logic here if needed, e.g., triggering another action
-        // For a purely virtual output, you can leave this minimal
+      - logger.log:
+          format: "Virtual Relay 1 - Hallway Light - state changed to %s"
+          args: ['state ? "ON" : "OFF"']
 
 
   - platform: gpio
@@ -468,16 +471,24 @@ switch:
 #    pin: GPIO13
 
   - platform: gpio
-    name: "Power Switch - Garage Eave Lights"
+    name: "Power - Garage Eave Lights"
     id: relay3
+    icon: 'mdi:electric-switch'
     pin: GPIO15
     restore_mode: RESTORE_DEFAULT_ON
+    web_server:
+      sorting_group_id: group_power_circuits
+      sorting_weight: 1
 
   - platform: gpio
-    name: "Power Switch - Front Door Light"
+    name: "Power - Front Door Light"
     id: relay4
+    icon: 'mdi:electric-switch'
     pin: GPIO14
     restore_mode: RESTORE_DEFAULT_ON
+    web_server:
+      sorting_group_id: group_power_circuits
+      sorting_weight: 2
 
 
 ##########################################################################
@@ -486,7 +497,7 @@ switch:
 #
 light:
 
-  # Relays
+  # Relays - Hallway Light (Slave)
   - platform: binary
     name: ${button1_assignment}
     id: light1
@@ -497,6 +508,7 @@ light:
       sorting_group_id: group_light_switches
       sorting_weight: 1
       
+  # Relays - Master Bedroom Eave Lights (Virtual Switch)
   - platform: binary
     name: ${button2_assignment}
     id: light2
@@ -506,7 +518,8 @@ light:
     web_server:
       sorting_group_id: group_light_switches
       sorting_weight: 2
-    
+
+  # Relays - Garage Eave Lights (Virtual Switch)
   - platform: binary
     name: ${button3_assignment}
     id: light3
@@ -516,7 +529,8 @@ light:
     web_server:
       sorting_group_id: group_light_switches
       sorting_weight: 3
-    
+
+  # Relays - Front Door / Patio Light (Virtual Switch)
   - platform: binary
     name: ${button4_assignment}
     id: light4
