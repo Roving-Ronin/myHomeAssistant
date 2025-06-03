@@ -18,7 +18,7 @@ substitutions:
   # Project Name
   project_name: "DIY.Fireplace Monitor"
   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "0.1.0"
+  project_version: "0.2.0"
   # The phase in the locations power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C).
   # Used to populate a Text Sensor with this information, that may be used to loadshed in future, or trace outages to electrical faults.
   power_circuit: "TBA"
@@ -48,10 +48,28 @@ dashboard_import:
   import_full_config: false
 
 packages:
-  base-config:             !include common/base-configuration.yaml          # Base configuration applied to all ESPHome devices
-  network-config:          !include common/network-wifi.yaml                # Configure Ethernet port on this system board
+  base-config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/base-configuration.yaml]
+    refresh: 1h
+    
+  network_config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/network-wifi.yaml]
+    refresh: 1h
+
+  thermocouple-sensors:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/sensors/max31855.yaml]
+    refresh: 1h
+
+#  base-config:             !include common/base-configuration.yaml          # Base configuration applied to all ESPHome devices
+#  network-config:          !include common/network-wifi.yaml                # Configure Ethernet port on this system board
 #  bme280a-sensors:         !include sensors/bme280-bus-a.yaml              # Temperature, Humidity, Pressure sensor probe
-  thermocouple-sensors:    !include sensors/max31855.yaml                   # Temperature sensors probes
+#  thermocouple-sensors:    !include sensors/max31855.yaml                   # Temperature sensors probes
 #  ds18b20-sensors:       !include sensors/ds18b20-1wire.yaml
 
 
