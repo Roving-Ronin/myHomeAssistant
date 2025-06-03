@@ -15,7 +15,7 @@ substitutions:
    # Project Name
   project_name: "DIY.Environmental Monitor"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
-  project_version: "1.1.0"
+  project_version: "1.2.0"
 
    # If true, entity should not be added to Home Assistant frontend, without the user manually enabling it.
   disable_by_default: "false"
@@ -68,9 +68,28 @@ dashboard_import:
   import_full_config: false
 
 packages:
-  base-config:      !include common/base-configuration.yaml
-  wifi-config:      !include common/network-wifi.yaml
-  bme280a-sensors:  !include sensors/bme280-bus-a.yaml
+  base-config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/base-configuration.yaml]
+    refresh: 1h
+    
+  network_config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/network-wifi.yaml]
+    refresh: 1h
+
+  bme280a-sensors:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/sensors/bme280-bus-a.yaml]
+    refresh: 1h
+
+
+#  base-config:      !include common/base-configuration.yaml
+#  wifi-config:      !include common/network-wifi.yaml
+#  bme280a-sensors:  !include sensors/bme280-bus-a.yaml
 # bme280b-sensors:  !include sensors/bme280-bus-b.yaml
 
 
