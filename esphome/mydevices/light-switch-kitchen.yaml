@@ -39,18 +39,12 @@ substitutions:
   backlight3_assignment: "Hallway"
 
   # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
-  log_level: "INFO"
+  log_level: "NONE"
   
 ########################## End of Substitutions #########################
 #
 # Defines the type of ESP chip used on the device
 #
-esphome:
-  # this board has 2mb flash, but esphome assumes 1mb for the 8285 board id
-  platformio_options:
-    board_upload.flash_size: 2MB
-    board_upload.maximum_size: 2097152
-
 esp8266:
   board: esp8285
   restore_from_flash: true
@@ -154,6 +148,10 @@ web_server:
 #
 
 esphome:
+  # this board has 2mb flash, but esphome assumes 1mb for the 8285 board id
+  platformio_options:
+    board_upload.flash_size: 2MB
+    board_upload.maximum_size: 2097152
   on_boot:
     - priority: 600
       then:
