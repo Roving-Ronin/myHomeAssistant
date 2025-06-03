@@ -20,7 +20,7 @@ substitutions:
    # Project Name
   project_name: "DIY.Garage Controller"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
-  project_version: "1.0.2"
+  project_version: "1.1.0"
    # If true, entity should not be added to Home Assistant frontend, without the user manually enabling it.
   disable_by_default: "false"
 
@@ -63,11 +63,12 @@ substitutions:
   ultrasonic_sensor_group_sorting_weight: "-48"
   ultrasonic_sensor_group_sensor_weight: "3"
 
+  # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
+  log_level: "WARN"
 
 ########################## End of Substitutions #########################
 
 esphome:
-
   on_boot:
     priority: -10
     then:
@@ -102,11 +103,36 @@ dashboard_import:
   import_full_config: false
 
 packages:
-  base-config:      !include common/base-configuration.yaml
-  wifi-config:      !include common/network-wifi.yaml
-  bme280a-sensors:  !include sensors/bme280-bus-a.yaml
-# bme280b-sensors:  !include sensors/bme280-bus-b.yaml
-  hc-sr04-sensors: !include sensors/hc-sr04-ultrasonic.yaml
+  base-config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/base-configuration.yaml]
+    refresh: 1h
+    
+  network_config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/network-wifi.yaml]
+    refresh: 1h
+
+  bme280a-sensors:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/sensors/bme280-bus-a.yaml]
+    refresh: 1h
+
+  hc-sr04-sensors:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/sensors/hc-sr04-ultrasonic.yaml]
+    refresh: 1h
+
+
+#  base-config:      !include common/base-configuration.yaml
+#  wifi-config:      !include common/network-wifi.yaml
+#  bme280a-sensors:  !include sensors/bme280-bus-a.yaml
+#  bme280b-sensors:  !include sensors/bme280-bus-b.yaml
+#  hc-sr04-sensors: !include sensors/hc-sr04-ultrasonic.yaml
 
 
 ########################## End of Substitutions ##########################
