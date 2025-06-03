@@ -26,6 +26,9 @@ substitutions:
   gpo_switch_pin:     "GPIO5"
   gpo_status_led_pin: "GPIO6"
 
+  # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
+  log_level: "WARN"
+
 ########################## End of Substitutions #########################
 #
 # Defines the type of ESP chip used on the device
