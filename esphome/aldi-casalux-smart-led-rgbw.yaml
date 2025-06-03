@@ -18,8 +18,8 @@ substitutions:
    # Restore the relay (Light switch) upon reboot to state:
   light_restore_mode: RESTORE_DEFAULT_OFF
    # Set your locations latitude and longitude. Useful if you want to use the sun and its location in relation to the horizon to on/off (or as a condition) to control lights.
-  my_latitude: "-34.73503534407444"
-  my_longitude: "149.72998380661014"
+#  my_latitude: "-34.73503534407444"
+#  my_longitude: "149.72998380661014"
    # From: https://esphome.io/components/output/ledc.html
   frequency_rgb: "1220Hz"
   frequency_cw: "1220Hz"
@@ -27,6 +27,9 @@ substitutions:
    # Set the default colour temperature desired (min. 2700 K / max. 65000 K). 3000 K = Warm White, 4000 K = Cool White, 5000 K = Daylight, 6500 K = Cool Daylight.
    # Normally this can be left at '6500 K' and is defined in Home Assistant Automation / Blueprints, where they can be varied per automation/blueprint used.
   default_colour_temperature: "6500 K"
+
+  # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
+  log_level: "NONE"
   
 ########################## End of Substitutions #########################
 
@@ -242,10 +245,10 @@ sensor:
 # Event on_sunrise / on_sunset etc, see: https://esphome.io/components/sun.html
 #
 
-sun:
-  latitude: "${my_latitude}"
-  longitude: "${my_longitude}"
-  id: sun_home
+#sun:
+#  latitude: "${my_latitude}"
+#  longitude: "${my_longitude}"
+#  id: sun_home
 
 #########################################################################
 #
