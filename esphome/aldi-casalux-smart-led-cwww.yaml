@@ -210,9 +210,9 @@ sensor:
 # Event on_sunrise / on_sunset etc, see: https://esphome.io/components/sun.html
 #
 
-sun:
-  latitude: "${my_latitude}"
-  longitude: "${my_longitude}"
-  id: sun_home
+#sun:
+#  latitude: "${my_latitude}"
+#  longitude: "${my_longitude}"
+#  id: sun_home
 
 #########################################################################
