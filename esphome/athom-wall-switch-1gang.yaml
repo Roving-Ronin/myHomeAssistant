@@ -26,7 +26,8 @@ substitutions:
   power_circuit: "Lights"  
   # Restore the relay (GPO switch) upon reboot to state:
   light_restore_mode: RESTORE_DEFAULT_OFF
-
+  # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
+  log_level: "NONE"
 
 ########################## End of Substitutions #########################
 #
