@@ -22,7 +22,7 @@ substitutions:
   # Project Name
   project_name: "Kincony.KC868-A16"
   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "1.3.5"
+  project_version: "1.4.0"
   # Restore the relay (GPO switch) upon reboot to state:
   relay_restore_mode: RESTORE_DEFAULT_OFF
   # Disable sensors
@@ -54,6 +54,9 @@ substitutions:
   humidity_1_offset: "0.0"
   humidity_2_offset: "0.0"
 
+   # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
+  log_level: "WARN"
+
 ########################## End of Substitutions #########################
 #
 # Defines the type of ESP chip used on the device. 
@@ -76,10 +79,29 @@ dashboard_import:
   import_full_config: false
 
 packages:
-  base-config:     !include common/base-configuration.yaml
+  base-config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/base-configuration.yaml]
+    refresh: 1h
+    
+  network_config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/network-ethernet-lan8720.yaml]
+    refresh: 1h
+
+  bme280a-sensors:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/sensors/bme280-bus-a.yaml]
+    refresh: 1h
+
+
+#  base-config:     !include common/base-configuration.yaml
 #  wifi-config:     !include common/network-wifi.yaml
-  ethernet-config: !include common/network-ethernet-lan8720.yaml
-  bme280-sensors:  !include sensors/bme280-bus-a.yaml
+#  ethernet-config: !include common/network-ethernet-lan8720.yaml
+#  bme280-sensors:  !include sensors/bme280-bus-a.yaml
 
 # ADD GAS AND WATER SENSORS
 
