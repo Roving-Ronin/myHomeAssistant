@@ -60,10 +60,20 @@ dashboard_import:
   import_full_config: false
 
 packages:
-  base-config:   !include common/base-configuration.yaml
-  wifi-config:   !include common/network-wifi.yaml
-#  led-lifecycle: !include sensors/led-lifetime-runtime.yaml
-#  led-lifecycle: !include sensors/led_duty_time.yaml
+  base-config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/base-configuration.yaml]
+    refresh: 1h
+    
+  network_config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/network-wifi.yaml]
+    refresh: 1h
+
+#  base-config:   !include common/base-configuration.yaml
+#  wifi-config:   !include common/network-wifi.yaml
 
 #########################################################################
 #
