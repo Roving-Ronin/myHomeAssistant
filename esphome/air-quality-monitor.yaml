@@ -19,7 +19,7 @@ substitutions:
    # Project Name
   project_name: "DIY.Air Quality Monitor"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
-  project_version: "0.1.0"
+  project_version: "0.1.1"
 
    # If true, entity should not be added to Home Assistant frontend, without the user manually enabling it.
   disable_by_default: "false"
