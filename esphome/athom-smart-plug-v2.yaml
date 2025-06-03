@@ -21,11 +21,11 @@ substitutions:
    # Project Name
   project_name: "Athom Technology.Smart Plug v2"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
-  project_version: "2.7.0"
+  project_version: "2.7.1"
    # Restore the relay (GPO switch) upon reboot to state:
   relay_restore_mode: RESTORE_DEFAULT_ON      # RESTORE_DEFAULT_ON
    # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
-  log_level: "DEBUG"
+  log_level: "NONE"
 
    # cse7766 Power Monitoring Chip  
    # Current Limit in Amps. AU Plug = 10. IL, BR, EU, UK, US Plug = 16.
@@ -61,9 +61,28 @@ dashboard_import:
   import_full_config: false
 
 packages:
-  base-config:         !include common/base-configuration.yaml
-  wifi-config:         !include common/network-wifi.yaml
-  athom-power-sensors: !include sensors/athom-power-plugs.yaml
+  base-config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/base-configuration.yaml]
+    refresh: 1h
+    
+  network_config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/network-wifi.yaml]
+    refresh: 1h
+
+  athom-power-sensors:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/sensors/athom-power-plug-plugs.yaml]
+    refresh: 1h
+
+#  base-config:         !include common/base-configuration.yaml
+#  wifi-config:         !include common/network-wifi.yaml
+#  athom-power-sensors: !include sensors/athom-power-plugs.yaml
+
 
 #####################################################################
 #
