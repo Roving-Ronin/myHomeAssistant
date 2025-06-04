@@ -85,8 +85,8 @@ ota:
 logger:
   level: ${log_level}
   baud_rate: 0
-#  logs:
-#    component: ERROR # Fix for issue #4717 "Component xxxxxx took a long time for an operation"
+  logs:
+    component: ERROR # Fix for issue #4717 "Component xxxxxx took a long time for an operation"
 
 mdns:
   disabled: false
