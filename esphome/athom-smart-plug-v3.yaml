@@ -24,7 +24,7 @@ substitutions:
    # Restore the relay (GPO switch) upon reboot to state:
   relay_restore_mode: RESTORE_DEFAULT_ON      # RESTORE_DEFAULT_ON
    # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
-  log_level: "WARN"
+  log_level: "ERROR"
   
    # cse7766 Power Monitoring Chip 
    # Current Limit in Amps. AU Plug = 10. IL, BR, EU, UK, US Plug = 16.
