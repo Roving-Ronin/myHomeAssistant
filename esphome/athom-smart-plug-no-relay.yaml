@@ -29,7 +29,7 @@ substitutions:
   gpo_status_led_pin: "GPIO13"
 
   # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
-  log_level: "WARN"
+  log_level: "ERROR"
   
 ########################## End of Substitutions #########################
 #
