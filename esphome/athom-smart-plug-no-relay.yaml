@@ -22,14 +22,15 @@ substitutions:
    # Project Name
   project_name: "Athom Technology.Smart Plug (No Relay)"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
-  project_version: "1.7.1"
-   # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
-  log_level: "NONE"
+  project_version: "1.7.2"
 
    # DO NOT CHANGE THESE SETTINGS. They are specific to the Plug Hardware Version, as defined by Athom.
   power_button_pin:   "5"
   gpo_status_led_pin: "GPIO13"
 
+  # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
+  log_level: "WARN"
+  
 ########################## End of Substitutions #########################
 #
 # Defines the type of ESP chip used on the device
