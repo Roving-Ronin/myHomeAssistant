@@ -1,0 +1,2606 @@
+#
+#  User customised version : https://www.kincony.com/forum/showthread.php?tid=4088&page=4
+#
+#- Renamed xxx_1 xxx_2 xxx_3... to xxx_01 xxx_02 xxx_03... (So they are arranged in the list)
+#- Renamed M30_1_xxx M30_2_xxx M30_3_xxx to M30_L1_xxx M30_L2_xxx M30_L3_xxx (I prefere)
+#- Renamed m30_x_watt_x to m30_x_Power_x
+#
+#- Created variable for led_brightness (To set the brightness value for all LEDs at once)
+#- Created variable for the min current to trigger the LEDs (So all the sensors that have the current value under this threshold are off)
+#- Created variable for power factor (As i had issues with power (watt) value indicated by the original yaml, I changed the way the power value is calculated to: [current * voltage * power factor])
+#- Created variable for current correction (To be able to calibrate the measured current)
+#
+#- created slider for LEDs brightness (so it can be adjusted in HASS user GUI)
+#- created slider for LEDs trigger current (so it can be adjusted in HASS user GUI)
+#- created slider for Power factor (so it can be adjusted in HASS user GUI)
+#- created slider for Current factor (so it can be adjusted in HASS user GUI)
+#
+#- changed LEDs color scheme:
+#- current <= led_trigger_current = LED "Off"
+#- current <= max_current_rangeX * 0.25 led = "Blue"
+#- current <= max_current_rangeX * 0.5 led = "Violet"
+#- current <= max_current_rangeX * 0.75 led = "Orange"
+#- current > max_current_rangeX * 0.75 led = "Red"
+#
+
+substitutions:
+  max_current_range1: "10"
+  max_current_range2: "10"
+  max_current_range3: "10"
+  max_current_range4: "10"
+  max_current_range5: "10"
+  max_current_range6: "10"
+  max_current_range7: "10"
+  max_current_range8: "10"
+  max_current_range9: "10"
+  max_current_range10: "10"
+  max_current_range11: "10"
+  max_current_range12: "10"
+  max_current_range13: "10"
+  max_current_range14: "10"
+  max_current_range15: "10"
+  max_current_range16: "10"
+  max_current_range17: "10"
+  max_current_range18: "10"
+  max_current_range19: "10"
+  max_current_range20: "10"
+  max_current_range21: "10"
+  max_current_range22: "10"
+  max_current_range23: "10"
+  max_current_range24: "10"
+  max_current_range25: "10"
+  max_current_range26: "10"
+  max_current_range27: "10"
+  max_current_range28: "10"
+  max_current_range29: "10"
+  max_current_range30: "10"
+ 
+globals:
+  # LEDs Brightness
+  - id: led_brightness
+    type: float
+    initial_value: '0.3'
+  # Min current to trigger LEDs
+  - id: led_trigger_current
+    type: float
+    initial_value: '0.002'
+  # Power factor used to calculate Power in watt(w)
+  - id: power_factor
+    type: float
+    initial_value: '0.95'
+  # Current correction factor (Original value: 0.00098)
+  - id: Current_factor
+    type: float
+    initial_value: '0.00098'
+
+  # Setable values in HASS GUI
+number:
+  - platform: template
+    name: "- LEDs Trigger Current"
+    id: led_trigger_current_control
+    optimistic: true
+    min_value: 0.0
+    max_value: 1.0
+    step: 0.01
+    initial_value: 0.02
+    on_value:
+      then:
+        - lambda: |-
+            id(led_trigger_current) = x;
+            
+  - platform: template
+    name: "- LEDs Brightness"
+    id: led_brightness_control
+    optimistic: true
+    min_value: 0.0
+    max_value: 1.0
+    step: 0.1
+    initial_value: 0.3
+    on_value:
+      then:
+        - lambda: |-
+            id(led_brightness) = x;
+            
+  - platform: template
+    name: "! Power Factor"
+    id: power_factor_control
+    optimistic: true
+    min_value: 0.1
+    max_value: 1.0
+    step: 0.01
+    initial_value: 0.85
+    on_value:
+      then:
+        - lambda: |-
+            id(power_factor) = x;
+            
+  - platform: template
+    name: "! Current Factor"
+    id: Current_factor_control
+    optimistic: true
+    min_value: 0.00050
+    max_value: 0.00999
+    step: 0.00001
+    initial_value: 0.00098
+    on_value:
+      then:
+        - lambda: |-
+            id(Current_factor) = x;
+            
+esphome:
+  name: m30
+  friendly_name: Kincony M30
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+
+# Enable logging
+logger:
+  # baud_rate: 0
+
+# Enable Home Assistant API
+api:
+
+ota:
+  platform: esphome
+
+web_server:
+  version: 3
+  port: 80 
+
+ethernet:
+  type: LAN8720
+  mdc_pin: GPIO23
+  mdio_pin: GPIO18
+  clk_mode: GPIO17_OUT
+  phy_addr: 0
+
+uart:
+  id: modbus_uart
+  rx_pin: 32
+  tx_pin: 33
+  baud_rate: 115200
+  stop_bits: 1
+  data_bits: 8
+  parity: NONE
+  
+
+modbus:
+  id: modbus_hub
+  uart_id: modbus_uart
+  
+
+modbus_controller:
+  - id: modbus_hub_m30
+    address: 1
+    modbus_id: modbus_hub
+    update_interval: 5s
+
+sensor:
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 100
+    register_type: holding
+    name: m30_L1_current_01
+    id: m30_L1_current_01
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L1_current_01).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_01).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_01).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 101
+    register_type: holding
+    name: m30_L1_current_02
+    id: m30_L1_current_02
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L1_current_02).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_02).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_02).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }  
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 102
+    register_type: holding
+    name: m30_L1_current_03
+    id: m30_L1_current_03
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L1_current_03).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_03).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_03).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 103
+    register_type: holding
+    name: m30_L1_current_04
+    id: m30_L1_current_04
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L1_current_04).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_04).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_04).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 104
+    register_type: holding
+    name: m30_L1_current_05
+    id: m30_L1_current_05
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L1_current_05).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_05).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_05).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 105
+    register_type: holding
+    name: m30_L1_current_06
+    id: m30_L1_current_06
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L1_current_06).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_06).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_06).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 106
+    register_type: holding
+    name: m30_L1_current_07
+    id: m30_L1_current_07
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L1_current_07).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_07).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_07).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 107
+    register_type: holding
+    name: m30_L1_current_08
+    id: m30_L1_current_08
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L1_current_08).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_08).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_08).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 108
+    register_type: holding
+    name: m30_L1_current_09
+    id: m30_L1_current_09
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L1_current_09).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_09).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_09).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 109
+    register_type: holding
+    name: m30_L1_current_10
+    id: m30_L1_current_10
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L1_current_10).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_10).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_10).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 110
+    register_type: holding
+    name: m30_L1_voltage
+    id: m30_L1_voltage
+    unit_of_measurement: V
+    accuracy_decimals: 1
+    value_type: U_WORD
+    filters:
+      - multiply: 0.01
+      
+  # Calculated Power Value
+  - platform: template
+    name: "m30_L1_Power_01"
+    id: m30_L1_Power_01
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L1_current_01).state * id(m30_L1_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L1_Power_02"
+    id: m30_L1_Power_02
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L1_current_02).state * id(m30_L1_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L1_Power_03"
+    id: m30_L1_Power_03
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L1_current_03).state * id(m30_L1_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L1_Power_04"
+    id: m30_L1_Power_04
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L1_current_04).state * id(m30_L1_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L1_Power_05"
+    id: m30_L1_Power_05
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L1_current_05).state * id(m30_L1_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L1_Power_06"
+    id: m30_L1_Power_06
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L1_current_06).state * id(m30_L1_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L1_Power_07"
+    id: m30_L1_Power_07
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L1_current_07).state * id(m30_L1_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L1_Power_08"
+    id: m30_L1_Power_08
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L1_current_08).state * id(m30_L1_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L1_Power_09"
+    id: m30_L1_Power_09
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L1_current_09).state * id(m30_L1_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L1_Power_10"
+    id: m30_L1_Power_10
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L1_current_10).state * id(m30_L1_voltage).state * id(power_factor);
+      
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 121
+    register_type: holding
+    name: m30_L1_energy_01
+    id: m30_L1_energy_01
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 122
+    register_type: holding
+    name: m30_L1_energy_02
+    id: m30_L1_energy_02
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 123
+    register_type: holding
+    name: m30_L1_energy_03
+    id: m30_L1_energy_03
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 124
+    register_type: holding
+    name: m30_L1_energy_04
+    id: m30_L1_energy_04
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 125
+    register_type: holding
+    name: m30_L1_energy_05
+    id: m30_L1_energy_05
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 126
+    register_type: holding
+    name: m30_L1_energy_06
+    id: m30_L1_energy_06
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 127
+    register_type: holding
+    name: m30_L1_energy_07
+    id: m30_L1_energy_07
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 128
+    register_type: holding
+    name: m30_L1_energy_08
+    id: m30_L1_energy_08
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 129
+    register_type: holding
+    name: m30_L1_energy_09
+    id: m30_L1_energy_09
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 130
+    register_type: holding
+    name: m30_L1_energy_10
+    id: m30_L1_energy_10
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 131
+    register_type: holding
+    name: m30_L1_energy_sum
+    id: m30_L1_energy_sum
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 132
+    register_type: holding
+    name: m30_L1_Frequency
+    id: m30_L1_Frequency
+    unit_of_measurement: Hz
+    accuracy_decimals: 1
+    value_type: U_WORD
+    filters:
+      - multiply: 0.01
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 133
+    register_type: holding
+    name: m30_L1_Temp_01
+    id: m30_L1_Temp_01
+    unit_of_measurement: °C
+    accuracy_decimals: 1
+    value_type: U_WORD
+    filters:
+      - multiply: 0.1
+  # - platform: modbus_controller
+  #   modbus_controller_id: modbus_hub_m30
+  #   address: 134
+  #   register_type: holding
+  #   name: m30_L1_Temp_02
+  #   id: m30_L1_Temp_02
+  #   unit_of_measurement: °C
+  #   accuracy_decimals: 1
+  #   value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 200
+    register_type: holding
+    name: m30_L2_current_01
+    id: m30_L2_current_01
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L2_current_01).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_11).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_11).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 201
+    register_type: holding
+    name: m30_L2_current_02
+    id: m30_L2_current_02
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L2_current_02).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_12).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_12).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 202
+    register_type: holding
+    name: m30_L2_current_03
+    id: m30_L2_current_03
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L2_current_03).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_13).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_13).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 203
+    register_type: holding
+    name: m30_L2_current_04
+    id: m30_L2_current_04
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L2_current_04).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_14).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_14).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 204
+    register_type: holding
+    name: m30_L2_current_05
+    id: m30_L2_current_05
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L2_current_05).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_15).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_15).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 205
+    register_type: holding
+    name: m30_L2_current_06
+    id: m30_L2_current_06
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L2_current_06).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_16).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_16).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 206
+    register_type: holding
+    name: m30_L2_current_07
+    id: m30_L2_current_07
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L2_current_07).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_17).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_17).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 207
+    register_type: holding
+    name: m30_L2_current_08
+    id: m30_L2_current_08
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L2_current_08).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_18).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_18).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 208
+    register_type: holding
+    name: m30_L2_current_09
+    id: m30_L2_current_09
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L2_current_09).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_19).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_19).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 209
+    register_type: holding
+    name: m30_L2_current_10
+    id: m30_L2_current_10
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L2_current_10).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_20).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_20).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 210
+    register_type: holding
+    name: m30_L2_voltage
+    id: m30_L2_voltage
+    unit_of_measurement: V
+    accuracy_decimals: 1
+    value_type: U_WORD
+    filters:
+      - multiply: 0.01
+      
+  # Calculated Power Value
+  - platform: template
+    name: "m30_L2_Power_01"
+    id: m30_L2_Power_01
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L2_current_01).state * id(m30_L2_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L2_Power_02"
+    id: m30_L2_Power_02
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L2_current_02).state * id(m30_L2_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L2_Power_03"
+    id: m30_L2_Power_03
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L2_current_03).state * id(m30_L2_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L2_Power_04"
+    id: m30_L2_Power_04
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L2_current_04).state * id(m30_L2_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L2_Power_05"
+    id: m30_L2_Power_05
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L2_current_05).state * id(m30_L2_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L2_Power_06"
+    id: m30_L2_Power_06
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L2_current_06).state * id(m30_L2_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L2_Power_07"
+    id: m30_L2_Power_07
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L2_current_07).state * id(m30_L2_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L2_Power_08"
+    id: m30_L2_Power_08
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L2_current_08).state * id(m30_L2_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L2_Power_09"
+    id: m30_L2_Power_09
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L2_current_09).state * id(m30_L2_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L2_Power_10"
+    id: m30_L2_Power_10
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L2_current_10).state * id(m30_L2_voltage).state * id(power_factor);
+      
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 221
+    register_type: holding
+    name: m30_L2_energy_01
+    id: m30_L2_energy_01
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 222
+    register_type: holding
+    name: m30_L2_energy_02
+    id: m30_L2_energy_02
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 223
+    register_type: holding
+    name: m30_L2_energy_03
+    id: m30_L2_energy_03
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 224
+    register_type: holding
+    name: m30_L2_energy_04
+    id: m30_L2_energy_04
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 225
+    register_type: holding
+    name: m30_L2_energy_05
+    id: m30_L2_energy_05
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 226
+    register_type: holding
+    name: m30_L2_energy_06
+    id: m30_L2_energy_06
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 227
+    register_type: holding
+    name: m30_L2_energy_07
+    id: m30_L2_energy_07
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 228
+    register_type: holding
+    name: m30_L2_energy_08
+    id: m30_L2_energy_08
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 229
+    register_type: holding
+    name: m30_L2_energy_09
+    id: m30_L2_energy_09
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 230
+    register_type: holding
+    name: m30_L2_energy_10
+    id: m30_L2_energy_10
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 231
+    register_type: holding
+    name: m30_L2_energy_sum
+    id: m30_L2_energy_sum
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 232
+    register_type: holding
+    name: m30_L2_Frequency
+    id: m30_L2_Frequency
+    unit_of_measurement: Hz
+    accuracy_decimals: 1
+    value_type: U_WORD
+    filters:
+      - multiply: 0.01
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 233
+    register_type: holding
+    name: m30_L2_Temp_01
+    id: m30_L2_Temp_01
+    unit_of_measurement: °C
+    accuracy_decimals: 1
+    value_type: U_WORD
+    filters:
+      - multiply: 0.1
+  # - platform: modbus_controller
+  #   modbus_controller_id: modbus_hub_m30
+  #   address: 234
+  #   register_type: holding
+  #   name: m30_L2_Temp_02
+  #   id: m30_L2_Temp_02
+  #   unit_of_measurement: °C
+  #   accuracy_decimals: 1
+  #   value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 300
+    register_type: holding
+    name: m30_L3_current_01
+    id: m30_L3_current_01
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L3_current_01).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_21).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_21).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 301
+    register_type: holding
+    name: m30_L3_current_02
+    id: m30_L3_current_02
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L3_current_02).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_22).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_22).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 302
+    register_type: holding
+    name: m30_L3_current_03
+    id: m30_L3_current_03
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L3_current_03).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_23).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_23).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 303
+    register_type: holding
+    name: m30_L3_current_04
+    id: m30_L3_current_04
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L3_current_04).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_24).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_24).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 304
+    register_type: holding
+    name: m30_L3_current_05
+    id: m30_L3_current_05
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L3_current_05).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_25).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_25).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 305
+    register_type: holding
+    name: m30_L3_current_06
+    id: m30_L3_current_06
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L3_current_06).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_26).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_26).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 306
+    register_type: holding
+    name: m30_L3_current_07
+    id: m30_L3_current_07
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L3_current_07).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_27).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_27).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 307
+    register_type: holding
+    name: m30_L3_current_08
+    id: m30_L3_current_08
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L3_current_08).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_28).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_28).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 308
+    register_type: holding
+    name: m30_L3_current_09
+    id: m30_L3_current_09
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L3_current_09).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_29).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_29).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 309
+    register_type: holding
+    name: m30_L3_current_10
+    id: m30_L3_current_10
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    value_type: U_WORD
+    filters:
+      - lambda: 'return x * id(Current_factor);'
+    on_value:
+      - then:
+          - lambda: |-
+              float current = id(m30_L3_current_10).state;
+              if (current < id(led_trigger_current)) {
+                auto call = id(M30_LED_30).turn_off();
+                call.perform();
+              } else {
+                float ratio = current / ${max_current_range1};
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                if (ratio < 0.25) {
+                  // Blue
+                  red = 0.0;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.5) {
+                  // Violet
+                  red = 0.5;
+                  green = 0.0;
+                  blue = 1.0;
+                } else if (ratio < 0.75) {
+                  // Orange
+                  red = 1.0;
+                  green = 0.5;
+                  blue = 0.0;
+                } else {
+                  // Red
+                  red = 1.0;
+                  green = 0.0;
+                  blue = 0.0;
+                }
+                auto call = id(M30_LED_30).turn_on();
+                call.set_brightness(id(led_brightness));
+                call.set_rgb(red, green, blue);
+                call.set_color_mode(ColorMode::RGB);
+                call.perform();
+              }
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 310
+    register_type: holding
+    name: m30_L3_voltage
+    id: m30_L3_voltage
+    unit_of_measurement: V
+    accuracy_decimals: 1
+    value_type: U_WORD
+    filters:
+      - multiply: 0.01
+      
+  # Calculated Power Value
+  - platform: template
+    name: "m30_L3_Power_01"
+    id: m30_L3_Power_01
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L3_current_01).state * id(m30_L3_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L3_Power_02"
+    id: m30_L3_Power_02
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L3_current_02).state * id(m30_L3_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L3_Power_03"
+    id: m30_L3_Power_03
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L3_current_03).state * id(m30_L3_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L3_Power_04"
+    id: m30_L3_Power_04
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L3_current_04).state * id(m30_L3_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L3_Power_05"
+    id: m30_L3_Power_05
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L3_current_05).state * id(m30_L3_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L3_Power_06"
+    id: m30_L3_Power_06
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L3_current_06).state * id(m30_L3_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L3_Power_07"
+    id: m30_L3_Power_07
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L3_current_07).state * id(m30_L3_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L3_Power_08"
+    id: m30_L3_Power_08
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L3_current_08).state * id(m30_L3_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L3_Power_09"
+    id: m30_L3_Power_09
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L3_current_09).state * id(m30_L3_voltage).state * id(power_factor);
+  - platform: template
+    name: "m30_L3_Power_10"
+    id: m30_L3_Power_10
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      return id(m30_L3_current_10).state * id(m30_L3_voltage).state * id(power_factor);
+      
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 321
+    register_type: holding
+    name: m30_L3_energy_01
+    id: m30_L3_energy_01
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 322
+    register_type: holding
+    name: m30_L3_energy_02
+    id: m30_L3_energy_02
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 323
+    register_type: holding
+    name: m30_L3_energy_03
+    id: m30_L3_energy_03
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 324
+    register_type: holding
+    name: m30_L3_energy_04
+    id: m30_L3_energy_04
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 325
+    register_type: holding
+    name: m30_L3_energy_05
+    id: m30_L3_energy_05
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 326
+    register_type: holding
+    name: m30_L3_energy_06
+    id: m30_L3_energy_06
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 327
+    register_type: holding
+    name: m30_L3_energy_07
+    id: m30_L3_energy_07
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 328
+    register_type: holding
+    name: m30_L3_energy_08
+    id: m30_L3_energy_08
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 329
+    register_type: holding
+    name: m30_L3_energy_09
+    id: m30_L3_energy_09
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 330
+    register_type: holding
+    name: m30_L3_energy_10
+    id: m30_L3_energy_10
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 331
+    register_type: holding
+    name: m30_L3_energy_sum
+    id: m30_L3_energy_sum
+    unit_of_measurement: kWh
+    accuracy_decimals: 1
+    value_type: U_WORD
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 332
+    register_type: holding
+    name: m30_L3_Frequency
+    id: m30_L3_Frequency
+    unit_of_measurement: Hz
+    accuracy_decimals: 1
+    value_type: U_WORD
+    filters:
+      - multiply: 0.01
+  - platform: modbus_controller
+    modbus_controller_id: modbus_hub_m30
+    address: 333
+    register_type: holding
+    name: m30_L3_Temp_01
+    id: m30_L3_Temp_01
+    unit_of_measurement: °C
+    accuracy_decimals: 1
+    value_type: U_WORD
+    filters:
+      - multiply: 0.1
+  # - platform: modbus_controller
+  #   modbus_controller_id: modbus_hub_m30
+  #   address: 334
+  #   register_type: holding
+  #   name: m30_L3_Temp_02
+  #   id: m30_L3_Temp_02
+  #   unit_of_measurement: °C
+  #   accuracy_decimals: 1
+  #   value_type: U_WORD
+
+
+light:
+  - platform: partition
+    name: "M30_LED_01"
+    id: M30_LED_01
+    segments:
+      - id: light1
+        from: 14
+        to: 14
+
+
+  - platform: partition
+    name: "M30_LED_02"
+    id: M30_LED_02
+    segments:
+      - id: light1
+        from: 13
+        to: 13
+
+  - platform: partition
+    name: "M30_LED_03"
+    id: M30_LED_03
+    segments:
+      - id: light1
+        from: 12
+        to: 12
+
+  - platform: partition
+    name: "M30_LED_04"
+    id: M30_LED_04
+    segments:
+      - id: light1
+        from: 11
+        to: 11
+
+  - platform: partition
+    name: "M30_LED_05"
+    id: M30_LED_05
+    segments:
+      - id: light1
+        from: 10
+        to: 10
+
+  - platform: partition
+    name: "M30_LED_06"
+    id: M30_LED_06
+    segments:
+      - id: light1
+        from: 9
+        to: 9
+
+  - platform: partition
+    name: "M30_LED_07"
+    id: M30_LED_07
+    segments:
+      - id: light1
+        from: 8
+        to: 8
+
+  - platform: partition
+    name: "M30_LED_08"
+    id: M30_LED_08
+    segments:
+      - id: light1
+        from: 7
+        to: 7
+
+  - platform: partition
+    name: "M30_LED_09"
+    id: M30_LED_09
+    segments:
+      - id: light1
+        from: 6
+        to: 6
+
+  - platform: partition
+    name: "M30_LED_10"
+    id: M30_LED_10
+    segments:
+      - id: light1
+        from: 5
+        to: 5
+
+  - platform: partition
+    name: "M30_LED_11"
+    id: M30_LED_11
+    segments:
+      - id: light1
+        from: 4
+        to: 4
+
+  - platform: partition
+    name: "M30_LED_12"
+    id: M30_LED_12
+    segments:
+      - id: light1
+        from: 3
+        to: 3
+
+  - platform: partition
+    name: "M30_LED_13"
+    id: M30_LED_13
+    segments:
+      - id: light1
+        from: 2
+        to: 2
+
+  - platform: partition
+    name: "M30_LED_14"
+    id: M30_LED_14
+    segments:
+      - id: light1
+        from: 1
+        to: 1
+
+  - platform: partition
+    name: "M30_LED_15"
+    id: M30_LED_15
+    segments:
+      - id: light1
+        from: 0
+        to: 0
+
+  - platform: partition
+    name: "M30_LED_16"
+    id: M30_LED_16
+    segments:
+      - id: light1
+        from: 15
+        to: 15
+
+  - platform: partition
+    name: "M30_LED_17"
+    id: M30_LED_17
+    segments:
+      - id: light1
+        from: 16
+        to: 16
+
+  - platform: partition
+    name: "M30_LED_18"
+    id: M30_LED_18
+    segments:
+      - id: light1
+        from: 17
+        to: 17
+
+  - platform: partition
+    name: "M30_LED_19"
+    id: M30_LED_19
+    segments:
+      - id: light1
+        from: 18
+        to: 18
+
+  - platform: partition
+    name: "M30_LED_20"
+    id: M30_LED_20
+    segments:
+      - id: light1
+        from: 19
+        to: 19
+
+  - platform: partition
+    name: "M30_LED_21"
+    id: M30_LED_21
+    segments:
+      - id: light1
+        from: 20
+        to: 20
+
+  - platform: partition
+    name: "M30_LED_22"
+    id: M30_LED_22
+    segments:
+      - id: light1
+        from: 21
+        to: 21
+
+  - platform: partition
+    name: "M30_LED_23"
+    id: M30_LED_23
+    segments:
+      - id: light1
+        from: 22
+        to: 22
+
+  - platform: partition
+    name: "M30_LED_24"
+    id: M30_LED_24
+    segments:
+      - id: light1
+        from: 23
+        to: 23
+
+  - platform: partition
+    name: "M30_LED_25"
+    id: M30_LED_25
+    segments:
+      - id: light1
+        from: 24
+        to: 24
+
+  - platform: partition
+    name: "M30_LED_26"
+    id: M30_LED_26
+    segments:
+      - id: light1
+        from: 25
+        to: 25
+
+  - platform: partition
+    name: "M30_LED_27"
+    id: M30_LED_27
+    segments:
+      - id: light1
+        from: 26
+        to: 26
+
+  - platform: partition
+    name: "M30_LED_28"
+    id: M30_LED_28
+    segments:
+      - id: light1
+        from: 27
+        to: 27
+
+  - platform: partition
+    name: "M30_LED_29"
+    id: M30_LED_29
+    segments:
+      - id: light1
+        from: 28
+        to: 28
+
+  - platform: partition
+    name: "M30_LED_30"
+    id: M30_LED_30
+    segments:
+      - id: light1
+        from: 29
+        to: 29
+        
+  # Example for light segment source
+  - platform: esp32_rmt_led_strip
+    id: light1
+    rgb_order: GRB
+    pin: GPIO12
+    num_leds: 30
+    rmt_channel: 0
+    chipset: ws2812
