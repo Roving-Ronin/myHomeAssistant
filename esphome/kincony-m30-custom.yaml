@@ -135,7 +135,8 @@ esp32:
   board: esp32dev
   framework:
     type: arduino
-
+  flash_size: 16MB
+  psram: true
 
 # Enable logging
 logger:
