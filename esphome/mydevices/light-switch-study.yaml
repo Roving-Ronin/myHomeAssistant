@@ -35,7 +35,7 @@ substitutions:
   backlight2_assignment: "Dining"
 
   # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
-  log_level: "NONE"
+  log_level: "ERROR"
   
 ########################## End of Substitutions #########################
 #
