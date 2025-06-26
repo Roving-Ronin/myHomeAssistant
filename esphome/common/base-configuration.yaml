@@ -19,7 +19,7 @@ substitutions:
 # Time Update Settings:
 #
    # Set timezone of the smart plug. Useful if the plug is in a location different to the HA server. Can be entered in unix Country/Area format (i.e. "Australia/Sydney")
-  timezone: "Australia/Sydney"
+  timezone: "New Zealand/Auckland"
    # Set the duration between the sntp service polling ntp.org servers for an update
   sntp_update_interval: 4h
    # Network time servers for your region, enter from lowest to highest priority
@@ -31,7 +31,7 @@ substitutions:
 # Network Settings
 #
    # Enable or disable the use of IPv6 networking on the device
-  ipv6_enable: "false"
+  ipv6_enable: "true"
 
 ##########################
 # Device Settings:
@@ -51,11 +51,11 @@ substitutions:
    # The subnet mask of the static IP address.
   network_subnet: "255.255.255.0"
    # Primary DNS server to be utilised
-  dns_server1: "8.8.8.8"
+  dns_server1: "9.9.9.9"
    # Secondary DNS server to be utilised
   dns_server2: "1.1.1.1"
    # Define a domain for this device to use. i.e. iot.home.lan (so device will appear as athom-smart-plug-v2.iot.home.lan in DNS/DHCP logs)
-  dns_domain: ".iot.home.lan"
+  dns_domain: ".local"
 
 ########################## End of Substitutions #########################
 
