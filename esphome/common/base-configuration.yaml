@@ -78,7 +78,7 @@ preferences:
   flash_write_interval: 5min
 
 api:
-  reboot_timeout: 4h
+#  reboot_timeout: 4h  # Hashed out as devices when trying to add this fail to update with 'Unknown Error'
 
 ota:
   - platform: esphome
