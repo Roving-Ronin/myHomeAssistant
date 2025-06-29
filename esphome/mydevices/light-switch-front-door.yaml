@@ -7,6 +7,7 @@
 # VERSION UPATES:
 #
 # v0.1.0 - Upate to use Roving Ronin base configurations
+# v1.2.0 - Upate to support Aldi CasaLux Lights on Bedroom Eave circuit
 #
 
 substitutions:
@@ -19,7 +20,7 @@ substitutions:
   # Project Name
   project_name: "Athom Technology.Light Switch 4 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "v1.1.0"
+  project_version: "v1.2.0"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   location: "Front Door"
   # The phase in the home power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)  
@@ -226,11 +227,13 @@ esphome:
               switch(id(relay_restore_mode))
               {
               case 1:{
+                      id(relay2).turn_off();
                       id(relay3).turn_off();
                       id(relay4).turn_off();
                       break;
                             }
               case 2:{
+                      id(relay2).turn_on();
                       id(relay3).turn_on();
                       id(relay4).turn_on();
                       break;
@@ -380,30 +383,30 @@ binary_sensor:
 
     # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
     # This is used by the usage_tracker as its source sensor.
-  - platform: template
-    name: "Light 2 - State"
-    id: light2_state
-    lambda: |-
-      return id(light2).current_values.is_on();
-    internal: true
+#  - platform: template
+#    name: "Light 2 - State"
+#    id: light2_state
+#    lambda: |-
+#      return id(light2).current_values.is_on();
+#    internal: true
 
     # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
     # This is used by the usage_tracker as its source sensor.
-  - platform: template
-    name: "Light 3 - State"
-    id: light3_state
-    lambda: |-
-      return id(light3).current_values.is_on();
-    internal: true
+#  - platform: template
+#    name: "Light 3 - State"
+#    id: light3_state
+#    lambda: |-
+#      return id(light3).current_values.is_on();
+#    internal: true
 
     # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
     # This is used by the usage_tracker as its source sensor.
-  - platform: template
-    name: "Light 4 - State"
-    id: light4_state
-    lambda: |-
-      return id(light4).current_values.is_on();
-    internal: true
+#  - platform: template
+#    name: "Light 4 - State"
+#    id: light4_state
+#    lambda: |-
+#      return id(light4).current_values.is_on();
+#    internal: true
 
 
 ##########################################################################
@@ -425,20 +428,20 @@ output:
           args: ['state ? "ON" : "OFF"']
 
 
-  - platform: gpio
+#  - platform: gpio
 #    name: "Power Switch - Bedroom Eave Lights"
-    id: relay2
-    pin: GPIO4
+#    id: relay2
+#    pin: GPIO4
 
- # BEDROOM EAVE LIGHTS - Virtual Relay to replace the relay2 that supplies power to the Master Bedroom Eave Lights
+ # BEDROOM EAVE LIGHTS - Virtual Relay to replace the relay2 (above) that supplies power to the Master Bedroom Eave Lights
  # that need power 24x7 and the Switch Button 2 sends Tasmota Group On/Off command only
-#  - platform: template
-#    id: virtual_relay2
-#    type: binary
-#    write_action:
-#      - logger.log:
-#          format: "Virtual Relay 2 - Bedroom Eave Lights - state changed to %s"
-#          args: ['state ? "ON" : "OFF"']
+  - platform: template
+    id: virtual_relay2
+    type: binary
+    write_action:
+      - logger.log:
+          format: "Virtual Relay 2 - Bedroom Eave Lights - state changed to %s"
+          args: ['state ? "ON" : "OFF"']
 
 
  # GARAGE EAVE LIGHTS - Virtual Relay to replace the relay3 that supplies power to the Master Bedroom Eave Lights
@@ -464,7 +467,9 @@ output:
 
 
 ###############
-
+#
+# Power Circuits - Relays
+#
 switch:
   # Relays
 
@@ -475,6 +480,16 @@ switch:
 #    pin: GPIO13
 
   - platform: gpio
+    name: "Power - Bedroom Eave Lights"
+    id: relay2
+    icon: 'mdi:electric-switch'
+    pin: GPIO4
+    restore_mode: RESTORE_DEFAULT_ON
+    web_server:
+      sorting_group_id: group_power_circuits
+      sorting_weight: 3
+
+  - platform: gpio
     name: "Power - Garage Eave Lights"
     id: relay3
     icon: 'mdi:electric-switch'
@@ -482,7 +497,7 @@ switch:
     restore_mode: RESTORE_DEFAULT_ON
     web_server:
       sorting_group_id: group_power_circuits
-      sorting_weight: 1
+      sorting_weight: 2
 
   - platform: gpio
     name: "Power - Front Door Light"
@@ -492,7 +507,7 @@ switch:
     restore_mode: RESTORE_DEFAULT_ON
     web_server:
       sorting_group_id: group_power_circuits
-      sorting_weight: 2
+      sorting_weight: 1
 
 
 ##########################################################################
@@ -516,7 +531,7 @@ light:
   - platform: binary
     name: ${button2_assignment}
     id: light2
-    output: relay2       # virtual_relay2 - Swap when Aldi Casalux LED installed in Eaves
+    output: virtual_relay2       # relay2
     restore_mode: ${light2_restore_mode}
     icon: 'mdi:lightbulb'
     web_server:
