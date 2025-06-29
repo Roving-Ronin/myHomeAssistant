@@ -20,7 +20,7 @@ substitutions:
   # Project Name
   project_name: "Athom Technology.Light Switch 4 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "v1.2.0"
+  project_version: "v1.2.1"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   location: "Front Door"
   # The phase in the home power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)  
@@ -28,7 +28,7 @@ substitutions:
 
   # Restore the relay (GPO switch) upon reboot to state:
   switch1_restore_mode: RESTORE_DEFAULT_OFF
-  switch2_restore_mode: RESTORE_DEFAULT_OFF
+  switch2_restore_mode: RESTORE_DEFAULT_ON
   switch3_restore_mode: RESTORE_DEFAULT_ON
   switch4_restore_mode: RESTORE_DEFAULT_ON
   
@@ -484,7 +484,7 @@ switch:
     id: relay2
     icon: 'mdi:electric-switch'
     pin: GPIO4
-    restore_mode: RESTORE_DEFAULT_ON
+    restore_mode: ${switch2_restore_mode}
     web_server:
       sorting_group_id: group_power_circuits
       sorting_weight: 3
@@ -494,7 +494,7 @@ switch:
     id: relay3
     icon: 'mdi:electric-switch'
     pin: GPIO15
-    restore_mode: RESTORE_DEFAULT_ON
+    restore_mode: ${switch3_restore_mode}
     web_server:
       sorting_group_id: group_power_circuits
       sorting_weight: 2
@@ -504,7 +504,7 @@ switch:
     id: relay4
     icon: 'mdi:electric-switch'
     pin: GPIO14
-    restore_mode: RESTORE_DEFAULT_ON
+    restore_mode: ${switch4_restore_mode}
     web_server:
       sorting_group_id: group_power_circuits
       sorting_weight: 1
