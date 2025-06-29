@@ -374,12 +374,14 @@ binary_sensor:
 
     # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
     # This is used by the usage_tracker as its source sensor.
-  - platform: template
-    name: "Light 1 - State"
-    id: light1_state
-    lambda: |-
-      return id(light1).current_values.is_on();
-    internal: true
+
+    # NOT USED - As this sensor is operated on the Kitchen Switch that that actually powers this LED light
+#  - platform: template
+#    name: "Light 1 - State"
+#    id: light1_state
+#    lambda: |-
+#      return id(light1).current_values.is_on();
+#    internal: true
 
     # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
     # This is used by the usage_tracker as its source sensor.
