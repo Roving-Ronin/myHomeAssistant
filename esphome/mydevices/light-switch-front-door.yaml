@@ -20,7 +20,7 @@ substitutions:
   # Project Name
   project_name: "Athom Technology.Light Switch 4 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "v1.2.1"
+  project_version: "v1.3.0"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   location: "Front Door"
   # The phase in the home power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)  
@@ -139,14 +139,14 @@ device_groups:
 # Electrical Wiring - RELAY 2 ON 24x7 - Master Bedroom Eave LED Lights
   - group_name: "bedroom-eave-lights"  # Tasmota device group name
     send_mask: 0xFFFFFFFF              # Optional, defaults to 0xFFFFFFFF (send everything).  Can be integer or hex
-    receive_mask: 0x0                  # Optional, defaults to 0xFFFFFFFF (receive everything).  Can be integer or hex
+    receive_mask: 0xFFFFFFFF           # Optional, defaults to 0xFFFFFFFF (receive everything).  Can be integer or hex
     lights:
       - light2                         # ESPHome entity id
 
 # Electrical Wiring - RELAY 3 ON 24x7 - Garage Eave LED Lights
   - group_name: "garage-eave-lights"  # Tasmota device group name
     send_mask: 0xFFFFFFFF              # Optional, defaults to 0xFFFFFFFF (send everything).  Can be integer or hex
-    receive_mask: 0x0                  # Optional, defaults to 0xFFFFFFFF (receive everything).  Can be integer or hex
+    receive_mask: 0xFFFFFFFF           # Optional, defaults to 0xFFFFFFFF (receive everything).  Can be integer or hex
     lights:
       - light3                         # ESPHome entity id
 
@@ -154,7 +154,7 @@ device_groups:
 # Electrical Wiring - RELAY 4 ON 24x7 - Patio (Front Door) LED Light
   - group_name: "front-door-light"  # Tasmota device group name
     send_mask: 0xFFFFFFFF              # Optional, defaults to 0xFFFFFFFF (send everything).  Can be integer or hex
-    receive_mask: 0x0                  # Optional, defaults to 0xFFFFFFFF (receive everything).  Can be integer or hex
+    receive_mask: 0xFFFFFFFF           # Optional, defaults to 0xFFFFFFFF (receive everything).  Can be integer or hex
     lights:
       - light4                         # ESPHome entity id
 
