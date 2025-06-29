@@ -374,12 +374,14 @@ binary_sensor:
 
     # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
     # This is used by the usage_tracker as its source sensor.
-  - platform: template
-    name: "Light 1 - State"
-    id: light1_state
-    lambda: |-
-      return id(light1).current_values.is_on();
-    internal: true
+
+    # NOT NEEDED as Kitchen Switch Records this data
+#  - platform: template
+#    name: "Light 1 - State"
+#    id: light1_state
+#    lambda: |-
+#      return id(light1).current_values.is_on();
+#    internal: true
 
     # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
     # This is used by the usage_tracker as its source sensor.
@@ -419,13 +421,13 @@ binary_sensor:
 output:      
 
  # Virtual Relay to replace the relay1 that isn't wired to anything
-  - platform: template
-    id: virtual_relay1
-    type: binary
-    write_action:
-      - logger.log:
-          format: "Virtual Relay 1 - Hallway Light - state changed to %s"
-          args: ['state ? "ON" : "OFF"']
+#  - platform: template
+#    id: virtual_relay1
+#    type: binary
+#    write_action:
+#      - logger.log:
+#          format: "Virtual Relay 1 - Hallway Light - state changed to %s"
+#          args: ['state ? "ON" : "OFF"']
 
 
 #  - platform: gpio
@@ -474,10 +476,10 @@ switch:
   # Relays
 
   # Phyiscally not wired into Power Cicruits
-#  - platform: gpio
-#    name: "Power Switch - Hallway Light"
-#    id: relay1
-#    pin: GPIO13
+  - platform: gpio
+    name: "Power Switch - Hallway Light"
+    id: relay1
+    pin: GPIO13
 
   - platform: gpio
     name: "Power - Bedroom Eave Lights"
@@ -520,7 +522,7 @@ light:
   - platform: binary
     name: ${button1_assignment}
     id: light1
-    output: virtual_relay1      # relay1
+    output: relay1              # virtual_relay1
     restore_mode: ${light1_restore_mode}
     icon: 'mdi:lightbulb'
     web_server:
