@@ -53,7 +53,14 @@ esphome:
     board_build.mcu: esp32c3
     board_build.variant: esp32c3
     board_build.flash_mode: dio
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 1100ms
+    window: 1100ms
+    active: true
 
+bluetooth_proxy:
+  active: true
 #########################################################################
 #
 # Remote Packages to be utilised
@@ -61,7 +68,7 @@ esphome:
 
 dashboard_import:
   package_import_url: github://roving-ronin/myhomeassistant/esphome/athom-smart-plug-v3.yaml@main
-  import_full_config: false
+  import_full_config: true
 
 packages:
   base-config:
