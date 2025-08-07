@@ -45,6 +45,8 @@ sensor:
     temperature:
       name: "${bme_sensor1_location}Temperature"
       id: bme280a_temperature
+      state_class: measurement
+      device_class: temperature
       icon: 'mdi:temperature-celsius'
       accuracy_decimals: 1
       filters:
@@ -57,6 +59,8 @@ sensor:
     pressure:
       name: "${bme_sensor1_location}Pressure"
       id: bme280a_pressure
+      state_class: measurement
+      device_class: pressure
       icon: 'mdi:weather-hurricane'
       accuracy_decimals: 1
       filters:
@@ -69,6 +73,8 @@ sensor:
     humidity:
       name: "${bme_sensor1_location}Humidity (Relative)"
       id: bme280a_humidity
+      state_class: measurement
+      device_class: humidity
       icon: 'mdi:water-percent'
       accuracy_decimals: 1
       filters:
@@ -81,6 +87,8 @@ sensor:
   - platform: absolute_humidity
     name: "${bme_sensor1_location}Humidity (Absolute)"
     id: bme280a_humidity_absolute
+    state_class: measurement
+    device_class: absolute_humidity
     icon: 'mdi:water-percent'
     temperature: bme280a_temperature
     humidity: bme280a_humidity
@@ -121,6 +129,8 @@ sensor:
   - platform: template
     name: "${bme_sensor1_location}Equivalent Sea Level Pressure"
     id: bme280a_sea_level_pressure
+    state_class: measurement
+    device_class: pressure
     icon: 'mdi:waves-arrow-up'
     unit_of_measurement: 'hPa'
 #    state_class: 'measurement'
