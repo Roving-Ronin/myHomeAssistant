@@ -1,0 +1,24 @@
+rest_command:
+  update_pvoutput:
+    url: https://pvoutput.org/service/r2/addstatus.jsp
+    method: post
+    content_type: "application/x-www-form-urlencoded"
+    headers:
+      X-Pvoutput-Apikey: Your-Key
+      X-Pvoutput-SystemId: SiteID
+    payload: |-
+      {{ ''.join([
+        'd=' ~ now().strftime('%Y%m%d'),
+        '&t=' ~ now().strftime('%H:%M'),
+        '&c1=1',
+        '&v1=' ~ ((states('sensor.sigen_plant_accumulated_pv_energy') | float(0)) * 1000 | round(0)),
+        '&v2=' ~ ((states('sensor.sigen_plant_pv_power') | float(0)) * 1000 | round(0)),
+        '&v3=' ~ ((states('sensor.sigen_plant_accumulated_consumed_energy') | float(0)) * 1000 | round(0)),
+        '&v4=' ~ ((states('sensor.sigen_plant_consumed_power') | float(0)) * 1000 | round(0)),
+        '&v6=' ~ (states('sensor.sigen_inverter_phase_a_voltage')),
+        '&v7=' ~ (states('sensor.sigen_plant_battery_state_of_charge')),
+        '&v8=' ~ ((states('sensor.sigen_plant_daily_grid_import_energy') | float(0)) | round(5)),
+        '&v9=' ~ ((states('sensor.sigen_plant_daily_grid_export_energy') | float(0)) | round(5)),
+        '&v11=' ~ ((states('sensor.amber_feed_in_price') | float(0)) ),
+        '&v12=' ~ ((states('sensor.amber_general_price') | float(0)) )
+      ]) }}
