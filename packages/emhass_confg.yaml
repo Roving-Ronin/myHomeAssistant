@@ -1,0 +1,123 @@
+{
+  "adjusted_pv_regression_model": "LassoRegression",
+  "adjusted_pv_solar_elevation_threshold": 10,
+  "battery_charge_efficiency": 0.95,
+  "battery_charge_power_max": 25317,
+  "battery_discharge_efficiency": 0.95,
+  "battery_discharge_power_max": 25317,
+  "battery_dynamic_max": 0.9,
+  "battery_dynamic_min": -0.9,
+  "battery_maximum_state_of_charge": 1,
+  "battery_minimum_state_of_charge": 0.2,
+  "battery_nominal_energy_capacity": 48360,
+  "battery_target_state_of_charge": 0.99,
+  "compute_curtailment": true,
+  "continual_publish": true,
+  "costfun": "self-consumption",
+  "delta_forecast_daily": 1,
+  "end_timesteps_of_each_deferrable_load": [
+    0
+  ],
+  "historic_days_to_retrieve": 3,
+  "inverter_is_hybrid": true,
+  "load_cost_forecast_method": "hp_hc_periods",
+  "load_forecast_method": "naive",
+  "load_negative": false,
+  "load_offpeak_hours_cost": 0.1419,
+  "load_peak_hour_periods": {
+    "period_hp_1": [
+      {
+        "start": "00:00"
+      },
+      {
+        "end": "00:00"
+      }
+    ]
+  },
+  "load_peak_hours_cost": 0.1907,
+  "logging_level": "INFO",
+  "lp_solver": "HiGHS",
+  "lp_solver_path": "empty",
+  "lp_solver_timeout": 45,
+  "maximum_power_from_grid": 50000,
+  "maximum_power_to_grid": 6300,
+  "method_ts_round": "nearest",
+  "minimum_power_of_deferrable_loads": [
+    0
+  ],
+  "modules_per_string": [
+    20,
+    11,
+    20
+  ],
+  "nominal_power_of_deferrable_loads": [
+    3000
+  ],
+  "num_threads": 0,
+  "number_of_deferrable_loads": 0,
+  "open_meteo_cache_max_age": 30,
+  "operating_hours_of_each_deferrable_load": [
+    0
+  ],
+  "optimization_time_step": 5,
+  "photovoltaic_production_sell_price": 0.1419,
+  "production_price_forecast_method": "constant",
+  "pv_inverter_model": [
+    "SMA_America__STP30000TL_US_10__480V_",
+    "SMA_America__STP30000TL_US_10__480V_",
+    "SMA_America__STP30000TL_US_10__480V_"
+  ],
+  "pv_module_model": [
+    "Philadelphia_Solar_PS_M132_HCBF__500W",
+    "Philadelphia_Solar_PS_M132_HCBF__500W",
+    "Philadelphia_Solar_PS_M132_HCBF__500W"
+  ],
+  "sensor_linear_interp": [
+    "sensor.sigen_plant_pv_power_watts",
+    "sensor.sigen_plant_consumed_power_watts"
+  ],
+  "sensor_power_load_no_var_loads": "sensor.sigen_plant_consumed_power_watts",
+  "sensor_power_photovoltaics": "sensor.sigen_plant_pv_power_watts",
+  "sensor_power_photovoltaics_forecast": "sensor.solcast_pv_forecast_forecast_today",
+  "sensor_replace_zero": [
+    "sensor.sigen_plant_pv_power_watts"
+  ],
+  "set_battery_dynamic": false,
+  "set_deferrable_load_single_constant": [
+    false
+  ],
+  "set_deferrable_startup_penalty": [
+    0
+  ],
+  "set_nocharge_from_grid": false,
+  "set_nodischarge_to_grid": false,
+  "set_total_pv_sell": false,
+  "set_use_adjusted_pv": false,
+  "set_use_battery": true,
+  "set_use_pv": true,
+  "set_zero_min": false,
+  "start_timesteps_of_each_deferrable_load": [
+    0
+  ],
+  "strings_per_inverter": [
+    1,
+    1,
+    1
+  ],
+  "surface_azimuth": [
+    23,
+    113,
+    203
+  ],
+  "surface_tilt": [
+    23,
+    23,
+    23
+  ],
+  "treat_deferrable_load_as_semi_cont": [
+    true
+  ],
+  "weather_forecast_method": "open-meteo",
+  "weight_battery_charge": 0.05,
+  "weight_battery_discharge": 0.05
+}
