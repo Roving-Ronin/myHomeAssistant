@@ -111,11 +111,11 @@ sensor:
     update_interval: 150s
     icon: mdi:wifi-strength-2
 #    entity_category: diagnostic
-    update_interval: "${wifi_sensor_update_interval}"
     web_server:
       sorting_group_id: group_network_info
       sorting_weight: 5
     internal: true
 
 ##########################################################################
+
 
