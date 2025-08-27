@@ -1,8 +1,7 @@
 import esphome.config_validation as cv
 import esphome.codegen as cg
 from esphome import automation
-from esphome.components import sensor, binary_sensor
-from esphome.components import sensor, time
+from esphome.components import sensor, binary_sensor, time
 from esphome.const import (
     CONF_ID,
     CONF_SENSOR,
