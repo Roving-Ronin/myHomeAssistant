@@ -5,8 +5,6 @@
 substitutions:
    # Enables faster network connections, with last connected SSID being connected to and no full scan for SSID being undertaken
   wifi_fast_connect: "true"
-   # WiFi sensors update interval
-  wifi_sensor_update_interval: "15s" 
 
 ########################## End of Substitutions ##########################
 #
@@ -57,7 +55,6 @@ text_sensor:
       name: 'WiFi IP Address'
       icon: mdi:ip-network
   #    entity_category: diagnostic
-      update_interval: "${wifi_sensor_update_interval}"
       web_server:
         sorting_group_id: group_network_info
         sorting_weight: 1
@@ -67,7 +64,6 @@ text_sensor:
       name: 'WiFi MAC Address'
       icon: mdi:network-pos
  #     entity_category: diagnostic
-      update_interval: "${wifi_sensor_update_interval}"
       web_server:
         sorting_group_id: group_network_info
         sorting_weight: 2
@@ -77,7 +73,6 @@ text_sensor:
       name: 'WiFi SSID'
       icon: mdi:wifi-strength-2
 #      entity_category: diagnostic
-      update_interval: "${wifi_sensor_update_interval}"
       web_server:
         sorting_group_id: group_network_info
         sorting_weight: 3
@@ -116,6 +111,7 @@ sensor:
     internal: true
 
 ##########################################################################
+
 
 
 
