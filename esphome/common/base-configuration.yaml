@@ -95,7 +95,6 @@ mdns:
 
    # Enable local webserver on ESP Device
 web_server:
-  include_internal: true
    # TCP Port the webserver operates upon
   port: 80
    # Webserver version (default is 2).
