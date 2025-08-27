@@ -214,7 +214,7 @@ binary_sensor:
     id: light_state
     lambda: |-
       return id(light1).current_values.is_on();
-    internal: true
+    internal: false # true
 
 
 ##########################################################################
