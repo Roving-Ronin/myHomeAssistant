@@ -99,7 +99,6 @@ sensor:
     unit_of_measurement: "%"
 #    entity_category: diagnostic
     device_class: ""
-    update_interval: "${wifi_sensor_update_interval}"
     web_server:
       sorting_group_id: group_network_info
       sorting_weight: 4
@@ -117,5 +116,6 @@ sensor:
     internal: true
 
 ##########################################################################
+
 
 
