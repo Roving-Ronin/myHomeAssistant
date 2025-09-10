@@ -82,7 +82,7 @@ api:
 
 ota:
   - platform: esphome
-  - platform: web_server
+#  - platform: web_server
   
 logger:
   level: ${log_level}
