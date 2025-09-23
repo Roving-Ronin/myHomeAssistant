@@ -136,13 +136,13 @@ packages:
     url: https://github.com/roving-ronin/myhomeassistant
     ref: main
     files: [esphome/common/base-configuration.yaml]
-    refresh: 5m
+    refresh: 5s
     
   network_config:
     url: https://github.com/roving-ronin/myhomeassistant
     ref: main
     files: [esphome/common/network-wifi.yaml]
-    refresh: 5m
+    refresh: 5s
 
 #  base-config: !include common/base-configuration.yaml
 #  wifi-config: !include common/network-wifi.yaml
