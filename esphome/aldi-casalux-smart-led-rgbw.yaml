@@ -15,6 +15,10 @@ substitutions:
   project_name: "Aldi Casalux.Smart LED Downlight RGBW"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
   project_version: "1.2.1"
+   # The phase in the home power supply, upon which this device is utilsed. A, B or C.  (myHome GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C)  
+  power_phase: "A"
+   # The circuit breaker / RCBO that the load is attached to.  
+  power_rcbo: "Lights"
    # Restore the relay (Light switch) upon reboot to state:
   light_restore_mode: RESTORE_DEFAULT_OFF
    # Set your locations latitude and longitude. Useful if you want to use the sun and its location in relation to the horizon to on/off (or as a condition) to control lights.
