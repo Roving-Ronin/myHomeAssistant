@@ -109,25 +109,25 @@ packages:
     url: https://github.com/roving-ronin/myhomeassistant
     ref: main
     files: [esphome/common/base-configuration.yaml]
-    refresh: 1h
+    refresh: 5s
     
   network_config:
     url: https://github.com/roving-ronin/myhomeassistant
     ref: main
     files: [esphome/common/network-wifi.yaml]
-    refresh: 1h
+    refresh: 5s
 
   bme280a-sensors:
     url: https://github.com/roving-ronin/myhomeassistant
     ref: main
     files: [esphome/sensors/bme280-bus-a.yaml]
-    refresh: 1h
+    refresh: 5s
 
   hc-sr04-sensors:
     url: https://github.com/roving-ronin/myhomeassistant
     ref: main
     files: [esphome/sensors/hc-sr04-ultrasonic.yaml]
-    refresh: 1h
+    refresh: 5s
 
 
 #  base-config:      !include common/base-configuration.yaml
