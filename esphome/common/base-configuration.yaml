@@ -206,18 +206,6 @@ text_sensor:
     web_server:
       sorting_weight: 36
 
-  #  Creates a sensor showing power circuit / breaker the device it connected to
-  - platform: template
-    name: 'Power RCBO'
-    id: power_rcbo
-    icon: "mdi:electric-switch"
-    entity_category: diagnostic
-    lambda: |-
-      return {"${power_rcbo}"};
-#    update_interval: 1h
-    web_server:
-      sorting_weight: 37
-
 
   #  Creates a sensor showing power circuit / phase of the device
   - platform: template
@@ -229,7 +217,19 @@ text_sensor:
       return {"${power_phase}"};
 #    update_interval: 1h
     web_server:
-      sorting_weight: 38      
+      sorting_weight: 37     
+
+  #  Creates a sensor showing power circuit / breaker the device it connected to
+  - platform: template
+    name: 'Power RCBO'
+    id: power_rcbo
+    icon: "mdi:electric-switch"
+    entity_category: diagnostic
+    lambda: |-
+      return {"${power_rcbo}"};
+#    update_interval: 1h
+    web_server:
+      sorting_weight: 38
 
    # Creates a sensor of the name of installed project
   - platform: template
