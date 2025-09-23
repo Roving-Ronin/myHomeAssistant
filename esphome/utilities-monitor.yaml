@@ -69,43 +69,43 @@ packages:
     url: https://github.com/roving-ronin/myhomeassistant
     ref: main
     files: [esphome/boards/kincony-esp32-s3-core.yaml]
-    refresh: 1h
+    refresh: 5s
 
   base-config:
     url: https://github.com/roving-ronin/myhomeassistant
     ref: main
     files: [esphome/common/base-configuration.yaml]
-    refresh: 1h
+    refresh: 5s
     
   network_config:
     url: https://github.com/roving-ronin/myhomeassistant
     ref: main
     files: [esphome/common/network-ethernet-w5500.yaml]
-    refresh: 1h
+    refresh: 5s
 
   bme280a-sensors:
     url: https://github.com/roving-ronin/myhomeassistant
     ref: main
     files: [esphome/sensors/bme280-bus-a.yaml]
-    refresh: 1h
+    refresh: 5s
 
   water-tank-sensors:
     url: https://github.com/roving-ronin/myhomeassistant
     ref: main
     files: [esphome/sensors/cylinder-liquid-pressure-tl136.yaml]
-    refresh: 1h
+    refresh: 5s
 
   consumption-gas:
     url: https://github.com/roving-ronin/myhomeassistant
     ref: main
     files: [esphome/sensors/utilities-gas.yaml ]
-    refresh: 1h
+    refresh: 5s
 
   consumption-town-water:
     url: https://github.com/roving-ronin/myhomeassistant
     ref: main
     files: [esphome/sensors/utilities-town-water.yaml]
-    refresh: 1h
+    refresh: 5s
 
 #  consumption-tank-water:
 #    url: https://github.com/roving-ronin/myhomeassistant
