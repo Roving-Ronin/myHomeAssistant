@@ -49,19 +49,19 @@ packages:
     url: https://github.com/roving-ronin/myhomeassistant
     ref: main
     files: [esphome/common/base-configuration.yaml]
-    refresh: 1h
+    refresh: 5s
     
   network_config:
     url: https://github.com/roving-ronin/myhomeassistant
     ref: main
     files: [esphome/common/network-wifi.yaml]
-    refresh: 1h
+    refresh: 5s
 
   thermocouple-sensors:
     url: https://github.com/roving-ronin/myhomeassistant
     ref: main
     files: [esphome/sensors/max31855.yaml]
-    refresh: 1h
+    refresh: 5s
 
 #  base-config:             !include common/base-configuration.yaml          # Base configuration applied to all ESPHome devices
 #  network-config:          !include common/network-wifi.yaml                # Configure Ethernet port on this system board
