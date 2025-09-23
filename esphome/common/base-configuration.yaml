@@ -12,8 +12,10 @@ substitutions:
   site: ""
    # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   location: ""
-   # The phase in the home power supply, upon which this device is utilsed. 1p = A. 3p = A, B or C.  (myHome GPO 1 = Phase C, GPO 2 = Phase A, GPO 3 = Phase B)  
-  power_circuit: "TBA"  
+   # The phase in the home power supply, upon which this device is utilsed. A, B or C.  (myHome GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C)  
+  power_phase: "TBA"
+   # The circuit breaker / RCBO that the load is attached to.  
+  power_rcbo: "TBA"
 
 ###############################
 # Time Update Settings:
@@ -142,7 +144,7 @@ binary_sensor:
     entity_category: diagnostic
     icon: "mdi:check-network-outline"
     web_server:
-      sorting_weight: 35
+      sorting_weight: 34
 
 ##########################################################################
 #
@@ -193,7 +195,7 @@ text_sensor:
     update_interval: ${sensor_update_interval}
     icon: mdi:clock-start
     web_server:
-      sorting_weight: 36
+      sorting_weight: 35
     
    # Creates a sensor showing when the device was last restarted
   - platform: template
@@ -202,19 +204,32 @@ text_sensor:
     icon: mdi:clock
     entity_category: diagnostic
     web_server:
-      sorting_weight: 37
+      sorting_weight: 36
 
-  #  Creates a sensor showing power circuit / phase of the device
+  #  Creates a sensor showing power circuit / breaker the device it connected to
   - platform: template
-    name: 'Power Circuit'
-    id: power_circuit
+    name: 'Power RCBO'
+    id: power_rcbo
     icon: "mdi:electric-switch"
     entity_category: diagnostic
     lambda: |-
-      return {"${power_circuit}"};
+      return {"${power_rcbo}"};
 #    update_interval: 1h
     web_server:
-      sorting_weight: 38
+      sorting_weight: 37
+
+
+  #  Creates a sensor showing power circuit / phase of the device
+  - platform: template
+    name: 'Power Phase'
+    id: power_phase
+    icon: "mdi:electric-switch"
+    entity_category: diagnostic
+    lambda: |-
+      return {"${power_phase}"};
+#    update_interval: 1h
+    web_server:
+      sorting_weight: 38      
 
    # Creates a sensor of the name of installed project
   - platform: template
