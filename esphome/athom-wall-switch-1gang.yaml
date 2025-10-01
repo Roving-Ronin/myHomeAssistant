@@ -289,35 +289,35 @@ light:
 # See: https://github.com/Roving-Ronin/myHomeAssistant/tree/main/components/usage_tracker
 #
 
-sensor:
-  - platform: "usage_tracker"
-    id: usage_tracker_component
-    on_off_sensor: light_state
+#sensor:
+#  - platform: "usage_tracker"
+#    id: usage_tracker_component
+#    on_off_sensor: light_state
       
-    last_use:
-      name: "Duration Last Use"
-      id: duration_last_use
-      unit_of_measurement: h
-      accuracy_decimals: 3
-      filters:
-        - lambda: |-
-            return x / 3600.0;
-        - delta: 0.001
-      web_server:
-        sorting_group_id: group_light_usage
-        sorting_weight: 1
+#    last_use:
+#      name: "Duration Last Use"
+#      id: duration_last_use
+#      unit_of_measurement: h
+#      accuracy_decimals: 3
+#      filters:
+#        - lambda: |-
+#            return x / 3600.0;
+#        - delta: 0.001
+#      web_server:
+#        sorting_group_id: group_light_usage
+#        sorting_weight: 1
 
-    lifetime_use:
-      name: "Duration Lifetime Use"
-      id: duration_lifetime_use
-      unit_of_measurement: h
-      accuracy_decimals: 3
-      filters:
-        - lambda: |-
-            return x / 3600.0;
-        - delta: 0.001
-      web_server:
-        sorting_group_id: group_light_usage
-        sorting_weight: 2
+#    lifetime_use:
+#      name: "Duration Lifetime Use"
+#      id: duration_lifetime_use
+#      unit_of_measurement: h
+#      accuracy_decimals: 3
+#      filters:
+#        - lambda: |-
+#            return x / 3600.0;
+#        - delta: 0.001
+#      web_server:
+#        sorting_group_id: group_light_usage
+#        sorting_weight: 2
       
 #########################################################################
