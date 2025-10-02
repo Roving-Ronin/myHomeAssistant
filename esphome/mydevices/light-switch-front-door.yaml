@@ -109,13 +109,13 @@ packages:
 # Dentra Components - Adds 'Platform - Energy Statistics'
 # https://github.com/Roving-Ronin/myHomeAssistant/tree/main/components/energy_statistics
 
-external_components:
-  - source:
-      type: git
-      url: https://github.com/roving-ronin/myhomeassistant/
-      ref: main
-    refresh: 1h
-    components: [ usage_tracker ]
+#external_components:
+#  - source:
+#      type: git
+#      url: https://github.com/roving-ronin/myhomeassistant/
+#      ref: main
+#    refresh: 1h
+#    components: [ usage_tracker ]
 
 
   - source:
