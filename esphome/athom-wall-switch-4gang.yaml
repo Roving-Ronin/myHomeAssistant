@@ -228,7 +228,9 @@ binary_sensor:
           - ON for at least 4s
         then:
           - button.press: Reset
-    internal: true 
+    internal: true
+    disabled_by_default: true
+    
 
   # Touch Button 2
   - platform: gpio
@@ -244,6 +246,8 @@ binary_sensor:
       then:
         - light.toggle: light2
     internal: true
+    disabled_by_default: true
+    
 
   # Touch Button 3  
   - platform: gpio
@@ -259,6 +263,8 @@ binary_sensor:
       then:
         - light.toggle: light3
     internal: true
+    disabled_by_default: true
+    
 
   # Touch Button 4
   - platform: gpio
@@ -274,6 +280,7 @@ binary_sensor:
       then:
         - light.toggle: light4
     internal: true
+    disabled_by_default: true
 
 
     # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
@@ -281,36 +288,44 @@ binary_sensor:
   - platform: template
     name: "Light 1 - State"
     id: light1_state
+    icon: 'mdi:state-machine'
     lambda: |-
       return id(light1).current_values.is_on();
     internal: true
+    disabled_by_default: true
 
     # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
     # This is used by the usage_tracker as its source sensor.
   - platform: template
     name: "Light 2 - State"
     id: light2_state
+    icon: 'mdi:state-machine'
     lambda: |-
       return id(light2).current_values.is_on();
     internal: true
+    disabled_by_default: true
 
     # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
     # This is used by the usage_tracker as its source sensor.
   - platform: template
     name: "Light 3 - State"
     id: light3_state
+    icon: 'mdi:state-machine'
     lambda: |-
       return id(light3).current_values.is_on();
     internal: true
+    disabled_by_default: true
 
     # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
     # This is used by the usage_tracker as its source sensor.
   - platform: template
     name: "Light 4 - State"
     id: light4_state
+    icon: 'mdi:state-machine'
     lambda: |-
       return id(light4).current_values.is_on();
     internal: true
+    disabled_by_default: true
 
 
 ##########################################################################
