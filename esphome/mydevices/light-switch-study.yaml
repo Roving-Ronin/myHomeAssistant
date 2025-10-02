@@ -21,7 +21,7 @@ substitutions:
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
   project_version: "v1.3.0"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
-  location: "Study"
+  location: ""
   # The phase in the home power supply, upon which this device is utilsed. A, B or C.  (myHome GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C)  
   power_phase: "A"
   # The circuit breaker / RCBO that the load is attached to.  
@@ -143,11 +143,26 @@ web_server:
 #
 
 esphome:
+  # Define areas (optional), as opposed to 'area'
+  areas:
+    - id: dining_room_area
+      name: "Dining Room"
+    - id: study_area
+      name: "Study"
+  # Define devices, to be used in 'Areas'
+  devices:
+    - id: dining_room_device
+      name: "Dining Room Sensors"
+      area_id: dining_room_area
+    - id: study_device
+      name: "Study Sensors"
+      area_id: study_area
   # this board has 2mb flash, but esphome assumes 1mb for the 8285 board id
   platformio_options:
     board_upload.flash_size: 2MB
     board_upload.maximum_size: 2097152
     board_build.ldscript: eagle.flash.2m.ld
+  # Actions to perform upon device booting
   on_boot:
     - priority: 600
       then:
@@ -318,6 +333,7 @@ light:
   - platform: binary
     name: ${button1_assignment}
     id: light1
+    device_id: study_device
     icon: 'mdi:lightbulb'
     output: relay1
     restore_mode: ${light1_restore_mode}
@@ -332,6 +348,7 @@ light:
   - platform: binary
     name: ${button2_assignment}
     id: light2
+    device_id: dining_room_device
     icon: 'mdi:lightbulb'
     output: relay2
     restore_mode: ${light2_restore_mode}
@@ -350,6 +367,7 @@ light:
     icon: 'mdi:led-on'
     disabled_by_default: true
     id: led1
+    device_id: study_device
     output: button_led1
     default_transition_length: 500ms
     web_server:
@@ -362,6 +380,7 @@ light:
     icon: 'mdi:led-on'
     disabled_by_default: true
     id: led2
+    device_id: dining_room_device
     output: button_led2
     default_transition_length: 500ms
     web_server:
