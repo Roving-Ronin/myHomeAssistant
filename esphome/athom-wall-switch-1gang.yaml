@@ -207,6 +207,8 @@ binary_sensor:
         then:
           - button.press: Reset
     internal: true
+    web_server:
+      hidden: true    
 
     # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
     # This is used by the usage_tracker as its source sensor.
@@ -216,6 +218,8 @@ binary_sensor:
     lambda: |-
       return id(light1).current_values.is_on();
     internal: true
+    web_server:
+      hidden: true
 
 
 ##########################################################################
