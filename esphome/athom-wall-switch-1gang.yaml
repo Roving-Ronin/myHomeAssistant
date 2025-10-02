@@ -97,7 +97,7 @@ packages:
 #
 
 web_server:
-  include_internal: true
+  include_internal: false
   sorting_groups:
     
     - id: group_light_switches
