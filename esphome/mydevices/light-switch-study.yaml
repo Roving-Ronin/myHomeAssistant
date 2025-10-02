@@ -126,6 +126,7 @@ device_groups:
 #
 
 web_server:
+  include_internal: true
   sorting_groups:
     
     - id: group_light_switches
