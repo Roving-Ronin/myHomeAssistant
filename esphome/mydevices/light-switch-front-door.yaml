@@ -203,8 +203,8 @@ esphome:
       name: "Front Entrance"
   # Define devices, to be used in 'Areas'
   devices:
-    - id: hallyway_device
-      name: "Hallway Lights"
+    - id: hallway_device
+      name: "Hallway Light"
       area_id: hallway_area
     - id: yard_front_device
       name: "Front Yard Lights"
@@ -213,7 +213,7 @@ esphome:
       name: "Driveway Lights"
       area_id: driveway_area
     - id: front_entrance_device
-      name: "Front Entrance Lights"
+      name: "Front Entrance Light"
       area_id: front_entrance_area
   # this board has 2mb flash, but esphome assumes 1mb for the 8285 board id
   platformio_options:
@@ -568,7 +568,7 @@ light:
   - platform: binary
     name: ${button1_assignment}
     id: light1
-    device_id: hallyway_device
+    device_id: hallway_device
     output: virtual_relay1      # relay1
     restore_mode: ${light1_restore_mode}
     icon: 'mdi:lightbulb'
