@@ -206,7 +206,6 @@ binary_sensor:
     name: ${button1_assignment}
     id: button1
     icon: 'mdi:gesture-tap-button'
-    disabled_by_default: true
     on_multi_click:
       - timing:
           - ON for at most 0.5s
@@ -218,6 +217,8 @@ binary_sensor:
         then:
           - button.press: Reset
     internal: true
+    disabled_by_default: true
+
 
   - platform: gpio
     pin:
@@ -229,30 +230,35 @@ binary_sensor:
     name: ${button2_assignment}
     id: button2
     icon: 'mdi:gesture-tap-button'
-    disabled_by_default: true
     on_click:
       max_length: 0.5s
       then:
         - light.toggle: light2
-
+    internal: true
+    disabled_by_default: true
+    
     
     # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
     # This is used by the usage_tracker as its source sensor.
   - platform: template
     name: "Light 1 - State"
     id: light1_state
+    icon: 'mdi:state-machine'
     lambda: |-
       return id(light1).current_values.is_on();
     internal: true
+    disabled_by_default: true
 
     # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
     # This is used by the usage_tracker as its source sensor.
   - platform: template
     name: "Light 2 - State"
     id: light2_state
+    icon: 'mdi:state-machine'
     lambda: |-
       return id(light2).current_values.is_on();
     internal: true
+    disabled_by_default: true
 
 
 ##########################################################################
