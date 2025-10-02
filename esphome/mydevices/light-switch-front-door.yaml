@@ -366,7 +366,6 @@ binary_sensor:
     name: ${button2_assignment}
     id: button2
     icon: 'mdi:gesture-tap-button'
-    disabled_by_default: true
     on_click:
       max_length: 0.5s
       then:
@@ -383,7 +382,6 @@ binary_sensor:
     name: ${button3_assignment}
     id: button3
     icon: 'mdi:gesture-tap-button'
-    disabled_by_default: true
     on_click:
       max_length: 0.5s
       then:
@@ -400,7 +398,6 @@ binary_sensor:
     name: ${button4_assignment}
     id: button4
     icon: 'mdi:gesture-tap-button'
-    disabled_by_default: true
     on_click:
       max_length: 0.5s
       then:
