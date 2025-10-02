@@ -193,8 +193,8 @@ web_server:
 esphome:
   # Define areas (optional), as opposed to 'area'
   areas:
-    - id: hallway_front_area
-      name: "Hallway Front"
+    - id: hallway_area
+      name: "Hallway"
     - id: yard_front_area
       name: "Yard Front"
     - id: driveway_area
@@ -203,9 +203,9 @@ esphome:
       name: "Front Entrance"
   # Define devices, to be used in 'Areas'
   devices:
-    - id: hallyway_front_device
-      name: "Hallway Front Lights"
-      area_id: hallway_front_area
+    - id: hallyway_device
+      name: "Hallway Lights"
+      area_id: hallway_area
     - id: yard_front_device
       name: "Front Yard Lights"
       area_id: yard_front_area
@@ -568,7 +568,7 @@ light:
   - platform: binary
     name: ${button1_assignment}
     id: light1
-    device_id: hallyway_front_device
+    device_id: hallyway_device
     output: virtual_relay1      # relay1
     restore_mode: ${light1_restore_mode}
     icon: 'mdi:lightbulb'
