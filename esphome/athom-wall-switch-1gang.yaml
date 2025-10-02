@@ -214,6 +214,7 @@ binary_sensor:
   - platform: template
     name: "Light State"
     id: light_state
+    icon: 'mdi:state-machine'
     lambda: |-
       return id(light1).current_values.is_on();
     internal: true
