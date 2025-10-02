@@ -195,7 +195,6 @@ binary_sensor:
     name: "Button"
     id: button1
     icon: 'mdi:gesture-tap-button'
-    disabled_by_default: true
     on_multi_click:
       - timing:
           - ON for at most 0.5s
@@ -207,8 +206,8 @@ binary_sensor:
         then:
           - button.press: Reset
     internal: true
-    web_server:
-      hidden: true    
+    disabled_by_default: true
+
 
     # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
     # This is used by the usage_tracker as its source sensor.
@@ -218,8 +217,7 @@ binary_sensor:
     lambda: |-
       return id(light1).current_values.is_on();
     internal: true
-    web_server:
-      hidden: true
+    disabled_by_default: true
 
 
 ##########################################################################
