@@ -152,11 +152,26 @@ web_server:
 #
 
 esphome:
+  # Define areas (optional), as opposed to 'area'
+  areas:
+    - id: kitchen_area
+      name: "Kitchen"
+    - id: hallyway_front_area
+      name: "Hallway Front"
+  # Define devices, to be used in 'Areas'
+  devices:
+    - id: kitchen_device
+      name: "Kitchen Sensors"
+      area_id: kitchen_area
+    - id: hallyway_front_device
+      name: "Hallway Front Sensors"
+      area_id: hallway_front_area
   # this board has 2mb flash, but esphome assumes 1mb for the 8285 board id
   platformio_options:
     board_upload.flash_size: 2MB
     board_upload.maximum_size: 2097152
     board_build.ldscript: eagle.flash.2m.ld
+  # Actions to perform upon device booting
   on_boot:
     - priority: 600
       then:
@@ -373,6 +388,7 @@ light:
   - platform: binary
     name: ${button1_assignment}
     id: light1
+    device_id: kitchen_device
     icon: 'mdi:lightbulb'
     output: relay1
     restore_mode: ${light1_restore_mode}
@@ -387,6 +403,7 @@ light:
   - platform: binary
     name: ${button2_assignment}
     id: light2
+    device_id: kitchen_device
     icon: 'mdi:lightbulb'
     output: relay2
     restore_mode: ${light2_restore_mode}
@@ -402,6 +419,7 @@ light:
   - platform: binary
     name: ${button3_assignment}
     id: light3
+    device_id: hallway_front_device
     icon: 'mdi:lightbulb'
     output: relay3
     restore_mode: ${light3_restore_mode}
@@ -433,6 +451,7 @@ light:
     icon: 'mdi:led-on'
     disabled_by_default: true
     id: led1
+    device_id: kitchen_device
     output: button_led1
     default_transition_length: 500ms
     web_server:
@@ -445,6 +464,7 @@ light:
     icon: 'mdi:led-on'
     disabled_by_default: true
     id: led2
+    device_id: kitchen_device
     output: button_led2
     default_transition_length: 500ms
     web_server:
@@ -457,6 +477,7 @@ light:
     icon: 'mdi:led-on'
     disabled_by_default: true
     id: led3
+    device_id: hallway_front_device
     output: button_led3
     default_transition_length: 500ms
     web_server:
