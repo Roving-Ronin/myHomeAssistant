@@ -88,13 +88,13 @@ packages:
 # Custom Components to be utilised - For Light Last/Lifetime usage
 #
 
-#external_components:
-#  - source:
-#      type: git
-#      url: https://github.com/roving-ronin/myhomeassistant/
-#      ref: main
-#    refresh: 0s
-#    components: [ usage_tracker ]
+external_components:
+  - source:
+      type: git
+      url: https://github.com/Cossid/TasmotaDeviceGroupsForESPHome
+      ref: main
+    refresh: 1h
+    components: [ device_groups ]
 
 #########################################################################
 #
