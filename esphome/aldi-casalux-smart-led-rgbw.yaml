@@ -85,7 +85,7 @@ packages:
 
 #########################################################################
 #
-# Custom Components to be utilised - For Light Last/Lifetime usage
+# Custom Components to be utilised - For synching lights and/or switches
 #
 
 external_components:
