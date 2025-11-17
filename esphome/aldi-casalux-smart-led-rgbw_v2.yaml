@@ -153,16 +153,16 @@ packages:
 
 #########################################################################
 #
-# Custom Components to be utilised - For Light Last/Lifetime usage
+# Custom Components to be utilised - For synching lights and/or switches
 #
 
 external_components:
   - source:
       type: git
-      url: https://github.com/roving-ronin/myhomeassistant/
+      url: https://github.com/Cossid/TasmotaDeviceGroupsForESPHome
       ref: main
-    refresh: 0s
-    components: [ usage_tracker ]
+    refresh: 1h
+    components: [ device_groups ]
 
 #########################################################################
 #
@@ -277,17 +277,28 @@ binary_sensor:
 #########################################################################
 #
 # Define the sensors that publish the Last Use & Lifetime Use duration of the LED.
-# See: https://github.com/Roving-Ronin/myHomeAssistant/tree/main/components/usage_tracker
+# See: https://esphome.io/components/sensor/duty_time/
 #
 
 sensor:
-  - platform: "usage_tracker"
-    id: usage_tracker_component
-    on_off_sensor: downlight_state
-      
-    last_use:
-      name: "Duration Last Use"
-      id: duration_last_use
+
+  - platform: duty_time
+    id: duration_lifetime_use
+    unit_of_measurement: h
+    accuracy_decimals: 1
+    filters:
+      - lambda: |-
+          return x / 3600.0;
+      - delta: 0.001
+    sensor: downlight_state
+    name: "Duration Lifetime Use"
+    update_interval: 60s
+    restore: true
+    web_server:
+      sorting_group_id: group_light_usage
+      sorting_weight: 2
+    last_time:
+      name: Duration Last Use
       unit_of_measurement: h
       accuracy_decimals: 3
       filters:
@@ -297,19 +308,6 @@ sensor:
       web_server:
         sorting_group_id: group_light_usage
         sorting_weight: 1
-
-    lifetime_use:
-      name: "Duration Lifetime Use"
-      id: duration_lifetime_use
-      unit_of_measurement: h
-      accuracy_decimals: 3
-      filters:
-        - lambda: |-
-            return x / 3600.0;
-        - delta: 0.001
-      web_server:
-        sorting_group_id: group_light_usage
-        sorting_weight: 2
       
 #########################################################################
 #
@@ -317,10 +315,10 @@ sensor:
 # Event on_sunrise / on_sunset etc, see: https://esphome.io/components/sun.html
 #
 
-sun:
-  latitude: "${my_latitude}"
-  longitude: "${my_longitude}"
-  id: sun_home
+#sun:
+#  latitude: "${my_latitude}"
+#  longitude: "${my_longitude}"
+#  id: sun_home
 
 #########################################################################
 #
