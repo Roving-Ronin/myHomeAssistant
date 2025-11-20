@@ -163,7 +163,7 @@ esphome:
     - id: kitchen_device
       name: "Kitchen Sensors"
       area_id: kitchen_area
-    - id: hallyway_front_device
+    - id: hallway_front_device
       name: "Hallway Front Sensors"
       area_id: hallway_front_area
   # this board has 2mb flash, but esphome assumes 1mb for the 8285 board id
