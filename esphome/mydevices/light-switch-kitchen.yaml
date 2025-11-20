@@ -156,7 +156,7 @@ esphome:
   areas:
     - id: kitchen_area
       name: "Kitchen"
-    - id: hallyway_front_area
+    - id: hallway_front_area
       name: "Hallway Front"
   # Define devices, to be used in 'Areas'
   devices:
