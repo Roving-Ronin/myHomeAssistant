@@ -252,7 +252,6 @@ binary_sensor:
     name: ${button1_assignment}
     id: button1
     icon: 'mdi:gesture-tap-button'
-    disabled_by_default: true
     on_multi_click:
       - timing:
           - ON for at most 0.5s
