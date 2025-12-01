@@ -234,7 +234,7 @@ sensor:
     id: "gas_flow_rate"
     unit_of_measurement: "L/min" # "m³/h"
     state_class: measurement
-#    device_class: volume  # Disabled to stop this being recorded in HA
+    device_class: volume_flow_rate  # Remeber to add an 'exclude' for 'sensor.*_flow_rate' to your recorder.yaml so these are not logged
     icon: "mdi:pump"
     accuracy_decimals: 3
     pin:
