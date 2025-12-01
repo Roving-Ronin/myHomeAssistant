@@ -162,7 +162,7 @@ sensor:
     id: tank_water_flow_rate
     unit_of_measurement: "L/min"
     state_class: measurement
-    device_class: water
+    device_class: volume_flow_rate
     icon: "mdi:pump"
     accuracy_decimals: 2
     pin:
