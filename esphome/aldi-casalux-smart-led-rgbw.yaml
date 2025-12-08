@@ -77,7 +77,7 @@ packages:
   network_config:
     url: https://github.com/roving-ronin/myhomeassistant
     ref: main
-    files: [esphome/common/network-wifi.yaml]
+    files: [esphome/common/network-wifi-bk723lt.yaml]
     refresh: 5s
 
 #  base-config: !include common/base-configuration.yaml
