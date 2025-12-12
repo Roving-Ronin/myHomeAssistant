@@ -121,17 +121,17 @@ sensor:
     filters:
       - calibrate_linear:
           # Measured value of X volt maps to Y cm. 241.0 (and preceding numbers) are based upon a inlet height of 241cm. i.e. 120.5 = 50% of that etc
-          - 4.01667 -> 241.0   # 100%
-          - 3.61500 -> 216.9   #  90%
-          - 3.21333 -> 192.8   #  80%
-          - 2.81167 -> 168.7   #  70%
-          - 2.41000 -> 144.6   #  60%
-          - 2.00833 -> 120.5   #  50%
-          - 1.60667 -> 96.4    #  40%
-          - 1.20500 -> 72.3    #  30%
-          - 0.80333 -> 48.2    #  20%
-          - 0.40167 -> 24.1    #  10%
-          - 0.00000 -> 0.00    #   0%
+          - 4.01667 -> 0.00     #   0%
+          - 3.61500 -> 24.1     #  10%
+          - 3.21333 -> 48.2     #  20%
+          - 2.81167 -> 72.3     #  30%
+          - 2.41000 -> 96.4     #  40%
+          - 2.00833 -> 120.5    #  50%
+          - 1.60667 -> 144.6    #  60%
+          - 1.20500 -> 168.7    #  70%
+          - 0.80333 -> 192.8    #  80%
+          - 0.40167 -> 216.9    #  90%
+          - 0.00000 -> 241.0    # 100%
     # From https://www.sensorsone.com/measurement-to-linear-0-5v-converter/?iunit=cm&irdg=0.8452500672&ilo=0.469&ihi=4.016666&ounit=V&olo=0&ohi=5
       - delta : 0.001                  # Only send the result if the difference with the last sent result is higher than this
       - offset: ${tank_level_offset}   # Add 0.01847cm to total, to correct to 0L when voltage is 0.469V
