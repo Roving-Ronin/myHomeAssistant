@@ -75,6 +75,7 @@ sensor:
     pin: ${analog_1}
     name: "Tank - Voltage"
     id: "tank_voltage"
+    icon: 'mdi:lightning-bolt'
     accuracy_decimals: 3
     device_class: "voltage"
     state_class: "measurement"
