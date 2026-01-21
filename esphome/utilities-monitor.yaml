@@ -10,6 +10,7 @@
 # v1.2.0 - Upate to Dentra v2 based water_statistics with publish yesterday = 0
 # v1.3.0 - Updated Water and Gas (m3 and MJ) components, so that values remain between reflashing
 # v1.8.2 - Fixed the Gas/Water Flow Rates (L/min) device class to be 'volume_flow_rate'
+# v1.9.0 - Switch to Framework Type = ESP-IDF (Was Arduino)
 
    # Provides substitutions or variables that are then called elsewhere multiple times in the config
 substitutions:
