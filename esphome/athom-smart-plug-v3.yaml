@@ -20,7 +20,7 @@ substitutions:
    # Project Name
   project_name: "Athom Technology.Smart Plug v3"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "1.7.1"
+  project_version: "1.8.0"
    # Restore the relay (GPO switch) upon reboot to state:
   relay_restore_mode: RESTORE_DEFAULT_ON      # RESTORE_DEFAULT_ON
    # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
@@ -45,7 +45,7 @@ esp32:
   flash_size: 4MB
   variant: ESP32C3
   framework:
-    type: arduino
+    type: esp-idf # arduino
     version: recommended
     
 esphome:
