@@ -53,6 +53,7 @@ esp8266:
   restore_from_flash: true
   framework:
     type: esp-idf # arduino
+    version: recommended
 
 #########################################################################
 #
