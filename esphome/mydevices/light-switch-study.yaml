@@ -320,7 +320,7 @@ light:
   - platform: binary
     name: ${button1_assignment}
     id: light1
-    device_id: study_device
+#    device_id: study_device
     icon: 'mdi:lightbulb'
     output: relay1
     restore_mode: ${light1_restore_mode}
@@ -335,7 +335,7 @@ light:
   - platform: binary
     name: ${button2_assignment}
     id: light2
-    device_id: dining_room_device
+#    device_id: dining_room_device
     icon: 'mdi:lightbulb'
     output: relay2
     restore_mode: ${light2_restore_mode}
@@ -354,7 +354,7 @@ light:
     icon: 'mdi:led-on'
     disabled_by_default: true
     id: led1
-    device_id: study_device
+#    device_id: study_device
     output: button_led1
     default_transition_length: 500ms
     web_server:
@@ -367,7 +367,7 @@ light:
     icon: 'mdi:led-on'
     disabled_by_default: true
     id: led2
-    device_id: dining_room_device
+#    device_id: dining_room_device
     output: button_led2
     default_transition_length: 500ms
     web_server:
