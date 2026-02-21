@@ -93,7 +93,7 @@ packages:
     url: https://github.com/roving-ronin/myhomeassistant
     ref: main
     files: [esphome/common/network-wifi.yaml]
-    refresh: 1h
+    refresh: 5s
 
   webserver_groups:
     url: https://github.com/roving-ronin/myhomeassistant
