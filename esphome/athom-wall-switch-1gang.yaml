@@ -98,11 +98,11 @@ packages:
 
 web_server:
   include_internal: false
-  sorting_groups:
+#  sorting_groups:
     
-    - id: group_light_switches
-      name: "Light Switches"
-      sorting_weight: -28
+#    - id: group_light_switches
+#      name: "Light Switches"
+#      sorting_weight: -28
 
 #    - id: group_light_usage
 #      name: "Light Statistics"
