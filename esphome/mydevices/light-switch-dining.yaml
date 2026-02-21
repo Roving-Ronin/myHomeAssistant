@@ -27,7 +27,7 @@ substitutions:
    # The circuit breaker / RCBO that the load is attached to.  
   power_rcbo: "Lights"
   # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
-  log_level: "ERROR"
+  log_level: "INFO"
 
 
   # Restore the relay (GPO switch) upon reboot to state:
