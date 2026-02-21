@@ -61,6 +61,14 @@ web_server:
       name: "Light Switches"
       sorting_weight: -28
 
+    - id: group_power_circuits
+      name: "Power Circuits"
+      sorting_weight: -27
+
+    - id: group_light_usage
+      name: "Light Statistics"
+      sorting_weight: -26
+
 ################################################## 
 #
 #  Used in ATHOM x6 Energy Meter
