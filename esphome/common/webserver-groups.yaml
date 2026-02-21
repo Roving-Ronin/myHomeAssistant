@@ -65,9 +65,9 @@ web_server:
       name: "Power Circuits"
       sorting_weight: -27
 
-    - id: group_light_usage
-      name: "Light Statistics"
-      sorting_weight: -26
+#    - id: group_light_usage
+#      name: "Light Statistics"
+#      sorting_weight: -26
 
 ################################################## 
 #
