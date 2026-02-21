@@ -14,7 +14,7 @@ substitutions:
    # Project Name
   project_name: "Aldi Casalux.Smart LED Downlight RGBW"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "1.3.1"
+  project_version: "1.3.2"
    # The phase in the home power supply, upon which this device is utilsed. A, B or C.  (myHome GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C)  
   power_phase: "A"
    # The circuit breaker / RCBO that the load is attached to.  
