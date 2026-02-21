@@ -55,6 +55,14 @@ web_server:
 
 ################################################## 
 #
+# Athom Light Switches
+#
+    - id: group_light_switches
+      name: "Light Switches"
+      sorting_weight: -28
+
+################################################## 
+#
 #  Used in ATHOM x6 Energy Meter
 #
 
