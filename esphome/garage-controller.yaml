@@ -40,8 +40,8 @@ substitutions:
   sonar_echo_pin: GPIO18
 
    # Ultrasonic sensor name and ID
-  ultrasonic_sensor_name: "Parked Car Sensor"
-  ultrasonic_sensor_id: "parked_car_sensor"
+  ultrasonic_sensor_name: "Parked Car Height"
+  ultrasonic_sensor_id: "parked_car_height"
 
    # Height of the ultrasonic sensor above the floor in cm.
    # Overrides the default of 0 in hc-sr04-ultrasonic.yaml.
