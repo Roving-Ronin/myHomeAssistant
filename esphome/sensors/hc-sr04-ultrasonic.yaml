@@ -43,7 +43,7 @@ sensor:
       - filter_out: nan
       - lambda: return (${ultrasonic_sensor_height} == 0) ? x : (${ultrasonic_sensor_height} - x);
      # Maximum distance reading possible. Enter distance from sensor to floor.
-    timeout: 231cm
+    timeout: 232cm
      # Hides this sensor from ESPHome web interface
 #    internal: true
     web_server:
