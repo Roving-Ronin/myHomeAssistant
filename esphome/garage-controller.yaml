@@ -206,6 +206,22 @@ globals:
 #########################################################################
 
 binary_sensor:
+     
+     # Sensor to use in HA Automations to tell if car is away and garage eve lights should be turned on
+  - platform: template
+    name: Parking Space Lights
+    id: parking_space_lights
+    icon: "mdi:car"
+    lambda: |-
+      if (id(parked_car_sensor).state >= 1.0) {
+        return true;  // on (empty)
+      } else {
+        return false; // off (occupied or invalid)
+      }
+    web_server:
+      sorting_group_id: group_garage_parking_status
+      sorting_weight: 3
+
 
      # Reed switch used to detect if the garage door is in the OPEN position
   - platform: gpio
