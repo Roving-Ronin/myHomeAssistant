@@ -89,7 +89,7 @@ substitutions:
   ultrasonic_sensor_group_sensor_weight: "3"
 
   # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
-  log_level: "ERROR"
+  log_level: "INFO"
 
 ########################## End of Substitutions #########################
 
