@@ -34,7 +34,7 @@ sensor:
     id: ${ultrasonic_sensor_id}
     disabled_by_default: $disable_by_default
     state_class: 'measurement'
-    unit_of_measurement: cm  # Default is meters. If using cm then lambdas need to be changed to reflect
+    unit_of_measurement: 'cm'  # Default is meters. If using cm then lambdas need to be changed to reflect
     trigger_pin: $sonar_trigger_pin
     echo_pin: $sonar_echo_pin
     update_interval: 30s
