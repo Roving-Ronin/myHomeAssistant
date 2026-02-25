@@ -5,7 +5,6 @@
 # for temperature, humidity, pressure & dew point.
 #
 
-  # Provides substitutions or variables that are then called elsewhere multiple times in the config
 substitutions:
    # Default name
   name: "garage-controller"
@@ -22,7 +21,7 @@ substitutions:
    # Project Name
   project_name: "DIY.Garage Controller"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
-  project_version: "1.2.0"
+  project_version: "2.0.0"
    # If true, entity should not be added to Home Assistant frontend, without the user manually enabling it.
   disable_by_default: "false"
 
@@ -32,8 +31,8 @@ substitutions:
   bus_a_frequency: "100kHz"    # Optional: 100kHz
 
    # I2C PINS - Used for BME280 sensor Bus B
-  bus_b_sda_pin: "GPIO14"      # Default on ESP32 is SDA = PIN14 ??. ES32-S3 use ??
-  bus_b_scl_pin: "GPIO15"      # Default on ESP32 is SLC = PIN15 ??. ES32-S3 use ??  
+  bus_b_sda_pin: "GPIO14"      # Default on ESP32 is SDA = PIN14. ES32-S3 use ??
+  bus_b_scl_pin: "GPIO15"      # Default on ESP32 is SLC = PIN15. ES32-S3 use ??
   bus_b_frequency: "100kHz"    # Optional: 100kHz
 
    # Ultrasonic HC-SR04+ PINs
@@ -49,17 +48,33 @@ substitutions:
   close_duration: "12500" # ms
 
    # Garage Door Opener (Relay) Switch config
-  garage_door_relay_pin: GPIO32 # gpio pin that trigger the door opening/closing/stop
-  active_switch_duration: 200ms # amount of time relay is closed
-  push_interval: "1500" # safe time between relay activations in ms
+  garage_door_relay_pin: GPIO32  # gpio pin that triggers the door opening/closing/stop
+  active_switch_duration: 200ms  # amount of time relay is closed
+
+   # Delay between relay activations for single-press sequences (open from closed, close from open)
+  push_interval: "1500"          # ms - safe minimum time between relay activations
+
+   # Delay between relay activations used in the 3-press resume sequence.
+   # When the door is stopped mid-travel and needs to resume in the SAME direction,
+   # the motor requires 3 presses: opposite → stop → original direction.
+   # This interval controls the pause between each of those 3 presses and can be
+   # tuned independently of push_interval to suit your motor's response time.
+  resume_press_interval: "2000"  # ms - delay between presses in the 3-press resume sequence
 
    # Reed Switch Sensors
-  garage_door_open_sensor_pin: GPIO26 # gpio pin for open endstop sensor
+  garage_door_open_sensor_pin: GPIO26   # gpio pin for open endstop sensor
   garage_door_closed_sensor_pin: GPIO27 # gpio pin for close endstop sensor
-  debounce_time: 30ms # debounce time for open/close endstops
+  debounce_time: 30ms                   # debounce time for open/close endstops
 
-  # Web_server v3 Sort Groups - These substitutes are applied to overwrite the default ones supplied by the 
-  # sensor specific template file, in this case the /sensors/hc-sr04-ultrasonic.yaml file.
+   # Parking thresholds (metres) - shared between parking_state and parking_space
+   # to ensure consistent behaviour across both sensors
+  car_parked_threshold: "0.80"   # Below this distance = car is present
+  car_away_threshold: "0.80"     # Above this distance = car is absent
+
+   # How long the door must be open and idle before the left-open alert fires
+  door_open_alert_time: "1200s"  # 20 minutes
+
+  # Web_server v3 Sort Groups - overrides defaults from hc-sr04-ultrasonic.yaml package
   ultrasonic_sensor_group_id: "group_garage_door_controls"
   ultrasonic_sensor_group_name: "Garage Door Controls"
   ultrasonic_sensor_group_sorting_weight: "-48"
@@ -75,24 +90,24 @@ esphome:
     priority: -10
     then:
       - lambda: |-
-          // check cover position
-          if (id(garage_door_open_sensor).state) // door open
+          // Restore cover position on boot based on reed sensor states
+          if (id(garage_door_open_sensor).state)
           {
             id(garage_door).current_operation = esphome::cover::COVER_OPERATION_IDLE;
             id(garage_door).position = esphome::cover::COVER_OPEN;
             id(last_dir) = esphome::cover::COVER_OPERATION_OPENING;
             id(garage_door).publish_state();
           }
-          else if (id(garage_door_closed_sensor).state) // door closed
+          else if (id(garage_door_closed_sensor).state)
           {
             id(garage_door).current_operation = esphome::cover::COVER_OPERATION_IDLE;
             id(garage_door).position = esphome::cover::COVER_CLOSED;
             id(last_dir) = esphome::cover::COVER_OPERATION_CLOSING;
             id(garage_door).publish_state();
           }
-          else // door neither closed nor open 
+          else
           {
-            // last dir not know, so let cover restore last state
+            // Door is mid-travel - let cover restore last known state
           }
 
 #########################################################################
@@ -129,19 +144,7 @@ packages:
     files: [esphome/sensors/hc-sr04-ultrasonic.yaml]
     refresh: 5s
 
-
-#  base-config:      !include common/base-configuration.yaml
-#  wifi-config:      !include common/network-wifi.yaml
-#  bme280a-sensors:  !include sensors/bme280-bus-a.yaml
-#  bme280b-sensors:  !include sensors/bme280-bus-b.yaml
-#  hc-sr04-sensors: !include sensors/hc-sr04-ultrasonic.yaml
-
-
-########################## End of Substitutions ##########################
-#
-# Combined with web_server settings in /common/base-configuration to
-# define a network information group
-#
+########################## End of Packages ##########################
 
 web_server:
   version: 3
@@ -153,7 +156,6 @@ web_server:
       name: "Garage Door Controls"
       sorting_weight: -48
 
-
 #########################################################################
 
 globals:
@@ -161,26 +163,41 @@ globals:
     type: esphome::cover::CoverOperation
     restore_value: yes
     initial_value: esphome::cover::COVER_OPERATION_IDLE
-  
+
   - id: target_action
     type: int
     restore_value: no
     initial_value: "3" # Idle: 0, Open: 1, Close: 2, None: 3
-  
+
   - id: push_interval
     type: int
     restore_value: no
     initial_value: $push_interval
-  
+
   - id: open_duration
     type: uint32_t
     restore_value: no
     initial_value: $open_duration
-  
+
   - id: close_duration
     type: uint32_t
     restore_value: no
     initial_value: $close_duration
+
+   # Tracks total open/close cycles completed - persists across reboots.
+   # Useful for motor/mechanism maintenance planning.
+  - id: door_cycle_count
+    type: int
+    restore_value: yes
+    initial_value: "0"
+
+   # Tamper flag - set true when the closed reed releases with no pending 
+   # ESPHome command (target_action == 3), indicating a possible forced or manual open.
+   # Cleared automatically when the door is confirmed fully closed again.
+  - id: door_tamper_detected
+    type: bool
+    restore_value: no
+    initial_value: "false"
 
 #########################################################################
 
@@ -195,29 +212,27 @@ binary_sensor:
     name: "Garage Door - Sensor (Open)"
     id: garage_door_open_sensor
     disabled_by_default: $disable_by_default
-     # Hides this sensor from ESPHome web interface
     internal: true
     filters:
       - delayed_on_off: $debounce_time
     on_press:
       then:
         - lambda: |-
-            // stop all current actions
             id(push_one).stop();
-            // update states
+            id(push_three).stop();
             id(garage_door).current_operation = esphome::cover::COVER_OPERATION_IDLE;
             id(garage_door).position = esphome::cover::COVER_OPEN;
             id(last_dir) = esphome::cover::COVER_OPERATION_OPENING;
             id(garage_door).publish_state();
+        - text_sensor.template.publish:
+            id: garage_door_last_opened
+            state: !lambda 'return id(sntp_time).now().strftime("%a %d %b %Y - %I:%M:%S %p");'
     on_release:
-       # Door was commanded manually (not ESPhome)
       then:
-        - lambda: |-          
-            // set state as closing. This will start position update and reporting
+        - lambda: |-
             id(last_dir) = esphome::cover::COVER_OPERATION_CLOSING;
             id(garage_door).current_operation = esphome::cover::COVER_OPERATION_CLOSING;
             id(garage_door).publish_state();
-
 
      # Reed switch used to detect if the garage door is in the CLOSED position
   - platform: gpio
@@ -228,39 +243,76 @@ binary_sensor:
     name: "Garage Door - Sensor (Closed)"
     id: garage_door_closed_sensor
     disabled_by_default: $disable_by_default
-    # Hides this sensor from ESPHome web interface
     internal: true
     filters:
       - delayed_on_off: $debounce_time
     on_press:
       then:
         - lambda: |-
-            // stop all current actions
             id(push_one).stop();
-            // update states
+            id(push_three).stop();
             id(garage_door).current_operation = esphome::cover::COVER_OPERATION_IDLE;
             id(garage_door).position = esphome::cover::COVER_CLOSED;
             id(last_dir) = esphome::cover::COVER_OPERATION_CLOSING;
             id(garage_door).publish_state();
+            // Increment cycle counter - one full cycle = one close completion
+            id(door_cycle_count) += 1;
+            // Clear tamper flag now door is confirmed fully closed
+            id(door_tamper_detected) = false;
+        - text_sensor.template.publish:
+            id: garage_door_last_closed
+            state: !lambda 'return id(sntp_time).now().strftime("%a %d %b %Y - %I:%M:%S %p");'
     on_release:
-       # door was commanded manually (not ESPhome)
+       # If no ESPHome command was pending, this was a manual or forced open - flag as tamper
       then:
         - lambda: |-
-            // set state as opening. This will start position update and reporting
+            if (id(target_action) == 3) {
+              id(door_tamper_detected) = true;
+            }
             id(last_dir) = esphome::cover::COVER_OPERATION_OPENING;
             id(garage_door).current_operation = esphome::cover::COVER_OPERATION_OPENING;
             id(garage_door).publish_state();
+
+     # Fires after the door has been left fully open and idle for door_open_alert_time.
+     # delayed_on means it resets if the door moves at all during the alert period.
+  - platform: template
+    name: "Garage Door - Left Open Alert"
+    id: door_left_open_alert
+    icon: 'mdi:garage-alert-variant'
+    device_class: problem
+    disabled_by_default: $disable_by_default
+    lambda: |-
+      return (id(garage_door).position == COVER_OPEN &&
+              id(garage_door).current_operation == COVER_OPERATION_IDLE);
+    filters:
+      - delayed_on: $door_open_alert_time
+    web_server:
+      sorting_group_id: group_garage_door_controls
+      sorting_weight: 5
+
+     # Fires when the closed reed releases with no pending ESPHome command.
+     # Clears automatically once the door is confirmed closed again.
+  - platform: template
+    name: "Garage Door - Tamper Alert"
+    id: door_tamper_alert
+    icon: 'mdi:shield-alert'
+    device_class: tamper
+    disabled_by_default: $disable_by_default
+    lambda: |-
+      return id(door_tamper_detected);
+    web_server:
+      sorting_group_id: group_garage_door_controls
+      sorting_weight: 6
 
 #########################################################################
 
 switch:
 
-     # Relay with wire to garage door motor/opener, to send open/close signal
+     # Relay connected to garage door motor/opener to send open/close/stop signal
   - platform: gpio
     pin: $garage_door_relay_pin
     name: "Garage Door - Relay"
     id: garage_door_relay
-    # Hides this sensor from ESPHome web interface
     internal: true
     disabled_by_default: $disable_by_default
     restore_mode: ALWAYS_OFF
@@ -268,7 +320,8 @@ switch:
       - delay: $active_switch_duration
       - switch.turn_off: garage_door_relay
 
-     # Virtual lock, if enabled will stop the garage door (via relay) from being triggered to open/close
+     # Virtual lock - when ON, prevents all relay activations via ESPHome.
+     # Defaults to locked (ALWAYS_ON) for safety.
   - platform: template
     name: "Garage Door - Virtual Lock"
     id: virtual_lock
@@ -281,51 +334,88 @@ switch:
 
 #########################################################################
 
+sensor:
+
+     # Exposes the persistent door cycle count to Home Assistant.
+     # Increments each time the door completes a close (closed reed sensor triggers).
+  - platform: template
+    name: "Garage Door - Cycle Count"
+    id: garage_door_cycle_count
+    icon: 'mdi:counter'
+    accuracy_decimals: 0
+    unit_of_measurement: "cycles"
+    state_class: total_increasing
+    lambda: return id(door_cycle_count);
+    update_interval: 60s
+    web_server:
+      sorting_group_id: group_garage_door_controls
+      sorting_weight: 7
+
+#########################################################################
+
 text_sensor:
 
+     # Combined door and vehicle state string for dashboard display
   - platform: template
     name: "Parking State"
     id: parking_state
     icon: 'mdi:parking'
     lambda: |-
-      if (id(garage_door_open_sensor).state && id(parked_car_sensor).state <= 0.75) {
-        return {"Door Open | Vehicle Parked"};
-      } else if (id(garage_door_closed_sensor).state && id(parked_car_sensor).state <= 0.75) {
-        return {"Door Closed | Vehicle Parked"};
-      } else if ((id(garage_door_closed_sensor).state == id(garage_door_open_sensor).state) && id(parked_car_sensor).state <= 0.75) {
-        return {"Door Ajar | Vehicle Parked"};
-      } else if (id(garage_door_open_sensor).state && id(parked_car_sensor).state >= 0.80 && id(parked_car_sensor).state <= 3.00) {
-        return {"Door Open | Vehicle Away"};
-      } else if (id(garage_door_closed_sensor).state && id(parked_car_sensor).state >= 0.80 && id(parked_car_sensor).state <= 3.00) {
-        return {"Door Closed | Vehicle Away"};
-      } else if ((id(garage_door_closed_sensor).state == id(garage_door_open_sensor).state) && id(parked_car_sensor).state >= 0.80 && id(parked_car_sensor).state <= 3.00) {
-        return {"Door Ajar | Vehicle Away"};
-      } else { 
-        return {"Unknown"};  
-      }
-    update_interval: 30s
+      float dist = id(parked_car_sensor).state;
+      bool door_open   = id(garage_door_open_sensor).state;
+      bool door_closed = id(garage_door_closed_sensor).state;
+      bool car_present = dist <= ${car_parked_threshold};
+      bool car_away    = dist >  ${car_away_threshold} && dist <= 3.00;
+      std::string door_str;
+      if (door_open && !door_closed)       door_str = "Door Open";
+      else if (door_closed && !door_open)  door_str = "Door Closed";
+      else                                 door_str = "Door Ajar";
+      if (car_present) return {door_str + " | Vehicle Parked"};
+      if (car_away)    return {door_str + " | Vehicle Away"};
+      return {"Unknown"};
+    update_interval: never  # Updated via interval block, in sync with ultrasonic sensor
     web_server:
       sorting_group_id: group_garage_parking_status
       sorting_weight: 1
 
-    # Use the distance under the ultrasonic sensor to determine if the parking space is occupied or empty
+     # Whether the parking space is occupied or empty based on ultrasonic distance
   - platform: template
     name: "Parking Space"
     id: parking_space
     icon: 'mdi:car'
     lambda: |-
-      if (id(parked_car_sensor).state <= 0.99) {
-        // car is in the garage
+      float dist = id(parked_car_sensor).state;
+      if (dist <= ${car_parked_threshold}) {
         return {"OCCUPIED"};
-      } else if (id(parked_car_sensor).state >= 1.0) {
+      } else if (dist > ${car_away_threshold}) {
         return {"EMPTY"};
-      } else { 
-        return {"Unknown"};  
+      } else {
+        return {"Unknown"};
       }
-    update_interval: 30s
+    update_interval: never  # Updated via interval block, in sync with ultrasonic sensor
     web_server:
       sorting_group_id: group_garage_parking_status
       sorting_weight: 2
+
+     # Timestamp of when the door last reached the fully open position
+  - platform: template
+    name: "Garage Door - Last Opened"
+    id: garage_door_last_opened
+    icon: 'mdi:clock-outline'
+    update_interval: never
+    web_server:
+      sorting_group_id: group_garage_door_controls
+      sorting_weight: 8
+
+     # Timestamp of when the door last reached the fully closed position
+  - platform: template
+    name: "Garage Door - Last Closed"
+    id: garage_door_last_closed
+    icon: 'mdi:clock-check-outline'
+    update_interval: never
+    web_server:
+      sorting_group_id: group_garage_door_controls
+      sorting_weight: 9
 
 #########################################################################
 
@@ -339,91 +429,153 @@ cover:
     optimistic: false
     has_position: true
     assumed_state: false
-    # main loop
+    # Main control loop - updates estimated position and manages watchdog
     lambda: |-
       static uint32_t last_recompute_time = 0;
       static uint32_t last_publish_time = 0;
-      static uint32_t last_push_time = 0;
-      // store current time
+      static uint32_t move_start_time = 0;
       const uint32_t now = millis();
-      // recompute position
-      if (id(garage_door).current_operation != COVER_OPERATION_IDLE)  // Door moving
+
+      if (id(garage_door).current_operation != COVER_OPERATION_IDLE)
       {
         float dir;
         float action_dur;
-        // set dir and duration depending on current movement
         if (id(garage_door).current_operation == COVER_OPERATION_CLOSING)
         {
-          // door closing
           dir = -1.0f;
           action_dur = id(close_duration);
         }
         else
         {
-          // door opening
           dir = 1.0f;
           action_dur = id(open_duration);
         }
-        // calculate position
+        // Update estimated position
         float position = id(garage_door).position;
         position += dir * (now - last_recompute_time) / action_dur;
         id(garage_door).position = clamp(position, 0.0f, 1.0f);
-        // publish position every second
+        // Publish position update once per second
         if (now - last_publish_time > 1000)
         {
           id(garage_door).publish_state();
           last_publish_time = now;
         }
-      }
-      last_recompute_time = now;
-      // push button if target action different than current operation
-      if (id(target_action) != 3 && id(target_action) != id(garage_door).current_operation)
-      {
-        if (now - last_push_time > id(push_interval))
+        // Watchdog: if door has been moving longer than expected duration + 5s,
+        // assume stuck and force back to IDLE. Reed sensors will correct position
+        // if the door does eventually complete travel.
+        uint32_t max_duration = (uint32_t)(action_dur) + 5000;
+        if (move_start_time > 0 && (now - move_start_time) > max_duration)
         {
-          id(push_one).execute();
-          last_push_time = now;
+          ESP_LOGW("watchdog", "Door movement timed out - resetting to IDLE");
+          id(garage_door).current_operation = COVER_OPERATION_IDLE;
+          id(target_action) = 3;
+          id(garage_door).publish_state();
+          move_start_time = 0;
         }
       }
-      else if (id(target_action) == id(garage_door).current_operation)
+      else
       {
-        // target reached, set target as None (3).
-        ESP_LOGD("target", "Target Reached");
-        id(target_action) = 3;
+        move_start_time = now;
       }
+      last_recompute_time = now;
       return {};
+
+    # -----------------------------------------------------------------------
+    # open_action: Move the door to the open position.
+    #
+    # The motor cycle from any state is:
+    #   Fully closed (idle)          -> press 1 -> starts opening        = 1 press
+    #   Moving (either direction)    -> press 1 -> stops                 = 1 press
+    #   Stopped mid-travel:
+    #     last_dir was CLOSING       -> press 1 -> starts opening        = 1 press (opposite = desired)
+    #     last_dir was OPENING       -> press 1 -> starts closing        (wrong way!)
+    #                                   press 2 -> stops again
+    #                                   press 3 -> starts opening        = 3 presses to resume original dir
+    # -----------------------------------------------------------------------
     open_action:
-        - if:
-            condition:
-              - and:
-                - switch.is_off: virtual_lock
-                - binary_sensor.is_on: garage_door_closed_sensor
-            then: 
-              - logger.log:
-                  format: "Open Action - CO:%u PO:%f LD:%u"
-                  args: [ id(garage_door).current_operation, id(garage_door).position, id(last_dir) ]
-      # update target
-              - lambda: |-
-                  if (id(garage_door).position != COVER_OPEN)
-                  {
-                    id(target_action) = COVER_OPERATION_OPENING;
-                  }
+      - if:
+          condition:
+            switch.is_off: virtual_lock
+          then:
+            - logger.log:
+                format: "Open Action - CO:%u PO:%f LD:%u"
+                args: [ id(garage_door).current_operation, id(garage_door).position, id(last_dir) ]
+            - lambda: |-
+                id(target_action) = COVER_OPERATION_OPENING;
+                // Already open - nothing to do
+                if (id(garage_door).position == COVER_OPEN) {
+                  id(target_action) = 3;
+                  return;
+                }
+                // Fully closed - single press will start opening
+                if (id(garage_door_closed_sensor).state) {
+                  id(push_one).execute();
+                  return;
+                }
+                // Door is moving - single press will stop it, push_three will then resume opening
+                if (id(garage_door).current_operation == esphome::cover::COVER_OPERATION_OPENING ||
+                    id(garage_door).current_operation == esphome::cover::COVER_OPERATION_CLOSING) {
+                  id(push_three).execute();
+                  return;
+                }
+                // Door is stopped mid-travel
+                if (id(last_dir) == esphome::cover::COVER_OPERATION_CLOSING) {
+                  // Last moved closing, so single press starts opening - what we want
+                  id(push_one).execute();
+                } else {
+                  // Last moved opening, so single press would start closing (wrong way).
+                  // Use 3-press sequence: closing -> stop -> opening
+                  id(push_three).execute();
+                }
+
+    # -----------------------------------------------------------------------
+    # close_action: Move the door to the closed position.
+    #
+    # Mirror of open_action above, with directions reversed:
+    #   Fully open (idle)            -> press 1 -> starts closing        = 1 press
+    #   Moving (either direction)    -> press 1 -> stops                 = 1 press
+    #   Stopped mid-travel:
+    #     last_dir was OPENING       -> press 1 -> starts closing        = 1 press (opposite = desired)
+    #     last_dir was CLOSING       -> press 1 -> starts opening        (wrong way!)
+    #                                   press 2 -> stops again
+    #                                   press 3 -> starts closing        = 3 presses to resume original dir
+    # -----------------------------------------------------------------------
     close_action:
       - if:
           condition:
-            - and:
-              - switch.is_off: virtual_lock
-              - binary_sensor.is_on: garage_door_open_sensor
+            switch.is_off: virtual_lock
           then:
-              - logger.log:
-                  format: "Close Action - CO:%u PO:%f LD:%u"
-                  args: [ id(garage_door).current_operation, id(garage_door).position, id(last_dir) ]
-      # update target
-              - lambda: |-
-                  if (id(garage_door).position != COVER_CLOSED)
-                  {
-                    id(target_action) = COVER_OPERATION_CLOSING;
-                  }
+            - logger.log:
+                format: "Close Action - CO:%u PO:%f LD:%u"
+                args: [ id(garage_door).current_operation, id(garage_door).position, id(last_dir) ]
+            - lambda: |-
+                id(target_action) = COVER_OPERATION_CLOSING;
+                // Already closed - nothing to do
+                if (id(garage_door).position == COVER_CLOSED) {
+                  id(target_action) = 3;
+                  return;
+                }
+                // Fully open - single press will start closing
+                if (id(garage_door_open_sensor).state) {
+                  id(push_one).execute();
+                  return;
+                }
+                // Door is moving - single press will stop it, push_three will then resume closing
+                if (id(garage_door).current_operation == esphome::cover::COVER_OPERATION_OPENING ||
+                    id(garage_door).current_operation == esphome::cover::COVER_OPERATION_CLOSING) {
+                  id(push_three).execute();
+                  return;
+                }
+                // Door is stopped mid-travel
+                if (id(last_dir) == esphome::cover::COVER_OPERATION_OPENING) {
+                  // Last moved opening, so single press starts closing - what we want
+                  id(push_one).execute();
+                } else {
+                  // Last moved closing, so single press would start opening (wrong way).
+                  // Use 3-press sequence: opening -> stop -> closing
+                  id(push_three).execute();
+                }
+
     stop_action:
       - if:
           condition:
@@ -432,15 +584,18 @@ cover:
               - binary_sensor.is_off: garage_door_closed_sensor
               - binary_sensor.is_off: garage_door_open_sensor
           then:
-              - logger.log:
-                  format: "Stop Action - CO:%u PO:%f LD:%u"
-                  args: [ id(garage_door).current_operation, id(garage_door).position, id(last_dir) ]
-      # update target
-              - lambda: |-
-                  if (id(garage_door).position != COVER_OPEN && id(garage_door).position != COVER_CLOSED)
-                  {
-                    id(target_action) = COVER_OPERATION_IDLE;
-                  }
+            - logger.log:
+                format: "Stop Action - CO:%u PO:%f LD:%u"
+                args: [ id(garage_door).current_operation, id(garage_door).position, id(last_dir) ]
+            - lambda: |-
+                // Cancel any in-progress press sequences
+                id(push_one).stop();
+                id(push_three).stop();
+                if (id(garage_door).current_operation != COVER_OPERATION_IDLE)
+                {
+                  id(target_action) = COVER_OPERATION_IDLE;
+                  id(push_one).execute();
+                }
     web_server:
       sorting_group_id: group_garage_door_controls
       sorting_weight: 1
@@ -448,21 +603,25 @@ cover:
 #########################################################################
 
 script:
+
+   # Single relay press - used when the door is in a known state and a single
+   # press will produce the desired outcome (e.g. fully closed -> open).
   - id: push_one
     mode: single
     then:
-      - logger.log: "Push 1 Times"
+      - logger.log: "Push: 1 press"
       - switch.turn_on: garage_door_relay
-      # state machine
       - lambda: |-
-          if (id(garage_door).current_operation == esphome::cover::COVER_OPERATION_OPENING || id(garage_door).current_operation == esphome::cover::COVER_OPERATION_CLOSING)
+          // Update state machine to reflect what the press will cause
+          if (id(garage_door).current_operation == esphome::cover::COVER_OPERATION_OPENING ||
+              id(garage_door).current_operation == esphome::cover::COVER_OPERATION_CLOSING)
           {
-            // door moving
+            // Was moving - press stops it
             id(garage_door).current_operation = esphome::cover::COVER_OPERATION_IDLE;
           }
           else
           {
-            // door idle
+            // Was idle - press starts it moving opposite to last direction
             if (id(last_dir) == esphome::cover::COVER_OPERATION_OPENING)
             {
               id(garage_door).current_operation = esphome::cover::COVER_OPERATION_CLOSING;
@@ -475,5 +634,75 @@ script:
             }
           }
           id(garage_door).publish_state();
+
+   # Three-press sequence - used when the door is stopped mid-travel and needs
+   # to resume in the SAME direction as last_dir. The motor will not allow
+   # directly resuming the same direction from a stopped state; it must cycle
+   # through: opposite direction -> stop -> original direction.
+   #
+   # Press 1: starts door moving in opposite direction to last_dir
+   # Delay:   resume_press_interval ms
+   # Press 2: stops the door again
+   # Delay:   resume_press_interval ms  
+   # Press 3: starts door moving in original direction (last_dir)
+   #
+   # Note: if a reed sensor triggers during this sequence (door reaches an
+   # endstop), the reed on_press handler will call push_three.stop() to
+   # abort the sequence cleanly.
+  - id: push_three
+    mode: single
+    then:
+      - logger.log: "Push: 3-press resume sequence start"
+      # Press 1 - starts moving in opposite direction
+      - switch.turn_on: garage_door_relay
+      - lambda: |-
+          if (id(last_dir) == esphome::cover::COVER_OPERATION_OPENING)
+          {
+            id(garage_door).current_operation = esphome::cover::COVER_OPERATION_CLOSING;
+            id(last_dir) = esphome::cover::COVER_OPERATION_CLOSING;
+          }
+          else
+          {
+            id(garage_door).current_operation = esphome::cover::COVER_OPERATION_OPENING;
+            id(last_dir) = esphome::cover::COVER_OPERATION_OPENING;
+          }
+          id(garage_door).publish_state();
+      - delay: !lambda 'return ${resume_press_interval};'
+      # Press 2 - stops the door
+      - switch.turn_on: garage_door_relay
+      - lambda: |-
+          id(garage_door).current_operation = esphome::cover::COVER_OPERATION_IDLE;
+          id(garage_door).publish_state();
+      - delay: !lambda 'return ${resume_press_interval};'
+      # Press 3 - starts moving in original direction
+      - switch.turn_on: garage_door_relay
+      - lambda: |-
+          if (id(last_dir) == esphome::cover::COVER_OPERATION_OPENING)
+          {
+            id(garage_door).current_operation = esphome::cover::COVER_OPERATION_CLOSING;
+            id(last_dir) = esphome::cover::COVER_OPERATION_CLOSING;
+          }
+          else
+          {
+            id(garage_door).current_operation = esphome::cover::COVER_OPERATION_OPENING;
+            id(last_dir) = esphome::cover::COVER_OPERATION_OPENING;
+          }
+          id(garage_door).publish_state();
+      - logger.log: "Push: 3-press resume sequence complete"
+
+#########################################################################
+#
+# Interval - keeps parking text sensors in sync with the ultrasonic sensor.
+# Both sensors use update_interval: never and are triggered here instead,
+# matching the 30s update rate of the HC-SR04 package.
+# Note: If you ever move the HC-SR04 config inline into this file, replace
+# this interval with an on_value callback on the sensor directly.
+#
+
+interval:
+  - interval: 30s
+    then:
+      - component.update: parking_state
+      - component.update: parking_space
 
 #########################################################################
