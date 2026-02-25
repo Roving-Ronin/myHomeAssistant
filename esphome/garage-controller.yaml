@@ -21,7 +21,7 @@ substitutions:
    # Project Name
   project_name: "DIY.Garage Controller"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
-  project_version: "2.0.0"
+  project_version: "2.0.1"
    # If true, entity should not be added to Home Assistant frontend, without the user manually enabling it.
   disable_by_default: "false"
 
@@ -43,6 +43,10 @@ substitutions:
   ultrasonic_sensor_name: "Parked Car Sensor"
   ultrasonic_sensor_id: "parked_car_sensor"
 
+   # Height of the ultrasonic sensor above the floor in cm
+   # = ceiling height - mount offset below ceiling (240cm - 10cm = 230cm)
+  ultrasonic_sensor_height: "230"
+  
    # Garage Door Cover - Time to open or close (1,000ms = 1sec)
   open_duration: "14000" # ms
   close_duration: "12500" # ms
