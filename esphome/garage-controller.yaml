@@ -241,7 +241,7 @@ binary_sensor:
     id: parking_space_lights
     icon: "mdi:car"
     lambda: |-
-      if (id(parked_car_sensor).state < ${car_parked_threshold}) {
+      if (id(parked_car_height).state < ${car_parked_threshold}) {
         return true;  // on (empty - no vehicle detected)
       } else {
         return false; // off (vehicle present)
@@ -407,14 +407,14 @@ sensor:
 text_sensor:
 
      # Combined door and vehicle state string for dashboard display.
-     # parked_car_sensor now reports vehicle height in cm (via hc-sr04-ultrasonic.yaml filter),
+     # parked_car_height now reports vehicle height in cm (via hc-sr04-ultrasonic.yaml filter),
      # so thresholds are compared against cm height values rather than gap distances in metres.
   - platform: template
     name: "Parking State"
     id: parking_state
     icon: 'mdi:parking'
     lambda: |-
-      float height = id(parked_car_sensor).state;
+      float height = id(parked_car_height).state;
       bool door_open   = id(garage_door_open_sensor).state;
       bool door_closed = id(garage_door_closed_sensor).state;
       bool car_present = height >= ${car_parked_threshold};
@@ -437,7 +437,7 @@ text_sensor:
     id: parking_space
     icon: 'mdi:car'
     lambda: |-
-      float height = id(parked_car_sensor).state;
+      float height = id(parked_car_height).state;
       if (height >= ${car_parked_threshold}) {
         return {"OCCUPIED"};
       } else if (height < ${car_away_threshold}) {
