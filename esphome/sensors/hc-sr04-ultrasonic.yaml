@@ -12,6 +12,10 @@ substitutions:
   ultrasonic_sensor_name: "Ultrasonic Sensor"
   ultrasonic_sensor_id: "ultrasonic_sensor"
 
+  # Height of the ultrasonic sensor above the floor in cm
+  # = ceiling height - mount offset below ceiling (240cm - 10cm = 230cm)
+  ultrasonic_sensor_height: "0"
+  
   # Web_server v3 Sort Groups - The template DEVICE yaml (i.e. Garage-Controller.yaml) should repeat these entries, but contrain
   # the settings required for that specific device, that will then overwrite these default settings.
 #  ultrasonic_sensor_group_id: "group_ultrasonic_sensor"
@@ -30,15 +34,16 @@ sensor:
     id: ${ultrasonic_sensor_id}
     disabled_by_default: $disable_by_default
     state_class: 'measurement'
-#    unit_of_measurement: cm  # Default is meters. If using cm then lambdas need to be changed to reflect
+    unit_of_measurement: cm  # Default is meters. If using cm then lambdas need to be changed to reflect
     trigger_pin: $sonar_trigger_pin
     echo_pin: $sonar_echo_pin
     update_interval: 30s
 #    pulse_time: 20us
     filters:
       - filter_out: nan
+      - lambda: return (${ultrasonic_sensor_height} == 0) ? x : (${ultrasonic_sensor_height} - x);
      # Maximum distance reading possible. Enter distance from sensor to floor.
-    timeout: 3.0m
+    timeout: 231cm
      # Hides this sensor from ESPHome web interface
 #    internal: true
     web_server:
