@@ -21,7 +21,7 @@ substitutions:
    # Project Name
   project_name: "DIY.Garage Controller"
    # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version  
-  project_version: "2.0.1"
+  project_version: "2.1.0"
    # If true, entity should not be added to Home Assistant frontend, without the user manually enabling it.
   disable_by_default: "false"
 
@@ -43,10 +43,12 @@ substitutions:
   ultrasonic_sensor_name: "Parked Car Sensor"
   ultrasonic_sensor_id: "parked_car_sensor"
 
-   # Height of the ultrasonic sensor above the floor in cm
+   # Height of the ultrasonic sensor above the floor in cm.
+   # Overrides the default of 0 in hc-sr04-ultrasonic.yaml.
    # = ceiling height - mount offset below ceiling (240cm - 10cm = 230cm)
+   # When set, the sensor reports vehicle height in cm rather than gap distance.
   ultrasonic_sensor_height: "230"
-  
+
    # Garage Door Cover - Time to open or close (1,000ms = 1sec)
   open_duration: "14000" # ms
   close_duration: "12500" # ms
@@ -70,18 +72,20 @@ substitutions:
   garage_door_closed_sensor_pin: GPIO27 # gpio pin for close endstop sensor
   debounce_time: 30ms                   # debounce time for open/close endstops
 
-   # Parking thresholds (metres) - shared between parking_state and parking_space
-   # to ensure consistent behaviour across both sensors
-  car_parked_threshold: "0.80"   # Below this distance = car is present
-  car_away_threshold: "0.80"     # Above this distance = car is absent
+   # Parking thresholds in cm - based on vehicle height as reported by the ultrasonic sensor.
+   # The sensor now reports vehicle height (cm) rather than gap distance.
+   # Honda Civic ~143cm, Toyota Prado ~181cm - threshold of 120cm safely detects both.
+   # A reading below this threshold means no vehicle is present (or an invalid reading).
+  car_parked_threshold: "120"    # cm - vehicle height above this = car is present
+  car_away_threshold: "120"      # cm - vehicle height below this = no car present
 
    # How long the door must be open and idle before the left-open alert fires
   door_open_alert_time: "1200s"  # 20 minutes
 
   # Web_server v3 Sort Groups - overrides defaults from hc-sr04-ultrasonic.yaml package
-  ultrasonic_sensor_group_id: "group_garage_door_controls"
-  ultrasonic_sensor_group_name: "Garage Door Controls"
-  ultrasonic_sensor_group_sorting_weight: "-48"
+  ultrasonic_sensor_group_id: "group_garage_parking_status"
+  ultrasonic_sensor_group_name: "Garage Parking Status"
+  ultrasonic_sensor_group_sorting_weight: "-49"
   ultrasonic_sensor_group_sensor_weight: "3"
 
   # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
@@ -93,8 +97,8 @@ esphome:
   on_boot:
     priority: -10
     then:
+       # Restore cover position on boot based on reed sensor states
       - lambda: |-
-          // Restore cover position on boot based on reed sensor states
           if (id(garage_door_open_sensor).state)
           {
             id(garage_door).current_operation = esphome::cover::COVER_OPERATION_IDLE;
@@ -113,6 +117,13 @@ esphome:
           {
             // Door is mid-travel - let cover restore last known state
           }
+       # Restore persisted timestamps to text sensors after reboot/reflash
+      - text_sensor.template.publish:
+          id: garage_door_last_opened
+          state: !lambda 'return id(last_opened_time);'
+      - text_sensor.template.publish:
+          id: garage_door_last_closed
+          state: !lambda 'return id(last_closed_time);'
 
 #########################################################################
 #
@@ -203,25 +214,41 @@ globals:
     restore_value: no
     initial_value: "false"
 
+   # Persisted timestamp of when the door last reached the fully open position.
+   # Stored as a global so it survives reboots and reflashing, then restored
+   # to the text sensor on boot.
+  - id: last_opened_time
+    type: std::string
+    restore_value: yes
+    initial_value: '""'
+
+   # Persisted timestamp of when the door last reached the fully closed position.
+   # Stored as a global so it survives reboots and reflashing, then restored
+   # to the text sensor on boot.
+  - id: last_closed_time
+    type: std::string
+    restore_value: yes
+    initial_value: '""'
+
 #########################################################################
 
 binary_sensor:
-     
-     # Sensor to use in HA Automations to tell if car is away and garage eve lights should be turned on
+
+     # Sensor to use in HA Automations to tell if car is away and garage eve lights should be turned on.
+     # Car is considered absent when vehicle height reading is below the parked threshold.
   - platform: template
     name: Parking Space Lights
     id: parking_space_lights
     icon: "mdi:car"
     lambda: |-
-      if (id(parked_car_sensor).state >= 1.0) {
-        return true;  // on (empty)
+      if (id(parked_car_sensor).state < ${car_parked_threshold}) {
+        return true;  // on (empty - no vehicle detected)
       } else {
-        return false; // off (occupied or invalid)
+        return false; // off (vehicle present)
       }
     web_server:
       sorting_group_id: group_garage_parking_status
       sorting_weight: 3
-
 
      # Reed switch used to detect if the garage door is in the OPEN position
   - platform: gpio
@@ -244,9 +271,11 @@ binary_sensor:
             id(garage_door).position = esphome::cover::COVER_OPEN;
             id(last_dir) = esphome::cover::COVER_OPERATION_OPENING;
             id(garage_door).publish_state();
+            // Save timestamp to persistent global then publish to text sensor
+            id(last_opened_time) = id(sntp_time).now().strftime("%a %d %b %Y - %I:%M:%S %p");
         - text_sensor.template.publish:
             id: garage_door_last_opened
-            state: !lambda 'return id(sntp_time).now().strftime("%a %d %b %Y - %I:%M:%S %p");'
+            state: !lambda 'return id(last_opened_time);'
     on_release:
       then:
         - lambda: |-
@@ -279,9 +308,11 @@ binary_sensor:
             id(door_cycle_count) += 1;
             // Clear tamper flag now door is confirmed fully closed
             id(door_tamper_detected) = false;
+            // Save timestamp to persistent global then publish to text sensor
+            id(last_closed_time) = id(sntp_time).now().strftime("%a %d %b %Y - %I:%M:%S %p");
         - text_sensor.template.publish:
             id: garage_door_last_closed
-            state: !lambda 'return id(sntp_time).now().strftime("%a %d %b %Y - %I:%M:%S %p");'
+            state: !lambda 'return id(last_closed_time);'
     on_release:
        # If no ESPHome command was pending, this was a manual or forced open - flag as tamper
       then:
@@ -375,17 +406,19 @@ sensor:
 
 text_sensor:
 
-     # Combined door and vehicle state string for dashboard display
+     # Combined door and vehicle state string for dashboard display.
+     # parked_car_sensor now reports vehicle height in cm (via hc-sr04-ultrasonic.yaml filter),
+     # so thresholds are compared against cm height values rather than gap distances in metres.
   - platform: template
     name: "Parking State"
     id: parking_state
     icon: 'mdi:parking'
     lambda: |-
-      float dist = id(parked_car_sensor).state;
+      float height = id(parked_car_sensor).state;
       bool door_open   = id(garage_door_open_sensor).state;
       bool door_closed = id(garage_door_closed_sensor).state;
-      bool car_present = dist <= ${car_parked_threshold};
-      bool car_away    = dist >  ${car_away_threshold} && dist <= 3.00;
+      bool car_present = height >= ${car_parked_threshold};
+      bool car_away    = height < ${car_away_threshold};
       std::string door_str;
       if (door_open && !door_closed)       door_str = "Door Open";
       else if (door_closed && !door_open)  door_str = "Door Closed";
@@ -398,16 +431,16 @@ text_sensor:
       sorting_group_id: group_garage_parking_status
       sorting_weight: 1
 
-     # Whether the parking space is occupied or empty based on ultrasonic distance
+     # Whether the parking space is occupied or empty based on vehicle height in cm
   - platform: template
     name: "Parking Space"
     id: parking_space
     icon: 'mdi:car'
     lambda: |-
-      float dist = id(parked_car_sensor).state;
-      if (dist <= ${car_parked_threshold}) {
+      float height = id(parked_car_sensor).state;
+      if (height >= ${car_parked_threshold}) {
         return {"OCCUPIED"};
-      } else if (dist > ${car_away_threshold}) {
+      } else if (height < ${car_away_threshold}) {
         return {"EMPTY"};
       } else {
         return {"Unknown"};
@@ -417,7 +450,8 @@ text_sensor:
       sorting_group_id: group_garage_parking_status
       sorting_weight: 2
 
-     # Timestamp of when the door last reached the fully open position
+     # Timestamp of when the door last reached the fully open position.
+     # Value is persisted via the last_opened_time global and restored on boot.
   - platform: template
     name: "Garage Door - Last Opened"
     id: garage_door_last_opened
@@ -427,7 +461,8 @@ text_sensor:
       sorting_group_id: group_garage_door_controls
       sorting_weight: 8
 
-     # Timestamp of when the door last reached the fully closed position
+     # Timestamp of when the door last reached the fully closed position.
+     # Value is persisted via the last_closed_time global and restored on boot.
   - platform: template
     name: "Garage Door - Last Closed"
     id: garage_door_last_closed
@@ -532,7 +567,7 @@ cover:
                   id(push_one).execute();
                   return;
                 }
-                // Door is moving - single press will stop it, push_three will then resume opening
+                // Door is moving - use 3-press to stop then resume opening
                 if (id(garage_door).current_operation == esphome::cover::COVER_OPERATION_OPENING ||
                     id(garage_door).current_operation == esphome::cover::COVER_OPERATION_CLOSING) {
                   id(push_three).execute();
@@ -580,7 +615,7 @@ cover:
                   id(push_one).execute();
                   return;
                 }
-                // Door is moving - single press will stop it, push_three will then resume closing
+                // Door is moving - use 3-press to stop then resume closing
                 if (id(garage_door).current_operation == esphome::cover::COVER_OPERATION_OPENING ||
                     id(garage_door).current_operation == esphome::cover::COVER_OPERATION_CLOSING) {
                   id(push_three).execute();
@@ -663,7 +698,7 @@ script:
    # Press 1: starts door moving in opposite direction to last_dir
    # Delay:   resume_press_interval ms
    # Press 2: stops the door again
-   # Delay:   resume_press_interval ms  
+   # Delay:   resume_press_interval ms
    # Press 3: starts door moving in original direction (last_dir)
    #
    # Note: if a reed sensor triggers during this sequence (door reaches an
