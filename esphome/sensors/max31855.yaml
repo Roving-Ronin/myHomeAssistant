@@ -30,7 +30,7 @@ substitutions:
 #
 
 spi:
-  interface: vspi
+  interface: spi2
   miso_pin: 
     number: GPIO21
     mode:
