@@ -96,6 +96,6 @@ web_server:
       # This sort group is used by both the Water and Gas Meter senors (flow rate / pulse counter), so must be in at this level, not in the water vs gas sensor yaml
     - id: group_fireplace_sensors
       name: "Fireplace Sensors"
-      sorting_weight: -44
+      sorting_weight: -24
 
 #########################################################################
