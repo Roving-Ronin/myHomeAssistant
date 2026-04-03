@@ -18,11 +18,11 @@ substitutions:
 # sensor specific template file, in this case the /sensors/hc-sr04-ultrasonic.yaml file.
 #
 
-web_server:
-  sorting_groups:
-    - id: group_fireplace_sensors
-      name: "Fireplace Sensors"
-      sorting_weight: -24
+#web_server:
+#  sorting_groups:
+#    - id: group_fireplace_sensors
+#      name: "Fireplace Sensors"
+#      sorting_weight: -24
       
 #########################################################################
 #
