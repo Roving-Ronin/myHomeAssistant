@@ -49,7 +49,7 @@ sensor:
   - platform: max31855
     name: "Firebox - Temperature"
     id: firebox_temperature
-    cs_pin: GPIO37
+    cs_pin: GPIO44
     device_class: "temperature"
     state_class: "measurement"
     unit_of_measurement: "°C"
