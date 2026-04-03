@@ -32,8 +32,8 @@ substitutions:
   temperature_2_offset: "0.0"
 
   # PIN usage for ???
-  spi3_miso_pin: "35"
-  spi3_clk_pin: "37"
+  spi3_miso_pin: "33"
+  spi3_clk_pin: "35"
 
 ########################## End of Substitutions #########################
 #
