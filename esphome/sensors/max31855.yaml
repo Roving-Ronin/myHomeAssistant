@@ -32,11 +32,11 @@ substitutions:
 spi:
   interface: spi3
   miso_pin: 
-    number: GPIO33
+    number: "${spi3_miso_pin}"
     mode:
       input: true
   clk_pin:
-    number: GPIO35
+    number: "${spi3_clk_pin}"
 
 #########################################################################
 #
