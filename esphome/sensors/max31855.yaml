@@ -22,7 +22,7 @@ web_server:
   sorting_groups:
     - id: group_fireplace_sensors
       name: "Fireplace Sensors"
-      sorting_weight: -38
+      sorting_weight: -24
       
 #########################################################################
 #
