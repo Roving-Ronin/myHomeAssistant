@@ -32,11 +32,11 @@ substitutions:
 spi:
   interface: spi3
   miso_pin: 
-    number: GPIO21
+    number: GPIO33
     mode:
       input: true
   clk_pin:
-    number: GPIO17
+    number: GPIO35
 
 #########################################################################
 #
@@ -49,7 +49,7 @@ sensor:
   - platform: max31855
     name: "Firebox - Temperature"
     id: firebox_temperature
-    cs_pin: GPIO18
+    cs_pin: GPIO37
     device_class: "temperature"
     state_class: "measurement"
     unit_of_measurement: "°C"
