@@ -31,11 +31,11 @@ substitutions:
 
 spi:
   miso_pin: 
-    number: GPIO15
+    number: GPIO21
     mode:
       input: true
   clk_pin:
-    number: GPIO3
+    number: GPIO17
 
 #########################################################################
 #
