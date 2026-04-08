@@ -341,3 +341,18 @@ light:
 #        sorting_weight: 2
       
 #########################################################################
+#
+# Automative Reboot of the ESP device on Sunday morning
+#
+time:
+  - platform: sntp
+    id: sntp_time
+    on_time:
+      - seconds: 0
+        minutes: 1
+        hours: 3
+        days_of_week: SUN
+        then:
+          - button.press: restart_device  # This "presses" the button below
+
+#########################################################################
