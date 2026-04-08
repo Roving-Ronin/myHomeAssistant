@@ -349,7 +349,7 @@ time:
     id: sntp_time
     on_time:
       - seconds: 0
-        minutes: 1
+        minutes: 7
         hours: 3
         days_of_week: SUN
         then:
