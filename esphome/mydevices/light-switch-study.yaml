@@ -71,7 +71,7 @@ packages:
     ref: main
     files: [esphome/common/base-configuration.yaml]
     refresh: 5s
-    
+
   network_config:
     url: https://github.com/roving-ronin/myhomeassistant
     ref: main
@@ -83,6 +83,9 @@ packages:
     ref: main
     files: [esphome/common/webserver-groups.yaml]
     refresh: 5s
+
+# Don't load the time component from base-configuration package.
+time: !remove
 
 #####################################################################
 #
