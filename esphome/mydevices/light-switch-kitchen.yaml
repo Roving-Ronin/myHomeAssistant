@@ -575,14 +575,12 @@ light:
 #        sorting_group_id: group_light_usage
 #        sorting_weight: 6
 
-
-##########################################################################
+#########################################################################
 #
 # Automative Reboot of the ESP device on Sunday morning
 #
 time:
-  - platform: sntp
-    id: sntp_time
+  - id: !extend sntp_time
     on_time:
       - seconds: 0
         minutes: 1
@@ -592,3 +590,4 @@ time:
           - button.press: restart_device  # This "presses" the button below
 
 #########################################################################
+
