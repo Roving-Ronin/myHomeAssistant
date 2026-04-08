@@ -345,8 +345,7 @@ light:
 # Automative Reboot of the ESP device on Sunday morning
 #
 time:
-  - platform: sntp
-    id: sntp_time
+  - id: !extend sntp_time
     on_time:
       - seconds: 0
         minutes: 7
@@ -356,3 +355,4 @@ time:
           - button.press: restart_device  # This "presses" the button below
 
 #########################################################################
+
