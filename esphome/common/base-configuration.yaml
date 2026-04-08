@@ -114,6 +114,7 @@ network:
 button:
   - platform: restart
     name: 'Restart Device'
+    id: restart_device
     entity_category: config
     web_server:
       sorting_weight: 45
