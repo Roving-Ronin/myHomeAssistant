@@ -84,9 +84,6 @@ packages:
     files: [esphome/common/webserver-groups.yaml]
     refresh: 5s
 
-# Don't load the time component from base-configuration package.
-time: !remove
-
 #####################################################################
 #
 # External Components
@@ -451,34 +448,9 @@ light:
 #########################################################################
 #
 # Automative Reboot of the ESP device on Sunday morning
-# Updates the system time using SNTP. Upon boot also publishes when the device was started.
 #
 time:
-  - platform: sntp
-    id: sntp_time
-  # Define the timezone of the device
-    timezone: "${timezone}"
-  # Change sync interval from default 5min
-    update_interval: ${sntp_update_interval}
-  # Set specific sntp servers to use
-    servers: 
-      - "${sntp_server_1}"
-      - "${sntp_server_2}"
-      - "${sntp_server_3}"
-  # Publish the time the device was last restarted
-    on_time_sync:
-      then:
-        # Update last restart time, but only once.
-        - if:
-            condition:
-              lambda: 'return id(device_last_restart).state == "";'
-            then:
-              - text_sensor.template.publish:
-                  id: device_last_restart
-                  state: !lambda 'return id(sntp_time).now().strftime("%a %d %b %Y - %I:%M:%S %p");'
-        # Log a message when the time is synchronized
-        - logger.log:
-            format: "SNTP: Synchronized system clock"
+  - id: !extend sntp_time
     on_time:
       - seconds: 0
         minutes: 5
