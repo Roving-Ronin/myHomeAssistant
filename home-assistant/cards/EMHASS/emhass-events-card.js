@@ -1,4 +1,4 @@
-// EMHASS Events Card v2.0.3
+// EMHASS Events Card v2.0.5
 // Combines Future Decisions (forecast) and Past Events (history) in one card
 // Modelled on haeo-events-card structure and style
 // Copy to /config/www/emhass-events-card.js
@@ -30,7 +30,7 @@
 //   energy_batt_charge:   sensor.your_daily_batt_charge_energy
 //   energy_batt_discharge: sensor.your_daily_batt_discharge_energy
 
-const _EMHASS_VERSION = 'v2.0.3';
+const _EMHASS_VERSION = 'v2.0.5';
 
 // ── Tier 2: Sigenergy / annable.me MPC sensor names ─────────────────────────
 const _EMHASS_MPC = {
@@ -263,6 +263,10 @@ function _emhass_classifyPast(pvW, loadW, battW, gridW) {
 function _emhass_fmtP(v) {
   return '$' + Math.abs(v).toFixed(4);
 }
+
+// Clamp values below noise floor to zero for display (20W threshold)
+const _EMHASS_NOISE_W = 20;
+function _emhass_clamp(w) { return Math.abs(w) < _EMHASS_NOISE_W ? 0 : w; }
 
 // cost > 0 = money spent, cost < 0 = money earned
 function _emhass_fmtCost(cost) {
@@ -782,9 +786,10 @@ class EmhassEventsCard extends HTMLElement {
         lastDay = day;
         const dayTotal   = dailyCosts[day] || 0;
         const dk         = dailyKwh[day]  || { load:0, pv:0, grid:0, batt:0 };
-        const dayColor   = dayTotal >= 0 ? '#4caf50' : '#f44336';
+        // dayTotal < 0 = profit earned (exports > imports), dayTotal > 0 = net cost
+        const dayColor   = dayTotal <= 0 ? '#4caf50' : '#f44336';
         const dayLabel   = day === todayStr ? '📅 Today' : '📅 ' + new Date(ts).toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
-        const dayCostLbl = dayTotal >= 0 ? '$' + dayTotal.toFixed(2) : '-$' + Math.abs(dayTotal).toFixed(2);
+        const dayCostLbl = dayTotal <= 0 ? '$' + Math.abs(dayTotal).toFixed(2) : '-$' + dayTotal.toFixed(2);
         const fmtKd = (v) => Math.abs(v) > 0.001 ? (v < 0 ? '-' : '') + Math.abs(v).toFixed(2) : '—';
         const fmtG  = (v) => { if (Math.abs(v) <= 0.001) return '—'; const col = v > 0 ? '#f44336' : '#4caf50'; return '<span style="color:' + col + ';">' + (v < 0 ? '-' : '') + Math.abs(v).toFixed(2) + '</span>'; };
         const fmtB  = (v) => { if (Math.abs(v) <= 0.001) return '—'; const col = v > 0 ? '#4caf50' : '#f44336'; return '<span style="color:' + col + ';">' + (v < 0 ? '-' : '') + Math.abs(v).toFixed(2) + '</span>'; };
@@ -792,14 +797,14 @@ class EmhassEventsCard extends HTMLElement {
           '<td class="bgl"></td><td class="bgi" style="text-align:right;">' + fmtKd(dk.load) + '</td>' +
           '<td class="bgl"></td><td class="bgi" style="text-align:right;">' + fmtKd(dk.pv)   + '</td>' +
           '<td class="bgl"></td><td class="bgi" style="text-align:right;">' + fmtG(dk.grid)  + '</td>' +
-          '<td class="bgl"></td><td class="bgi" style="text-align:right;">' + fmtB(dk.batt)  + '</td>' +
+          '<td class="bgl"></td><td class="bgi" style="text-align:right;">' + fmtB(-dk.batt) + '</td>' +  // negate: raw +ve=discharge → display -ve
           '<td class="bgl"></td><td class="bgl" style="text-align:right;color:' + dayColor + ';">' + dayCostLbl + '</td></tr>');
       }
 
-      const battW  = battMap.get(ts) || 0;
-      const gridW  = gridMap.get(ts) || 0;
-      const loadW  = loadMap.get(ts) || 0;
-      const pvW    = pvMap.get(ts)   || 0;
+      const battW  = _emhass_clamp(battMap.get(ts) || 0);
+      const gridW  = _emhass_clamp(gridMap.get(ts) || 0);
+      const loadW  = _emhass_clamp(loadMap.get(ts) || 0);
+      const pvW    = _emhass_clamp(pvMap.get(ts)   || 0);
       const soc    = socMap.get(ts)  || 0;
       const buyP   = nearestGet(buyMap,  ts);
       const sellP  = nearestGet(sellMap, ts);
@@ -938,10 +943,10 @@ class EmhassEventsCard extends HTMLElement {
       const pastDailyCosts = {}, pastDailyKwh = {};
       for (const ts of entries) {
         const dayStr = new Date(ts).toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
-        const battW = (parseFloat(_emhass_getAt(lookup[battEid], ts))||0) * this._pwrMult.p_batt;
-        const gridW = (parseFloat(_emhass_getAt(lookup[gridEid], ts))||0) * this._pwrMult.p_grid;
-        const loadW = (parseFloat(_emhass_getAt(lookup[loadEid], ts))||0) * this._pwrMult.p_load;
-        const pvW   = (parseFloat(_emhass_getAt(lookup[pvEid],   ts))||0) * this._pwrMult.p_pv;
+        const battW = _emhass_clamp((parseFloat(_emhass_getAt(lookup[battEid], ts))||0) * this._pwrMult.p_batt);
+        const gridW = _emhass_clamp((parseFloat(_emhass_getAt(lookup[gridEid], ts))||0) * this._pwrMult.p_grid);
+        const loadW = _emhass_clamp((parseFloat(_emhass_getAt(lookup[loadEid], ts))||0) * this._pwrMult.p_load);
+        const pvW   = _emhass_clamp((parseFloat(_emhass_getAt(lookup[pvEid],   ts))||0) * this._pwrMult.p_pv);
         const buyP  = parseFloat(_emhass_getAt(lookup[buyEid],  ts)) || 0;
         const sellP = parseFloat(_emhass_getAt(lookup[sellEid], ts)) || 0;
         const stepH = 5/60, gridKw = gridW/1000;
@@ -964,8 +969,9 @@ class EmhassEventsCard extends HTMLElement {
           lastDay = dayStr;
           const dayTotal   = pastDailyCosts[dayStr] || 0;
           const pk         = pastDailyKwh[dayStr]   || { load:0, pv:0, grid:0, batt:0 };
-          const dayColor   = dayTotal >= 0 ? '#4caf50' : '#f44336';
-          const dayCostLbl = dayTotal >= 0 ? '$' + dayTotal.toFixed(2) : '-$' + Math.abs(dayTotal).toFixed(2);
+          // dayTotal < 0 = profit earned, dayTotal > 0 = net cost
+          const dayColor   = dayTotal <= 0 ? '#4caf50' : '#f44336';
+          const dayCostLbl = dayTotal <= 0 ? '$' + Math.abs(dayTotal).toFixed(2) : '-$' + dayTotal.toFixed(2);
           const fmtKd = (v) => Math.abs(v) > 0.001 ? (v<0?'-':'') + Math.abs(v).toFixed(2) : '—';
           const fmtG  = (v) => { if (Math.abs(v)<=0.001) return '—'; const col=v>0?'#f44336':'#4caf50'; return '<span style="color:'+col+';">'+(v<0?'-':'')+Math.abs(v).toFixed(2)+'</span>'; };
           const fmtB  = (v) => { if (Math.abs(v)<=0.001) return '—'; const col=v>0?'#4caf50':'#f44336'; return '<span style="color:'+col+';">'+(v<0?'-':'')+Math.abs(v).toFixed(2)+'</span>'; };
@@ -973,14 +979,14 @@ class EmhassEventsCard extends HTMLElement {
             '<td class="bgl"></td><td class="bgi" style="text-align:right;">' + fmtKd(pk.load) + '</td>' +
             '<td class="bgl"></td><td class="bgi" style="text-align:right;">' + fmtKd(pk.pv)   + '</td>' +
             '<td class="bgl"></td><td class="bgi" style="text-align:right;">' + fmtG(pk.grid)  + '</td>' +
-            '<td class="bgl"></td><td class="bgi" style="text-align:right;">' + fmtB(pk.batt)  + '</td>' +
+            '<td class="bgl"></td><td class="bgi" style="text-align:right;">' + fmtB(-pk.batt) + '</td>' +  // negate: raw +ve=discharge → display -ve
             '<td class="bgl"></td><td class="bgl" style="text-align:right;color:' + dayColor + ';">' + dayCostLbl + '</td></tr>');
         }
 
-        const battW = (parseFloat(_emhass_getAt(lookup[battEid], ts))||0) * this._pwrMult.p_batt;
-        const gridW = (parseFloat(_emhass_getAt(lookup[gridEid], ts))||0) * this._pwrMult.p_grid;
-        const loadW = (parseFloat(_emhass_getAt(lookup[loadEid], ts))||0) * this._pwrMult.p_load;
-        const pvW   = (parseFloat(_emhass_getAt(lookup[pvEid],   ts))||0) * this._pwrMult.p_pv;
+        const battW = _emhass_clamp((parseFloat(_emhass_getAt(lookup[battEid], ts))||0) * this._pwrMult.p_batt);
+        const gridW = _emhass_clamp((parseFloat(_emhass_getAt(lookup[gridEid], ts))||0) * this._pwrMult.p_grid);
+        const loadW = _emhass_clamp((parseFloat(_emhass_getAt(lookup[loadEid], ts))||0) * this._pwrMult.p_load);
+        const pvW   = _emhass_clamp((parseFloat(_emhass_getAt(lookup[pvEid],   ts))||0) * this._pwrMult.p_pv);
         const soc   = parseFloat(_emhass_getAt(lookup[socEid],  ts)) || 0;
         const buyP  = parseFloat(_emhass_getAt(lookup[buyEid],  ts)) || 0;
         const sellP = parseFloat(_emhass_getAt(lookup[sellEid], ts)) || 0;
