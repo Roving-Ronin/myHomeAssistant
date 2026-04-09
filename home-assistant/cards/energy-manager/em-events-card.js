@@ -1,17 +1,10 @@
 // EM Events Card
-// Maintainer = Roving-Ronin
 // Combines Future Decisions (timeline) and Past Decisions (history) in one card
 // Requires: sensor.energy_manager_plan + inverter sensors
 // Copy to /config/www/em-events-card.js
 // Add resource: /local/em-events-card.js (type: JavaScript module)
 
-// Add to a Sections HA Dashboard, set to 2 width and with the following config:
-// type: custom:em-events-card
-// grid_options:
-//   columns: full
-//   rows: auto
-
-const _EMEC_VERSION = 'v2.4.4';
+const _EMEC_VERSION = 'v2.4.7';
 
 const _EMEC_SENSORS = [
   'sensor.energy_manager_decision',
@@ -782,11 +775,16 @@ class EmEventsCard extends HTMLElement {
         const dk       = dailyKwh[day]  || { load:0, pv:0, grid:0, batt:0 };
         const dayColor = dayTotal <= 0 ? '#4caf50' : '#f44336';
         const dayLabel = day === todayStr ? '📅 Today' : '📅 ' + new Date(ts).toLocaleDateString('en-AU', { weekday:'short', day:'numeric', month:'short' });
-        const dayCostLabel = dayTotal <= 0 ? 'Est. -$' + Math.abs(dayTotal).toFixed(2) : 'Est. +$' + dayTotal.toFixed(2);
+        const dayCostLabel = dayTotal <= 0 ? '$' + Math.abs(dayTotal).toFixed(2) : '-$' + dayTotal.toFixed(2);
         const fmtKd = (v) => Math.abs(v) > 0.001 ? (v < 0 ? '-' : '') + Math.abs(v).toFixed(2) : '—';
-        const fmtKdColoured = (v) => {
+        const fmtGrid = (v) => {  // negative=export=green, positive=import=red
           if (Math.abs(v) <= 0.001) return '—';
           const col = v < 0 ? '#4caf50' : '#f44336';
+          return '<span style="color:' + col + ';">' + (v < 0 ? '-' : '') + Math.abs(v).toFixed(2) + '</span>';
+        };
+        const fmtBatt = (v) => {  // negative=discharge=red, positive=charge=green
+          if (Math.abs(v) <= 0.001) return '—';
+          const col = v < 0 ? '#f44336' : '#4caf50';
           return '<span style="color:' + col + ';">' + (v < 0 ? '-' : '') + Math.abs(v).toFixed(2) + '</span>';
         };
         rows.push('<tr class="dr">' +
@@ -797,9 +795,9 @@ class EmEventsCard extends HTMLElement {
           '<td class="bgl"></td>' +
           '<td class="bgi" style="text-align:right;">' + fmtKd(dk.pv) + '</td>' +
           '<td class="bgl"></td>' +
-          '<td class="bgi" style="text-align:right;">' + fmtKdColoured(dk.grid) + '</td>' +
+          '<td class="bgi" style="text-align:right;">' + fmtGrid(dk.grid) + '</td>' +
           '<td class="bgl"></td>' +
-          '<td class="bgi" style="text-align:right;">' + fmtKdColoured(dk.batt) + '</td>' +
+          '<td class="bgi" style="text-align:right;">' + fmtBatt(dk.batt) + '</td>' +
           '<td class="bgl"></td>' +
           '<td class="bgl" style="text-align:right;color:' + dayColor + ';">' + dayCostLabel + '</td>' +
           '</tr>');
@@ -848,6 +846,7 @@ class EmEventsCard extends HTMLElement {
 
       const c       = _EMEC_COLOURS[cls.color] || { bg:'transparent', txt:'var(--primary-text-color)', cost:'var(--primary-text-color)' };
       const gridCol = gridKw < 0 ? '#4caf50' : gridKw > 0 ? '#f44336' : c.txt;
+      const battCol = battKw < 0 ? '#f44336' : battKw > 0 ? '#4caf50' : c.txt;  // discharge=red, charge=green
       const socCol  = soc <= 20 ? '#f44336' : soc >= 75 ? '#4caf50' : c.txt;
       const costFmt = _emec_fmtCost(cost);
       const costCol = costFmt.col || (cost > 0.0001 ? c.cost : c.txt);
@@ -870,8 +869,8 @@ class EmEventsCard extends HTMLElement {
         '<td class="bgi">' + (Math.abs(fPvKwh) > 0.001 ? fPvKwh.toFixed(3) : '—') + '</td>' +
         '<td class="bgl"><span style="color:' + gridCol + ';">' + gridKw.toFixed(2) + '</span></td>' +
         '<td class="bgi"><span style="color:' + gridCol + ';">' + (Math.abs(fGridKwh) > 0.001 ? fGridKwh.toFixed(3) : '—') + '</span></td>' +
-        '<td class="bgl">' + battKw.toFixed(2) + '</td>' +
-        '<td class="bgi">' + (Math.abs(fBattKwh) > 0.001 ? fBattKwh.toFixed(3) : '—') + '</td>' +
+        '<td class="bgl"><span style="color:' + battCol + ';">' + battKw.toFixed(2) + '</span></td>' +
+        '<td class="bgi"><span style="color:' + battCol + ';">' + (Math.abs(fBattKwh) > 0.001 ? fBattKwh.toFixed(3) : '—') + '</span></td>' +
         '<td class="bgl"><span style="color:' + socCol + ';">' + soc.toFixed(1) + '</span></td>' +
         '<td class="bgl"><span style="color:' + costCol + ';font-weight:bold;">' + costFmt.disp + '</span></td>' +
         '</tr>');
@@ -997,9 +996,14 @@ class EmEventsCard extends HTMLElement {
           const dayColor   = dayTotal <= 0 ? '#4caf50' : '#f44336';
           const dayCostLbl = dayTotal > 0 ? '-$' + dayTotal.toFixed(2) : '$' + Math.abs(dayTotal).toFixed(2);
           const fmtKd = (v) => Math.abs(v) > 0.001 ? (v < 0 ? '-' : '') + Math.abs(v).toFixed(2) : '—';
-          const fmtKdColoured = (v) => {
+          const fmtGrid = (v) => {
             if (Math.abs(v) <= 0.001) return '—';
             const col = v < 0 ? '#4caf50' : '#f44336';
+            return '<span style="color:' + col + ';">' + (v < 0 ? '-' : '') + Math.abs(v).toFixed(2) + '</span>';
+          };
+          const fmtBatt = (v) => {
+            if (Math.abs(v) <= 0.001) return '—';
+            const col = v < 0 ? '#f44336' : '#4caf50';
             return '<span style="color:' + col + ';">' + (v < 0 ? '-' : '') + Math.abs(v).toFixed(2) + '</span>';
           };
           rows.push('<tr class="dr">' +
@@ -1010,9 +1014,9 @@ class EmEventsCard extends HTMLElement {
             '<td class="bgl"></td>' +
             '<td class="bgi" style="text-align:right;">' + fmtKd(pk.pv) + '</td>' +
             '<td class="bgl"></td>' +
-            '<td class="bgi" style="text-align:right;">' + fmtKdColoured(pk.grid) + '</td>' +
+            '<td class="bgi" style="text-align:right;">' + fmtGrid(pk.grid) + '</td>' +
             '<td class="bgl"></td>' +
-            '<td class="bgi" style="text-align:right;">' + fmtKdColoured(pk.batt) + '</td>' +
+            '<td class="bgi" style="text-align:right;">' + fmtBatt(pk.batt) + '</td>' +
             '<td class="bgl"></td>' +
             '<td class="bgl" style="text-align:right;color:' + dayColor + ';">' + dayCostLbl + '</td>' +
             '</tr>');
@@ -1055,6 +1059,7 @@ class EmEventsCard extends HTMLElement {
         const cls     = _emec_classifyPast(solarKw, gridImpKw, gridExpKw, battCKw, battDKw);
         const c       = _EMEC_COLOURS[cls.color] || { bg:'#ffffcc', txt:'#888888' };
         const gridCol = gridKw < 0 ? '#4caf50' : gridKw > 0 ? '#f44336' : c.txt;
+        const battCol = battKw < 0 ? '#f44336' : battKw > 0 ? '#4caf50' : c.txt;
         const socCol  = soc <= 20 ? '#f44336'  : soc >= 75 ? '#4caf50'  : c.txt;
 
         // Cost/profit: imports cost money (red), exports earn money (green)
@@ -1098,8 +1103,8 @@ class EmEventsCard extends HTMLElement {
           '<td class="bgi">' + (eSolar !== null && Math.abs(eSolar) > 0.001 ? eSolar.toFixed(3) : '—') + '</td>' +
           '<td class="bgl"><span style="color:' + gridCol + ';">' + gridKw.toFixed(2) + '</span></td>' +
           '<td class="bgi"><span style="color:' + gridCol + ';">' + (eGrid  !== null && Math.abs(eGrid)  > 0.001 ? eGrid.toFixed(3)  : '—') + '</span></td>' +
-          '<td class="bgl">' + battKw.toFixed(2) + '</td>' +
-          '<td class="bgi">' + (eBatt  !== null && Math.abs(eBatt)  > 0.001 ? eBatt.toFixed(3)  : '—') + '</td>' +
+          '<td class="bgl"><span style="color:' + battCol + ';">' + battKw.toFixed(2) + '</span></td>' +
+          '<td class="bgi"><span style="color:' + battCol + ';">' + (eBatt  !== null && Math.abs(eBatt)  > 0.001 ? eBatt.toFixed(3)  : '—') + '</span></td>' +
           '<td class="bgl"><span style="color:' + socCol  + ';">' + soc.toFixed(1)   + '</span></td>' +
           '<td class="bgl"><span style="color:' + costCol + ';font-weight:bold;">' + costDisp + '</span></td>' +
           '</tr>');
