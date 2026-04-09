@@ -1,4 +1,4 @@
-﻿// HAEO Events Card
+// HAEO Events Card
 // Combines Future Decisions (forecast) and Past Events (history) in one card
 // Requires: sensor.grid_net_cost + associated HAEO sensors
 // Copy to /config/www/haeo-events-card.js
@@ -32,7 +32,7 @@
 //   entity_energy_batt_charge:    sensor.sigen_plant_daily_battery_charge_energy    # Daily reset — gaps at midnight
 //   entity_energy_batt_discharge: sensor.sigen_plant_daily_battery_discharge_energy # Daily reset — gaps at midnight
 
-const _HAEO_VERSION = 'v2.1.4';
+const _HAEO_VERSION = 'v2.1.5';
 
 // ── Default sensor entity IDs ────────────────────────────────────────────────
 // Power sensors: provided by HAEO optimizer — same for all installs
@@ -69,23 +69,25 @@ const _HAEO_COLOURS = {
 
 // ── Legend ────────────────────────────────────────────────────────────────────
 const _HAEO_LEG_L = [
-  ['#ccffcc','#333','🌞 Solar → 🏠 Home','Solar covering home — no battery, no grid'],
-  ['#ccffcc','#333','🌞 Solar → 🏠 Home + 🔋 Battery','Solar covering home and charging battery — no grid'],
-  ['#ccffcc','#333','🌞 Solar → 🏠 Home + ⚡ Grid','Solar covering home and exporting surplus — no battery'],
-  ['#ccffcc','#333','🌞 Solar → 🏠 Home + 🔋 Battery + ⚡ Grid','Solar covering home, charging battery and exporting'],
-  ['#ccfff5','#333','🌞 Solar + 🔋 Battery → 🏠 Home','Solar and battery together covering home — no grid'],
-  ['#ffe0e0','#333','🌞 Solar + ⚡ Grid → 🏠 Home','Solar and grid together covering home — battery idle'],
-  ['#ffe0e0','#333','🌞 Solar + ⚡ Grid → 🏠 Home + 🔋 Battery (Force)','Forced grid charge: solar + grid covering home and charging battery'],
+  ['#ccffcc','#333','🌞 Solar → 🏠 Home','Self Consumption - Solar'],
+  ['#ccffcc','#333','🌞 Solar → 🏠 Home + 🔋 Battery','Self Consumption - Charge Battery'],
+  ['#ccffcc','#333','🌞 Solar → 🏠 Home + ⚡ Grid','Profit - Grid Export (Solar)'],
+  ['#ccffcc','#333','🌞 Solar → 🏠 Home + 🔋 Battery + ⚡ Grid','Profit - Grid Export + Charge Battery'],
+  ['#ccfff5','#333','🌞 Solar + 🔋 Battery → 🏠 Home','Self Consumption - No Grid'],
+  ['#ffe0e0','#333','🌞 Solar + ⚡ Grid → 🏠 Home','Cost - Solar + Grid Import'],
+  ['#ffe0e0','#333','🌞 Solar + ⚡ Grid → 🏠 Home + 🔋 Battery (Force)','Cost - Solar + Grid Import + Charge Battery'],
+  ['#ffe0e0','#333','🌞 Solar + 🔋 Battery → 🏠 Home + ⚡ Grid (Force)','Profit - Grid Export (Forced)'],
 ];
 
 const _HAEO_LEG_R = [
-  ['rgba(30,150,80,0.55)','#fff','🌞 Solar + 🔋 Battery → 🏠 Home + ⚡ Grid (Force)','Forced export: solar and battery exporting to grid'],
-  ['#ffffcc','#333','🔋 Battery → 🏠 Home + ⚡ Grid (Force)','Forced discharge: battery exporting to grid'],
-  ['#ccfff5','#333','🔋 Battery → 🏠 Home','Battery powering home — no solar, no grid'],
-  ['#ffffcc','#333','🔋 Battery + ⚡ Grid → 🏠 Home','Battery discharging but grid supplement needed'],
-  ['rgba(180,50,50,0.35)','#fff','⚡ Grid → 🏠 Home','Grid covering home — battery idle'],
-  ['rgba(180,50,50,0.35)','#fff','⚡ Grid → 🏠 Home + 🔋 Battery (Force)','Forced grid charging — cheap rate window'],
-  ['#ccfff5','#333','🚗 ❄️ 🚿 Scheduled Load(s)','Scheduled Load(s): EV Charger, HVAC, HWS — placeholder'],
+  ['#ccfff5','#333','🔋 Battery → 🏠 Home','Self Consumption - Battery'],
+  ['#ffffcc','#333','🔋 Battery → 🏠 Home + ⚡ Grid (Force)','Profit - Grid Export (Forced)'],
+  ['#ffe0e0','#333','🔋 Battery + ⚡ Grid → 🏠 Home','Cost - Battery + Grid Import'],
+  ['rgba(180,50,50,0.35)','#fff','⚡ Grid → 🏠 Home','Cost - Grid Import (Battery Idle | No Solar)'],
+  ['rgba(180,50,50,0.35)','#fff','⚡ Grid → 🏠 Home + 🔋 Battery (Force)','Cost - Grid Import (Forced Battery Charge)'],
+  ['#ffe0e0','#333','🌞 Solar + 🔋 Battery + ⚡ Grid → 🏠 Home','Cost - Solar + Battery + Grid Import'],
+  ['#ccfff5','#333','🚗 EV Charger','Placeholder - EV Charger'],
+  ['#ccfff5','#333','❄️ 🚿 Scheduled Load(s)','Placeholder - HVAC, HWS - Surplus Solar'],
 ];
 
 // ── Classify future ───────────────────────────────────────────────────────────
