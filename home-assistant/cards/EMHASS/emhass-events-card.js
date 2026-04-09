@@ -1,4 +1,4 @@
-// EMHASS Events Card v2.0.5
+// EMHASS Events Card v2.0.9
 // Combines Future Decisions (forecast) and Past Events (history) in one card
 // Modelled on haeo-events-card structure and style
 // Copy to /config/www/emhass-events-card.js
@@ -23,6 +23,8 @@
 //   buy_price:            sensor.mpc_general_price
 //   sell_price:           sensor.mpc_feed_in_price
 //   net_cost:             sensor.mpc_cost_fun
+//   past_buy_price:       sensor.amber_general_price        # Actual buy price for Past Events tab
+//   past_sell_price:      sensor.amber_feed_in_price        # Actual sell price for Past Events tab
 //   energy_load:          sensor.your_total_load_energy
 //   energy_solar:         sensor.your_total_pv_energy
 //   energy_grid_import:   sensor.your_total_imported_energy
@@ -30,7 +32,7 @@
 //   energy_batt_charge:   sensor.your_daily_batt_charge_energy
 //   energy_batt_discharge: sensor.your_daily_batt_discharge_energy
 
-const _EMHASS_VERSION = 'v2.0.5';
+const _EMHASS_VERSION = 'v2.0.9';
 
 // ── Tier 2: Sigenergy / annable.me MPC sensor names ─────────────────────────
 const _EMHASS_MPC = {
@@ -43,6 +45,8 @@ const _EMHASS_MPC = {
   buy_price:             'sensor.mpc_general_price',
   sell_price:            'sensor.mpc_feed_in_price',
   net_cost:              'sensor.mpc_cost_fun',
+  past_buy_price:        'sensor.amber_express_home_general_price',
+  past_sell_price:       'sensor.amber_express_home_feed_in_price',
   energy_load:           null,
   energy_solar:          null,
   energy_grid_import:    null,
@@ -62,6 +66,8 @@ const _EMHASS_STD = {
   buy_price:             'sensor.unit_load_cost',
   sell_price:            'sensor.unit_prod_price',
   net_cost:              'sensor.total_cost_fun_value',
+  past_buy_price:        'sensor.unit_load_cost',
+  past_sell_price:       'sensor.unit_prod_price',
   energy_load:           null,
   energy_solar:          null,
   energy_grid_import:    null,
@@ -265,7 +271,7 @@ function _emhass_fmtP(v) {
 }
 
 // Clamp values below noise floor to zero for display (20W threshold)
-const _EMHASS_NOISE_W = 20;
+const _EMHASS_NOISE_W = 10;
 function _emhass_clamp(w) { return Math.abs(w) < _EMHASS_NOISE_W ? 0 : w; }
 
 // cost > 0 = money spent, cost < 0 = money earned
@@ -878,7 +884,9 @@ class EmhassEventsCard extends HTMLElement {
       const powerIds = [
         this._eid('p_batt_forecast'), this._eid('p_grid_forecast'),
         this._eid('p_pv_forecast'),   this._eid('p_load_forecast'),
-        this._eid('soc_forecast'),    this._eid('buy_price'), this._eid('sell_price'),
+        this._eid('soc_forecast'),
+        this._eid('past_buy_price'),  // Actual price sensors for past tab (Amber or equivalent)
+        this._eid('past_sell_price'),
       ].filter(Boolean);
 
       const energyIds = [
@@ -898,6 +906,7 @@ class EmhassEventsCard extends HTMLElement {
       for (const [eid, states] of Object.entries(result)) {
         lookup[eid] = states.map(s => ({ t: (s.lu !== undefined ? s.lu : s.lc) * 1000, s: s.s })).sort((a,b) => a.t - b.t);
       }
+
 
       this._pwrMult = {
         p_batt: _emhass_powerMult(this._hass, this._eid('p_batt_forecast')),
@@ -919,8 +928,8 @@ class EmhassEventsCard extends HTMLElement {
       const pvEid   = this._eid('p_pv_forecast');
       const loadEid = this._eid('p_load_forecast');
       const socEid  = this._eid('soc_forecast');
-      const buyEid  = this._eid('buy_price');
-      const sellEid = this._eid('sell_price');
+      const buyEid  = this._eid('past_buy_price');   // Actual price — Amber or equivalent
+      const sellEid = this._eid('past_sell_price');  // Actual price — Amber or equivalent
 
       if (!lookup[loadEid]?.length && !lookup[pvEid]?.length) {
         const sel = this.shadowRoot.getElementById('range-past');
@@ -933,20 +942,44 @@ class EmhassEventsCard extends HTMLElement {
         st.textContent = 'No data'; this._pastState = 'ready'; return;
       }
 
-      const step    = 5 * 60 * 1000;
-      const startMs = Math.ceil(start.getTime() / step) * step;
-      const entries = [];
-      for (let t = startMs; t <= end.getTime(); t += step) entries.push(t);
-      entries.reverse();
+      const step = 5 * 60 * 1000;
+
+      // Build entries from actual recorded timestamps across all power sensors.
+      // Using fixed 5-min slots fails when history is sparse (only records state
+      // changes) — most slots return null→0 and get skipped. Instead use the
+      // union of all recorded timestamps, snapped to nearest 5-min boundary.
+      // Fall back to fixed 5-min slots only if no timestamps found.
+      const recordedTs = new Set();
+      for (const eid of [battEid, gridEid, pvEid, loadEid]) {
+        if (!lookup[eid]) continue;
+        for (const s of lookup[eid]) {
+          // Snap to nearest 5-min boundary
+          const snapped = Math.round(s.t / step) * step;
+          if (snapped >= start.getTime() && snapped <= end.getTime()) {
+            recordedTs.add(snapped);
+          }
+        }
+      }
+      let entries;
+      if (recordedTs.size > 0) {
+        entries = Array.from(recordedTs).sort((a, b) => b - a); // descending (newest first)
+      } else {
+        // Fallback: fixed 5-min slots
+        const startMs = Math.ceil(start.getTime() / step) * step;
+        entries = [];
+        for (let t = startMs; t <= end.getTime(); t += step) entries.push(t);
+        entries.reverse();
+      }
 
       // Pass 1: daily totals
       const pastDailyCosts = {}, pastDailyKwh = {};
       for (const ts of entries) {
         const dayStr = new Date(ts).toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
-        const battW = _emhass_clamp((parseFloat(_emhass_getAt(lookup[battEid], ts))||0) * this._pwrMult.p_batt);
-        const gridW = _emhass_clamp((parseFloat(_emhass_getAt(lookup[gridEid], ts))||0) * this._pwrMult.p_grid);
-        const loadW = _emhass_clamp((parseFloat(_emhass_getAt(lookup[loadEid], ts))||0) * this._pwrMult.p_load);
-        const pvW   = _emhass_clamp((parseFloat(_emhass_getAt(lookup[pvEid],   ts))||0) * this._pwrMult.p_pv);
+        // Keep values in W — pwrMult (W→kW) removed; all thresholds/display are in W
+        const battW = _emhass_clamp(parseFloat(_emhass_getAt(lookup[battEid], ts)) || 0);
+        const gridW = _emhass_clamp(parseFloat(_emhass_getAt(lookup[gridEid], ts)) || 0);
+        const loadW = _emhass_clamp(parseFloat(_emhass_getAt(lookup[loadEid], ts)) || 0);
+        const pvW   = _emhass_clamp(parseFloat(_emhass_getAt(lookup[pvEid],   ts)) || 0);
         const buyP  = parseFloat(_emhass_getAt(lookup[buyEid],  ts)) || 0;
         const sellP = parseFloat(_emhass_getAt(lookup[sellEid], ts)) || 0;
         const stepH = 5/60, gridKw = gridW/1000;
@@ -983,15 +1016,17 @@ class EmhassEventsCard extends HTMLElement {
             '<td class="bgl"></td><td class="bgl" style="text-align:right;color:' + dayColor + ';">' + dayCostLbl + '</td></tr>');
         }
 
-        const battW = _emhass_clamp((parseFloat(_emhass_getAt(lookup[battEid], ts))||0) * this._pwrMult.p_batt);
-        const gridW = _emhass_clamp((parseFloat(_emhass_getAt(lookup[gridEid], ts))||0) * this._pwrMult.p_grid);
-        const loadW = _emhass_clamp((parseFloat(_emhass_getAt(lookup[loadEid], ts))||0) * this._pwrMult.p_load);
-        const pvW   = _emhass_clamp((parseFloat(_emhass_getAt(lookup[pvEid],   ts))||0) * this._pwrMult.p_pv);
+        // Keep values in W — pwrMult removed; thresholds/clamp/display all in W
+        const battW = _emhass_clamp(parseFloat(_emhass_getAt(lookup[battEid], ts)) || 0);
+        const gridW = _emhass_clamp(parseFloat(_emhass_getAt(lookup[gridEid], ts)) || 0);
+        const loadW = _emhass_clamp(parseFloat(_emhass_getAt(lookup[loadEid], ts)) || 0);
+        const pvW   = _emhass_clamp(parseFloat(_emhass_getAt(lookup[pvEid],   ts)) || 0);
         const soc   = parseFloat(_emhass_getAt(lookup[socEid],  ts)) || 0;
         const buyP  = parseFloat(_emhass_getAt(lookup[buyEid],  ts)) || 0;
         const sellP = parseFloat(_emhass_getAt(lookup[sellEid], ts)) || 0;
 
-        if (soc===0 && Math.abs(battW)<10 && Math.abs(gridW)<10 && loadW<10 && pvW<10) continue;
+        // Skip only if ALL power values are zero — don't gate on SoC which may have no history
+        if (Math.abs(battW)<10 && Math.abs(gridW)<10 && loadW<10 && pvW<10) continue;
 
         const cls = _emhass_classifyPast(pvW, loadW, battW, gridW);
         const c   = _EMHASS_COLOURS[cls.color] || { bg:'transparent', txt:'var(--primary-text-color)', cost:'var(--primary-text-color)' };
@@ -1037,7 +1072,7 @@ class EmhassEventsCard extends HTMLElement {
       tb.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="15" class="msg">⚠️ No readings for this period.</td></tr>';
       requestAnimationFrame(() => this._setWrapHeight());
       const sel2 = this.shadowRoot.getElementById('range-past');
-      st.textContent = entries.length + ' readings — ' + (sel2 ? sel2.options[sel2.selectedIndex].text : '');
+      st.textContent = rows.length + ' events from ' + entries.length + ' readings — ' + (sel2 ? sel2.options[sel2.selectedIndex].text : '');
       this._pastState = 'ready';
 
     } catch (e) {
