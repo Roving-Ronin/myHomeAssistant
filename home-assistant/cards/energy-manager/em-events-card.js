@@ -4,7 +4,7 @@
 // Copy to /config/www/em-events-card.js
 // Add resource: /local/em-events-card.js (type: JavaScript module)
 
-const _EMEC_VERSION = 'v2.4.7';
+const _EMEC_VERSION = 'v2.4.8';
 
 const _EMEC_SENSORS = [
   'sensor.energy_manager_decision',
@@ -1086,11 +1086,14 @@ class EmEventsCard extends HTMLElement {
         const eBattD   = _emec_getDelta(lookup['sensor.monthly_battery_discharge'],ts, prevTs);
         // Load sensor — config override → daily_consumed_energy
         const loadSensor = this._config.load_energy_sensor || 'sensor.daily_consumed_energy';
-        const eLoad    = _emec_getDelta(lookup[loadSensor], ts, prevTs);
-        const eGrid    = gridExpKw > 0.2 ? (eGridExp !== null ? -eGridExp : null) : eGridImp;
-        const eBatt    = battCKw   > 0.2 ? eBattC   : (eBattD !== null ? -eBattD : null);
-        // Sanity cap: kWh delta can't exceed kW * step * 1.5 — filters sensor update artefacts
-        const eSolar   = (eSolarRaw !== null && solarKw < 0.05) ? 0 : eSolarRaw;
+        const eLoadRaw = _emec_getDelta(lookup[loadSensor], ts, prevTs);
+        // Sanity: if kW reading < 0.05kW (50W), treat kWh delta as 0 — filters sensor rounding artefacts
+        const eSolar = (eSolarRaw !== null && solarKw   < 0.05) ? 0 : eSolarRaw;
+        const eLoad  = (eLoadRaw  !== null && loadKw    < 0.05) ? 0 : eLoadRaw;
+        const eGridRaw = gridExpKw > 0.2 ? (eGridExp !== null ? -eGridExp : null) : eGridImp;
+        const eGrid  = (eGridRaw  !== null && Math.abs(gridKw)  < 0.05) ? 0 : eGridRaw;
+        const eBattRaw = battCKw  > 0.2 ? eBattC : (eBattD !== null ? -eBattD : null);
+        const eBatt  = (eBattRaw  !== null && Math.abs(battKw)  < 0.05) ? 0 : eBattRaw;
 
         rows.push('<tr style="background-color:' + c.bg + ';color:' + c.txt + ';">' +
           '<td>' + timeStr + '</td>' +
