@@ -19,7 +19,7 @@ substitutions:
   # Project Name
   project_name: "Athom Technology.Light Switch 3 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "v1.4.2"
+  project_version: "v1.4.3"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   location: "Kitchen"
   # The phase in the home power supply, upon which this device is utilsed. A, B or C.  (myHome GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C)  
@@ -31,14 +31,14 @@ substitutions:
   light2_restore_mode: RESTORE_DEFAULT_OFF
   light3_restore_mode: RESTORE_DEFAULT_OFF
   # Button Label Names
-  button1_assignment: "Bench Lights"
-  button2_assignment: "Ceiling Lights"
-  button3_assignment: "Hallway Light"
+  button1_assignment: "Kitchen Bench"
+  button2_assignment: "Kitchen Ceiling"
+  button3_assignment: "Front Hallway"
 
   # Backlight LED Name:
-  backlight1_assignment: "Bench"
-  backlight2_assignment: "Ceiling"
-  backlight3_assignment: "Hallway"
+  backlight1_assignment: "Kitchen Bench"
+  backlight2_assignment: "Kitchen Ceiling"
+  backlight3_assignment: "Front Hallway"
 
   # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
   log_level: "INFO"
@@ -144,11 +144,11 @@ esphome:
       name: "Hallway Front"
   # Define devices, to be used in 'Areas'
   devices:
-    - id: kitchen_device
-      name: "Kitchen Sensors"
+    - id: kitchen_lights
+      name: "Kitchen Lights"
       area_id: kitchen_area
-    - id: hallway_front_device
-      name: "Hallway Front Sensors"
+    - id: hallway_front_light
+      name: "Hallway Front Light"
       area_id: hallway_front_area
   # this board has 2mb flash, but esphome assumes 1mb for the 8285 board id
   platformio_options:
@@ -371,7 +371,7 @@ light:
   - platform: binary
     name: ${button1_assignment}
     id: light1
-#    device_id: kitchen_device
+#    device_id: kitchen_light
     icon: 'mdi:lightbulb'
     output: relay1
     restore_mode: ${light1_restore_mode}
@@ -386,7 +386,7 @@ light:
   - platform: binary
     name: ${button2_assignment}
     id: light2
-#    device_id: kitchen_device
+#    device_id: kitchen_light
     icon: 'mdi:lightbulb'
     output: relay2
     restore_mode: ${light2_restore_mode}
@@ -402,7 +402,7 @@ light:
   - platform: binary
     name: ${button3_assignment}
     id: light3
-#    device_id: hallway_front_device
+#    device_id: hallway_front_light
     icon: 'mdi:lightbulb'
     output: relay3
     restore_mode: ${light3_restore_mode}
