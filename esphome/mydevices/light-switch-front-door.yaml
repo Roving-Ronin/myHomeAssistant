@@ -262,7 +262,7 @@ binary_sensor:
           - ON for at least 4s
         then:
           - button.press: Reset
-    internal: true
+#    internal: true
     disabled_by_default: true
     
 
@@ -278,7 +278,7 @@ binary_sensor:
       max_length: 0.5s
       then:
         - light.toggle: light2
-    internal: true
+#    internal: true
     disabled_by_default: true
     
 
@@ -294,7 +294,7 @@ binary_sensor:
       max_length: 0.5s
       then:
         - light.toggle: light3
-    internal: true
+#    internal: true
     disabled_by_default: true
     
 
@@ -310,7 +310,7 @@ binary_sensor:
       max_length: 0.5s
       then:
         - light.toggle: light4
-    internal: true
+#    internal: true
     disabled_by_default: true
 
 ##########################################################################
@@ -345,6 +345,19 @@ output:
 #
 
 light:
+
+  # ESP PCB Light
+  - platform: status_led
+    name: "Status LED"
+    icon: 'mdi:wifi-alert'
+    disabled_by_default: true
+    pin:
+      number: GPIO0
+      inverted: true
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 9
+
 
   # Relays - Hallway Light (Slave)
   - platform: binary
@@ -393,74 +406,6 @@ light:
     web_server:
       sorting_group_id: group_light_switches
       sorting_weight: 4
-
-  # ESP PCB Light
-  - platform: status_led
-    name: "Status LED"
-    icon: 'mdi:wifi-alert'
-    disabled_by_default: true
-    pin:
-      number: GPIO0
-      inverted: true
-    web_server:
-      sorting_group_id: group_light_switches
-      sorting_weight: 9
-
-
-
-
-############################
-
-  # Button LEDs
-  - platform: monochromatic
-    name: "Backlight - ${backlight1_assignment}"
-    icon: 'mdi:led-on'
-    disabled_by_default: true
-    id: led1
-#    device_id: hallway_light
-    output: button_led1
-    default_transition_length: 500ms
-    web_server:
-      sorting_group_id: group_light_switches
-      sorting_weight: 5
-
-
-  - platform: monochromatic
-    name: "Backlight - ${backlight2_assignment}"
-    icon: 'mdi:led-on'
-    disabled_by_default: true
-    id: led2
-#    device_id: yard_front_light
-    output: button_led2
-    default_transition_length: 500ms
-    web_server:
-      sorting_group_id: group_light_switches
-      sorting_weight: 6
-
-      
-  - platform: monochromatic
-    name: "Backlight - ${backlight3_assignment}"
-    icon: 'mdi:led-on'
-    disabled_by_default: true
-    id: led3
-#    device_id: driveway_light
-    output: button_led3
-    default_transition_length: 500ms
-    web_server:
-      sorting_group_id: group_light_switches
-      sorting_weight: 7
-
-  - platform: monochromatic
-    name: "Backlight - ${backlight4_assignment}"
-    icon: 'mdi:led-on'
-    disabled_by_default: true
-    id: led4
-#    device_id: front_door_light
-    output: button_led3
-    default_transition_length: 500ms
-    web_server:
-      sorting_group_id: group_light_switches
-      sorting_weight: 8
 
 
 #########################################################################
