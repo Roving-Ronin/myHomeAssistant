@@ -108,6 +108,14 @@ packages:
 
 external_components:
 
+# https://github.com/Cossid/TasmotaDeviceGroupsForESPHome
+  - source:
+      type: git
+      url: https://github.com/Cossid/TasmotaDeviceGroupsForESPHome
+      ref: main
+    refresh: 1h
+    components: [ device_groups ]
+
 # https://github.com/Roving-Ronin/myHomeAssistant/tree/main/components/energy_statistics
 #  - source:
 #      type: git
@@ -116,13 +124,6 @@ external_components:
 #    refresh: 1h
 #    components: [ usage_tracker ]
 
-
-  - source:
-      type: git
-      url: https://github.com/Cossid/TasmotaDeviceGroupsForESPHome
-      ref: main
-    refresh: 1h
-    components: [ device_groups ]
 
 
 #####################################################################
