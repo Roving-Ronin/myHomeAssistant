@@ -1,0 +1,406 @@
+#########################################################################
+#
+# Device configuration for Athom Wall Switch, with neutral (ESP8285)
+#
+
+##########################################################################
+# VERSION UPATES:
+#
+# v0.1.0 - Upate to use Roving Ronin base configurations
+# v1.2.0 - Upate to support Aldi CasaLux Lights on Bedroom Eave circuit
+#
+
+substitutions:
+  # Default name
+  name: "switch-front-door"
+  # Default friendly name
+  friendly_name: "Switch - Front Door"
+  # Description as appears in ESPHome & top of webserver page
+  device_description: "Athom - Light Switch for Front Door, Hallway, Garage and Bedroom Eaves"
+  # Project Name
+  project_name: "Athom Technology.Light Switch 4 Gang"
+  # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
+  project_version: "v1.0.0"
+  # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
+  location: "Front Door"
+  # The phase in the home power supply, upon which this device is utilsed. A, B or C.  (myHome GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C)  
+  power_phase: "A"
+  # The circuit breaker / RCBO that the load is attached to.  
+  power_rcbo: "Lights"
+  # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
+  log_level: "INFO"
+
+ 
+  # Restore the relay (GPO switch) upon reboot to state:
+  light1_restore_mode: RESTORE_DEFAULT_OFF
+  light2_restore_mode: RESTORE_DEFAULT_OFF
+  light3_restore_mode: RESTORE_DEFAULT_OFF
+  light4_restore_mode: RESTORE_DEFAULT_OFF
+  
+  # Button Label Names
+  button1_assignment: "Hallway Light"
+  button2_assignment: "Bedroom Eave Lights"
+  button3_assignment: "Garage Eave Lights"
+  button4_assignment: "Front Door Light"
+
+  # Backlight LED Name:
+  backlight1_assignment: "Hallway"
+  backlight2_assignment: "Bedroom Eave"
+  backlight3_assignment: "Garage Eave"
+  backlight4_assignment: "Front Door"
+
+   # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
+  log_level: "INFO"
+  
+########################## End of Substitutions #########################
+#
+# Defines the type of ESP chip used on the device
+#
+
+esp8266:
+  board: esp8285
+  restore_from_flash: true
+
+logger:
+  baud_rate: 115200
+
+preferences:
+   # Enable to allow storing of 'Read Total' between reboots and flashing.
+  flash_write_interval: 30min
+
+
+#########################################################################
+#
+# Remote Packages to be utilised
+#
+
+dashboard_import:
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/mydevices/light-switch-front-door-v2.yaml@main
+  import_full_config: false
+
+
+packages:
+  base-config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/base-configuration.yaml]
+    refresh: 5s
+    
+  network_config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/network-wifi.yaml]
+    refresh: 5s
+
+  webserver_groups:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/webserver-groups.yaml]
+    refresh: 5s
+
+#####################################################################
+#
+# External Components
+
+#external_components:
+
+# https://github.com/Roving-Ronin/myHomeAssistant/tree/main/components/energy_statistics
+#  - source:
+#      type: git
+#      url: https://github.com/roving-ronin/myhomeassistant/
+#      ref: main
+#    refresh: 1h
+#    components: [ usage_tracker ]
+
+#####################################################################
+
+web_server:
+  include_internal: false
+
+#####################################################################
+#
+#
+#
+
+esphome:
+  # Define areas (optional), as opposed to 'area'
+  areas:
+    - id: hallway_area
+      name: "Hallway"
+    - id: yard_front_area
+      name: "Yard Front"
+    - id: driveway_area
+      name: "Driveway"
+    - id: front_entrance_area
+      name: "Front Entrance"
+  # Define devices, to be used in 'Areas'
+  devices:
+    - id: hallway_device
+      name: "Hallway Light"
+      area_id: hallway_area
+    - id: yard_front_device
+      name: "Front Yard Lights"
+      area_id: yard_front_area
+    - id: driveway_device
+      name: "Driveway Lights"
+      area_id: driveway_area
+    - id: front_entrance_device
+      name: "Front Entrance Light"
+      area_id: front_entrance_area
+  # this board has 2mb flash, but esphome assumes 1mb for the 8285 board id
+  platformio_options:
+    board_upload.flash_size: 2MB
+    board_upload.maximum_size: 2097152
+    board_build.ldscript: eagle.flash.2m.ld
+  # Actions to perform upon device booting
+  on_boot:
+    - priority: 600
+      then:
+        - select.set_index:
+            id: power_mode
+            index: !lambda |-
+                    return id(restore_mode)-1;
+        - lambda: |-
+            // Light restore logic
+              switch(id(restore_mode))
+              {
+              case 1:{
+                      id(light1).turn_off();
+                      id(light2).turn_off();
+                      id(light3).turn_off();
+                      id(light4).turn_off();
+                      break;
+                            }
+              case 2:{
+                      id(light1).turn_on();
+                      id(light2).turn_on();
+                      id(light3).turn_on();
+                      id(light4).turn_on();
+                      break;
+                            }
+              default:{
+                      break;
+                            }
+              }
+
+#########################################################################
+#
+# Globals to save values to NVS RAM
+#
+
+globals:
+  - id: restore_mode
+    type: int
+    restore_value: yes
+    initial_value: "3"
+
+
+#########################################################################
+#
+# Select action to set default power on state
+#
+
+  # Control the Switches and Physical Relays
+select:
+  - platform: template
+    name: "Power On State"
+    id: "power_mode"
+    optimistic: true
+    icon: 'mdi:electric-switch'
+    options:
+      - Always Off
+      - Always On
+      - Restore Power Off State
+    on_value:
+      then:
+        - lambda: |-
+            id(restore_mode)=i+1;
+    entity_category:  config
+
+#########################################################################
+#
+# Binary Sensors
+#
+binary_sensor:
+
+  # Touch Button 1
+  - platform: gpio
+    pin:
+      inverted: true
+      number: GPIO12
+    name: ${button1_assignment}
+    id: button1
+    icon: 'mdi:gesture-tap-button'
+    disabled_by_default: true
+    on_multi_click:
+      - timing:
+          - ON for at most 0.5s
+          - OFF for at least 0.2s
+        then:
+          - light.toggle: light1
+      - timing:
+          - ON for at least 4s
+        then:
+          - button.press: Reset
+    internal: true
+    disabled_by_default: true
+    
+
+  # Touch Button 2
+  - platform: gpio
+    pin:
+      inverted: true
+      number: GPIO3
+    name: ${button2_assignment}
+    id: button2
+    icon: 'mdi:gesture-tap-button'
+    disabled_by_default: true
+    on_click:
+      max_length: 0.5s
+      then:
+        - light.toggle: light2
+    internal: true
+    disabled_by_default: true
+    
+
+  # Touch Button 3  
+  - platform: gpio
+    pin:
+      inverted: true
+      number: GPIO5
+    name: ${button3_assignment}
+    id: button3
+    icon: 'mdi:gesture-tap-button'
+    disabled_by_default: true
+    on_click:
+      max_length: 0.5s
+      then:
+        - light.toggle: light3
+    internal: true
+    disabled_by_default: true
+    
+
+  # Touch Button 4
+  - platform: gpio
+    pin:
+      inverted: true
+      number: GPIO16
+    name: ${button4_assignment}
+    id: button4
+    icon: 'mdi:gesture-tap-button'
+    disabled_by_default: true
+    on_click:
+      max_length: 0.5s
+      then:
+        - light.toggle: light4
+    internal: true
+    disabled_by_default: true
+
+##########################################################################
+#
+# Relays - Seperate to Lights and Buttons. Controlled directly by SWITCHES
+#
+
+#   - Default component used by the Athom 4Gang Switch
+
+output:
+  # Relays
+  - platform: gpio
+    pin: GPIO13
+    id: relay1
+
+  - platform: gpio
+    pin: GPIO4
+    id: relay2
+
+  - platform: gpio
+    pin: GPIO15
+    id: relay3
+
+  - platform: gpio
+    pin: GPIO14
+    id: relay4
+
+
+##########################################################################
+#
+# Lights
+#
+
+light:
+
+  # Relays - Hallway Light (Slave)
+  - platform: binary
+    name: ${button1_assignment}
+    id: light1
+#    device_id: hallway_device
+    output: relay1
+    restore_mode: ${light1_restore_mode}
+    icon: 'mdi:lightbulb'
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 1
+      
+  # Relays - Master Bedroom Eave Lights (Virtual Switch)
+  - platform: binary
+    name: ${button2_assignment}
+    id: light2
+#    device_id: yard_front_device
+    output: relay2
+    restore_mode: ${light2_restore_mode}
+    icon: 'mdi:lightbulb'
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 2
+
+  # Relays - Garage Eave Lights (Virtual Switch)
+  - platform: binary
+    name: ${button3_assignment}
+    id: light3
+#    device_id: driveway_device
+    output: relay3
+    restore_mode: ${light3_restore_mode}
+    icon: 'mdi:lightbulb'
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 3
+
+  # Relays - Front Door / Patio Light (Virtual Switch)
+  - platform: binary
+    name: ${button4_assignment}
+    id: light4
+#    device_id: front_entrance_device
+    output: relay4
+    restore_mode: ${light4_restore_mode}
+    icon: 'mdi:lightbulb'
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 4
+
+  # ESP PCB Light
+  - platform: status_led
+    name: "Status LED"
+    icon: 'mdi:wifi-alert'
+    disabled_by_default: true
+    pin:
+      number: GPIO0
+      inverted: true
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 5
+
+#########################################################################
+#
+# Automative Reboot of the ESP device on Sunday morning
+#
+time:
+  - id: !extend sntp_time
+    on_time:
+      - seconds: 0
+        minutes: 3
+        hours: 3
+        days_of_week: SUN
+        then:
+          - button.press: restart_device  # This "presses" the button below
+
+#########################################################################
