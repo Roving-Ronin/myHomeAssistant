@@ -83,11 +83,11 @@ packages:
     files: [esphome/common/network-wifi.yaml]
     refresh: 5s
 
-  webserver_groups:
-    url: https://github.com/roving-ronin/myhomeassistant
-    ref: main
-    files: [esphome/common/webserver-groups.yaml]
-    refresh: 5s
+#  webserver_groups:
+#    url: https://github.com/roving-ronin/myhomeassistant
+#    ref: main
+#    files: [esphome/common/webserver-groups.yaml]
+#    refresh: 5s
 
 #####################################################################
 #
@@ -98,19 +98,21 @@ packages:
 # https://github.com/Roving-Ronin/myHomeAssistant/tree/main/components/energy_statistics
 
 external_components:
-#  - source:
-#      type: git
-#      url: https://github.com/roving-ronin/myhomeassistant/
-#      ref: main
-#    refresh: 1h
-#    components: [ usage_tracker ]
 
+  # https://github.com/Cossid/TasmotaDeviceGroupsForESPHome
   - source:
       type: git
       url: https://github.com/Cossid/TasmotaDeviceGroupsForESPHome
       ref: main
     refresh: 1h
     components: [ device_groups ]
+
+#  - source:
+#      type: git
+#      url: https://github.com/roving-ronin/myhomeassistant/
+#      ref: main
+#    refresh: 1h
+#    components: [ usage_tracker ]
 
 
 #####################################################################
