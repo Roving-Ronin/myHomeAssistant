@@ -121,8 +121,6 @@ device_groups:
   - group_name: "hallway-light"   # Tasmota device group name
     send_mask: 0xFFFFFFFF         # Optional, defaults to 0xFFFFFFFF (send everything).  Can be integer or hex
     receive_mask: 0xFFFFFFFF      # Optional, defaults to 0xFFFFFFFF (receive everything).  Can be integer or hex
-#    switches:
-#      - light3                    # ESPHome entity id
     lights:
       - light3                     # ESPHome entity id
 
@@ -349,19 +347,16 @@ output:
   - platform: esp8266_pwm
     pin: GPIO16
     inverted: true
-    internal: true
     id: button_led1
     
   - platform: esp8266_pwm
     pin: GPIO14
     inverted: true
-    internal: true
     id: button_led2
     
   - platform: esp8266_pwm
     pin: GPIO1
     inverted: true
-    internal: true
     id: button_led3
 
 
@@ -442,6 +437,7 @@ light:
 #    device_id: kitchen_device
     output: button_led1
     default_transition_length: 500ms
+    internal: true
     web_server:
       sorting_group_id: group_light_switches
       sorting_weight: 4
@@ -455,6 +451,7 @@ light:
 #    device_id: kitchen_device
     output: button_led2
     default_transition_length: 500ms
+    internal: true
     web_server:
       sorting_group_id: group_light_switches
       sorting_weight: 5
@@ -468,6 +465,7 @@ light:
 #    device_id: hallway_front_device
     output: button_led3
     default_transition_length: 500ms
+    internal: true
     web_server:
       sorting_group_id: group_light_switches
       sorting_weight: 6
