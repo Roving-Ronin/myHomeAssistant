@@ -10,6 +10,7 @@
 # v1.2.0 - Upate to support Aldi CasaLux Lights on Bedroom Eave circuit
 # v1.5.0 - Upate to revert to having 'dumb' LED lights controlled by the switch
 # v1.5.1 - Add TasmotaDeviceGroupsForESPHome back in for Hallyway Light
+# v1.5.2 - Rename Front Entrance to Front Door
 
 substitutions:
   # Default name
@@ -21,7 +22,7 @@ substitutions:
   # Project Name
   project_name: "Athom Technology.Light Switch 4 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "v1.5.1"
+  project_version: "v1.5.2"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   location: "Front Door"
   # The phase in the home power supply, upon which this device is utilsed. A, B or C.  (myHome GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C)  
@@ -151,8 +152,8 @@ esphome:
       name: "Yard Front"
     - id: driveway_area
       name: "Driveway"
-    - id: front_entrance_area
-      name: "Front Entrance"
+    - id: front_door_area
+      name: "Front Door"
   # Define devices, to be used in 'Areas'
   devices:
     - id: hallway_device
@@ -164,9 +165,9 @@ esphome:
     - id: driveway_device
       name: "Driveway Lights"
       area_id: driveway_area
-    - id: front_entrance_device
-      name: "Front Entrance Light"
-      area_id: front_entrance_area
+    - id: front_door_device
+      name: "Front Door Light"
+      area_id: front_door_area
   # this board has 2mb flash, but esphome assumes 1mb for the 8285 board id
   platformio_options:
     board_upload.flash_size: 2MB
@@ -385,7 +386,7 @@ light:
   - platform: binary
     name: ${button4_assignment}
     id: light4
-#    device_id: front_entrance_device
+#    device_id: front_door_device
     output: relay4
     restore_mode: ${light4_restore_mode}
     icon: 'mdi:lightbulb'
