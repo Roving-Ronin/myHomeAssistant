@@ -9,6 +9,7 @@
 # v0.1.0 - Upate to use Roving Ronin base configurations
 # v1.2.0 - Upate to support Aldi CasaLux Lights on Bedroom Eave circuit
 # v1.5.0 - Upate to revert to having 'dumb' LED lights controlled by the switch
+# v1.5.1 - Add TasmotaDeviceGroupsForESPHome back in for Hallyway Light
 
 substitutions:
   # Default name
@@ -20,7 +21,7 @@ substitutions:
   # Project Name
   project_name: "Athom Technology.Light Switch 4 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "v1.5.0"
+  project_version: "v1.5.1"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   location: "Front Door"
   # The phase in the home power supply, upon which this device is utilsed. A, B or C.  (myHome GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C)  
@@ -99,7 +100,14 @@ packages:
 #
 # External Components
 
-#external_components:
+external_components:
+
+  - source:
+      type: git
+      url: https://github.com/Cossid/TasmotaDeviceGroupsForESPHome
+      ref: main
+    refresh: 1h
+    components: [ device_groups ]
 
 # https://github.com/Roving-Ronin/myHomeAssistant/tree/main/components/energy_statistics
 #  - source:
@@ -108,6 +116,21 @@ packages:
 #      ref: main
 #    refresh: 1h
 #    components: [ usage_tracker ]
+
+
+#####################################################################
+#
+# Tasmota Device Groups for ESPHome
+#
+
+# Electrical Wiring - NOT CONNECTED - Slave to RELAY 3 on 'Switch Kitchen'
+device_groups:
+  - group_name: "hallway-light"        # Tasmota device group name
+    send_mask: 0xFFFFFFFF              # Optional, defaults to 0xFFFFFFFF (send everything).  Can be integer or hex
+    receive_mask: 0xFFFFFFFF           # Optional, defaults to 0xFFFFFFFF (receive everything).  Can be integer or hex
+    lights:
+      - light1                         # ESPHome entity id
+
 
 #####################################################################
 
