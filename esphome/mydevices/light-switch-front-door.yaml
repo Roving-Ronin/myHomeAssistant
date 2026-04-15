@@ -22,7 +22,7 @@ substitutions:
   # Project Name
   project_name: "Athom Technology.Light Switch 4 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "v1.5.3"
+  project_version: "v1.5.4"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   location: "Front Door"
   # The phase in the home power supply, upon which this device is utilsed. A, B or C.  (myHome GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C)  
@@ -40,13 +40,13 @@ substitutions:
   light4_restore_mode: RESTORE_DEFAULT_OFF
   
   # Button Label Names
-  button1_assignment: "Hallway"
+  button1_assignment: "Front Hallway"
   button2_assignment: "Bedroom Eave"
   button3_assignment: "Garage Eave"
   button4_assignment: "Front Door"
 
   # Backlight LED Name:
-  backlight1_assignment: "Hallway"
+  backlight1_assignment: "Front Hallway"
   backlight2_assignment: "Bedroom Eave"
   backlight3_assignment: "Garage Eave"
   backlight4_assignment: "Front Door"
@@ -262,7 +262,7 @@ binary_sensor:
           - ON for at least 4s
         then:
           - button.press: Reset
-#    internal: true
+    internal: true
     disabled_by_default: true
     
 
@@ -278,7 +278,7 @@ binary_sensor:
       max_length: 0.5s
       then:
         - light.toggle: light2
-#    internal: true
+    internal: true
     disabled_by_default: true
     
 
@@ -294,7 +294,7 @@ binary_sensor:
       max_length: 0.5s
       then:
         - light.toggle: light3
-#    internal: true
+    internal: true
     disabled_by_default: true
     
 
@@ -310,7 +310,7 @@ binary_sensor:
       max_length: 0.5s
       then:
         - light.toggle: light4
-#    internal: true
+    internal: true
     disabled_by_default: true
 
 ##########################################################################
@@ -356,7 +356,7 @@ light:
       inverted: true
     web_server:
       sorting_group_id: group_light_switches
-      sorting_weight: 9
+      sorting_weight: 5
 
 
   # Relays - Hallway Light (Slave)
@@ -369,7 +369,7 @@ light:
     icon: 'mdi:lightbulb'
     web_server:
       sorting_group_id: group_light_switches
-      sorting_weight: 1
+      sorting_weight: 2
       
   # Relays - Master Bedroom Eave Lights (Virtual Switch)
   - platform: binary
@@ -381,7 +381,7 @@ light:
     icon: 'mdi:lightbulb'
     web_server:
       sorting_group_id: group_light_switches
-      sorting_weight: 2
+      sorting_weight: 4
 
   # Relays - Garage Eave Lights (Virtual Switch)
   - platform: binary
@@ -405,7 +405,7 @@ light:
     icon: 'mdi:lightbulb'
     web_server:
       sorting_group_id: group_light_switches
-      sorting_weight: 4
+      sorting_weight: 1
 
 
 #########################################################################
