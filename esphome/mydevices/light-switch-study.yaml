@@ -87,7 +87,7 @@ packages:
 #####################################################################
 
 web_server:
-  sort_groups:
+  sorting_groups:
 
 # Athom Light Switches
     - id: group_light_switches
