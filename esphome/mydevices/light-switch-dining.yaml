@@ -79,11 +79,25 @@ packages:
     files: [esphome/common/network-wifi.yaml]
     refresh: 5s
 
-  webserver_groups:
-    url: https://github.com/roving-ronin/myhomeassistant
-    ref: main
-    files: [esphome/common/webserver-groups.yaml]
-    refresh: 5s
+#  webserver_groups:
+#    url: https://github.com/roving-ronin/myhomeassistant
+#    ref: main
+#    files: [esphome/common/webserver-groups.yaml]
+#    refresh: 5s
+
+#####################################################################
+
+web_server:
+  sorting_groups:
+
+# Athom Light Switches
+    - id: group_light_switches
+      name: "Light Switches"
+      sorting_weight: -28
+
+    - id: group_power_circuits
+      name: "Power Circuits"
+      sorting_weight: -27
 
 #####################################################################
 #
