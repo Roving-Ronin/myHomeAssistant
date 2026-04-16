@@ -396,6 +396,7 @@ light:
     id: led1
     output: button_led1
     default_transition_length: 500ms
+    internal: true
     web_server:
       sorting_group_id: group_light_switches
       sorting_weight: 4
@@ -408,6 +409,7 @@ light:
     id: led2
     output: button_led2
     default_transition_length: 500ms
+    internal: true
     web_server:
       sorting_group_id: group_light_switches
       sorting_weight: 5
@@ -420,6 +422,7 @@ light:
     id: led3
     output: button_led3
     default_transition_length: 500ms
+    internal: true
     web_server:
       sorting_group_id: group_light_switches
       sorting_weight: 6
