@@ -86,7 +86,7 @@ packages:
 
 #####################################################################
 
-webserver:
+web_server:
   sort_groups:
 
 # Athom Light Switches
