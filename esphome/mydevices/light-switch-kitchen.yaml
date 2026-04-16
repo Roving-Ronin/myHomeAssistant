@@ -364,11 +364,10 @@ output:
 
 light:
 
-  # Relays
+  # Kitchen Bench Light
   - platform: binary
     name: ${button1_assignment}
     id: light1
-#    device_id: kitchen_light
     icon: 'mdi:lightbulb'
     output: relay1
     restore_mode: ${light1_restore_mode}
@@ -380,10 +379,10 @@ light:
       sorting_group_id: group_light_switches
       sorting_weight: 1
 
+  # Kitchen Light (Ceiling)
   - platform: binary
     name: ${button2_assignment}
     id: light2
-#    device_id: kitchen_light
     icon: 'mdi:lightbulb'
     output: relay2
     restore_mode: ${light2_restore_mode}
@@ -395,11 +394,10 @@ light:
       sorting_group_id: group_light_switches
       sorting_weight: 2
 
-
+  # Front Hallway Light
   - platform: binary
     name: ${button3_assignment}
     id: light3
-#    device_id: hallway_front_light
     icon: 'mdi:lightbulb'
     output: relay3
     restore_mode: ${light3_restore_mode}
@@ -431,7 +429,6 @@ light:
     icon: 'mdi:led-on'
     disabled_by_default: true
     id: led1
-#    device_id: kitchen_device
     output: button_led1
     default_transition_length: 500ms
     internal: true
@@ -445,7 +442,6 @@ light:
     icon: 'mdi:led-on'
     disabled_by_default: true
     id: led2
-#    device_id: kitchen_device
     output: button_led2
     default_transition_length: 500ms
     internal: true
@@ -459,7 +455,6 @@ light:
     icon: 'mdi:led-on'
     disabled_by_default: true
     id: led3
-#    device_id: hallway_front_device
     output: button_led3
     default_transition_length: 500ms
     internal: true
