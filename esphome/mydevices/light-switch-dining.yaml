@@ -19,7 +19,7 @@ substitutions:
   # Project Name
   project_name: "Athom Technology.Light Switch 1 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "v1.4.1"
+  project_version: "v1.5.0"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   location: "Dining Room"
    # The phase in the home power supply, upon which this device is utilsed. A, B or C.  (myHome GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C)  
@@ -122,20 +122,6 @@ device_groups:
 
 
 #####################################################################
-
-web_server:
-  sorting_groups:
-
-# Athom Light Switches
-    - id: group_light_switches
-      name: "Light Switches"
-      sorting_weight: -28
-
-    - id: group_power_circuits
-      name: "Power Circuits"
-      sorting_weight: -27  
-
-#####################################################################
 #
 #
 #
@@ -168,7 +154,6 @@ esphome:
                       break;
                             }
               }
-
 
 
 #########################################################################
@@ -296,6 +281,7 @@ light:
     id: led1
     output: button_led1
     default_transition_length: 500ms
+    internal: true
     web_server:
       sorting_group_id: group_light_switches
       sorting_weight: 2
