@@ -158,14 +158,14 @@ esphome:
               {
               case 1:{
                       id(light1).turn_off();
-                      id(light2).turn_off();
-                      id(light3).turn_off();
+                      id(switch2).turn_off();
+                      id(switch3).turn_off();
                       break;
                             }
               case 2:{
                       id(light1).turn_on();
-                      id(light2).turn_on();
-                      id(light3).turn_on();
+                      id(switch2).turn_on();
+                      id(switch3).turn_on();
                       break;
                             }
               default:{
