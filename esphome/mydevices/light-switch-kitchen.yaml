@@ -19,7 +19,7 @@ substitutions:
   # Project Name
   project_name: "Athom Technology.Light Switch 3 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "v1.5.0"
+  project_version: "v1.5.1"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   location: "Kitchen"
   # The phase in the home power supply, upon which this device is utilsed. A, B or C.  (myHome GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C)  
@@ -31,14 +31,14 @@ substitutions:
   light2_restore_mode: RESTORE_DEFAULT_OFF
   light3_restore_mode: RESTORE_DEFAULT_OFF
   # Button Label Names
-  button1_assignment: "Kitchen Bench"
-  button2_assignment: "Kitchen Ceiling"
-  button3_assignment: "Front Hallway"
+  button1_assignment: "Bench Lights"
+  button2_assignment: "Ceiling Lights"
+  button3_assignment: "Lights"
 
   # Backlight LED Name:
-  backlight1_assignment: "Kitchen Bench"
-  backlight2_assignment: "Kitchen Ceiling"
-  backlight3_assignment: "Front Hallway"
+  backlight1_assignment: "Bench Lights"
+  backlight2_assignment: "Ceiling Lights"
+  backlight3_assignment: "Lights"
 
   # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
   log_level: "INFO"
@@ -151,16 +151,16 @@ esphome:
   areas:
     - id: kitchen_area
       name: "Kitchen"
-    - id: hallway_front_area
-      name: "Hallway Front"
+    - id: hallway_area
+      name: "Hallway"
   # Define devices, to be used in 'Areas'
   devices:
     - id: kitchen_lights
-      name: "Kitchen Lights"
+      name: "Kitchen"
       area_id: kitchen_area
-    - id: hallway_front_light
-      name: "Hallway Front Light"
-      area_id: hallway_front_area
+    - id: hallway_lights
+      name: "Hallway"
+      area_id: hallway_area
   # this board has 2mb flash, but esphome assumes 1mb for the 8285 board id
   platformio_options:
     board_upload.flash_size: 2MB
@@ -385,6 +385,7 @@ light:
     icon: 'mdi:lightbulb'
     output: relay1
     restore_mode: ${light1_restore_mode}
+    device_id: kitchen_lights
     on_turn_on:
       - light.turn_on: led1
     on_turn_off:
@@ -400,6 +401,7 @@ light:
     icon: 'mdi:lightbulb'
     output: relay2
     restore_mode: ${light2_restore_mode}
+    device_id: kitchen_lights
     on_turn_on:
       - light.turn_on: led2
     on_turn_off:
@@ -415,6 +417,7 @@ light:
     icon: 'mdi:lightbulb'
     output: relay3
     restore_mode: ${light3_restore_mode}
+    device_id: hallway_lights
     on_turn_on:
       - light.turn_on: led3
     on_turn_off:
