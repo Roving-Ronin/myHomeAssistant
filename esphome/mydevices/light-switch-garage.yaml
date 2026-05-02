@@ -35,12 +35,12 @@ substitutions:
   light3_restore_mode: RESTORE_DEFAULT_OFF
   # Button Label Names
   button1_assignment: "Garage Lights"
-  button2_assignment: "Workbnech Lights"
+  button2_assignment: "Workbench Lights"
   button3_assignment: "Gun Safe Lights"
 
   # Backlight LED Name:
   backlight1_assignment: "Garage Lights"
-  backlight2_assignment: "Workbnech Lights"
+  backlight2_assignment: "Workbench Lights"
   backlight3_assignment: "Gun Safe Lights"
 
   # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
