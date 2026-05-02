@@ -112,6 +112,7 @@ web_server:
 
 http_request:
   useragent: esphome/switch-garage
+  verify_ssl: false
   timeout: 5s
 
 #####################################################################
