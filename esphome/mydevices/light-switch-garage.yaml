@@ -107,7 +107,12 @@ web_server:
       sorting_weight: -27
 
 #####################################################################
+# HTTP calls to Shelly Pro 4PM - To On/Off Light switch relays
+# component block (http_request is needed for RPC calls)
 
+http_request:
+  useragent: esphome/switch-garage
+  timeout: 5s
 
 #####################################################################
 #
@@ -209,7 +214,7 @@ select:
 
 binary_sensor:
 
-  # Touch Button 1
+  # Touch Button 1 - Garage LED Batons x 2
   - platform: gpio
     pin:
       inverted: true
@@ -234,7 +239,7 @@ binary_sensor:
     disabled_by_default: true
     
 
-  # Touch Button 2
+  # Touch Button 2 - Workbench Lights
   - platform: gpio
     pin:
       inverted: true
@@ -249,12 +254,12 @@ binary_sensor:
     on_click:
       max_length: 0.5s
       then:
-        - light.toggle: light2
+        - switch.toggle: switch2
     internal: true
     disabled_by_default: true
 
 
-  # Touch Button 3
+  # Touch Button 3 - Safes Lights
   - platform: gpio
     pin:
       inverted: true
@@ -269,43 +274,9 @@ binary_sensor:
     on_click:
       max_length: 0.5s
       then:
-        - light.toggle: light3
+        - switch.toggle: switch3
     internal: true
     disabled_by_default: true
-
-
-    # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
-    # This is used by the usage_tracker as its source sensor.
-#  - platform: template
-#    name: "Light 1 - State"
-#    id: light1_state
-#    icon: 'mdi:state-machine'
-#    lambda: |-
-#      return id(light1).current_values.is_on();
-#    internal: true
-#    disabled_by_default: true
-
-    # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
-    # This is used by the usage_tracker as its source sensor.
-#  - platform: template
-#    name: "Light 2 - State"
-#    id: light2_state
-#    icon: 'mdi:state-machine'
-#    lambda: |-
-#      return id(light2).current_values.is_on();
-#    internal: true
-#    disabled_by_default: true
-
-    # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
-    # This is used by the usage_tracker as its source sensor.
-#  - platform: template
-#    name: "Light 3 - State"
-#    id: light3_state
-#    icon: 'mdi:state-machine'
-#    lambda: |-
-#      return id(light3).current_values.is_on();
-#    internal: true
-#    disabled_by_default: true
 
 
 ##########################################################################
@@ -351,7 +322,7 @@ output:
 
 light:
 
-  # Garage Bench Light
+  # Garage 2 x LED Baton Lights
   - platform: binary
     name: ${button1_assignment}
     id: light1
@@ -365,36 +336,6 @@ light:
     web_server:
       sorting_group_id: group_light_switches
       sorting_weight: 1
-
-  # Garage Light (Ceiling)
-  - platform: binary
-    name: ${button2_assignment}
-    id: light2
-    icon: 'mdi:lightbulb'
-    output: relay2
-    restore_mode: ${light2_restore_mode}
-    on_turn_on:
-      - light.turn_on: led2
-    on_turn_off:
-      - light.turn_off: led2
-    web_server:
-      sorting_group_id: group_light_switches
-      sorting_weight: 2
-
-  # Front Hallway Light
-  - platform: binary
-    name: ${button3_assignment}
-    id: light3
-    icon: 'mdi:lightbulb'
-    output: relay3
-    restore_mode: ${light3_restore_mode}
-    on_turn_on:
-      - light.turn_on: led3
-    on_turn_off:
-      - light.turn_off: led3
-    web_server:
-      sorting_group_id: group_light_switches
-      sorting_weight: 3
 
   - platform: status_led
     name: "Status LED"
@@ -448,6 +389,50 @@ light:
     web_server:
       sorting_group_id: group_light_switches
       sorting_weight: 6
+
+#########################################################################
+#
+# Template Switches - RPC calls to Shelly Pro 4PM (10.0.5.31)
+# Replaces light2 (Workbench) and light3 (Gun Safe) which have no wiring
+#
+
+switch:
+
+  - platform: template
+    name: ${button2_assignment}       # "Workbench Lights" - Shelly channel id=1
+    id: switch2
+    icon: 'mdi:lightbulb'
+    optimistic: true                  # Assumes the command succeeded immediately
+    restore_mode: ${light2_restore_mode}
+    turn_on_action:
+      - http_request.get:
+          url: "http://10.0.5.31/rpc/Switch.Set?id=1&on=true"
+      - light.turn_on: led2
+    turn_off_action:
+      - http_request.get:
+          url: "http://10.0.5.31/rpc/Switch.Set?id=1&on=false"
+      - light.turn_off: led2
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 2
+
+  - platform: template
+    name: ${button3_assignment}       # "Gun Safe Lights" - Shelly channel id=3
+    id: switch3
+    icon: 'mdi:lightbulb'
+    optimistic: true
+    restore_mode: ${light3_restore_mode}
+    turn_on_action:
+      - http_request.get:
+          url: "http://10.0.5.31/rpc/Switch.Set?id=3&on=true"
+      - light.turn_on: led3
+    turn_off_action:
+      - http_request.get:
+          url: "http://10.0.5.31/rpc/Switch.Set?id=3&on=false"
+      - light.turn_off: led3
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 3
 
 
 #########################################################################
