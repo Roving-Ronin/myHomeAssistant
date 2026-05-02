@@ -22,7 +22,7 @@ substitutions:
   # Project Name
   project_name: "Athom Technology.Light Switch 3 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "v1.5.2"
+  project_version: "v1.5.3"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Garage' etc  
   location: "Garage"
   # The phase in the home power supply, upon which this device is utilsed. A, B or C.  (myHome GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C)  
@@ -34,9 +34,9 @@ substitutions:
   light2_restore_mode: RESTORE_DEFAULT_OFF
   light3_restore_mode: RESTORE_DEFAULT_OFF
   # Button Label Names
-  button1_assignment: "Garage Lights"
-  button2_assignment: "Workbench Lights"
-  button3_assignment: "Gun Safe Lights"
+  button1_assignment: "Lights"  # "Garage Lights"
+  button2_assignment: "Lights"  # "Workbench Lights"
+  button3_assignment: "Lights"  # "Gun Safe Lights"
 
   # Backlight LED Name:
   backlight1_assignment: "Garage Lights"
