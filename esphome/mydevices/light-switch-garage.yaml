@@ -22,7 +22,7 @@ substitutions:
   # Project Name
   project_name: "Athom Technology.Light Switch 3 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "v1.5.1"
+  project_version: "v1.5.2"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Garage' etc  
   location: "Garage"
   # The phase in the home power supply, upon which this device is utilsed. A, B or C.  (myHome GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C)  
@@ -330,6 +330,7 @@ light:
     icon: 'mdi:lightbulb'
     output: relay1
     restore_mode: ${light1_restore_mode}
+    device_id: garage_lights
     on_turn_on:
       - light.turn_on: led1
     on_turn_off:
@@ -405,6 +406,7 @@ switch:
     icon: 'mdi:lightbulb'
     optimistic: true                  # Assumes the command succeeded immediately
     restore_mode: ${light2_restore_mode}
+    device_id: workbench_lights
     turn_on_action:
       - http_request.get:
           url: "http://10.0.5.31/rpc/Switch.Set?id=1&on=true"
@@ -423,6 +425,7 @@ switch:
     icon: 'mdi:lightbulb'
     optimistic: true
     restore_mode: ${light3_restore_mode}
+    device_id: gunsafes_lights
     turn_on_action:
       - http_request.get:
           url: "http://10.0.5.31/rpc/Switch.Set?id=3&on=true"
