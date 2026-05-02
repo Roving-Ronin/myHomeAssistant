@@ -1,0 +1,468 @@
+#########################################################################
+#
+# Device configuration for Athom Wall Switch, with neutral (ESP8285)
+#
+# L1 - 2 x LED Light Batons
+# L2 - 2 x Workbench Downlights
+# L3 - 4 x Gun Safe Downlights
+
+##########################################################################
+# VERSION UPATES:
+#
+# v0.1.0 - Upate to use Roving Ronin base configurations
+#
+
+substitutions:
+  # Default name
+  name: "switch-garage"
+  # Default friendly name
+  friendly_name: "Switch - Garage"
+  # Description as appears in ESPHome & top of webserver page
+  device_description: "Athom - Light Switch for Garage, Gun Safes & Workbench"
+  # Project Name
+  project_name: "Athom Technology.Light Switch 3 Gang"
+  # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
+  project_version: "v1.5.0"
+  # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Garage' etc  
+  location: "Garage"
+  # The phase in the home power supply, upon which this device is utilsed. A, B or C.  (myHome GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C)  
+  power_phase: "A"
+  # The circuit breaker / RCBO that the load is attached to.  
+  power_rcbo: "Lights"
+  # Restore the relay (GPO switch) upon reboot to state:
+  light1_restore_mode: RESTORE_DEFAULT_OFF
+  light2_restore_mode: RESTORE_DEFAULT_OFF
+  light3_restore_mode: RESTORE_DEFAULT_OFF
+  # Button Label Names
+  button1_assignment: "Garage Lights"
+  button2_assignment: "Workbnech Lights"
+  button3_assignment: "Gun Safe Lights"
+
+  # Backlight LED Name:
+  backlight1_assignment: "Garage Lights"
+  backlight2_assignment: "Workbnech Lights"
+  backlight3_assignment: "Gun Safe Lights"
+
+  # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
+  log_level: "INFO"
+  
+########################## End of Substitutions #########################
+#
+# Defines the type of ESP chip used on the device
+#
+
+esp8266:
+  board: esp8285
+  restore_from_flash: true
+
+logger:
+  baud_rate: 115200
+
+preferences:
+   # Enable to allow storing of 'Read Total' between reboots and flashing.
+  flash_write_interval: 30min
+  
+
+#########################################################################
+#
+# Remote Packages to be utilised
+#
+
+dashboard_import:
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/mydevices/light-switch-garage.yaml@main
+  import_full_config: false
+
+
+packages:
+  base-config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/base-configuration.yaml]
+    refresh: 5s
+    
+  network_config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/network-wifi.yaml]
+    refresh: 5s
+
+#  webserver_groups:
+#    url: https://github.com/roving-ronin/myhomeassistant
+#    ref: main
+#    files: [esphome/common/webserver-groups.yaml]
+#    refresh: 5s
+
+#####################################################################
+
+web_server:
+  sorting_groups:
+
+# Athom Light Switches
+    - id: group_light_switches
+      name: "Light Switches"
+      sorting_weight: -28
+
+    - id: group_power_circuits
+      name: "Power Circuits"
+      sorting_weight: -27
+
+#####################################################################
+
+
+#####################################################################
+#
+#
+#
+
+esphome:
+  # Define areas (optional), as opposed to 'area'
+  areas:
+    - id: carparking_area
+      name: "Car Parking"
+    - id: workbench_area
+      name: "Work Bench"
+    - id: gunsafes_area
+      name: "Gun Safes"
+  # Define devices, to be used in 'Areas'
+  devices:
+    - id: garage_lights
+      name: "Garage Lights"
+      area_id: carparking_area
+    - id: workbench_lights
+      name: "Workbench Lights"
+      area_id: workbench_area
+    - id: gunsafes_lights
+      name: "Gun Safe Lights"
+      area_id: gunsafes_area
+  # this board has 2mb flash, but esphome assumes 1mb for the 8285 board id
+  platformio_options:
+    board_upload.flash_size: 2MB
+    board_upload.maximum_size: 2097152
+    board_build.ldscript: eagle.flash.2m.ld
+  # Actions to perform upon device booting
+  on_boot:
+    - priority: 600
+      then:
+        - select.set_index:
+            id: power_mode
+            index: !lambda |-
+                    return id(restore_mode)-1;
+        - lambda: |-
+              switch(id(restore_mode))
+              {
+              case 1:{
+                      id(light1).turn_off();
+                      id(light2).turn_off();
+                      id(light3).turn_off();
+                      break;
+                            }
+              case 2:{
+                      id(light1).turn_on();
+                      id(light2).turn_on();
+                      id(light3).turn_on();
+                      break;
+                            }
+              default:{
+                      break;
+                            }
+              }
+
+#########################################################################
+#
+# Globals to save values to NVS RAM
+#
+
+globals:
+  - id: restore_mode
+    type: int
+    restore_value: yes
+    initial_value: "3"
+
+
+#########################################################################
+#
+# Select action to set default power on state
+#
+
+select:
+  - platform: template
+    name: "Power On State"
+    id: "power_mode"
+    icon: 'mdi:electric-switch'
+    optimistic: true
+    options:
+      - Always Off
+      - Always On
+      - Restore Power Off State
+    on_value:
+      then:
+        - lambda: |-
+            id(restore_mode)=i+1;
+    entity_category: config
+
+
+
+#########################################################################
+#
+# Binary Sensors
+#
+
+binary_sensor:
+
+  # Touch Button 1
+  - platform: gpio
+    pin:
+      inverted: true
+      number: GPIO12
+      mode:
+        input: true
+        pullup: true
+    name: ${button1_assignment}
+    id: button1
+    icon: 'mdi:gesture-tap-button'
+    on_multi_click:
+      - timing:
+          - ON for at most 0.5s
+          - OFF for at least 0.2s
+        then:
+          - light.toggle: light1
+      - timing:
+          - ON for at least 4s
+        then:
+          - button.press: Reset
+    internal: true
+    disabled_by_default: true
+    
+
+  # Touch Button 2
+  - platform: gpio
+    pin:
+      inverted: true
+      number: GPIO3
+      mode:
+        input: true
+        pullup: true
+    name: ${button2_assignment}
+    id: button2
+    icon: 'mdi:gesture-tap-button'
+#    disabled_by_default: true
+    on_click:
+      max_length: 0.5s
+      then:
+        - light.toggle: light2
+    internal: true
+    disabled_by_default: true
+
+
+  # Touch Button 3
+  - platform: gpio
+    pin:
+      inverted: true
+      number: GPIO5
+      mode:
+        input: true
+        pullup: true
+    name: ${button3_assignment}
+    id: button3
+    icon: 'mdi:gesture-tap-button'
+#    disabled_by_default: true
+    on_click:
+      max_length: 0.5s
+      then:
+        - light.toggle: light3
+    internal: true
+    disabled_by_default: true
+
+
+    # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
+    # This is used by the usage_tracker as its source sensor.
+#  - platform: template
+#    name: "Light 1 - State"
+#    id: light1_state
+#    icon: 'mdi:state-machine'
+#    lambda: |-
+#      return id(light1).current_values.is_on();
+#    internal: true
+#    disabled_by_default: true
+
+    # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
+    # This is used by the usage_tracker as its source sensor.
+#  - platform: template
+#    name: "Light 2 - State"
+#    id: light2_state
+#    icon: 'mdi:state-machine'
+#    lambda: |-
+#      return id(light2).current_values.is_on();
+#    internal: true
+#    disabled_by_default: true
+
+    # Binary sensor that tracks of the Light (id: downlight) is ON or OFF.
+    # This is used by the usage_tracker as its source sensor.
+#  - platform: template
+#    name: "Light 3 - State"
+#    id: light3_state
+#    icon: 'mdi:state-machine'
+#    lambda: |-
+#      return id(light3).current_values.is_on();
+#    internal: true
+#    disabled_by_default: true
+
+
+##########################################################################
+#
+# Relays
+#
+
+output:
+  # Relays
+  - platform: gpio
+    pin: GPIO13
+    id: relay1
+
+  - platform: gpio
+    pin: GPIO4
+    id: relay2
+
+  - platform: gpio
+    pin: GPIO15
+    id: relay3
+
+  # Button LEDs (1.0 = Blue / 0.0 = Red)
+  - platform: esp8266_pwm
+    pin: GPIO16
+    inverted: true
+    id: button_led1
+    
+  - platform: esp8266_pwm
+    pin: GPIO14
+    inverted: true
+    id: button_led2
+    
+  - platform: esp8266_pwm
+    pin: GPIO1
+    inverted: true
+    id: button_led3
+
+
+##########################################################################
+#
+# Lights
+#
+
+light:
+
+  # Garage Bench Light
+  - platform: binary
+    name: ${button1_assignment}
+    id: light1
+    icon: 'mdi:lightbulb'
+    output: relay1
+    restore_mode: ${light1_restore_mode}
+    on_turn_on:
+      - light.turn_on: led1
+    on_turn_off:
+      - light.turn_off: led1
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 1
+
+  # Garage Light (Ceiling)
+  - platform: binary
+    name: ${button2_assignment}
+    id: light2
+    icon: 'mdi:lightbulb'
+    output: relay2
+    restore_mode: ${light2_restore_mode}
+    on_turn_on:
+      - light.turn_on: led2
+    on_turn_off:
+      - light.turn_off: led2
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 2
+
+  # Front Hallway Light
+  - platform: binary
+    name: ${button3_assignment}
+    id: light3
+    icon: 'mdi:lightbulb'
+    output: relay3
+    restore_mode: ${light3_restore_mode}
+    on_turn_on:
+      - light.turn_on: led3
+    on_turn_off:
+      - light.turn_off: led3
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 3
+
+  - platform: status_led
+    name: "Status LED"
+    icon: 'mdi:wifi-alert'
+    disabled_by_default: true
+    pin:
+      number: GPIO0
+      inverted: true
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 7
+
+
+############################
+
+  # Button LEDs
+  - platform: monochromatic
+    name: "Backlight - ${backlight1_assignment}"
+    icon: 'mdi:led-on'
+    disabled_by_default: true
+    id: led1
+    output: button_led1
+    default_transition_length: 500ms
+    internal: true
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 4
+
+
+  - platform: monochromatic
+    name: "Backlight - ${backlight2_assignment}"
+    icon: 'mdi:led-on'
+    disabled_by_default: true
+    id: led2
+    output: button_led2
+    default_transition_length: 500ms
+    internal: true
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 5
+
+      
+  - platform: monochromatic
+    name: "Backlight - ${backlight3_assignment}"
+    icon: 'mdi:led-on'
+    disabled_by_default: true
+    id: led3
+    output: button_led3
+    default_transition_length: 500ms
+    internal: true
+    web_server:
+      sorting_group_id: group_light_switches
+      sorting_weight: 6
+
+
+#########################################################################
+#
+# Automative Reboot of the ESP device on Sunday morning
+#
+
+#time:
+#  - id: !extend sntp_time
+#    on_time:
+#      - seconds: 0
+#        minutes: 1
+#        hours: 3
+#        days_of_week: SUN
+#        then:
+#          - button.press: restart_device  # This "presses" the button below
+
+#########################################################################
