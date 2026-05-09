@@ -166,6 +166,7 @@ text_sensor:
    # WAS from : https://community.home-assistant.io/t/uptime-sensor-in-hours-or-days/116392/29
   - platform: uptime
     name: "Device Uptime"
+    id: device_uptime
     icon: mdi:clock-start
     entity_category: diagnostic
     update_interval: ${sensor_update_interval}
