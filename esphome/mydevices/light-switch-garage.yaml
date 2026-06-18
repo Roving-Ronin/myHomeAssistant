@@ -22,7 +22,7 @@ substitutions:
   # Project Name
   project_name: "Athom Technology.Light Switch 3 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "v1.5.4"
+  project_version: "v1.5.5"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Garage' etc  
   location: "Garage"
   # The phase in the home power supply, upon which this device is utilsed. A, B or C.  (myHome GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C)  
@@ -54,8 +54,8 @@ substitutions:
 esp8266:
   board: esp8285
   restore_from_flash: true
-  framework:
-    version: 3.0.2
+#  framework:
+#    version: 3.0.2
   
 
 logger:
