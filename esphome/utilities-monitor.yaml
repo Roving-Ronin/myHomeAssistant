@@ -3,119 +3,161 @@
 # Environmental monitoring using ESP32-S3 chipset and BME280 sensor(s)
 # for temperature, humidity, pressure & dew point.
 #
+
+##########################################################################
+# VERSION UPATES:
+#
+# v1.2.0 - Upate to Dentra v2 based water_statistics with publish yesterday = 0
+# v1.3.0 - Updated Water and Gas (m3 and MJ) components, so that values remain between reflashing
+# v1.8.2 - Fixed the Gas/Water Flow Rates (L/min) device class to be 'volume_flow_rate'
+# v1.9.0 - Switch to Framework Type = ESP-IDF (Was Arduino)
+
+   # Provides substitutions or variables that are then called elsewhere multiple times in the config
 substitutions:
-
-##########################
-# Device Settings:
-#  
-   # Set the update interval for sensors (Default is 10s)
-  sensor_update_interval: 10s   
-   # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
-  log_level: "INFO"
-
-###############################
-# Network Settings - Static IP
-#
-   # Network - Static IP - Address  
-  network_ip: ""
-   # Network - Static IP - Gateway
-  network_gateway: ""
-   # Network - Static IP - Subnet Mask
-  network_subnet: ""
-   # Network - Static IP - DNS Servers
-  dns_server1: ""
-  dns_server2: ""
-   # Define a domain for this device to use. i.e. iot.home.lan (so device will appear as athom-smart-plug-v2.iot.home.lan in DNS/DHCP logs)
-  dns_domain: ""
-
-###############################
-# BME 280 / BME680 Sensor
-#
-   # Location of BME280/680 Sensor #1. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
+  # Default name  
+  name: "utilities-monitor"
+  # Default friendly name 
+  friendly_name: "Utilities Monitor"
+  # Description as appears in ESPHome & top of webserver page
+  device_description: "Gas, Water & Environmental Monitor (Temp./Humidity/Pressure)"
+  # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Front Gate, Decontamination, Shed XYZ etc  
+  location: "Garage"
+  # Location geographical height, in meters. Used for calculations in sensors such as BME280/BME680 and Water Tank sensors. Goulburn (673)
+  location_height: "673"
+  # Project Name
+  project_name: "DIY.Utilities Monitor"
+  # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
+  project_version: "1.8.2"
+   # The phase in the home power supply, upon which this device is utilsed. A, B or C.  (myHome GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C)  
+  power_phase: "B"
+   # The circuit breaker / RCBO that the load is attached to.  
+  power_rcbo: "12V"
+  # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE.
+  # Use 'INFO' as at DEBUG the energy/water/gas statistics "Internal" sensors appear in the logs
+  log_level: "ERROR"
+  
+  # BME 280 / BME680 Sensor
+  # Location of BME280/680 Sensor #1. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
   bme_sensor1_location: ""
-   # Location of BME280/680 Sensor #2. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
+  # Location of BME280/680 Sensor #2. Used to prefix sensor if there are two. Leave empty if only 1. Add a " - " to the end of each entry if used.
   bme_sensor2_location: ""
-   # Calibrate the outpute of the temperature sensor(s).
+  # Calibrate the outpute of the temperature sensor(s).
   temperature_1_offset: "0.0"
   temperature_2_offset: "0.0"
-   # Calibrate the outpute of the pressure sensor(s).
+  # Calibrate the outpute of the pressure sensor(s).
   pressure_1_offset: "0.0"
   pressure_2_offset: "0.0"
-   # Calibrate the outpute of the humidity sensor(s).
+  # Calibrate the outpute of the humidity sensor(s).
   humidity_1_offset: "0.0"
   humidity_2_offset: "0.0"
 
-###############################
-# TL-136 / LIQ-136 Liquid Pressure Sensor
-#
-   # Name of the type of tank the sensor is being used to monitor. Omit entering 'Tank'.
-   # i.e. Water (Default), Sewerage, Disinfectant etc.
-  tank_name: "Water"
-   # Tank Inlet Height - Maximum level of water in centimetres (e.g. 241).
-  inlet_height: "241"
-   # Tank Diameter (i.e. distance from one side to the other) in centimeters.
-  tank_diameter: "238"
-   # Tank Radius - For a cylindrical tank. This will be half the diameter, in centimeters.
-  tank_radius: "119"
-   # Tank Level Offset. Add 0.01847cm to total, to correct to 0L when voltage is 0.469V
-  tank_level_offset: "0.01847"
+  # PIN usage upon the JAComms S3-Core Board
+  gpio_gas_pin: "10"
+  gpio_water_pin: "11"
 
-# Note: Default measurements are based upon a TankWorld 10,000L Tall Straight Wall Tank
-# https://www.tankworld.com.au/product/10000l-tall-straight-wall-tank/
-# Tank Capacity: 10,000L     |    Diameter Width: 2380mm
-# Inlet Height:  2410mm      |    Tank Height:    2485mm
+     # Configure the i2c bus, to Kincony S3-Core Board PINs
+  bus_a_sda_pin: "GPIO47"
+  bus_a_scl_pin: "GPIO48"
+  bus_a_frequency: "100kHz"    # Optional: 100kHz
+
 
 ########################## End of Substitutions #########################
-
-esphome:
-  name_add_mac_suffix: false
-  area: ${location}
-  
-#########################################################################
 #
 # Remote Packages to be utilised
 #
+
+dashboard_import:
+  package_import_url: github://roving-ronin/myhomeassistant/esphome/utilities-monitor.yaml@main
+  import_full_config: false
+
 packages:
-  remote_package:
-    url: https://github.com/Roving-Ronin/myHomeAssistant/
-    ref: main 
-    files: [esphome/utilities-monitor.yaml]
-    refresh: 0s
+
+  esp32-system-board:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/boards/kincony-esp32-s3-core.yaml]
+    refresh: 5s
+
+  base-config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/base-configuration.yaml]
+    refresh: 5s
+    
+  network_config:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/common/network-ethernet-w5500.yaml]
+    refresh: 5s
+
+  bme280a-sensors:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/sensors/bme280-bus-a.yaml]
+    refresh: 5s
+
+  water-tank-sensors:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/sensors/cylinder-liquid-pressure-tl136.yaml]
+    refresh: 5s
+
+  consumption-gas:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/sensors/utilities-gas.yaml ]
+    refresh: 5s
+
+  consumption-town-water:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/sensors/utilities-town-water.yaml]
+    refresh: 5s
+
+#  consumption-tank-water:
+#    url: https://github.com/roving-ronin/myhomeassistant
+#    ref: main
+#    files: [esphome/sensors/utilities-tank-water.yaml]
+#    refresh: 1h
+
+
+#  esp32-system-board:      !include boards/kincony-esp32-s3-core.yaml           # Model of ESP Board being used. This is Kincony S3 Core with JAComms add-on HAT board.
+#  base-config:             !include common/base-configuration.yaml              # Base configuration applied to all ESPHome devices
+#  network-config:          !include common/network-ethernet-w5500.yaml          # Configure Ethernet port on this system board
+#  bme280a-sensors:         !include sensors/bme280-bus-a.yaml                   # Temperature, Humidity, Pressure sensor probe
+#  water-tank-sensors:      !include sensors/cylinder-liquid-pressure-tl136.yaml # Pressure sensor to monitor water tank  
+#  ds18b20-sensors:       !include sensors/ds18b20-1wire.yaml
+#  consumption-gas:         !include sensors/utilities-gas.yaml                  # Sensors to monitor and calculate gas usage
+#  consumption-town-water:  !include sensors/utilities-town-water.yaml           # Sensors to monitor and calculate town water usage
+#  consumption-tank-water:  !include sensors/utilities-tank-water.yaml          # Sensors to monitor and calculate tank water usage
+
 
 #########################################################################
 #
-# Water Tank - Conversions and metrics from pressure sensor
-# NOTE: You MUST update the calibrate_linear recorded Voltage to Levels in the Tank.
-# eg. 4.01667 -> 241.0 being 4.01667V is the voltage when the tank is at 241.0cm (100%)
-#     then do the same for each 10% down to 0.0000V = 0cm / 0%
+# Custom Components to be utilised - For Gas and Water Statistics
+#
 
-#sensor:
-#  
-#  - platform: template
-#    name: "Tank - Level"
-#    id: "tank_level"
-#    icon: 'mdi:water-well'
-#    unit_of_measurement: 'cm'
-#    lambda: |-
-#        return id(tank_voltage).state;
-#    update_interval: 1s #the delta filter will ensure it only sends values when something changes. 
-#    filters:
-#      - calibrate_linear:
-#          # Measured value of X volt maps to Y cm
-#          - 4.01667 -> 241.0   # 100%
-#          - 3.61500 -> 216.9   #  90%
-#          - 3.21333 -> 192.8   #  80%
-#          - 2.81167 -> 168.7   #  70%
-#          - 2.41000 -> 144.6   #  60%
-#          - 2.00833 -> 120.5   #  50%
-#          - 1.60667 -> 96.4    #  40%
-#          - 1.20500 -> 72.3    #  30%
-#          - 0.80333 -> 48.2    #  20%
-#          - 0.40167 -> 24.1    #  10%
-#          - 0.00000 -> 0.00    #   0%
-#    # From https://www.sensorsone.com/measurement-to-linear-0-5v-converter/?iunit=cm&irdg=0.8452500672&ilo=0.469&ihi=4.016666&ounit=V&olo=0&ohi=5
-#      - delta : 0.001                  # Only send the result if the difference with the last sent result is higher than this
-#      - offset: ${tank_level_offset}   # Add 0.01847cm to total, to correct to 0L when voltage is 0.469V
-#    internal: true
-          
+external_components:
+  - source:
+      type: git
+      url: https://github.com/roving-ronin/myhomeassistant/
+      ref: main
+    refresh: 0s
+    components: [ gas_statistics, gas_statistics_mj, water_statistics, usage_tracker ]
+
+#########################################################################
+#
+# Web_server v3 Sort Groups - These substitutes are applied to overwrite the default ones supplied by the 
+# sensor specific template file, in this case the /sensors/hc-sr04-ultrasonic.yaml file.
+#
+
+web_server:
+#  css_url: https://raw.githubusercontent.com/Roving-Ronin/myHomeAssistant/main/esphome/custom_dashboard/tabs.css
+#  js_url: https://raw.githubusercontent.com/Roving-Ronin/myHomeAssistant/main/esphome/custom_dashboard/utilities-monitor.js
+  sorting_groups:
+      # This sort group is used by both the Water and Gas Meter senors (flow rate / pulse counter), so must be in at this level, not in the water vs gas sensor yaml
+    - id: group_utility_meter_sensors
+      name: "Gas & Water Meter Sensors"
+      sorting_weight: -44
+
 #########################################################################
