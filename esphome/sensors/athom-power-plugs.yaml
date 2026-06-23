@@ -164,6 +164,7 @@ sensor:
       filters:
         - throttle_average: ${sensor_update_interval}
       icon: "mdi:power"
+      disabled_by_default: true
       web_server:
         sorting_group_id: group_electricity
         sorting_weight: 2
