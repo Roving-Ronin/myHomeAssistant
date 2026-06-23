@@ -53,9 +53,9 @@ substitutions:
    # The subnet mask of the static IP address.
   network_subnet: "255.255.255.0"
    # Primary DNS server to be utilised
-  dns_server1: "8.8.8.8"
+  dns_server1: "10.0.0.1"
    # Secondary DNS server to be utilised
-  dns_server2: "1.1.1.1"
+  dns_server2: "8.8.8.8"
    # Define a domain for this device to use. i.e. iot.home.lan (so device will appear as athom-smart-plug-v2.iot.home.lan in DNS/DHCP logs)
   dns_domain: ".iot.home.lan"
 
