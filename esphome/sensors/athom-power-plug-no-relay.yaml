@@ -207,6 +207,7 @@ sensor:
       id: total_energy_yesterday_sensor
       accuracy_decimals: 3
       icon: "mdi:calendar-today"
+      disabled_by_default: true
       web_server:
         sorting_group_id: group_energy
         sorting_weight: 2
