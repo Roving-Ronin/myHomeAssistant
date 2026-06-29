@@ -22,7 +22,7 @@ substitutions:
   # Project Name
   project_name: "Athom Technology.Light Switch 4 Gang"
   # Projection version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "v1.5.5"
+  project_version: "v1.5.6"
   # Allows ESP device to be automatically lined to an 'Area' in Home Assistant. Typically used for areas such as 'Lounge Room', 'Kitchen' etc  
   location: "Front Door"
   # The phase in the home power supply, upon which this device is utilsed. A, B or C.  (myHome GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C)  
@@ -367,7 +367,6 @@ light:
       sorting_group_id: group_light_switches
       sorting_weight: 5
 
-
   # Hallway Light (Slave)
   - platform: binary
     name: ${button1_assignment}
@@ -375,6 +374,7 @@ light:
     output: relay1
     restore_mode: ${light1_restore_mode}
     icon: 'mdi:lightbulb'
+    device_id: hallway_light       # Maps this entity to the 'Hallway Front' area
     web_server:
       sorting_group_id: group_light_switches
       sorting_weight: 2
@@ -386,6 +386,7 @@ light:
     output: relay2
     restore_mode: ${light2_restore_mode}
     icon: 'mdi:lightbulb'
+    device_id: yard_front_lights   # Maps this entity to the 'Yard Front' area
     web_server:
       sorting_group_id: group_light_switches
       sorting_weight: 4
@@ -397,6 +398,7 @@ light:
     output: relay3
     restore_mode: ${light3_restore_mode}
     icon: 'mdi:lightbulb'
+    device_id: driveway_lights     # Maps this entity to the 'Driveway' area
     web_server:
       sorting_group_id: group_light_switches
       sorting_weight: 3
@@ -405,10 +407,10 @@ light:
   - platform: binary
     name: ${button4_assignment}
     id: light4
-
     output: relay4
     restore_mode: ${light4_restore_mode}
     icon: 'mdi:lightbulb'
+    device_id: hallway_light       # Maps this entity to the 'Hallway Front' area
     web_server:
       sorting_group_id: group_light_switches
       sorting_weight: 1
