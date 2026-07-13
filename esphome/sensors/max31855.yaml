@@ -96,7 +96,7 @@ binary_sensor:
 
 text_sensor:
   - platform: template
-    name: "Fireplace - ON|OFF"
+    name: "Fireplace - ON | OFF"
     id: fireplace_on_off
     icon: "mdi:fire"
 #       if (id(firebox_temperature).state >= 50 || id(chimney_temperature).state >= 50) {
