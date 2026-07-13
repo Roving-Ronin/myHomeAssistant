@@ -32,12 +32,12 @@ substitutions:
 spi:
   - id: thermocouple_spi
     interface: spi3
+    clk_pin:
+      number: "${spi3_clk_pin}"
     miso_pin: 
       number: "${spi3_miso_pin}"
       mode:
         input: true
-    clk_pin:
-      number: "${spi3_clk_pin}"
 
 #########################################################################
 #
