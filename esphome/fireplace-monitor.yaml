@@ -18,7 +18,7 @@ substitutions:
   # Project Name
   project_name: "DIY.Fireplace Monitor"
   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "0.2.0"
+  project_version: "0.2.1"
    # Define logging level: NONE, ERROR, WARN, INFO, DEBUG (Default), VERBOSE, VERY_VERBOSE
   log_level: "DEBUG"
   
@@ -32,8 +32,8 @@ substitutions:
   temperature_2_offset: "0.0"
 
   # PIN usage for ???
-  spi3_miso_pin: "40"
-  spi3_clk_pin: "42"
+  spi3_miso_pin: "2"
+  spi3_clk_pin: "1"
 
 ########################## End of Substitutions #########################
 #
