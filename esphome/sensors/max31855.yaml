@@ -51,7 +51,7 @@ sensor:
     name: "Firebox - Temperature"
     id: firebox_temperature
     spi_id: thermocouple_spi
-    cs_pin: GPIO4
+    cs_pin: GPIO3
     device_class: "temperature"
     state_class: "measurement"
     unit_of_measurement: "°C"
@@ -65,7 +65,7 @@ sensor:
     name: "Chimney - Temperature"
     id: chimney_temperature
     spi_id: thermocouple_spi
-    cs_pin: GPIO5
+    cs_pin: GPIO38
     device_class: "temperature"
     state_class: "measurement"
     unit_of_measurement: "°C"    
