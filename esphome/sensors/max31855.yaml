@@ -55,7 +55,7 @@ sensor:
     device_class: "temperature"
     state_class: "measurement"
     unit_of_measurement: "°C"
-    accuracy_decimals: 0
+    accuracy_decimals: 2
     reference_temperature:
       name: "Sensor 1 Internal Temp"
     icon: 'mdi:fire'
@@ -69,7 +69,7 @@ sensor:
     device_class: "temperature"
     state_class: "measurement"
     unit_of_measurement: "°C"    
-    accuracy_decimals: 0
+    accuracy_decimals: 2
     reference_temperature:
       name: "Sensor 2 Internal Temp"
     icon: 'mdi:fire'
