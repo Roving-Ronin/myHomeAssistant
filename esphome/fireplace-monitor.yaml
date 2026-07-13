@@ -33,7 +33,7 @@ substitutions:
 
   # PIN usage for ???
   spi3_clk_pin: "0"
-  spi3_miso_pin: "2"
+  spi3_miso_pin: "43"
   
 ########################## End of Substitutions #########################
 #
