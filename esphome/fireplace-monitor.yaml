@@ -32,9 +32,9 @@ substitutions:
   temperature_2_offset: "0.0"
 
   # PIN usage for ???
+  spi3_clk_pin: "0"
   spi3_miso_pin: "2"
-  spi3_clk_pin: "1"
-
+  
 ########################## End of Substitutions #########################
 #
 # Remote Packages to be utilised
