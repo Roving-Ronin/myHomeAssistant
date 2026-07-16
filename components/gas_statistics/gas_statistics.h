@@ -2,6 +2,7 @@
 
 #include "esphome/core/component.h"
 #include "esphome/core/preferences.h"
+#include "esphome/core/string_ref.h"
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/select/select.h"
 #include "esphome/components/time/real_time_clock.h"
@@ -40,8 +41,8 @@ class GasStatistics : public Component {
   void set_gas_yesterday(Sensor *sensor) { this->gas_yesterday_ = sensor; }
   void set_gas_week(Sensor *sensor) { this->gas_week_ = sensor; }
   void set_gas_month(Sensor *sensor) { this->gas_month_ = sensor; }
-  void set_gas_quarter(Sensor *sensor) { this->gas_quarter_ = sensor; }
   void set_gas_year(Sensor *sensor) { this->gas_year_ = sensor; }
+  void set_gas_quarter(Sensor *sensor) { this->gas_quarter_ = sensor; }
 
  protected:
   ESPPreferenceObject pref_;
@@ -64,8 +65,8 @@ class GasStatistics : public Component {
   Sensor *gas_yesterday_{nullptr};
   Sensor *gas_week_{nullptr};
   Sensor *gas_month_{nullptr};
-  Sensor *gas_quarter_{nullptr};
   Sensor *gas_year_{nullptr};
+  Sensor *gas_quarter_{nullptr};
 
   // Start day of week configuration
   int gas_week_start_day_{2};
@@ -90,8 +91,8 @@ class GasStatistics : public Component {
     float start_yesterday{NAN};
     float start_week{NAN};
     float start_month{NAN};
-    float start_quarter{NAN};
     float start_year{NAN};
+    float start_quarter{NAN};
   } gas_;
 
   // Store last published values for change detection
@@ -99,14 +100,14 @@ class GasStatistics : public Component {
   float last_yesterday_{NAN};
   float last_week_{NAN};
   float last_month_{NAN};
-  float last_quarter_{NAN};
   float last_year_{NAN};
+  float last_quarter_{NAN};
 
   int get_quarter_start_month_();
   int get_quarter_reset_day_(int year, int month);
   bool is_quarter_start_month_(int month);
   static int days_in_month_(int year, int month);
-  static int month_name_to_number_(const std::string &name);
+  static int month_name_to_number_(const StringRef &name);
   void process_(float total, bool is_initial_restore = false);
   void retry_sntp_sync_();
 };
