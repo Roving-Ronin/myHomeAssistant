@@ -20,6 +20,9 @@ esphome:
       - lambda: |-
           id(input_gas_pressure_factor).publish_state(id(gas_pressure_factor));
           id(input_gas_heating_value).publish_state(id(gas_heating_value));
+          id(input_gas_quarter_reset_day).publish_state(id(gas_quarter_reset_day));
+          id(input_gas_quarter_start_month).publish_state(id(gas_quarter_start_month));
+
 
 #########################################################################
 #
@@ -67,6 +70,15 @@ globals:
     restore_value: no
     initial_value: '""'
 
+  - id: gas_quarter_reset_day
+    type: int
+    restore_value: true
+    initial_value: "1"   # day-of-month (1-31), clamped in C++ to the real month length
+  - id: gas_quarter_start_month
+    type: int
+    restore_value: true
+    initial_value: "2"   # anchor month (1-12). 2 = Feb, matching your Feb/May/Aug/Nov cycle
+
 #######################################################################################
 #
 # Number Inputs - Used to configure the values used to convert Gas M3 to MJ
@@ -112,6 +124,43 @@ number:
     web_server:
       sorting_weight: 21
 
+  - platform: template
+    name: "Gas - Quarter Reset Day"
+    id: input_gas_quarter_reset_day
+    min_value: 1
+    max_value: 31
+    step: 1
+    unit_of_measurement: "day"
+    optimistic: true
+    mode: box
+    icon: "mdi:calendar-refresh"
+    entity_category: config
+    set_action:
+      then:
+        - globals.set:
+            id: gas_quarter_reset_day
+            value: !lambda "return x;"
+    web_server:
+      sorting_weight: 22
+ 
+  - platform: template
+    name: "Gas - Quarter Start Month"
+    id: input_gas_quarter_start_month
+    min_value: 1
+    max_value: 12
+    step: 1
+    unit_of_measurement: "month"
+    optimistic: true
+    mode: box
+    icon: "mdi:calendar-start"
+    entity_category: config
+    set_action:
+      then:
+        - globals.set:
+            id: gas_quarter_start_month
+            value: !lambda "return x;"
+    web_server:
+      sorting_weight: 23
 
 ################################################################################
 #
@@ -302,7 +351,9 @@ sensor:
   - platform: "gas_statistics"
     id: gas_statistics_component
     total: gas_total_m3
-
+    quarter_reset_day: input_gas_quarter_reset_day
+    quarter_start_month: input_gas_quarter_start_month 
+    
     gas_today:
       name: "Gas - Today"
       id: gas_m3_today
@@ -331,12 +382,19 @@ sensor:
         sorting_group_id: group_gas_m3_sensors
         sorting_weight: 4
 
+    gas_quarter:
+      name: "Gas - Quarter"
+      id: gas_m3_quarter
+      web_server:
+        sorting_group_id: group_gas_m3_sensors
+        sorting_weight: 5
+
     gas_year:
       name: "Gas - Year"
       id: gas_m3_year
       web_server:
         sorting_group_id: group_gas_m3_sensors
-        sorting_weight: 5
+        sorting_weight: 6
 
 
   ################################################################################
@@ -357,7 +415,7 @@ sensor:
     update_interval: ${gas_sensor_update_interval}
     web_server:
       sorting_group_id: group_gas_m3_sensors
-      sorting_weight: 6
+      sorting_weight: 7
 
 
   ################################################################################
@@ -368,6 +426,8 @@ sensor:
   - platform: "gas_statistics_mj"
     id: gas_statistics_mj_component
     total: gas_total_mj
+    quarter_reset_day: input_gas_quarter_reset_day
+    quarter_start_month: input_gas_quarter_start_month
 
     gas_today:
       name: "Gas - Today (MJ)"
@@ -376,12 +436,12 @@ sensor:
         sorting_group_id: group_gas_mj_sensors
         sorting_weight: 1
     
-    gas_yesterday:
-      name: "Gas - Yesterday (MJ)"
-      id: gas_used_yesterday_mj
-      web_server:
-        sorting_group_id: group_gas_mj_sensors
-        sorting_weight: 2
+#    gas_yesterday:
+#      name: "Gas - Yesterday (MJ)"
+#      id: gas_used_yesterday_mj
+#      web_server:
+#        sorting_group_id: group_gas_mj_sensors
+#        sorting_weight: 2
 
     gas_week:
       name: "Gas - Week (MJ)"
@@ -396,13 +456,21 @@ sensor:
       web_server:
         sorting_group_id: group_gas_mj_sensors
         sorting_weight: 4
+
+    gas_quarter:
+      name: "Gas - Quarter (MJ)"
+      id: gas_used_quarter_mj
+      web_server:
+        sorting_group_id: group_gas_mj_sensors
+        sorting_weight: 5
+
       
     gas_year:
       name: "Gas - Year (MJ)"
       id: gas_used_year_mj
       web_server:
         sorting_group_id: group_gas_mj_sensors
-        sorting_weight: 5
+        sorting_weight: 6
 
 
   ################################################################################
@@ -422,7 +490,7 @@ sensor:
     update_interval: ${gas_sensor_update_interval}
     web_server:
       sorting_group_id: group_gas_mj_sensors
-      sorting_weight: 6
+      sorting_weight: 7
 
   ################################################################################
   #
