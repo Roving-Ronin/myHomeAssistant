@@ -98,17 +98,17 @@ sensor:
         sorting_group_id: group_electricity
         sorting_weight: 1
 
-    apparent_power:
-      name: "Apparent Power"
-      unit_of_measurement: VA
-      accuracy_decimals: 1         
-      filters:
-        - throttle_average: ${sensor_update_interval}
-      icon: "mdi:power"
-      disabled_by_default: true
-      web_server:
-        sorting_group_id: group_electricity
-        sorting_weight: 2
+#    apparent_power:
+#      name: "Apparent Power"
+#      unit_of_measurement: VA
+#      accuracy_decimals: 1         
+#      filters:
+#        - throttle_average: ${sensor_update_interval}
+#      icon: "mdi:power"
+#      disabled_by_default: true
+#      web_server:
+#        sorting_group_id: group_electricity
+#        sorting_weight: 2
 
 #  REM OUT - Known issue with CSE7766 sees some plugs reporting/spamming "Impossible reactive power: -0.xxx "
 #    reactive_power:
