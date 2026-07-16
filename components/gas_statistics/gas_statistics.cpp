@@ -7,12 +7,16 @@ namespace gas_statistics {
 
 static const char *const TAG = "gas_statistics";
 
-// Bumped to v3 because gas_data_t grew a field (start_quarter). Loading a v2
-// blob into the larger v3 struct will fail the preference checksum, so this
-// causes a one-time, safe reset of the stored NVS on first boot after the
-// update (today/week/month/year/quarter baselines simply re-establish at the
-// next relevant day/quarter boundary).
-static const char *const PREF_V3 = "gas_statistics_v3";
+// Bumped to v4. v3 grew a field (start_quarter) but the "no NVS" fresh-start
+// path set every start_* baseline to 0.0f instead of NAN, and the "backfill
+// NaN baselines" step further down only fires for baselines that are still
+// NaN - so a fresh v3 struct got permanently stuck with start_week/month/
+// quarter/year pinned at 0.0f until the real calendar boundary arrived,
+// making Week/Month/Quarter/Year read as the full lifetime total in the
+// meantime. v4 fixes that (see setup()/loop() below) and forces one more
+// clean re-initialization so any device already stuck in the v3 state
+// self-heals on next boot instead of waiting out the bug.
+static const char *const PREF_V4 = "gas_statistics_v4";
 
 void GasStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Gas Statistics (m³) - Sensors");
@@ -49,7 +53,7 @@ void GasStatistics::dump_config() {
 void GasStatistics::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
 
-  this->pref_ = global_preferences->make_preference<gas_data_t>(fnv1_hash(PREF_V3));
+  this->pref_ = global_preferences->make_preference<gas_data_t>(fnv1_hash(PREF_V4));
   bool loaded = this->pref_.load(&this->gas_);
   if (loaded) {
     ESP_LOGI(TAG, "Loaded Gas (m³) NVS: today=%f, yesterday=%f, week=%f, month=%f, year=%f, quarter=%f",
@@ -65,13 +69,16 @@ void GasStatistics::setup() {
     this->process_(total, true); // Initial restore
   } else {
     ESP_LOGW(TAG, "No Gas (m³) NVS data loaded, starting fresh");
-    // Initialize defaults
-    this->gas_.start_today = 0.0f;
-    this->gas_.start_yesterday = 0.0f;
-    this->gas_.start_week = 0.0f;
-    this->gas_.start_month = 0.0f;
-    this->gas_.start_year = 0.0f;
-    this->gas_.start_quarter = 0.0f;
+    // Initialize defaults to NAN (matching the struct's own member
+    // defaults) rather than 0.0f, so loop() can tell "never initialized"
+    // apart from "genuinely zero" and correctly snaps every baseline to
+    // the current total on the very first run below.
+    this->gas_.start_today = NAN;
+    this->gas_.start_yesterday = NAN;
+    this->gas_.start_week = NAN;
+    this->gas_.start_month = NAN;
+    this->gas_.start_year = NAN;
+    this->gas_.start_quarter = NAN;
     this->pref_.save(&this->gas_);
     ESP_LOGD(TAG, "Saved initial Gas (m³) NVS: today=%f, yesterday=%f, week=%f, month=%f, year=%f, quarter=%f",
              this->gas_.start_today, this->gas_.start_yesterday, this->gas_.start_week,
@@ -211,33 +218,45 @@ void GasStatistics::loop() {
     return; // No day change, skip
   }
 
+  // A day change (current_day_of_year != 0 and different from t.day_of_year)
+  // means a real calendar day boundary was crossed. current_day_of_year == 0
+  // means this is the very first run against a fresh/reset baseline, with no
+  // prior data to compare against - every period is force-started here too,
+  // so Today/Week/Month/Quarter/Year all correctly read 0 immediately after
+  // a reset instead of some of them getting stuck reporting the full
+  // lifetime total until their real boundary eventually arrives.
+  bool is_first_run = (this->gas_.current_day_of_year == 0);
+
   // Save the current day's data
   this->gas_.start_yesterday = this->gas_.start_today;
   this->gas_.start_today = total;
 
-  if (this->gas_.current_day_of_year != 0) {
-    // At specified day of week, start a new week calculation
-    if (t.day_of_week == this->gas_week_start_day_) {
-      this->gas_.start_week = total;
-    }
-    // At first day of month, start a new month calculation
-    if (t.day_of_month == 1) {
-      this->gas_.start_month = total;
-    }
-    // At first day of year, start a new year calculation
-    if (t.day_of_year == 1) {
-      this->gas_.start_year = total;
-    }
-    // At the configured reset day, within a quarter-start month (derived
-    // from the configurable start-month anchor), start a new quarter
-    // calculation
-    if (this->is_quarter_start_month_(t.month) && t.day_of_month == this->get_quarter_reset_day_(t.year, t.month)) {
-      this->gas_.start_quarter = total;
+  // At specified day of week, start a new week calculation
+  if (is_first_run || t.day_of_week == this->gas_week_start_day_) {
+    this->gas_.start_week = total;
+  }
+  // At first day of month, start a new month calculation
+  if (is_first_run || t.day_of_month == 1) {
+    this->gas_.start_month = total;
+  }
+  // At first day of year, start a new year calculation
+  if (is_first_run || t.day_of_year == 1) {
+    this->gas_.start_year = total;
+  }
+  // At the configured reset day, within a quarter-start month (derived
+  // from the configurable start-month anchor), start a new quarter
+  // calculation
+  if (is_first_run ||
+      (this->is_quarter_start_month_(t.month) && t.day_of_month == this->get_quarter_reset_day_(t.year, t.month))) {
+    this->gas_.start_quarter = total;
+    if (!is_first_run) {
       ESP_LOGI(TAG, "Gas (m³) quarter reset triggered: month=%d, day=%d, baseline=%f", t.month, t.day_of_month, total);
     }
   }
 
-  // Initialize all sensors
+  // Defensive backfill: if any baseline is still NaN for some other reason
+  // (e.g. a sensor was newly added to the YAML after initial setup), fall
+  // back to yesterday's starting value rather than leaving it unset.
   if (this->gas_week_ && std::isnan(this->gas_.start_week)) {
     this->gas_.start_week = this->gas_.start_yesterday;
   }
