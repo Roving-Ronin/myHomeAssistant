@@ -3,14 +3,14 @@
 #include "esphome/core/component.h"
 #include "esphome/core/preferences.h"
 #include "esphome/components/sensor/sensor.h"
-#include "esphome/components/number/number.h"
+#include "esphome/components/select/select.h"
 #include "esphome/components/time/real_time_clock.h"
 
 namespace esphome {
 namespace gas_statistics {
 
 using sensor::Sensor;
-using number::Number;
+using select::Select;
 
 class GasStatistics : public Component {
  public:
@@ -23,25 +23,26 @@ class GasStatistics : public Component {
   void set_time(time::RealTimeClock *time) { this->time_ = time; }
   void set_total(Sensor *sensor) { this->total_ = sensor; }
 
-  // Optional number entity (e.g. a template number on the web_server GUI)
-  // holding the day-of-month (1-31) on which the quarter accumulator
-  // resets. Automatically clamped to the real length of the reset month
-  // (e.g. 31 falls back to the 28th/29th in February). Defaults to day 1
-  // if unset.
-  void set_quarter_reset_day(Number *number) { this->quarter_reset_day_ = number; }
+  // Optional select entity (e.g. a template select rendered as a dropdown
+  // on the web_server GUI) holding the day-of-month (options "1".."31") on
+  // which the quarter accumulator resets. Automatically clamped to the real
+  // length of the reset month (e.g. 31 falls back to the 28th/29th in
+  // February). Defaults to day 1 if unset or unparsable.
+  void set_quarter_reset_day(Select *select) { this->quarter_reset_day_ = select; }
 
-  // Optional number entity holding the "anchor" month (1-12) for the first
-  // quarter. The other three quarter-start months are anchor+3, anchor+6,
-  // anchor+9 (e.g. anchor=2 => Feb/May/Aug/Nov). Defaults to January if unset.
-  void set_quarter_start_month(Number *number) { this->quarter_start_month_ = number; }
+  // Optional select entity holding the "anchor" month (options "January"..
+  // "December") for the first quarter. The other three quarter-start months
+  // are anchor+3, anchor+6, anchor+9 (e.g. anchor=February => Feb/May/Aug/
+  // Nov). Defaults to January if unset or unparsable.
+  void set_quarter_start_month(Select *select) { this->quarter_start_month_ = select; }
 
   void set_gas_today(Sensor *sensor) { this->gas_today_ = sensor; }
   void set_gas_yesterday(Sensor *sensor) { this->gas_yesterday_ = sensor; }
   void set_gas_week(Sensor *sensor) { this->gas_week_ = sensor; }
   void set_gas_month(Sensor *sensor) { this->gas_month_ = sensor; }
-  void set_gas_quarter(Sensor *sensor) { this->gas_quarter_ = sensor; }  
+  void set_gas_quarter(Sensor *sensor) { this->gas_quarter_ = sensor; }
   void set_gas_year(Sensor *sensor) { this->gas_year_ = sensor; }
-  
+
  protected:
   ESPPreferenceObject pref_;
   time::RealTimeClock *time_;
@@ -55,8 +56,8 @@ class GasStatistics : public Component {
 
   // Input sensors
   Sensor *total_{nullptr};
-  Number *quarter_reset_day_{nullptr};
-  Number *quarter_start_month_{nullptr};
+  Select *quarter_reset_day_{nullptr};
+  Select *quarter_start_month_{nullptr};
 
   // Exposed sensors
   Sensor *gas_today_{nullptr};
@@ -70,6 +71,8 @@ class GasStatistics : public Component {
   int gas_week_start_day_{2};
   // Start day of month configuration
   int gas_month_start_day_{1};
+  // Start day of year configuration
+  int gas_year_start_day_{1};
   // Fallback reset day-of-month used when quarter_reset_day_ is not set
   // or has not yet published a valid state. Range 1-31; automatically
   // clamped to the number of days in the current reset month.
@@ -79,8 +82,6 @@ class GasStatistics : public Component {
   // state. The other three quarter-start months are anchor+3, anchor+6,
   // anchor+9.
   int gas_quarter_start_month_default_{1};
-  // Start day of year configuration
-  int gas_year_start_day_{1};
 
   // Structure for storing gas statistics in cubic meters
   struct gas_data_t {
@@ -89,8 +90,8 @@ class GasStatistics : public Component {
     float start_yesterday{NAN};
     float start_week{NAN};
     float start_month{NAN};
-    float start_year{NAN};
     float start_quarter{NAN};
+    float start_year{NAN};
   } gas_;
 
   // Store last published values for change detection
@@ -105,6 +106,7 @@ class GasStatistics : public Component {
   int get_quarter_reset_day_(int year, int month);
   bool is_quarter_start_month_(int month);
   static int days_in_month_(int year, int month);
+  static int month_name_to_number_(const std::string &name);
   void process_(float total, bool is_initial_restore = false);
   void retry_sntp_sync_();
 };
