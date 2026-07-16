@@ -74,6 +74,7 @@ globals:
     type: int
     restore_value: true
     initial_value: "1"   # day-of-month (1-31), clamped in C++ to the real month length
+
   - id: gas_quarter_start_month
     type: int
     restore_value: true
