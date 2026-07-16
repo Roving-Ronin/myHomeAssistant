@@ -220,12 +220,12 @@ sensor:
         sorting_group_id: group_tank_water_sensors
         sorting_weight: 4
     
-    water_yesterday:
-      name: "Tank Water - Yesterday"
-      id: tank_water_yesterday
-      web_server:
-        sorting_group_id: group_tank_water_sensors
-        sorting_weight: 5
+#    water_yesterday:
+#      name: "Tank Water - Yesterday"
+#      id: tank_water_yesterday
+#      web_server:
+#        sorting_group_id: group_tank_water_sensors
+#        sorting_weight: 5
 
     water_week:
       name: "Tank Water - Week"
