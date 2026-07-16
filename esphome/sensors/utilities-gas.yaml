@@ -310,12 +310,12 @@ sensor:
         sorting_group_id: group_gas_m3_sensors
         sorting_weight: 1
     
-    gas_yesterday:
-      name: "Gas - Yesterday"
-      id: gas_m3_yesterday
-      web_server:
-        sorting_group_id: group_gas_m3_sensors
-        sorting_weight: 2
+#    gas_yesterday:
+#      name: "Gas - Yesterday"
+#      id: gas_m3_yesterday
+#      web_server:
+#        sorting_group_id: group_gas_m3_sensors
+#        sorting_weight: 2
 
     gas_week:
       name: "Gas - Week"
