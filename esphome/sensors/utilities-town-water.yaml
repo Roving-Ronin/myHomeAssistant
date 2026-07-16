@@ -224,12 +224,12 @@ sensor:
         sorting_group_id: group_town_water_sensors
         sorting_weight: 1
     
-    water_yesterday:
-      name: "Town Water - Yesterday"
-      id: town_water_yesterday
-      web_server:
-        sorting_group_id: group_town_water_sensors
-        sorting_weight: 2
+#    water_yesterday:
+#      name: "Town Water - Yesterday"
+#      id: town_water_yesterday
+#      web_server:
+#        sorting_group_id: group_town_water_sensors
+#        sorting_weight: 2
 
     water_week:
       name: "Town Water - Week"
