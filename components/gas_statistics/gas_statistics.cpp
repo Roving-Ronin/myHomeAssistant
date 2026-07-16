@@ -39,12 +39,12 @@ void GasStatistics::dump_config() {
     LOG_SENSOR("  ", "Gas (m³) Quarter", this->gas_quarter_);
   }
   if (this->quarter_reset_day_) {
-    ESP_LOGCONFIG(TAG, "  Quarter reset day source: number entity (state read each day change)");
+    ESP_LOGCONFIG(TAG, "  Quarter reset day source: select entity (state read each day change)");
   } else {
     ESP_LOGCONFIG(TAG, "  Quarter reset day source: fixed default (day %d)", this->gas_quarter_reset_day_default_);
   }
   if (this->quarter_start_month_) {
-    ESP_LOGCONFIG(TAG, "  Quarter start month source: number entity (state read each day change)");
+    ESP_LOGCONFIG(TAG, "  Quarter start month source: select entity (state read each day change)");
   } else {
     ESP_LOGCONFIG(TAG, "  Quarter start month source: fixed default (month %d)", this->gas_quarter_start_month_default_);
   }
@@ -142,11 +142,22 @@ int GasStatistics::days_in_month_(int year, int month) {
   return dim[month - 1];
 }
 
+int GasStatistics::month_name_to_number_(const std::string &name) {
+  static const char *const names[12] = {"January", "February", "March",     "April",   "May",      "June",
+                                         "July",    "August",   "September", "October", "November", "December"};
+  for (int i = 0; i < 12; i++) {
+    if (name == names[i]) {
+      return i + 1;
+    }
+  }
+  return 0;  // No match
+}
+
 int GasStatistics::get_quarter_start_month_() {
   if (this->quarter_start_month_ != nullptr) {
-    float state = this->quarter_start_month_->state;
-    if (!std::isnan(state) && state >= 1.0f && state <= 12.0f) {
-      return (int) state;
+    int parsed = GasStatistics::month_name_to_number_(this->quarter_start_month_->state);
+    if (parsed >= 1 && parsed <= 12) {
+      return parsed;
     }
   }
   return this->gas_quarter_start_month_default_;
@@ -155,9 +166,12 @@ int GasStatistics::get_quarter_start_month_() {
 int GasStatistics::get_quarter_reset_day_(int year, int month) {
   int configured_day = this->gas_quarter_reset_day_default_;
   if (this->quarter_reset_day_ != nullptr) {
-    float state = this->quarter_reset_day_->state;
-    if (!std::isnan(state) && state >= 1.0f && state <= 31.0f) {
-      configured_day = (int) state;
+    const std::string &state = this->quarter_reset_day_->state;
+    if (!state.empty()) {
+      int parsed = atoi(state.c_str());
+      if (parsed >= 1 && parsed <= 31) {
+        configured_day = parsed;
+      }
     }
   }
   // Clamp to the actual number of days in this month, e.g. a configured
