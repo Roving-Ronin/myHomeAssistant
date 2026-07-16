@@ -70,15 +70,6 @@ globals:
     restore_value: no
     initial_value: '""'
 
-  - id: gas_quarter_reset_day
-    type: int
-    restore_value: true
-    initial_value: "1"   # day-of-month (1-31), clamped in C++ to the real month length
-
-  - id: gas_quarter_start_month
-    type: int
-    restore_value: true
-    initial_value: "2"   # anchor month (1-12). 2 = Feb, matching your Feb/May/Aug/Nov cycle
 
 #######################################################################################
 #
@@ -125,43 +116,80 @@ number:
     web_server:
       sorting_weight: 21
 
+
+#######################################################################################
+#
+# Select Inputs - Used to configure Gas day and month of the quarter reset day.
+#
+
+select:
   - platform: template
     name: "Gas - Quarter Reset Day"
     id: input_gas_quarter_reset_day
-    min_value: 1
-    max_value: 31
-    step: 1
-    unit_of_measurement: "day"
     optimistic: true
-    mode: box
+    restore_value: true
     icon: "mdi:calendar-refresh"
     entity_category: config
-    set_action:
-      then:
-        - globals.set:
-            id: gas_quarter_reset_day
-            value: !lambda "return x;"
+    options:
+      - "1"
+      - "2"
+      - "3"
+      - "4"
+      - "5"
+      - "6"
+      - "7"
+      - "8"
+      - "9"
+      - "10"
+      - "11"
+      - "12"
+      - "13"
+      - "14"
+      - "15"
+      - "16"
+      - "17"
+      - "18"
+      - "19"
+      - "20"
+      - "21"
+      - "22"
+      - "23"
+      - "24"
+      - "25"
+      - "26"
+      - "27"
+      - "28"
+      - "29"
+      - "30"
+      - "31"
+    initial_option: "1"
     web_server:
       sorting_weight: 22
  
   - platform: template
     name: "Gas - Quarter Start Month"
     id: input_gas_quarter_start_month
-    min_value: 1
-    max_value: 12
-    step: 1
-    unit_of_measurement: "month"
     optimistic: true
-    mode: box
+    restore_value: true
     icon: "mdi:calendar-start"
     entity_category: config
-    set_action:
-      then:
-        - globals.set:
-            id: gas_quarter_start_month
-            value: !lambda "return x;"
+    options:
+      - "January"
+      - "February"
+      - "March"
+      - "April"
+      - "May"
+      - "June"
+      - "July"
+      - "August"
+      - "September"
+      - "October"
+      - "November"
+      - "December"
+    initial_option: "January"
     web_server:
       sorting_weight: 23
+
 
 ################################################################################
 #
@@ -464,7 +492,6 @@ sensor:
       web_server:
         sorting_group_id: group_gas_mj_sensors
         sorting_weight: 5
-
       
     gas_year:
       name: "Gas - Year (MJ)"
