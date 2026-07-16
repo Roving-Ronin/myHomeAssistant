@@ -101,11 +101,6 @@ web_server:
   port: 80
    # Webserver version (default is 2).
   version: 3
-  # ESPHome 2026.7.0 Upgrade Checklist. Changes from default true to false
-  enable_private_network_access: true
-#  allowed_origins:
-#    - http://192.168.1.100
-#    - https://your-smart-home.com
     
 network:
   enable_ipv6: ${ipv6_enable}
