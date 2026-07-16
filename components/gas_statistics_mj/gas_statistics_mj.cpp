@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include "esphome/core/log.h"
 #include "esphome/core/hal.h"
 #include "gas_statistics_mj.h"
@@ -142,7 +143,7 @@ int GasStatisticsMJ::days_in_month_(int year, int month) {
   return dim[month - 1];
 }
 
-int GasStatisticsMJ::month_name_to_number_(const std::string &name) {
+int GasStatisticsMJ::month_name_to_number_(const StringRef &name) {
   static const char *const names[12] = {"January", "February", "March",     "April",   "May",      "June",
                                          "July",    "August",   "September", "October", "November", "December"};
   for (int i = 0; i < 12; i++) {
@@ -155,9 +156,15 @@ int GasStatisticsMJ::month_name_to_number_(const std::string &name) {
 
 int GasStatisticsMJ::get_quarter_start_month_() {
   if (this->quarter_start_month_ != nullptr) {
-    int parsed = GasStatisticsMJ::month_name_to_number_(this->quarter_start_month_->state);
-    if (parsed >= 1 && parsed <= 12) {
-      return parsed;
+    // select::Select has no public .state - the current selection is read via
+    // current_option(), which returns a StringRef into a static (codegen'd)
+    // string literal, not a std::string.
+    StringRef current = this->quarter_start_month_->current_option();
+    if (!current.empty()) {
+      int parsed = GasStatisticsMJ::month_name_to_number_(current);
+      if (parsed >= 1 && parsed <= 12) {
+        return parsed;
+      }
     }
   }
   return this->gas_quarter_start_month_default_;
@@ -166,9 +173,9 @@ int GasStatisticsMJ::get_quarter_start_month_() {
 int GasStatisticsMJ::get_quarter_reset_day_(int year, int month) {
   int configured_day = this->gas_quarter_reset_day_default_;
   if (this->quarter_reset_day_ != nullptr) {
-    const std::string &state = this->quarter_reset_day_->state;
-    if (!state.empty()) {
-      int parsed = atoi(state.c_str());
+    StringRef current = this->quarter_reset_day_->current_option();
+    if (!current.empty()) {
+      int parsed = atoi(current.c_str());
       if (parsed >= 1 && parsed <= 31) {
         configured_day = parsed;
       }
