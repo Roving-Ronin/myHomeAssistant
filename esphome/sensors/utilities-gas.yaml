@@ -20,8 +20,6 @@ esphome:
       - lambda: |-
           id(input_gas_pressure_factor).publish_state(id(gas_pressure_factor));
           id(input_gas_heating_value).publish_state(id(gas_heating_value));
-          id(input_gas_quarter_reset_day).publish_state(id(gas_quarter_reset_day));
-          id(input_gas_quarter_start_month).publish_state(id(gas_quarter_start_month));
 
 
 #########################################################################
