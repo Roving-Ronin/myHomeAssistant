@@ -11,6 +11,7 @@
 # v1.3.0 - Updated Water and Gas (m3 and MJ) components, so that values remain between reflashing
 # v1.8.2 - Fixed the Gas/Water Flow Rates (L/min) device class to be 'volume_flow_rate'
 # v1.9.0 - Switch to Framework Type = ESP-IDF (Was Arduino). Add Gas Quarterly meters & disable 'Yesterday'
+# v2.0.0 - Switch from using input_number to using a pull down selector for the Gas Quarter reset day and month.
 
    # Provides substitutions or variables that are then called elsewhere multiple times in the config
 substitutions:
@@ -27,7 +28,7 @@ substitutions:
   # Project Name
   project_name: "DIY.Utilities Monitor"
   # Project version denotes the release version of the yaml file, allowing checking of deployed vs latest version
-  project_version: "1.9.1"
+  project_version: "2.0.0"
    # The phase in the home power supply, upon which this device is utilsed. A, B or C.  (myHome GPO 1 = Phase A, GPO 2 = Phase B, GPO 3 = Phase C)  
   power_phase: "B"
    # The circuit breaker / RCBO that the load is attached to.  
