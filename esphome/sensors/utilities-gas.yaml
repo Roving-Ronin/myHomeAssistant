@@ -235,6 +235,8 @@ number:
   - platform: template
     name: "Gas - Step 1 Threshold (MJ)"
     id: input_gas_step1_threshold
+    min_value: 0
+    max_value: 1890
     step: 1
     unit_of_measurement: "MJ"
     optimistic: true
@@ -253,7 +255,7 @@ number:
     name: "Gas - Step 2 Threshold (MJ)"
     id: input_gas_step2_threshold
     min_value: 0
-    max_value: 500000
+    max_value: 3750
     step: 1
     unit_of_measurement: "MJ"
     optimistic: true
@@ -272,7 +274,7 @@ number:
     name: "Gas - Step 3 Threshold (MJ)"
     id: input_gas_step3_threshold
     min_value: 0
-    max_value: 500000
+    max_value: 8250
     step: 1
     unit_of_measurement: "MJ"
     optimistic: true
@@ -291,7 +293,7 @@ number:
     name: "Gas - Step 4 Threshold (MJ)"
     id: input_gas_step4_threshold
     min_value: 0
-    max_value: 500000
+    max_value: 250500
     step: 1
     unit_of_measurement: "MJ"
     optimistic: true
