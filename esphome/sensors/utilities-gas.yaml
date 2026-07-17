@@ -7,7 +7,6 @@
 #
 substitutions:
   gas_sensor_update_interval: 15s
-  
 ########################## End of Substitutions #########################
 #
 # Restore input values from the valued stored by their respective globals
@@ -20,19 +19,18 @@ esphome:
           id(input_gas_pressure_factor).publish_state(id(gas_pressure_factor));
           id(input_gas_heating_value).publish_state(id(gas_heating_value));
           id(input_gas_daily_service_charge).publish_state(id(gas_daily_service_charge));
-          id(input_gas_rates_per_mj).publish_state(id(gas_rates_per_mj));
           id(input_gas_step1_threshold).publish_state(id(gas_step1_threshold_mj));
           id(input_gas_step2_threshold).publish_state(id(gas_step2_threshold_mj));
           id(input_gas_step3_threshold).publish_state(id(gas_step3_threshold_mj));
           id(input_gas_step4_threshold).publish_state(id(gas_step4_threshold_mj));
-          id(input_gas_step1_rate_mj).publish_state(id(gas_step1_rate_mj));
-          id(input_gas_step2_rate_mj).publish_state(id(gas_step2_rate_mj));
-          id(input_gas_step3_rate_mj).publish_state(id(gas_step3_rate_mj));
-          id(input_gas_step4_rate_mj).publish_state(id(gas_step4_rate_mj));
-          id(input_gas_step5_rate_mj).publish_state(id(gas_step5_rate_mj));
+          // Rate globals are stored in $/MJ but the inputs are edited in ¢/MJ.
+          id(input_gas_step1_rate).publish_state(id(gas_step1_rate_mj) * 100.0f);
+          id(input_gas_step2_rate).publish_state(id(gas_step2_rate_mj) * 100.0f);
+          id(input_gas_step3_rate).publish_state(id(gas_step3_rate_mj) * 100.0f);
+          id(input_gas_step4_rate).publish_state(id(gas_step4_rate_mj) * 100.0f);
+          id(input_gas_step5_rate).publish_state(id(gas_step5_rate_mj) * 100.0f);
           id(input_gas_last_bill_reading).publish_state(id(gas_last_bill_reading_m3));
           id(input_gas_current_meter_reading).publish_state(id(gas_current_meter_reading_m3));
-          
 #########################################################################
 #
 # Web_server v3 Sort Groups - These substitutes are applied to overwrite the default ones supplied by the
@@ -44,114 +42,93 @@ web_server:
     - id: group_gas_mj_sensors
       name: "Gas Sensors (MJ)"
       sorting_weight: -38
-      
     - id: group_gas_m3_sensors
       name: "Gas Sensors (m³)"
       sorting_weight: -37
-      
 #######################################################################################
 globals:
   - id: gas_pressure_factor
     type: float
     restore_value: true
-
-  # initial_value: "0.9648"  # Default value stored in flash
+#    initial_value: "0.9648"  # Default value stored in flash
   - id: gas_heating_value
     type: float
     restore_value: true
-
-  # initial_value: "38.89"  # Default value stored in flash
+#    initial_value: "38.89"  # Default value stored in flash
   - id: global_gas_total_mj
     type: float
     restore_value: yes
-
   #  Globals for use with pulse meter, to allow storing and setting a base reading for gas meter
   - id: global_gas_total_m3
     type: float
     restore_value: yes
-
   # Used by the text_sensor to reformat the Last Used Duration into hours/minutes/seconds.
   - id: last_formatted_duration_gas
     type: std::string
     restore_value: no
     initial_value: '""'
-  
-  # Gas pricing / cost tracking - mirrors the steped MJ pricing + daily service
-  # charge from the gas retailer's bill. Update the step thresholds/rates each
-  # quarter along with Pressure Factor / Heating Value above.
+  #
+  # Gas pricing / cost tracking - mirrors the stepped MJ pricing + daily
+  # service charge from the gas retailer's bill. Update the step
+  # thresholds/rates each quarter along with Pressure Factor / Heating Value
+  # above. Always 4 thresholds / 5 rates (Step 5 is the catch-all above Step
+  # 4's threshold) - rates are stored here in $/MJ, but entered on the
+  # ¢/MJ number inputs below (converted in each input's set_action).
   #
   - id: gas_daily_service_charge
     type: float
     restore_value: true
     initial_value: "0.825"
-
-  - id: gas_rates_per_mj
-    type: int
-    restore_value: true
-    initial_value: "5"        # how many of the 5 step slots below are active
-
   - id: gas_step1_threshold_mj
     type: float
     restore_value: true
-    initial_value: "1864"
-
+    initial_value: "1890"
   - id: gas_step2_threshold_mj
     type: float
     restore_value: true
-    initial_value: "3699"
-
+    initial_value: "3750"
   - id: gas_step3_threshold_mj
     type: float
     restore_value: true
     initial_value: "8250"
-
   - id: gas_step4_threshold_mj
     type: float
     restore_value: true
     initial_value: "250500"
-
   - id: gas_step1_rate_mj
     type: float
     restore_value: true
-    initial_value: "0.03938"
-
+    initial_value: "0.03938"    # 3.938 ¢/MJ
   - id: gas_step2_rate_mj
     type: float
     restore_value: true
-    initial_value: "0.03278"
-
+    initial_value: "0.03278"    # 3.278 ¢/MJ
   - id: gas_step3_rate_mj
     type: float
     restore_value: true
-    initial_value: "0.03102"
-
+    initial_value: "0.03102"    # 3.102 ¢/MJ
   - id: gas_step4_rate_mj
     type: float
     restore_value: true
-    initial_value: "0.02838"
-
+    initial_value: "0.02838"    # 2.838 ¢/MJ
   - id: gas_step5_rate_mj
     type: float
     restore_value: true
-    initial_value: "0.02838"
-
+    initial_value: "0.02838"    # 2.838 ¢/MJ
   # One-off setup values - used by the "Gas - Apply Meter Readings" button to
   # seed the quarter baseline and calibrate the lifetime m³ total.
   - id: gas_last_bill_reading_m3
     type: float
     restore_value: true
     initial_value: "0"
-
   - id: gas_current_meter_reading_m3
     type: float
     restore_value: true
     initial_value: "0"
-
 #######################################################################################
 #
 # Number Inputs - Used to configure the values used to convert Gas M3 to MJ
 #
-
 number:
   - platform: template
     name: "Gas - Pressure Factor"
@@ -191,9 +168,11 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_weight: 21
-
   #
   # Gas pricing inputs - update these each quarter from the retailer's bill.
+  # Step thresholds are entered in MJ; Step rates are entered in ¢/MJ and
+  # converted to $/MJ (÷100) before being stored, since the pricing sensors'
+  # math expects $/MJ.
   #
   - platform: template
     name: "Gas - Daily Service Charge"
@@ -215,28 +194,10 @@ number:
       sorting_weight: 25
 
   - platform: template
-    name: "Gas - Rates per MJ"
-    id: input_gas_rates_per_mj
-    min_value: 1
-    max_value: 5
-    step: 1
-    optimistic: true
-    mode: box
-    icon: "mdi:stairs"
-    entity_category: config
-    set_action:
-      then:
-        - globals.set:
-            id: gas_rates_per_mj
-            value: !lambda "return x;"
-    web_server:
-      sorting_weight: 26
-
-  - platform: template
     name: "Gas - Step 1 Threshold (MJ)"
     id: input_gas_step1_threshold
     min_value: 0
-    max_value: 1890
+    max_value: 500000
     step: 1
     unit_of_measurement: "MJ"
     optimistic: true
@@ -255,7 +216,7 @@ number:
     name: "Gas - Step 2 Threshold (MJ)"
     id: input_gas_step2_threshold
     min_value: 0
-    max_value: 3750
+    max_value: 500000
     step: 1
     unit_of_measurement: "MJ"
     optimistic: true
@@ -274,7 +235,7 @@ number:
     name: "Gas - Step 3 Threshold (MJ)"
     id: input_gas_step3_threshold
     min_value: 0
-    max_value: 8250
+    max_value: 500000
     step: 1
     unit_of_measurement: "MJ"
     optimistic: true
@@ -293,7 +254,7 @@ number:
     name: "Gas - Step 4 Threshold (MJ)"
     id: input_gas_step4_threshold
     min_value: 0
-    max_value: 250500
+    max_value: 500000
     step: 1
     unit_of_measurement: "MJ"
     optimistic: true
@@ -309,12 +270,12 @@ number:
       sorting_weight: 30
 
   - platform: template
-    name: "Gas - Step 1 Rate ($ per MJ)"
-    id: input_gas_step1_rate_mj
-    min_value: 0
-    max_value: 1
-    step: 0.00001
-    unit_of_measurement: "$/MJ"
+    name: "Gas - Step 1 Rate (¢/MJ)"
+    id: input_gas_step1_rate
+    min_value: 1
+    max_value: 10
+    step: 0.001
+    unit_of_measurement: "¢/MJ"
     optimistic: true
     mode: box
     icon: "mdi:currency-usd"
@@ -323,17 +284,17 @@ number:
       then:
         - globals.set:
             id: gas_step1_rate_mj
-            value: !lambda "return x;"
+            value: !lambda "return x / 100.0f;"
     web_server:
       sorting_weight: 31
 
   - platform: template
-    name: "Gas - Step 2 Rate ($ per MJ)"
-    id: input_gas_step2_rate_mj
-    min_value: 0
-    max_value: 1
-    step: 0.00001
-    unit_of_measurement: "$/MJ"
+    name: "Gas - Step 2 Rate (¢/MJ)"
+    id: input_gas_step2_rate
+    min_value: 1
+    max_value: 10
+    step: 0.001
+    unit_of_measurement: "¢/MJ"
     optimistic: true
     mode: box
     icon: "mdi:currency-usd"
@@ -342,17 +303,17 @@ number:
       then:
         - globals.set:
             id: gas_step2_rate_mj
-            value: !lambda "return x;"
+            value: !lambda "return x / 100.0f;"
     web_server:
       sorting_weight: 32
 
   - platform: template
-    name: "Gas - Step 3 Rate ($ per MJ)"
-    id: input_gas_step3_rate_mj
-    min_value: 0
-    max_value: 1
-    step: 0.00001
-    unit_of_measurement: "$/MJ"
+    name: "Gas - Step 3 Rate (¢/MJ)"
+    id: input_gas_step3_rate
+    min_value: 1
+    max_value: 10
+    step: 0.001
+    unit_of_measurement: "¢/MJ"
     optimistic: true
     mode: box
     icon: "mdi:currency-usd"
@@ -361,17 +322,17 @@ number:
       then:
         - globals.set:
             id: gas_step3_rate_mj
-            value: !lambda "return x;"
+            value: !lambda "return x / 100.0f;"
     web_server:
       sorting_weight: 33
 
   - platform: template
-    name: "Gas - Step 4 Rate ($ per MJ)"
-    id: input_gas_step4_rate_mj
-    min_value: 0
-    max_value: 1
-    step: 0.00001
-    unit_of_measurement: "$/MJ"
+    name: "Gas - Step 4 Rate (¢/MJ)"
+    id: input_gas_step4_rate
+    min_value: 1
+    max_value: 10
+    step: 0.001
+    unit_of_measurement: "¢/MJ"
     optimistic: true
     mode: box
     icon: "mdi:currency-usd"
@@ -380,17 +341,17 @@ number:
       then:
         - globals.set:
             id: gas_step4_rate_mj
-            value: !lambda "return x;"
+            value: !lambda "return x / 100.0f;"
     web_server:
       sorting_weight: 41
 
   - platform: template
-    name: "Gas - Step 5 Rate ($ per MJ)"
-    id: input_gas_step5_rate_mj
-    min_value: 0
-    max_value: 1
-    step: 0.00001
-    unit_of_measurement: "$/MJ"
+    name: "Gas - Step 5 Rate (¢/MJ)"
+    id: input_gas_step5_rate
+    min_value: 1
+    max_value: 10
+    step: 0.001
+    unit_of_measurement: "¢/MJ"
     optimistic: true
     mode: box
     icon: "mdi:currency-usd"
@@ -399,7 +360,7 @@ number:
       then:
         - globals.set:
             id: gas_step5_rate_mj
-            value: !lambda "return x;"
+            value: !lambda "return x / 100.0f;"
     web_server:
       sorting_weight: 42
 
@@ -407,7 +368,7 @@ number:
     name: "Gas - Last Bill Reading (m³)"
     id: input_gas_last_bill_reading
     min_value: 0
-    max_value: 999999
+    max_value: 99999
     step: 1
     unit_of_measurement: "m³"
     optimistic: true
@@ -426,7 +387,7 @@ number:
     name: "Gas - Current Meter Reading (m³)"
     id: input_gas_current_meter_reading
     min_value: 0
-    max_value: 999999.999
+    max_value: 99999.999
     step: 0.001
     unit_of_measurement: "m³"
     optimistic: true
@@ -440,7 +401,6 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_weight: 44
-      
 #######################################################################################
 #
 # Select Inputs - Used to configure Gas day and month of the quarter reset day.
@@ -512,7 +472,6 @@ select:
     initial_option: "January"
     web_server:
       sorting_weight: 23
-      
 #######################################################################################
 #
 # Buttons - Manual quarter reset safety net, and one-off setup action for
@@ -576,7 +535,6 @@ button:
             id(gas_statistics_mj_component).reset_quarter(already_consumed_mj);
     web_server:
       sorting_weight: 49
-      
 ################################################################################
 #
 #  Binary Sensor - Used to internally determine if the tap is ON/OFF.
@@ -598,13 +556,11 @@ binary_sensor:
             id: gas_valve_state
             state: "CLOSED"
     internal: true
-    
 ################################################################################
 #
 #  Text Sensor - Used to publish if the tap is On
 #
 text_sensor:
-
   - platform: template
     name: "Gas - Valve State"
     id: gas_valve_state
@@ -613,7 +569,6 @@ text_sensor:
     web_server:
       sorting_group_id: group_utility_meter_sensors
       sorting_weight: 10
-
   - platform: template
     name: "Gas - Last Use Duration"
     id: gas_last_use_duration
@@ -656,12 +611,10 @@ text_sensor:
     web_server:
       sorting_group_id: group_utility_meter_sensors
       sorting_weight: 13
-      
 ################################################################################
 #
 #  Sensors
 #
-
 sensor:
   ################################################################################
   #
@@ -683,7 +636,6 @@ sensor:
     web_server:
       sorting_group_id: group_utility_meter_sensors
       sorting_weight: 12
-  
   - platform: pulse_meter
     name: 'Gas - Flow Rate'
     id: "gas_flow_rate"
@@ -742,13 +694,11 @@ sensor:
               id(gas_total_m3).update();
               id(gas_total_mj).update();
       internal: true
-  
   ################################################################################
   #
   # Custom Component - Gas m3 (Consumption) Statistics
   # These sensors are hidden as the publish their data into the globals, that stores them
   #
-  
   - platform: "gas_statistics"
     id: gas_statistics_component
     total: gas_total_m3
@@ -781,26 +731,22 @@ sensor:
       web_server:
         sorting_group_id: group_gas_m3_sensors
         sorting_weight: 4
-
     gas_quarter:
       name: "Gas - Quarter"
       id: gas_m3_quarter
       web_server:
         sorting_group_id: group_gas_m3_sensors
         sorting_weight: 5
-
     gas_year:
       name: "Gas - Year"
       id: gas_m3_year
       web_server:
         sorting_group_id: group_gas_m3_sensors
         sorting_weight: 6
-
   ################################################################################
   #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
   #  Hidden from HA/web_server (internal: true) - still required internally as
   #  the `total:` binding for gas_statistics_component above.
-
   - platform: template
     name: "Gas - Total"
     id: gas_total_m3
@@ -815,12 +761,10 @@ sensor:
     # Set interval that updates are sent to HA instance
     update_interval: ${gas_sensor_update_interval}
     internal: true
-
   ################################################################################
   #
   # Custom Component - Gas MJ (Consumption) Statistics
   #
-  
   - platform: "gas_statistics_mj"
     id: gas_statistics_mj_component
     total: gas_total_mj
@@ -839,7 +783,6 @@ sensor:
 #      web_server:
 #        sorting_group_id: group_gas_mj_sensors
 #        sorting_weight: 2
-
     gas_week:
       name: "Gas - Week (MJ)"
       id: gas_used_week_mj
@@ -853,7 +796,6 @@ sensor:
       web_server:
         sorting_group_id: group_gas_mj_sensors
         sorting_weight: 4
-
     gas_quarter:
       name: "Gas - Quarter (MJ)"
       id: gas_used_quarter_mj
@@ -867,13 +809,11 @@ sensor:
       web_server:
         sorting_group_id: group_gas_mj_sensors
         sorting_weight: 6
-  
   ################################################################################
   #  Hidden from HA/web_server (internal: true) - still required internally as
   #  the `total:` binding for gas_statistics_mj_component above. Never
   #  recalibrated to a single reading - Pressure Factor / Heating Value change
   #  every quarter, so this stays as a running sum of per-pulse conversions.
-
   - platform: template
     name: "Gas - Total (MJ)"
     id: gas_total_mj
@@ -888,15 +828,14 @@ sensor:
        return id(global_gas_total_mj);
     update_interval: ${gas_sensor_update_interval}
     internal: true
-
   ################################################################################
   #
-  #  Gas pricing - steped $/MJ lookup (based on quarter-to-date MJ usage),
-  #  the equivalent $/m³ rate derived from it, and today's running cost
-  #  (service charge + consumption). Recalculated continuously since the
-  #  active step depends on quarter-to-date usage.
+  #  Gas pricing - stepped $/MJ lookup (based on quarter-to-date MJ usage,
+  #  always 4 thresholds / 5 rates - Step 5 is the catch-all above Step 4's
+  #  threshold), the equivalent $/m³ rate derived from it, and today's
+  #  running cost (service charge + consumption). Recalculated continuously
+  #  since the active step depends on quarter-to-date usage.
   #
-
   - platform: template
     name: "Gas - Price (MJ)"
     id: gas_price_mj
@@ -907,9 +846,6 @@ sensor:
     update_interval: ${gas_sensor_update_interval}
     lambda: |-
       float quarter_mj = id(gas_used_quarter_mj).state;
-      int active_steps = (int) id(input_gas_rates_per_mj).state;
-      if (active_steps < 1) active_steps = 1;
-      if (active_steps > 5) active_steps = 5;
 
       float thresholds[4] = {
         id(input_gas_step1_threshold).state,
@@ -918,18 +854,17 @@ sensor:
         id(input_gas_step4_threshold).state,
       };
       float rates[5] = {
-        id(input_gas_step1_rate_mj).state,
-        id(input_gas_step2_rate_mj).state,
-        id(input_gas_step3_rate_mj).state,
-        id(input_gas_step4_rate_mj).state,
-        id(input_gas_step5_rate_mj).state,
+        id(gas_step1_rate_mj),
+        id(gas_step2_rate_mj),
+        id(gas_step3_rate_mj),
+        id(gas_step4_rate_mj),
+        id(gas_step5_rate_mj),
       };
 
-      // Walk the thresholds for only as many steps as are active; default to
-      // the last active step (the "everything above" catch-all) if none of
-      // the earlier thresholds matched.
-      int selected_step = active_steps - 1;
-      for (int i = 0; i < active_steps - 1; i++) {
+      // Walk the 4 thresholds; default to Step 5 (the "everything above
+      // Step 4" catch-all) if quarter usage is past all of them.
+      int selected_step = 4;
+      for (int i = 0; i < 4; i++) {
         if (quarter_mj <= thresholds[i]) {
           selected_step = i;
           break;
@@ -949,7 +884,7 @@ sensor:
     icon: "mdi:currency-usd"
     update_interval: ${gas_sensor_update_interval}
     lambda: |-
-      // Derived from Price (MJ), not its own independent step table - $/m³
+      // Derived from Price (MJ), not its own independent tier table - $/m³
       // is just $/MJ run through the same pressure factor / heating value
       // conversion used everywhere else.
       float price_mj = id(gas_price_mj).state;
@@ -976,12 +911,10 @@ sensor:
     web_server:
       sorting_group_id: group_gas_mj_sensors
       sorting_weight: 10
-
   ################################################################################
   #
   #  Uses the Usage_Tracker custom component to publish duration of last tap OPEN.
   #
-  
   - platform: usage_tracker
     on_off_sensor: gas_valve_state_sensor
     # This is internal as we use a text_sensor above to reformat the output into days/hours/min/sec.
