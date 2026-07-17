@@ -81,7 +81,7 @@ sensor:
       
      # Relative humidity %
     humidity:
-      name: "${bme_sensor2_location}Humidity (Relative)"
+      name: "${bme_sensor2_location}Humidity" # (Relative)"
       id: bme280b_humidity
       icon: 'mdi:water-percent'
       accuracy_decimals: 1
@@ -99,16 +99,16 @@ sensor:
         sorting_weight: 8
       
    # BME280 Sensor in I2C Port - Absolute Humidity
-  - platform: absolute_humidity
-    name: "${bme_sensor2_location}Humidity (Absolute)"
-    id: bme280b_humidity_absolute
-    icon: 'mdi:water-percent'    
-    temperature: bme280b_temperature
-    humidity: bme280b_humidity
-    equation: Wobus   # Wobus (Default), optional Tetens or Buck
-    web_server:
-      sorting_group_id: group_environmental_sensors_2
-      sorting_weight: 9
+#  - platform: absolute_humidity
+#    name: "${bme_sensor2_location}Humidity (Absolute)"
+#    id: bme280b_humidity_absolute
+#    icon: 'mdi:water-percent'    
+#    temperature: bme280b_temperature
+#    humidity: bme280b_humidity
+#    equation: Wobus   # Wobus (Default), optional Tetens or Buck
+#    web_server:
+#      sorting_group_id: group_environmental_sensors_2
+#      sorting_weight: 9
 
    # BME280 Sensor in I2C Port - Dew Point
   - platform: template
