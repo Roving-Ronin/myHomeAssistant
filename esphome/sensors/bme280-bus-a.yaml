@@ -127,7 +127,7 @@ sensor:
    # BME280 Sensor in I2C Port - Equivalent Sea Level Pressure 
    # Note: This is based on 655m for Goulburn North, NSW. Australia. Update for a different location.
   - platform: template
-    name: "${bme_sensor1_location}Equivalent Sea Level Pressure"
+    name: "${bme_sensor1_location}Pressure (Sea Level)"
     id: bme280a_sea_level_pressure
     state_class: measurement
     device_class: pressure
