@@ -21,15 +21,15 @@ esphome:
           id(input_gas_heating_value).publish_state(id(gas_heating_value));
           id(input_gas_daily_service_charge).publish_state(id(gas_daily_service_charge));
           id(input_gas_rates_per_mj).publish_state(id(gas_rates_per_mj));
-          id(input_gas_tier1_threshold).publish_state(id(gas_tier1_threshold_mj));
-          id(input_gas_tier2_threshold).publish_state(id(gas_tier2_threshold_mj));
-          id(input_gas_tier3_threshold).publish_state(id(gas_tier3_threshold_mj));
-          id(input_gas_tier4_threshold).publish_state(id(gas_tier4_threshold_mj));
-          id(input_gas_tier1_rate_mj).publish_state(id(gas_tier1_rate_mj));
-          id(input_gas_tier2_rate_mj).publish_state(id(gas_tier2_rate_mj));
-          id(input_gas_tier3_rate_mj).publish_state(id(gas_tier3_rate_mj));
-          id(input_gas_tier4_rate_mj).publish_state(id(gas_tier4_rate_mj));
-          id(input_gas_tier5_rate_mj).publish_state(id(gas_tier5_rate_mj));
+          id(input_gas_step1_threshold).publish_state(id(gas_step1_threshold_mj));
+          id(input_gas_step2_threshold).publish_state(id(gas_step2_threshold_mj));
+          id(input_gas_step3_threshold).publish_state(id(gas_step3_threshold_mj));
+          id(input_gas_step4_threshold).publish_state(id(gas_step4_threshold_mj));
+          id(input_gas_step1_rate_mj).publish_state(id(gas_step1_rate_mj));
+          id(input_gas_step2_rate_mj).publish_state(id(gas_step2_rate_mj));
+          id(input_gas_step3_rate_mj).publish_state(id(gas_step3_rate_mj));
+          id(input_gas_step4_rate_mj).publish_state(id(gas_step4_rate_mj));
+          id(input_gas_step5_rate_mj).publish_state(id(gas_step5_rate_mj));
           id(input_gas_last_bill_reading).publish_state(id(gas_last_bill_reading_m3));
           id(input_gas_current_meter_reading).publish_state(id(gas_current_meter_reading_m3));
           
@@ -76,8 +76,8 @@ globals:
     restore_value: no
     initial_value: '""'
   
-  # Gas pricing / cost tracking - mirrors the tiered MJ pricing + daily service
-  # charge from the gas retailer's bill. Update the tier thresholds/rates each
+  # Gas pricing / cost tracking - mirrors the steped MJ pricing + daily service
+  # charge from the gas retailer's bill. Update the step thresholds/rates each
   # quarter along with Pressure Factor / Heating Value above.
   #
   - id: gas_daily_service_charge
@@ -88,49 +88,49 @@ globals:
   - id: gas_rates_per_mj
     type: int
     restore_value: true
-    initial_value: "5"        # how many of the 5 tier slots below are active
+    initial_value: "5"        # how many of the 5 step slots below are active
 
-  - id: gas_tier1_threshold_mj
+  - id: gas_step1_threshold_mj
     type: float
     restore_value: true
-    initial_value: "1890"
+    initial_value: "1864"
 
-  - id: gas_tier2_threshold_mj
+  - id: gas_step2_threshold_mj
     type: float
     restore_value: true
-    initial_value: "3750"
+    initial_value: "3699"
 
-  - id: gas_tier3_threshold_mj
+  - id: gas_step3_threshold_mj
     type: float
     restore_value: true
     initial_value: "8250"
 
-  - id: gas_tier4_threshold_mj
+  - id: gas_step4_threshold_mj
     type: float
     restore_value: true
     initial_value: "250500"
 
-  - id: gas_tier1_rate_mj
+  - id: gas_step1_rate_mj
     type: float
     restore_value: true
     initial_value: "0.03938"
 
-  - id: gas_tier2_rate_mj
+  - id: gas_step2_rate_mj
     type: float
     restore_value: true
     initial_value: "0.03278"
 
-  - id: gas_tier3_rate_mj
+  - id: gas_step3_rate_mj
     type: float
     restore_value: true
     initial_value: "0.03102"
 
-  - id: gas_tier4_rate_mj
+  - id: gas_step4_rate_mj
     type: float
     restore_value: true
     initial_value: "0.02838"
 
-  - id: gas_tier5_rate_mj
+  - id: gas_step5_rate_mj
     type: float
     restore_value: true
     initial_value: "0.02838"
@@ -233,10 +233,8 @@ number:
       sorting_weight: 26
 
   - platform: template
-    name: "Gas - Tier 1 Threshold (MJ)"
-    id: input_gas_tier1_threshold
-    min_value: 0
-    max_value: 500000
+    name: "Gas - Step 1 Threshold (MJ)"
+    id: input_gas_step1_threshold
     step: 1
     unit_of_measurement: "MJ"
     optimistic: true
@@ -246,14 +244,14 @@ number:
     set_action:
       then:
         - globals.set:
-            id: gas_tier1_threshold_mj
+            id: gas_step1_threshold_mj
             value: !lambda "return x;"
     web_server:
       sorting_weight: 27
 
   - platform: template
-    name: "Gas - Tier 2 Threshold (MJ)"
-    id: input_gas_tier2_threshold
+    name: "Gas - Step 2 Threshold (MJ)"
+    id: input_gas_step2_threshold
     min_value: 0
     max_value: 500000
     step: 1
@@ -265,14 +263,14 @@ number:
     set_action:
       then:
         - globals.set:
-            id: gas_tier2_threshold_mj
+            id: gas_step2_threshold_mj
             value: !lambda "return x;"
     web_server:
       sorting_weight: 28
 
   - platform: template
-    name: "Gas - Tier 3 Threshold (MJ)"
-    id: input_gas_tier3_threshold
+    name: "Gas - Step 3 Threshold (MJ)"
+    id: input_gas_step3_threshold
     min_value: 0
     max_value: 500000
     step: 1
@@ -284,14 +282,14 @@ number:
     set_action:
       then:
         - globals.set:
-            id: gas_tier3_threshold_mj
+            id: gas_step3_threshold_mj
             value: !lambda "return x;"
     web_server:
       sorting_weight: 29
 
   - platform: template
-    name: "Gas - Tier 4 Threshold (MJ)"
-    id: input_gas_tier4_threshold
+    name: "Gas - Step 4 Threshold (MJ)"
+    id: input_gas_step4_threshold
     min_value: 0
     max_value: 500000
     step: 1
@@ -303,14 +301,14 @@ number:
     set_action:
       then:
         - globals.set:
-            id: gas_tier4_threshold_mj
+            id: gas_step4_threshold_mj
             value: !lambda "return x;"
     web_server:
       sorting_weight: 30
 
   - platform: template
-    name: "Gas - Tier 1 Rate ($ per MJ)"
-    id: input_gas_tier1_rate_mj
+    name: "Gas - Step 1 Rate ($ per MJ)"
+    id: input_gas_step1_rate_mj
     min_value: 0
     max_value: 1
     step: 0.00001
@@ -322,14 +320,14 @@ number:
     set_action:
       then:
         - globals.set:
-            id: gas_tier1_rate_mj
+            id: gas_step1_rate_mj
             value: !lambda "return x;"
     web_server:
       sorting_weight: 31
 
   - platform: template
-    name: "Gas - Tier 2 Rate ($ per MJ)"
-    id: input_gas_tier2_rate_mj
+    name: "Gas - Step 2 Rate ($ per MJ)"
+    id: input_gas_step2_rate_mj
     min_value: 0
     max_value: 1
     step: 0.00001
@@ -341,14 +339,14 @@ number:
     set_action:
       then:
         - globals.set:
-            id: gas_tier2_rate_mj
+            id: gas_step2_rate_mj
             value: !lambda "return x;"
     web_server:
       sorting_weight: 32
 
   - platform: template
-    name: "Gas - Tier 3 Rate ($ per MJ)"
-    id: input_gas_tier3_rate_mj
+    name: "Gas - Step 3 Rate ($ per MJ)"
+    id: input_gas_step3_rate_mj
     min_value: 0
     max_value: 1
     step: 0.00001
@@ -360,14 +358,14 @@ number:
     set_action:
       then:
         - globals.set:
-            id: gas_tier3_rate_mj
+            id: gas_step3_rate_mj
             value: !lambda "return x;"
     web_server:
       sorting_weight: 33
 
   - platform: template
-    name: "Gas - Tier 4 Rate ($ per MJ)"
-    id: input_gas_tier4_rate_mj
+    name: "Gas - Step 4 Rate ($ per MJ)"
+    id: input_gas_step4_rate_mj
     min_value: 0
     max_value: 1
     step: 0.00001
@@ -379,14 +377,14 @@ number:
     set_action:
       then:
         - globals.set:
-            id: gas_tier4_rate_mj
+            id: gas_step4_rate_mj
             value: !lambda "return x;"
     web_server:
       sorting_weight: 41
 
   - platform: template
-    name: "Gas - Tier 5 Rate ($ per MJ)"
-    id: input_gas_tier5_rate_mj
+    name: "Gas - Step 5 Rate ($ per MJ)"
+    id: input_gas_step5_rate_mj
     min_value: 0
     max_value: 1
     step: 0.00001
@@ -398,7 +396,7 @@ number:
     set_action:
       then:
         - globals.set:
-            id: gas_tier5_rate_mj
+            id: gas_step5_rate_mj
             value: !lambda "return x;"
     web_server:
       sorting_weight: 42
@@ -891,10 +889,10 @@ sensor:
 
   ################################################################################
   #
-  #  Gas pricing - tiered $/MJ lookup (based on quarter-to-date MJ usage),
+  #  Gas pricing - steped $/MJ lookup (based on quarter-to-date MJ usage),
   #  the equivalent $/m³ rate derived from it, and today's running cost
   #  (service charge + consumption). Recalculated continuously since the
-  #  active tier depends on quarter-to-date usage.
+  #  active step depends on quarter-to-date usage.
   #
 
   - platform: template
@@ -907,35 +905,35 @@ sensor:
     update_interval: ${gas_sensor_update_interval}
     lambda: |-
       float quarter_mj = id(gas_used_quarter_mj).state;
-      int active_tiers = (int) id(input_gas_rates_per_mj).state;
-      if (active_tiers < 1) active_tiers = 1;
-      if (active_tiers > 5) active_tiers = 5;
+      int active_steps = (int) id(input_gas_rates_per_mj).state;
+      if (active_steps < 1) active_steps = 1;
+      if (active_steps > 5) active_steps = 5;
 
       float thresholds[4] = {
-        id(input_gas_tier1_threshold).state,
-        id(input_gas_tier2_threshold).state,
-        id(input_gas_tier3_threshold).state,
-        id(input_gas_tier4_threshold).state,
+        id(input_gas_step1_threshold).state,
+        id(input_gas_step2_threshold).state,
+        id(input_gas_step3_threshold).state,
+        id(input_gas_step4_threshold).state,
       };
       float rates[5] = {
-        id(input_gas_tier1_rate_mj).state,
-        id(input_gas_tier2_rate_mj).state,
-        id(input_gas_tier3_rate_mj).state,
-        id(input_gas_tier4_rate_mj).state,
-        id(input_gas_tier5_rate_mj).state,
+        id(input_gas_step1_rate_mj).state,
+        id(input_gas_step2_rate_mj).state,
+        id(input_gas_step3_rate_mj).state,
+        id(input_gas_step4_rate_mj).state,
+        id(input_gas_step5_rate_mj).state,
       };
 
-      // Walk the thresholds for only as many tiers as are active; default to
-      // the last active tier (the "everything above" catch-all) if none of
+      // Walk the thresholds for only as many steps as are active; default to
+      // the last active step (the "everything above" catch-all) if none of
       // the earlier thresholds matched.
-      int selected_tier = active_tiers - 1;
-      for (int i = 0; i < active_tiers - 1; i++) {
+      int selected_step = active_steps - 1;
+      for (int i = 0; i < active_steps - 1; i++) {
         if (quarter_mj <= thresholds[i]) {
-          selected_tier = i;
+          selected_step = i;
           break;
         }
       }
-      return rates[selected_tier];
+      return rates[selected_step];
     web_server:
       sorting_group_id: group_gas_mj_sensors
       sorting_weight: 9
@@ -949,7 +947,7 @@ sensor:
     icon: "mdi:currency-usd"
     update_interval: ${gas_sensor_update_interval}
     lambda: |-
-      // Derived from Price (MJ), not its own independent tier table - $/m³
+      // Derived from Price (MJ), not its own independent step table - $/m³
       // is just $/MJ run through the same pressure factor / heating value
       // conversion used everywhere else.
       float price_mj = id(gas_price_mj).state;
