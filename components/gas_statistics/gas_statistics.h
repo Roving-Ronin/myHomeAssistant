@@ -44,6 +44,33 @@ class GasStatistics : public Component {
   void set_gas_year(Sensor *sensor) { this->gas_year_ = sensor; }
   void set_gas_quarter(Sensor *sensor) { this->gas_quarter_ = sensor; }
 
+  /** Manually (re)start the quarter accumulator, e.g. from a "Reset Quarter"
+   * button or a one-off setup action. If already_consumed is 0 (the
+   * default), this behaves like the automatic reset: the quarter baseline
+   * snaps to the current total, so Gas - Quarter reads 0 going forward. If
+   * already_consumed is non-zero (e.g. computed from a last-bill-reading /
+   * current-meter-reading pair), the baseline is backdated so Gas - Quarter
+   * immediately reflects that real consumption-so-far figure instead.
+   * Callable directly from a YAML lambda via id(component).reset_quarter(...).
+   */
+  void reset_quarter(float already_consumed = 0.0f);
+
+  /** Calibrate the lifetime total to match a physical meter reading (e.g.
+   * from a "Current Meter Reading" input). This is more than a simple
+   * publish: it computes the delta between the old and new total and shifts
+   * the today/yesterday/week/month/year baselines by that same delta, so
+   * those sensors keep reporting the consumption they'd already tracked
+   * rather than suddenly showing the calibration jump as a huge spurious
+   * reading. start_quarter is intentionally left untouched here - call
+   * reset_quarter() separately (typically right after this) if the quarter
+   * baseline also needs to move, since that's usually seeded from a more
+   * accurate source (the actual bill reading) than a simple delta shift.
+   * The caller is still responsible for actually updating the total_ sensor
+   * itself (e.g. via a global + .update()) - this only adjusts this
+   * component's internal baselines to match.
+   */
+  void calibrate_total(float new_total);
+
  protected:
   ESPPreferenceObject pref_;
   time::RealTimeClock *time_;
