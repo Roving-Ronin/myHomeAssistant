@@ -277,7 +277,7 @@ number:
     step: 0.001
     unit_of_measurement: "¢/MJ"
     optimistic: true
-    mode: slider
+    mode: box
     icon: "mdi:currency-usd"
     entity_category: config
     set_action:
