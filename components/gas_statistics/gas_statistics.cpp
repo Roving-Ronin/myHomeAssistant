@@ -197,6 +197,62 @@ bool GasStatistics::is_quarter_start_month_(int month) {
   return (diff % 3) == 0;
 }
 
+void GasStatistics::reset_quarter(float already_consumed) {
+  float current_total = this->total_->get_state();
+  if (std::isnan(current_total)) {
+    ESP_LOGW(TAG, "Gas (m³) reset_quarter called but total not yet available, ignoring");
+    return;
+  }
+  this->gas_.start_quarter = current_total - already_consumed;
+  // Force process_() to republish even if the numeric value happens to match
+  // what was last published (e.g. resetting to the same figure twice).
+  this->last_quarter_ = NAN;
+  this->pref_.save(&this->gas_);
+  this->process_(current_total);
+  ESP_LOGI(TAG, "Gas (m³) quarter manually (re)started: total=%f, already_consumed=%f, baseline=%f", current_total,
+           already_consumed, this->gas_.start_quarter);
+}
+
+void GasStatistics::calibrate_total(float new_total) {
+  float old_total = this->total_->get_state();
+  if (std::isnan(old_total)) {
+    // Nothing previously published to shift relative to - treat as a fresh
+    // baseline instead of computing a bogus delta.
+    old_total = new_total;
+  }
+  float delta = new_total - old_total;
+
+  if (!std::isnan(this->gas_.start_today)) {
+    this->gas_.start_today += delta;
+  }
+  if (!std::isnan(this->gas_.start_yesterday)) {
+    this->gas_.start_yesterday += delta;
+  }
+  if (!std::isnan(this->gas_.start_week)) {
+    this->gas_.start_week += delta;
+  }
+  if (!std::isnan(this->gas_.start_month)) {
+    this->gas_.start_month += delta;
+  }
+  if (!std::isnan(this->gas_.start_year)) {
+    this->gas_.start_year += delta;
+  }
+  // start_quarter is intentionally left alone here - see header comment.
+
+  // Force process_() to republish Today/Week/Month/Year immediately using
+  // the shifted baselines, rather than waiting for the next natural update.
+  this->last_today_ = NAN;
+  this->last_yesterday_ = NAN;
+  this->last_week_ = NAN;
+  this->last_month_ = NAN;
+  this->last_year_ = NAN;
+
+  this->pref_.save(&this->gas_);
+  this->process_(new_total);
+  ESP_LOGI(TAG, "Gas (m³) total calibrated: old=%f, new=%f, delta=%f applied to today/week/month/year baselines",
+           old_total, new_total, delta);
+}
+
 void GasStatistics::loop() {
   // Skip processing until SNTP sync delay
   if (!this->initial_processing_started_) {
