@@ -373,7 +373,7 @@ number:
     unit_of_measurement: "m³"
     optimistic: true
     mode: box
-    icon: "mdi:receipt-text"
+    icon: "mdi:counter"
     entity_category: config
     set_action:
       then:
@@ -392,7 +392,7 @@ number:
     unit_of_measurement: "m³"
     optimistic: true
     mode: box
-    icon: "mdi:gas-cylinder"
+    icon: "mdi:counter"
     entity_category: config
     set_action:
       then:
@@ -494,7 +494,7 @@ button:
   - platform: template
     name: "Gas - Apply Meter Readings"
     entity_category: config
-    icon: "mdi:gas-cylinder"
+    icon: "mdi:calendar-refresh"
     on_press:
       then:
         - lambda: |-
