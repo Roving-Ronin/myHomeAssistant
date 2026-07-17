@@ -197,6 +197,22 @@ bool GasStatisticsMJ::is_quarter_start_month_(int month) {
   return (diff % 3) == 0;
 }
 
+void GasStatisticsMJ::reset_quarter(float already_consumed) {
+  float current_total = this->total_->get_state();
+  if (std::isnan(current_total)) {
+    ESP_LOGW(TAG, "Gas (MJ) reset_quarter called but total not yet available, ignoring");
+    return;
+  }
+  this->gas_.start_quarter = current_total - already_consumed;
+  // Force process_() to republish even if the numeric value happens to match
+  // what was last published (e.g. resetting to the same figure twice).
+  this->last_quarter_ = NAN;
+  this->pref_.save(&this->gas_);
+  this->process_(current_total);
+  ESP_LOGI(TAG, "Gas (MJ) quarter manually (re)started: total=%f, already_consumed=%f, baseline=%f", current_total,
+           already_consumed, this->gas_.start_quarter);
+}
+
 void GasStatisticsMJ::loop() {
   // Skip processing until SNTP sync delay
   if (!this->initial_processing_started_) {
