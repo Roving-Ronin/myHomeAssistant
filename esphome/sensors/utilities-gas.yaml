@@ -387,7 +387,7 @@ number:
     name: "Gas - Current Meter Reading (m³)"
     id: input_gas_current_meter_reading
     min_value: 0
-    max_value: 99999.999
+    max_value: 100000
     step: 0.001
     unit_of_measurement: "m³"
     optimistic: true
