@@ -365,7 +365,7 @@ number:
       sorting_weight: 42
 
   - platform: template
-    name: "Gas - Last Bill Reading (m³)"
+    name: "Gas - Last Bill Reading"
     id: input_gas_last_bill_reading
     min_value: 0
     max_value: 99999
@@ -384,7 +384,7 @@ number:
       sorting_weight: 48.1
 
   - platform: template
-    name: "Gas - Current Meter Reading (m³)"
+    name: "Gas - Current Meter Reading"
     id: input_gas_current_meter_reading
     min_value: 0
     max_value: 99999.999
