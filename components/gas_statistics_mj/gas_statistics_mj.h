@@ -44,6 +44,24 @@ class GasStatisticsMJ : public Component {
   void set_gas_year(Sensor *sensor) { this->gas_year_ = sensor; }
   void set_gas_quarter(Sensor *sensor) { this->gas_quarter_ = sensor; }
 
+  /** Manually (re)start the quarter accumulator, e.g. from a "Reset Quarter"
+   * button or a one-off setup action. If already_consumed is 0 (the
+   * default), this behaves like the automatic reset: the quarter baseline
+   * snaps to the current total, so Gas - Quarter (MJ) reads 0 going forward.
+   * If already_consumed is non-zero (e.g. computed from a last-bill-reading
+   * / current-meter-reading pair converted to MJ), the baseline is backdated
+   * so Gas - Quarter (MJ) immediately reflects that real consumption-so-far
+   * figure instead. Callable directly from a YAML lambda via
+   * id(component).reset_quarter(...).
+   *
+   * Note: unlike the m3 component, there is no calibrate_total() here - the
+   * lifetime MJ total is never recalibrated to a single "physical reading",
+   * since it's built from per-pulse conversions using whatever Pressure
+   * Factor / Heating Value was set at the time, and those change every
+   * quarter. It's left to accumulate exactly as it always has.
+   */
+  void reset_quarter(float already_consumed = 0.0f);
+
  protected:
   ESPPreferenceObject pref_;
   time::RealTimeClock *time_;
