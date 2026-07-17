@@ -309,7 +309,7 @@ number:
       sorting_weight: 30
 
   - platform: template
-    name: "Gas - Tier 1 Rate ($/MJ)"
+    name: "Gas - Tier 1 Rate ($ per MJ)"
     id: input_gas_tier1_rate_mj
     min_value: 0
     max_value: 1
@@ -328,7 +328,7 @@ number:
       sorting_weight: 31
 
   - platform: template
-    name: "Gas - Tier 2 Rate ($/MJ)"
+    name: "Gas - Tier 2 Rate ($ per MJ)"
     id: input_gas_tier2_rate_mj
     min_value: 0
     max_value: 1
@@ -347,7 +347,7 @@ number:
       sorting_weight: 32
 
   - platform: template
-    name: "Gas - Tier 3 Rate ($/MJ)"
+    name: "Gas - Tier 3 Rate ($ per MJ)"
     id: input_gas_tier3_rate_mj
     min_value: 0
     max_value: 1
@@ -366,7 +366,7 @@ number:
       sorting_weight: 33
 
   - platform: template
-    name: "Gas - Tier 4 Rate ($/MJ)"
+    name: "Gas - Tier 4 Rate ($ per MJ)"
     id: input_gas_tier4_rate_mj
     min_value: 0
     max_value: 1
@@ -385,7 +385,7 @@ number:
       sorting_weight: 41
 
   - platform: template
-    name: "Gas - Tier 5 Rate ($/MJ)"
+    name: "Gas - Tier 5 Rate ($ per MJ)"
     id: input_gas_tier5_rate_mj
     min_value: 0
     max_value: 1
