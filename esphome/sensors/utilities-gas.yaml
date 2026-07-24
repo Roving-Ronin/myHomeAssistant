@@ -39,6 +39,8 @@ esphome:
 web_server:
   sorting_groups:
 
+
+
     - id: group_consumption_gas_mj
       name: "Consumption - Gas (MJ)"
       sorting_weight: -38
@@ -142,14 +144,14 @@ number:
     optimistic: true
     mode: box
     icon: "mdi:scale"
-    entity_category: config
     set_action:
       then:
         - globals.set:
             id: gas_pressure_factor
             value: !lambda "return x;"
     web_server:
-      sorting_weight: 20
+      sorting_group_id: group_configuration_gas_tariffs
+      sorting_weight: 1
 
   - platform: template
     name: "Gas - Heating Value"
@@ -162,14 +164,14 @@ number:
     optimistic: true
     mode: box
     icon: "mdi:fire"
-    entity_category: config
     set_action:
       then:
         - globals.set:
             id: gas_heating_value
             value: !lambda "return x;"
     web_server:
-      sorting_weight: 21
+      sorting_group_id: group_configuration_gas_tariffs
+      sorting_weight: 2
   #
   # Gas pricing inputs - update these each quarter from the retailer's bill.
   # Step thresholds are entered in MJ; Step rates are entered in ¢/MJ and
@@ -186,14 +188,14 @@ number:
     optimistic: true
     mode: box
     icon: "mdi:cash-minus"
-    entity_category: config
     set_action:
       then:
         - globals.set:
             id: gas_daily_service_charge
             value: !lambda "return x;"
     web_server:
-      sorting_weight: 25
+      sorting_group_id: group_configuration_gas_tariffs
+      sorting_weight: 3
 
   - platform: template
     name: "Gas - Step 1 Threshold"
@@ -205,14 +207,14 @@ number:
     optimistic: true
     mode: box
     icon: "mdi:stairs-up"
-    entity_category: config
     set_action:
       then:
         - globals.set:
             id: gas_step1_threshold_mj
             value: !lambda "return x;"
     web_server:
-      sorting_weight: 27
+      sorting_group_id: group_configuration_gas_tariffs
+      sorting_weight: 4
 
   - platform: template
     name: "Gas - Step 2 Threshold"
@@ -224,14 +226,14 @@ number:
     optimistic: true
     mode: box
     icon: "mdi:stairs-up"
-    entity_category: config
     set_action:
       then:
         - globals.set:
             id: gas_step2_threshold_mj
             value: !lambda "return x;"
     web_server:
-      sorting_weight: 28
+      sorting_group_id: group_configuration_gas_tariffs
+      sorting_weight: 5
 
   - platform: template
     name: "Gas - Step 3 Threshold"
@@ -243,14 +245,14 @@ number:
     optimistic: true
     mode: box
     icon: "mdi:stairs-up"
-    entity_category: config
     set_action:
       then:
         - globals.set:
             id: gas_step3_threshold_mj
             value: !lambda "return x;"
     web_server:
-      sorting_weight: 29
+      sorting_group_id: group_configuration_gas_tariffs
+      sorting_weight: 6
 
   - platform: template
     name: "Gas - Step 4 Threshold"
@@ -262,14 +264,14 @@ number:
     optimistic: true
     mode: box
     icon: "mdi:stairs-up"
-    entity_category: config
     set_action:
       then:
         - globals.set:
             id: gas_step4_threshold_mj
             value: !lambda "return x;"
     web_server:
-      sorting_weight: 30
+      sorting_group_id: group_configuration_gas_tariffs
+      sorting_weight: 7
 
   - platform: template
     name: "Gas - Step 1 Rate"
@@ -281,14 +283,14 @@ number:
     optimistic: true
     mode: box
     icon: "mdi:currency-usd"
-    entity_category: config
     set_action:
       then:
         - globals.set:
             id: gas_step1_rate_mj
             value: !lambda "return x / 100.0f;"
     web_server:
-      sorting_weight: 31
+      sorting_group_id: group_configuration_gas_tariffs
+      sorting_weight: 8
 
   - platform: template
     name: "Gas - Step 2 Rate"
@@ -300,14 +302,14 @@ number:
     optimistic: true
     mode: box
     icon: "mdi:currency-usd"
-    entity_category: config
     set_action:
       then:
         - globals.set:
             id: gas_step2_rate_mj
             value: !lambda "return x / 100.0f;"
     web_server:
-      sorting_weight: 32
+      sorting_group_id: group_configuration_gas_tariffs
+      sorting_weight: 9
 
   - platform: template
     name: "Gas - Step 3 Rate"
@@ -319,14 +321,14 @@ number:
     optimistic: true
     mode: box
     icon: "mdi:currency-usd"
-    entity_category: config
     set_action:
       then:
         - globals.set:
             id: gas_step3_rate_mj
             value: !lambda "return x / 100.0f;"
     web_server:
-      sorting_weight: 33
+      sorting_group_id: group_configuration_gas_tariffs
+      sorting_weight: 10
 
   - platform: template
     name: "Gas - Step 4 Rate"
@@ -338,14 +340,14 @@ number:
     optimistic: true
     mode: box
     icon: "mdi:currency-usd"
-    entity_category: config
     set_action:
       then:
         - globals.set:
             id: gas_step4_rate_mj
             value: !lambda "return x / 100.0f;"
     web_server:
-      sorting_weight: 41
+      sorting_group_id: group_configuration_gas_tariffs
+      sorting_weight: 11
 
   - platform: template
     name: "Gas - Step 5 Rate"
@@ -357,17 +359,17 @@ number:
     optimistic: true
     mode: box
     icon: "mdi:currency-usd"
-    entity_category: config
     set_action:
       then:
         - globals.set:
             id: gas_step5_rate_mj
             value: !lambda "return x / 100.0f;"
     web_server:
-      sorting_weight: 42
+      sorting_group_id: group_configuration_gas_tariffs
+      sorting_weight: 12
 
   - platform: template
-    name: "Gas - Last Bill Reading"
+    name: "Gas - Meter Reading (Last Bill)"
     id: input_gas_last_bill_reading
     min_value: 0
     max_value: 99999
@@ -376,17 +378,17 @@ number:
     optimistic: true
     mode: box
     icon: "mdi:counter"
-    entity_category: config
     set_action:
       then:
         - globals.set:
             id: gas_last_bill_reading_m3
             value: !lambda "return x;"
     web_server:
-      sorting_weight: 48.1
+      sorting_group_id: group_configuration_physical_meter_calibration
+      sorting_weight: 4
 
   - platform: template
-    name: "Gas - Current Meter Reading"
+    name: "Gas - Meter Reading (Current)"
     id: input_gas_current_meter_reading
     min_value: 0
     max_value: 99999.999
@@ -395,14 +397,15 @@ number:
     optimistic: true
     mode: box
     icon: "mdi:counter"
-    entity_category: config
     set_action:
       then:
         - globals.set:
             id: gas_current_meter_reading_m3
             value: !lambda "return x;"
     web_server:
-      sorting_weight: 48.2
+      sorting_group_id: group_configuration_physical_meter_calibration
+      sorting_weight: 5
+      
 #######################################################################################
 #
 # Select Inputs - Used to configure Gas day and month of the quarter reset day.
@@ -414,7 +417,6 @@ select:
     optimistic: true
     restore_value: true
     icon: "mdi:calendar-refresh"
-    entity_category: config
     options:
       - "1"
       - "2"
@@ -449,7 +451,8 @@ select:
       - "31"
     initial_option: "1"
     web_server:
-      sorting_weight: 47.1
+      sorting_group_id: group_configuration_physical_meter_calibration
+      sorting_weight: 1
 
   - platform: template
     name: "Gas - Quarter Start Month"
@@ -457,7 +460,6 @@ select:
     optimistic: true
     restore_value: true
     icon: "mdi:calendar-start"
-    entity_category: config
     options:
       - "January"
       - "February"
@@ -473,7 +475,9 @@ select:
       - "December"
     initial_option: "January"
     web_server:
-      sorting_weight: 47.2
+      sorting_group_id: group_configuration_physical_meter_calibration
+      sorting_weight: 2
+      
 #######################################################################################
 #
 # Buttons - Manual quarter reset safety net, and one-off setup action for
@@ -482,8 +486,7 @@ select:
 #
 button:
   - platform: template
-    name: "Gas - Reset Quarter"
-    entity_category: config
+    name: "Gas - Quarter Apply"
     icon: "mdi:restart"
     on_press:
       then:
@@ -491,11 +494,11 @@ button:
             id(gas_statistics_component).reset_quarter();
             id(gas_statistics_mj_component).reset_quarter();
     web_server:
-      sorting_weight: 48
+      sorting_group_id: group_configuration_physical_meter_calibration
+      sorting_weight: 3
 
   - platform: template
-    name: "Gas - Apply Meter Readings"
-    entity_category: config
+    name: "Gas - Meter Readings (Apply)"
     icon: "mdi:calendar-refresh"
     on_press:
       then:
@@ -536,7 +539,9 @@ button:
             float already_consumed_mj = already_consumed_m3 * pressure_factor * heating_value;
             id(gas_statistics_mj_component).reset_quarter(already_consumed_mj);
     web_server:
-      sorting_weight: 49
+      sorting_group_id: group_configuration_physical_meter_calibration
+      sorting_weight: 6
+
 ################################################################################
 #
 #  Binary Sensor - Used to internally determine if the tap is ON/OFF.
@@ -558,6 +563,7 @@ binary_sensor:
             id: gas_valve_state
             state: "CLOSED"
     internal: true
+    
 ################################################################################
 #
 #  Text Sensor - Used to publish if the tap is On
