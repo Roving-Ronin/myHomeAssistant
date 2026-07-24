@@ -34,11 +34,11 @@ substitutions:
 # define a network information group
 #
 
-web_server:
-  sorting_groups:
-    - id: group_tank_water_sensors
-      name: "Tank Water Sensors"
-      sorting_weight: -39
+#web_server:
+#  sorting_groups:
+#    - id: group_tank_water_sensors
+#      name: "Tank Water Sensors"
+#      sorting_weight: -39
 
 
 ###########################################################################
