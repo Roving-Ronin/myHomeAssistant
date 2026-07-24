@@ -21,7 +21,7 @@ substitutions:
 
 web_server:
   sorting_groups:
-    - id: group_town_water_sensors
+    - id: group_consumption_town_water
       name: "Consumption - Town Water"
       sorting_weight: -40
 
@@ -83,7 +83,7 @@ text_sensor:
     icon: "mdi:water-pump"
     update_interval: never
     web_server:
-      sorting_group_id: group_utility_meter_sensors
+      sorting_group_id: group_utility_water_meter_sensors
       sorting_weight: 1
 
 
@@ -130,7 +130,7 @@ text_sensor:
       return {};
 #    update_interval: 10s
     web_server:
-      sorting_group_id: group_utility_meter_sensors
+      sorting_group_id: group_utility_water_meter_sensors
       sorting_weight: 4
 
 
@@ -156,7 +156,7 @@ sensor:
       - multiply: ${town_water_litres_per_pulse} # Convert pulse count to liters
     internal: false
     web_server:
-      sorting_group_id: group_utility_meter_sensors
+      sorting_group_id: group_utility_water_meter_sensors
       sorting_weight: 3
 
 
@@ -181,7 +181,7 @@ sensor:
     filters:
       - multiply: ${town_water_litres_per_pulse}  # Each pulse equals 5 liters. The water counter 'helper' in Home Assistant must still be set to 'step size' = 5.
     web_server:
-      sorting_group_id: group_utility_meter_sensors
+      sorting_group_id: group_utility_water_meter_sensors
       sorting_weight: 2
 
     #  Uses the above pulse_meter and adds sensor and calculations for tracking current litres
@@ -221,35 +221,35 @@ sensor:
       name: "Town Water - Today"
       id: town_water_today
       web_server:
-        sorting_group_id: group_town_water_sensors
+        sorting_group_id: group_consumption_town_water
         sorting_weight: 1
     
 #    water_yesterday:
 #      name: "Town Water - Yesterday"
 #      id: town_water_yesterday
 #      web_server:
-#        sorting_group_id: group_town_water_sensors
+#        sorting_group_id: group_consumption_town_water
 #        sorting_weight: 2
 
     water_week:
       name: "Town Water - Week"
       id: town_water_week
       web_server:
-        sorting_group_id: group_town_water_sensors
+        sorting_group_id: group_consumption_town_water
         sorting_weight: 3
     
     water_month:
       name: "Town Water - Month"
       id: town_water_month
       web_server:
-        sorting_group_id: group_town_water_sensors
+        sorting_group_id: group_consumption_town_water
         sorting_weight: 4
 
     water_year:
       name: "Town Water - Year"
       id: town_water_year
       web_server:
-        sorting_group_id: group_town_water_sensors
+        sorting_group_id: group_consumption_town_water
         sorting_weight: 5
 
 
@@ -269,7 +269,7 @@ sensor:
     lambda: |-
           return id(global_town_water_total);
     web_server:
-      sorting_group_id: group_town_water_sensors
+      sorting_group_id: group_consumption_town_water
       sorting_weight: 6
 
 
@@ -301,7 +301,7 @@ sensor:
             return x / 60.0;
         - delta: 0.1         # Only update if change is ≥ 0.1 min
       web_server:
-        sorting_group_id: group_utility_meter_sensors
+        sorting_group_id: group_utility_water_meter_sensors
         sorting_weight: 5
       internal: true
       
