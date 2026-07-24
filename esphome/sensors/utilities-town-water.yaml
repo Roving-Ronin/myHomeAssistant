@@ -21,9 +21,27 @@ substitutions:
 
 web_server:
   sorting_groups:
+  
     - id: group_consumption_town_water
       name: "Consumption - Town Water"
-      sorting_weight: -40
+      sorting_weight: -42
+
+    - id: group_configuration_town_water_tariffs
+      name: "Configuration - Town Water Tariffs"
+      sorting_weight: -39     
+
+    - id: group_configuration_gas_meter_calibration
+      name: "Configuration - Gas Meter Calibration"
+      sorting_weight: -37
+
+    - id: group_configuration_gas_tariffs
+      name: "Configuration - Gas Tariffs"
+      sorting_weight: -38
+
+    - id: group_configuration_town_water_meter_calibration
+      name: "Configuration - Town Water Meter Calibration"
+      sorting_weight: -35
+
 
 #######################################################################################
 
