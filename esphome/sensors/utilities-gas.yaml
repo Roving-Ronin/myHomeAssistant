@@ -384,7 +384,7 @@ number:
             id: gas_last_bill_reading_m3
             value: !lambda "return x;"
     web_server:
-      sorting_group_id: group_configuration_physical_meter_calibration
+      sorting_group_id: group_configuration_gas_meter_calibration
       sorting_weight: 4
 
   - platform: template
@@ -403,7 +403,7 @@ number:
             id: gas_current_meter_reading_m3
             value: !lambda "return x;"
     web_server:
-      sorting_group_id: group_configuration_physical_meter_calibration
+      sorting_group_id: group_configuration_gas_meter_calibration
       sorting_weight: 5
       
 #######################################################################################
@@ -451,7 +451,7 @@ select:
       - "31"
     initial_option: "1"
     web_server:
-      sorting_group_id: group_configuration_physical_meter_calibration
+      sorting_group_id: group_configuration_gas_meter_calibration
       sorting_weight: 1
 
   - platform: template
@@ -475,7 +475,7 @@ select:
       - "December"
     initial_option: "January"
     web_server:
-      sorting_group_id: group_configuration_physical_meter_calibration
+      sorting_group_id: group_configuration_gas_meter_calibration
       sorting_weight: 2
       
 #######################################################################################
@@ -494,7 +494,7 @@ button:
             id(gas_statistics_component).reset_quarter();
             id(gas_statistics_mj_component).reset_quarter();
     web_server:
-      sorting_group_id: group_configuration_physical_meter_calibration
+      sorting_group_id: group_configuration_gas_meter_calibration
       sorting_weight: 3
 
   - platform: template
@@ -539,7 +539,7 @@ button:
             float already_consumed_mj = already_consumed_m3 * pressure_factor * heating_value;
             id(gas_statistics_mj_component).reset_quarter(already_consumed_mj);
     web_server:
-      sorting_group_id: group_configuration_physical_meter_calibration
+      sorting_group_id: group_configuration_gas_meter_calibration
       sorting_weight: 6
 
 ################################################################################
