@@ -21,9 +21,14 @@ substitutions:
 
 web_server:
   sorting_groups:
+    
     - id: group_tank_water_sensors
       name: "Tank Water Sensors"
       sorting_weight: -39
+
+    - id: group_consumption_tank_water
+      name: "Consumption - Tank Water"
+      sorting_weight: -41    
 
 #######################################################################################
 
@@ -83,7 +88,7 @@ text_sensor:
     icon: "mdi:water-pump"
     update_interval: never
     web_server:
-      sorting_group_id: group_utility_meter_sensors
+      sorting_group_id: group_utility_water_meter_sensors
       sorting_weight: 6
 
 
@@ -130,7 +135,7 @@ text_sensor:
       return {};
 #    update_interval: 10s
     web_server:
-      sorting_group_id: group_utility_meter_sensors
+      sorting_group_id: group_utility_water_meter_sensors
       sorting_weight: 9
 
 sensor:
@@ -153,7 +158,7 @@ sensor:
     filters:
       - multiply: ${tank_water_litres_per_pulse}  # Convert pulse count to liters
     web_server:
-      sorting_group_id: group_utility_meter_sensors
+      sorting_group_id: group_utility_water_meter_sensors
       sorting_weight: 8
 
 
@@ -178,7 +183,7 @@ sensor:
     filters:
       - multiply: ${tank_water_litres_per_pulse}  # Each pulse equals 5 liters. The water counter 'helper' in Home Assistant must still be set to 'step size' = 5.
     web_server:
-      sorting_group_id: group_utility_meter_sensors
+      sorting_group_id: group_utility_water_meter_sensors
       sorting_weight: 7
 
     #  Uses the above pulse_meter and adds sensor and calculations for tracking current litres
@@ -217,35 +222,35 @@ sensor:
       name: "Tank Water - Today"
       id: tank_water_today
       web_server:
-        sorting_group_id: group_tank_water_sensors
+        sorting_group_id: group_consumption_tank_water
         sorting_weight: 4
     
 #    water_yesterday:
 #      name: "Tank Water - Yesterday"
 #      id: tank_water_yesterday
 #      web_server:
-#        sorting_group_id: group_tank_water_sensors
+#        sorting_group_id: group_consumption_tank_water
 #        sorting_weight: 5
 
     water_week:
       name: "Tank Water - Week"
       id: tank_water_week
       web_server:
-        sorting_group_id: group_tank_water_sensors
+        sorting_group_id: group_consumption_tank_water
         sorting_weight: 6
     
     water_month:
       name: "Tank Water - Month"
       id: tank_water_month
       web_server:
-        sorting_group_id: group_tank_water_sensors
+        sorting_group_id: group_consumption_tank_water
         sorting_weight: 7
 
     water_year:
       name: "Tank Water - Year"
       id: tank_water_year
       web_server:
-        sorting_group_id: group_tank_water_sensors
+        sorting_group_id: group_consumption_tank_water
         sorting_weight: 8
 
 
@@ -265,7 +270,7 @@ sensor:
     lambda: |-
           return id(global_tank_water_total);
     web_server:
-      sorting_group_id: group_tank_water_sensors
+      sorting_group_id: group_consumption_tank_water
       sorting_weight: 9
 
   
@@ -297,7 +302,7 @@ sensor:
             return x / 60.0;
         - delta: 0.1         # Only update if change is ≥ 0.1 min
       web_server:
-        sorting_group_id: group_utility_meter_sensors
+        sorting_group_id: group_utility_water_meter_sensors
         sorting_weight: 10
       internal: true
       
