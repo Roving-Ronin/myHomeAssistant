@@ -22,7 +22,7 @@ substitutions:
 web_server:
   sorting_groups:
     - id: group_town_water_sensors
-      name: "Town Water Sensors"
+      name: "Consumption - Town Water"
       sorting_weight: -40
 
 #######################################################################################
