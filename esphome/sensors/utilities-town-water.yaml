@@ -23,7 +23,7 @@ web_server:
   sorting_groups:
 
     - id: group_utility_water_meter_sensors
-      name: "Town Water - Meter Sensors"
+      name: "Town Water - Sensors"
       sorting_weight: -43
       
     - id: group_consumption_town_water
