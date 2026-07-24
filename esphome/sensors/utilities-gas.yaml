@@ -43,13 +43,13 @@ web_server:
       name: "Gas Meter Sensors"
       sorting_weight: -44
 
+    - id: group_consumption_gas_m3
+      name: "Consumption - Gas (m³)"
+      sorting_weight: -42
+
     - id: group_consumption_gas_mj
       name: "Consumption - Gas (MJ)"
       sorting_weight: -41
-      
-    - id: group_consumption_gas_m3
-      name: "Consumption - Gas (m³)"
-      sorting_weight: -40
       
     - id: group_configuration_gas_tariffs
       name: "Configuration - Gas Tariffs"
