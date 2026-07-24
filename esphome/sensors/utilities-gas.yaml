@@ -585,7 +585,7 @@ text_sensor:
     icon: "mdi:meter-gas"
     update_interval: never
     web_server:
-      sorting_group_id: ggroup_utility_gas_meter_sensors
+      sorting_group_id: group_utility_gas_meter_sensors
       sorting_weight: 10
   - platform: template
     name: "Gas - Last Use Duration"
@@ -627,7 +627,7 @@ text_sensor:
       return {};
 #    update_interval: 10s
     web_server:
-      sorting_group_id: ggroup_utility_gas_meter_sensors
+      sorting_group_id: group_utility_gas_meter_sensors
       sorting_weight: 13
 ################################################################################
 #
@@ -652,7 +652,7 @@ sensor:
         pullup: true
     internal: false
     web_server:
-      sorting_group_id: ggroup_utility_gas_meter_sensors
+      sorting_group_id: group_utility_gas_meter_sensors
       sorting_weight: 12
   - platform: pulse_meter
     name: 'Gas - Flow Rate'
@@ -675,7 +675,7 @@ sensor:
     filters:
       - multiply: 10.0     # 1 pulse = 10L. The gas counter 'helper' in Home Assistant must still be set to 'step size' = 10.
     web_server:
-      sorting_group_id: ggroup_utility_gas_meter_sensors
+      sorting_group_id: group_utility_gas_meter_sensors
       sorting_weight: 11
     #  Uses the above pulse_meter and adds sensor and calculations for tracking m3
     total:
@@ -955,7 +955,7 @@ sensor:
             return x / 60.0;
         - delta: 0.1         # Only update if change is ≥ 0.1 min
       web_server:
-        sorting_group_id: ggroup_utility_gas_meter_sensors
+        sorting_group_id: group_utility_gas_meter_sensors
         sorting_weight: 5
       internal: true
 
