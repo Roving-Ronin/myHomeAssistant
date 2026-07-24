@@ -40,7 +40,7 @@ web_server:
   sorting_groups:
 
     - id: group_utility_gas_meter_sensors
-      name: "Gas Meter Sensors"
+      name: "Gas - Sensors"
       sorting_weight: -44
 
     - id: group_consumption_gas_m3
