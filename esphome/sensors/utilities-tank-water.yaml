@@ -23,7 +23,7 @@ web_server:
   sorting_groups:
 
     - id: group_tank_water_meter_sensors
-      name: "Tank Water - Meter Sensors"
+      name: "Tank Water - Sensors"
       sorting_weight: -42
 
     - id: group_consumption_tank_water
