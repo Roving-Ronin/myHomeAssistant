@@ -21,14 +21,14 @@ substitutions:
 
 web_server:
   sorting_groups:
+
+    - id: group_consumption_tank_water
+      name: "Consumption - Tank Water"
+      sorting_weight: -41
     
     - id: group_tank_water_sensors
       name: "Tank Water Sensors"
       sorting_weight: -39
-
-    - id: group_consumption_tank_water
-      name: "Consumption - Tank Water"
-      sorting_weight: -41    
 
 #######################################################################################
 
