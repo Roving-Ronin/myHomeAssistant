@@ -22,10 +22,6 @@ substitutions:
 web_server:
   sorting_groups:
 
-    - id: group_tank_water_meter_sensors
-      name: "Tank Water - Sensors"
-      sorting_weight: -42.1
-
     - id: group_consumption_tank_water
       name: "Consumption - Tank Water"
       sorting_weight: -38.1
