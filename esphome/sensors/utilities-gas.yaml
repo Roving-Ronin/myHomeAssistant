@@ -39,12 +39,14 @@ esphome:
 web_server:
   sorting_groups:
 
-    - id: group_gas_mj_sensors
+    - id: group_consumption_gas_mj
       name: "Consumption - Gas (MJ)"
       sorting_weight: -38
-    - id: group_gas_m3_sensors
+      
+    - id: group_consumption_gas_m3
       name: "Consumption - Gas (m³)"
       sorting_weight: -37
+      
 #######################################################################################
 globals:
   - id: gas_pressure_factor
@@ -567,7 +569,7 @@ text_sensor:
     icon: "mdi:meter-gas"
     update_interval: never
     web_server:
-      sorting_group_id: group_utility_meter_sensors
+      sorting_group_id: ggroup_utility_gas_meter_sensors
       sorting_weight: 10
   - platform: template
     name: "Gas - Last Use Duration"
@@ -609,7 +611,7 @@ text_sensor:
       return {};
 #    update_interval: 10s
     web_server:
-      sorting_group_id: group_utility_meter_sensors
+      sorting_group_id: ggroup_utility_gas_meter_sensors
       sorting_weight: 13
 ################################################################################
 #
@@ -634,7 +636,7 @@ sensor:
         pullup: true
     internal: false
     web_server:
-      sorting_group_id: group_utility_meter_sensors
+      sorting_group_id: ggroup_utility_gas_meter_sensors
       sorting_weight: 12
   - platform: pulse_meter
     name: 'Gas - Flow Rate'
@@ -657,7 +659,7 @@ sensor:
     filters:
       - multiply: 10.0     # 1 pulse = 10L. The gas counter 'helper' in Home Assistant must still be set to 'step size' = 10.
     web_server:
-      sorting_group_id: group_utility_meter_sensors
+      sorting_group_id: ggroup_utility_gas_meter_sensors
       sorting_weight: 11
     #  Uses the above pulse_meter and adds sensor and calculations for tracking m3
     total:
@@ -709,40 +711,41 @@ sensor:
       name: "Gas - Today"
       id: gas_m3_today
       web_server:
-        sorting_group_id: group_gas_m3_sensors
+        sorting_group_id: group_consumption_gas_m3
         sorting_weight: 1
 
 #    gas_yesterday:
 #      name: "Gas - Yesterday"
 #      id: gas_m3_yesterday
 #      web_server:
-#        sorting_group_id: group_gas_m3_sensors
+#        sorting_group_id: group_consumption_gas_m3
 #        sorting_weight: 2
     gas_week:
       name: "Gas - Week"
       id: gas_m3_week
       web_server:
-        sorting_group_id: group_gas_m3_sensors
+        sorting_group_id: group_consumption_gas_m3
         sorting_weight: 3
 
     gas_month:
       name: "Gas - Month"
       id: gas_m3_month
       web_server:
-        sorting_group_id: group_gas_m3_sensors
+        sorting_group_id: group_consumption_gas_m3
         sorting_weight: 4
     gas_quarter:
       name: "Gas - Quarter"
       id: gas_m3_quarter
       web_server:
-        sorting_group_id: group_gas_m3_sensors
+        sorting_group_id: group_consumption_gas_m3
         sorting_weight: 5
     gas_year:
       name: "Gas - Year"
       id: gas_m3_year
       web_server:
-        sorting_group_id: group_gas_m3_sensors
+        sorting_group_id: group_consumption_gas_m3
         sorting_weight: 6
+        
   ################################################################################
   #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
   #  Hidden from HA/web_server (internal: true) - still required internally as
@@ -774,40 +777,40 @@ sensor:
       name: "Gas - Today (MJ)"
       id: gas_used_today_mj
       web_server:
-        sorting_group_id: group_gas_mj_sensors
+        sorting_group_id: group_consumption_gas_mj
         sorting_weight: 1
 
 #    gas_yesterday:
 #      name: "Gas - Yesterday (MJ)"
 #      id: gas_used_yesterday_mj
 #      web_server:
-#        sorting_group_id: group_gas_mj_sensors
+#        sorting_group_id: group_consumption_gas_mj
 #        sorting_weight: 2
     gas_week:
       name: "Gas - Week (MJ)"
       id: gas_used_week_mj
       web_server:
-        sorting_group_id: group_gas_mj_sensors
+        sorting_group_id: group_consumption_gas_mj
         sorting_weight: 3
 
     gas_month:
       name: "Gas - Month (MJ)"
       id: gas_used_month_mj
       web_server:
-        sorting_group_id: group_gas_mj_sensors
+        sorting_group_id: group_consumption_gas_mj
         sorting_weight: 4
     gas_quarter:
       name: "Gas - Quarter (MJ)"
       id: gas_used_quarter_mj
       web_server:
-        sorting_group_id: group_gas_mj_sensors
+        sorting_group_id: group_consumption_gas_mj
         sorting_weight: 5
 
     gas_year:
       name: "Gas - Year (MJ)"
       id: gas_used_year_mj
       web_server:
-        sorting_group_id: group_gas_mj_sensors
+        sorting_group_id: group_consumption_gas_mj
         sorting_weight: 6
   ################################################################################
   #  Hidden from HA/web_server (internal: true) - still required internally as
@@ -872,7 +875,7 @@ sensor:
       }
       return rates[selected_step];
     web_server:
-      sorting_group_id: group_gas_mj_sensors
+      sorting_group_id: group_consumption_gas_mj
       sorting_weight: 9
 
   - platform: template
@@ -892,7 +895,7 @@ sensor:
       float heating_value = id(input_gas_heating_value).state;
       return price_mj * pressure_factor * heating_value;
     web_server:
-      sorting_group_id: group_gas_m3_sensors
+      sorting_group_id: group_consumption_gas_m3
       sorting_weight: 9
 
   - platform: template
@@ -909,7 +912,7 @@ sensor:
       float price_mj = id(gas_price_mj).state;
       return daily_charge + (today_mj * price_mj);
     web_server:
-      sorting_group_id: group_gas_mj_sensors
+      sorting_group_id: group_consumption_gas_mj
       sorting_weight: 10
   ################################################################################
   #
@@ -936,7 +939,7 @@ sensor:
             return x / 60.0;
         - delta: 0.1         # Only update if change is ≥ 0.1 min
       web_server:
-        sorting_group_id: group_utility_meter_sensors
+        sorting_group_id: ggroup_utility_gas_meter_sensors
         sorting_weight: 5
       internal: true
 
