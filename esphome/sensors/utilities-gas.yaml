@@ -40,10 +40,10 @@ web_server:
   sorting_groups:
 
     - id: group_gas_mj_sensors
-      name: "Gas Sensors (MJ)"
+      name: "Consumption - Gas (MJ)"
       sorting_weight: -38
     - id: group_gas_m3_sensors
-      name: "Gas Sensors (m³)"
+      name: "Consumption - Gas (m³)"
       sorting_weight: -37
 #######################################################################################
 globals:
