@@ -152,14 +152,14 @@ external_components:
 # sensor specific template file, in this case the /sensors/hc-sr04-ultrasonic.yaml file.
 #
 
-web_server:
+#web_server:
 #  css_url: https://raw.githubusercontent.com/Roving-Ronin/myHomeAssistant/main/esphome/custom_dashboard/tabs.css
 #  js_url: https://raw.githubusercontent.com/Roving-Ronin/myHomeAssistant/main/esphome/custom_dashboard/utilities-monitor.js
-  sorting_groups:
+#  sorting_groups:
 
       # This sort group is used by both the Town and Tank Water Meter senors (flow rate / pulse counter), so must be in at this level.
-    - id: group_utility_water_meter_sensors
-      name: "Water - Sensors"
-      sorting_weight: -43
+#    - id: group_utility_water_meter_sensors
+#      name: "Water - Sensors"
+#      sorting_weight: -43
 
 #########################################################################
