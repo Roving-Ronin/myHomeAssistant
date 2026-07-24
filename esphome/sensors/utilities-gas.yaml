@@ -41,23 +41,23 @@ web_server:
 
     - id: group_utility_gas_meter_sensors
       name: "Gas - Sensors"
-      sorting_weight: -44
+      sorting_weight: -44.1
 
     - id: group_consumption_gas_m3
       name: "Consumption - Gas (m³)"
-      sorting_weight: -41
+      sorting_weight: -41.1
 
     - id: group_consumption_gas_mj
       name: "Consumption - Gas (MJ)"
-      sorting_weight: -40
+      sorting_weight: -40.1
       
     - id: group_configuration_gas_tariffs
       name: "Configuration - Gas Tariffs"
-      sorting_weight: -37
+      sorting_weight: -37.1
 
     - id: group_configuration_gas_meter_calibration
       name: "Configuration - Gas Meter Calibration"
-      sorting_weight: -36
+      sorting_weight: -36.1
       
 #######################################################################################
 globals:
