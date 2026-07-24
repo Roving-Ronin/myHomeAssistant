@@ -151,7 +151,7 @@ sensor:
     filters:
       - delta : 0.001     # Only send the result if the difference with the last sent result is higher than this
     web_server:
-      sorting_group_id: group_tank_water_sensors
+      sorting_group_id: group_tank_water_meter_sensors
       sorting_weight: 3
 
 ################################################################################
@@ -173,7 +173,7 @@ sensor:
     filters:
       - delta : 0.1 #only send the result if the difference with the last sent result is higher than this
     web_server:
-      sorting_group_id: group_tank_water_sensors
+      sorting_group_id: group_tank_water_meter_sensors
       sorting_weight: 2
 
 ################################################################################
@@ -204,7 +204,7 @@ sensor:
     filters:
       - delta : 0.001 #only send the result if the difference with the last sent result is higher than this
     web_server:
-      sorting_group_id: group_tank_water_sensors
+      sorting_group_id: group_tank_water_meter_sensors
       sorting_weight: 1
 
 ## 655.4 m or 2150.3 feet Location :-34.72 , 149.72
