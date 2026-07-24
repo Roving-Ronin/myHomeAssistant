@@ -158,8 +158,8 @@ external_components:
 #  sorting_groups:
 
       # This sort group is used by both the Town and Tank Water Meter senors (flow rate / pulse counter), so must be in at this level.
-#    - id: group_utility_water_meter_sensors
-#      name: "Water - Sensors"
-#      sorting_weight: -43
+    - id: group_tank_water_meter_sensors
+      name: "Tank Water - Sensors"
+      sorting_weight: -42.1
 
 #########################################################################
