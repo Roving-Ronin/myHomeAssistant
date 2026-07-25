@@ -203,28 +203,61 @@ bool GasStatisticsMJ::is_quarter_start_month_(int month) {
   return (diff % 3) == 0;
 }
 
+namespace {
+// Converts a calendar date to a day-of-year (1-366), for backdating a
+// quarter start to a specific date picked via the "Quarter Start Date"
+// datetime entity, rather than always stamping "today".
+uint16_t day_of_year_from_ymd(uint16_t year, uint8_t month, uint8_t day) {
+  static const uint16_t cumulative_days[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
+  if (month < 1 || month > 12) {
+    month = 1;
+  }
+  bool leap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+  uint16_t doy = cumulative_days[month - 1] + day;
+  if (leap && month > 2) {
+    doy += 1;
+  }
+  return doy;
+}
+}  // namespace
+
 void GasStatisticsMJ::reset_quarter(float already_consumed) {
+  const auto t = this->time_->now();
+  if (t.is_valid()) {
+    this->set_quarter_baseline_(already_consumed, t.day_of_year, t.year);
+  } else {
+    // Time not synced yet - still move the usage baseline, but leave
+    // whatever quarter start date is already stored in place rather than
+    // writing a bogus one.
+    this->set_quarter_baseline_(already_consumed, 0, 0);
+  }
+}
+
+void GasStatisticsMJ::reset_quarter_from_date(float already_consumed, uint16_t year, uint8_t month, uint8_t day) {
+  this->set_quarter_baseline_(already_consumed, day_of_year_from_ymd(year, month, day), year);
+}
+
+void GasStatisticsMJ::set_quarter_baseline_(float already_consumed, uint16_t start_day_of_year, uint16_t start_year) {
   float current_total = this->total_->get_state();
   if (std::isnan(current_total)) {
-    ESP_LOGW(TAG, "Gas (MJ) reset_quarter called but total not yet available, ignoring");
+    ESP_LOGW(TAG, "Gas (MJ) quarter baseline set called but total not yet available, ignoring");
     return;
   }
   this->gas_.start_quarter = current_total - already_consumed;
-  // Record "today" as the quarter start date for days_into_quarter(), same
-  // as the automatic reset path in loop(). If time isn't synced yet, leave
-  // the previous date in place rather than writing a bogus one.
-  const auto t = this->time_->now();
-  if (t.is_valid()) {
-    this->gas_.quarter_start_day_of_year = t.day_of_year;
-    this->gas_.quarter_start_year = t.year;
+  if (start_day_of_year != 0 && start_year != 0) {
+    this->gas_.quarter_start_day_of_year = start_day_of_year;
+    this->gas_.quarter_start_year = start_year;
   }
   // Force process_() to republish even if the numeric value happens to match
   // what was last published (e.g. resetting to the same figure twice).
   this->last_quarter_ = NAN;
   this->pref_.save(&this->gas_);
   this->process_(current_total);
-  ESP_LOGI(TAG, "Gas (MJ) quarter manually (re)started: total=%f, already_consumed=%f, baseline=%f", current_total,
-           already_consumed, this->gas_.start_quarter);
+  ESP_LOGI(TAG,
+           "Gas (MJ) quarter (re)started: total=%f, already_consumed=%f, baseline=%f, start_day_of_year=%u, "
+           "start_year=%u",
+           current_total, already_consumed, this->gas_.start_quarter, (unsigned) this->gas_.quarter_start_day_of_year,
+           (unsigned) this->gas_.quarter_start_year);
 }
 
 int GasStatisticsMJ::days_into_quarter() {
@@ -318,17 +351,18 @@ void GasStatisticsMJ::loop() {
   if (is_first_run || t.day_of_year == 1) {
     this->gas_.start_year = total;
   }
-  // At the configured reset day, within a quarter-start month (derived
-  // from the configurable start-month anchor), start a new quarter
-  // calculation
-  if (is_first_run ||
-      (this->is_quarter_start_month_(t.month) && t.day_of_month == this->get_quarter_reset_day_(t.year, t.month))) {
+  // Quarter start is now driven entirely manually - either via the "Gas -
+  // Quarter Start Date" datetime entity's on_value handler (which calls
+  // reset_quarter_from_date()), or the max-quarter-length fallback in
+  // gas.yaml (which calls the plain reset_quarter()). There's no more
+  // automatic calendar day/month matching here - only the very first run
+  // after a fresh/reset baseline forces start_quarter to snap to the
+  // current total, so Quarter doesn't read the full lifetime total while
+  // waiting for the user to set the real start date.
+  if (is_first_run) {
     this->gas_.start_quarter = total;
     this->gas_.quarter_start_day_of_year = t.day_of_year;
     this->gas_.quarter_start_year = t.year;
-    if (!is_first_run) {
-      ESP_LOGI(TAG, "Gas (MJ) quarter reset triggered: month=%d, day=%d, baseline=%f", t.month, t.day_of_month, total);
-    }
   }
 
   // Defensive backfill: if any baseline is still NaN for some other reason
