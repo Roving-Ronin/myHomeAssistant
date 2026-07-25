@@ -234,7 +234,7 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 1
+      sorting_weight: 3
 
   - platform: template
     name: "Town Water - Tariff 2 Rate"
@@ -253,7 +253,7 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 2
+      sorting_weight: 5
 
   - platform: template
     name: "Town Water - Tariff 1 Daily Limit"
@@ -272,7 +272,7 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 3
+      sorting_weight: 4
 
   - platform: template
     name: "Town Water - Annual Fee"
@@ -291,10 +291,10 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 4
+      sorting_weight: 2
 
   - platform: template
-    name: "Town Water - Meter Reading (Last Bill)"
+    name: "Town Water - Meter (Last Bill)"
     id: input_town_water_last_bill_reading
     min_value: 0
     max_value: 99999
@@ -313,7 +313,7 @@ number:
       sorting_weight: 1
 
   - platform: template
-    name: "Town Water - Meter Reading (Current)"
+    name: "Town Water - Meter (Current)"
     id: input_town_water_current_meter_reading
     min_value: 0
     max_value: 9999999
@@ -332,10 +332,10 @@ number:
       sorting_weight: 2
 
   - platform: template
-    name: "Town Water - Quarter Max Length (days)"
+    name: "Town Water - Quarter Length (days)"
     id: input_town_water_quarter_max_days
-    min_value: 30
-    max_value: 120
+    min_value: 85
+    max_value: 100
     step: 1
     unit_of_measurement: "days"
     optimistic: true
@@ -353,7 +353,7 @@ number:
 # started (once you know it from the real bill/meter read - often only
 # known a week or two after the fact, since periods land on irregular
 # dates). Setting this date runs the full calibration in one step: it reads
-# "Town Water - Meter Reading (Last Bill)" / "Town Water - Meter Reading
+# "Town Water - Meter (Last Bill)" / "Town Water - Meter
 # (Current)", calibrates the lifetime L total to the physical reading, and
 # backdates the quarter usage + day-count baseline to this date instead of
 # "today" - so day-scaled pricing (and Sewerage's shared quarter, which
@@ -413,7 +413,7 @@ datetime:
 #######################################################################################
 #
 # Interval - Max-quarter-length fallback. Checked hourly; if the quarter has
-# run longer than "Town Water - Quarter Max Length (days)" without a real
+# run longer than "Town Water - Quarter Length (days)" without a real
 # calibration, auto-resets the baseline to today so pricing thresholds (and
 # Sewerage's shared quarter fee) don't scale up indefinitely. This does NOT
 # touch "Town Water - Quarter Start Date" itself (it stays showing whatever
