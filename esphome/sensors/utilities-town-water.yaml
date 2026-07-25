@@ -576,9 +576,11 @@ sensor:
     update_interval: ${water_sensor_update_interval}  # Set interval that updates are sent to HA instance
     lambda: |-
           return id(global_town_water_total);
-    web_server:
-      sorting_group_id: group_consumption_town_water
-      sorting_weight: 6
+    internal: true
+#    web_server:
+#      sorting_group_id: group_consumption_town_water
+#      sorting_weight: 6
+
 
   - platform: template
     name: "Town Water - Quarter Days Elapsed"
