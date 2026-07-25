@@ -10,8 +10,8 @@
 # town_water_statistics_component's days_into_quarter().
 #
 # Requires utilities-town-water.yaml to be loaded (for
-# town_water_statistics_component and group_configuration_town_water_tariffs
-# / group_utility_cost_sensors).
+# town_water_statistics_component, town_water_quarter_cost, and
+# group_configuration_town_water_tariffs / group_utility_cost_sensors).
 #
 
 ########################## Restore input values from globals ###########
@@ -57,7 +57,9 @@ number:
 
 #######################################################################################
 #
-# Sensors - Daily and quarter-to-date pro-rated fee. No usage charges at all.
+# Sensors - Daily and quarter-to-date pro-rated fee (no usage charges at
+# all - see "Sewerage & Water - Bill" below for the combined total with
+# Town Water).
 #
 sensor:
   - platform: template
@@ -90,7 +92,25 @@ sensor:
       if (days_elapsed < 1) days_elapsed = 1;
       return (id(sewerage_annual_fee) / 365.0f) * days_elapsed;
     web_server:
+      sorting_group_id: group_configuration_town_water_tariffs
+      sorting_weight: 3
+
+  - platform: template
+    name: "Sewerage & Water - Bill"
+    id: sewerage_water_bill
+    unit_of_measurement: "$"
+    device_class: monetary
+    accuracy_decimals: 2
+    icon: "mdi:cash-multiple"
+    update_interval: ${water_sensor_update_interval}
+    lambda: |-
+      // Combined running estimate of the Town Water + Sewerage bill:
+      // Town Water's usage cost (already includes its own accrued
+      // Quarter Service Fee - see "Town Water - Quarter Cost" in
+      // utilities-town-water.yaml) plus Sewerage's own accrued quarter fee.
+      return id(town_water_quarter_cost).state + id(sewerage_quarter_fee).state;
+    web_server:
       sorting_group_id: group_utility_cost_sensors
-      sorting_weight: 8
+      sorting_weight: 5
 
 ################################################################################
