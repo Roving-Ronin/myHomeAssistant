@@ -31,6 +31,13 @@ esphome:
           id(input_gas_step5_rate).publish_state(id(gas_step5_rate_mj) * 100.0f);
           id(input_gas_last_bill_reading).publish_state(id(gas_last_bill_reading_m3));
           id(input_gas_current_meter_reading).publish_state(id(gas_current_meter_reading_m3));
+          // Flips true only after every component's setup() (and therefore
+          // every restore_value-triggered publish/on_value) has already run -
+          // on_boot triggers always fire after that point regardless of this
+          // trigger's own priority value. Used by "Gas - Quarter Start
+          // Date"'s on_value guard below to tell a genuine user-initiated
+          // change apart from the boot-time restore republish.
+          id(gas_quarter_date_boot_restored) = true;
 #########################################################################
 #
 # Web_server v3 Sort Groups - These substitutes are applied to overwrite the default ones supplied by the
@@ -61,6 +68,15 @@ web_server:
 
 #######################################################################################
 globals:
+  # Boot guard for "Gas - Quarter Start Date"'s on_value handler - starts
+  # false on every boot (never restored), flips true once on_boot has run
+  # (i.e. once every entity's own restore_value republish has already
+  # happened), so the handler can tell a real user-initiated date change
+  # apart from the boot-time restore firing on_value on its own.
+  - id: gas_quarter_date_boot_restored
+    type: bool
+    restore_value: false
+    initial_value: "false"
   - id: gas_pressure_factor
     type: float
     restore_value: true
@@ -478,7 +494,7 @@ datetime:
             // Without this guard, every reboot would silently re-run the
             // whole calibration using whatever the meter-reading inputs
             // happen to hold at the time.
-            if (!App.is_fully_setup()) {
+            if (!id(gas_quarter_date_boot_restored)) {
               return;
             }
 
