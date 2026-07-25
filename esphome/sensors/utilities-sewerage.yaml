@@ -53,7 +53,7 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 5
+      sorting_weight: 1
 
 #######################################################################################
 #
