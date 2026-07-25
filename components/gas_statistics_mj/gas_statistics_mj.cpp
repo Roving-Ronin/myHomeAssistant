@@ -17,7 +17,11 @@ static const char *const TAG = "gas_statistics_mj";
 // meantime. v4 fixes that (see setup()/loop() below) and forces one more
 // clean re-initialization so any device already stuck in the v3 state
 // self-heals on next boot instead of waiting out the bug.
-static const char *const PREF_V4 = "gas_statistics_mj_v4";
+//
+// Bumped to v5: struct grew quarter_start_day_of_year/quarter_start_year,
+// used by days_into_quarter() to scale per-day MJ pricing thresholds by the
+// actual number of days elapsed in the current quarter.
+static const char *const PREF_V5 = "gas_statistics_mj_v5";
 
 void GasStatisticsMJ::dump_config() {
   ESP_LOGCONFIG(TAG, "Gas Statistics (MJ) - Sensors");
@@ -54,7 +58,7 @@ void GasStatisticsMJ::dump_config() {
 void GasStatisticsMJ::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
 
-  this->pref_ = global_preferences->make_preference<gas_mj_data_t>(fnv1_hash(PREF_V4));
+  this->pref_ = global_preferences->make_preference<gas_mj_data_t>(fnv1_hash(PREF_V5));
   bool loaded = this->pref_.load(&this->gas_);
   if (loaded) {
     ESP_LOGI(TAG, "Loaded Gas (MJ) NVS: today=%f, yesterday=%f, week=%f, month=%f, year=%f, quarter=%f",
@@ -80,6 +84,8 @@ void GasStatisticsMJ::setup() {
     this->gas_.start_month = NAN;
     this->gas_.start_year = NAN;
     this->gas_.start_quarter = NAN;
+    this->gas_.quarter_start_day_of_year = 0;
+    this->gas_.quarter_start_year = 0;
     this->pref_.save(&this->gas_);
     ESP_LOGD(TAG, "Saved initial Gas (MJ) NVS: today=%f, yesterday=%f, week=%f, month=%f, year=%f, quarter=%f",
              this->gas_.start_today, this->gas_.start_yesterday, this->gas_.start_week,
@@ -204,6 +210,14 @@ void GasStatisticsMJ::reset_quarter(float already_consumed) {
     return;
   }
   this->gas_.start_quarter = current_total - already_consumed;
+  // Record "today" as the quarter start date for days_into_quarter(), same
+  // as the automatic reset path in loop(). If time isn't synced yet, leave
+  // the previous date in place rather than writing a bogus one.
+  const auto t = this->time_->now();
+  if (t.is_valid()) {
+    this->gas_.quarter_start_day_of_year = t.day_of_year;
+    this->gas_.quarter_start_year = t.year;
+  }
   // Force process_() to republish even if the numeric value happens to match
   // what was last published (e.g. resetting to the same figure twice).
   this->last_quarter_ = NAN;
@@ -211,6 +225,30 @@ void GasStatisticsMJ::reset_quarter(float already_consumed) {
   this->process_(current_total);
   ESP_LOGI(TAG, "Gas (MJ) quarter manually (re)started: total=%f, already_consumed=%f, baseline=%f", current_total,
            already_consumed, this->gas_.start_quarter);
+}
+
+int GasStatisticsMJ::days_into_quarter() {
+  if (this->gas_.quarter_start_day_of_year == 0) {
+    return 0;  // Quarter start date not yet established
+  }
+  const auto t = this->time_->now();
+  if (!t.is_valid()) {
+    return 0;
+  }
+  int days;
+  if (t.year == this->gas_.quarter_start_year) {
+    days = (int) t.day_of_year - (int) this->gas_.quarter_start_day_of_year + 1;
+  } else {
+    // Quarter start was in a previous calendar year (e.g. a Nov-anchored
+    // quarter still running in January). Approximate the year length using
+    // the quarter-start year's leap status - good enough for a quarter that
+    // spans at most one New Year boundary.
+    bool leap = (this->gas_.quarter_start_year % 4 == 0 &&
+                 (this->gas_.quarter_start_year % 100 != 0 || this->gas_.quarter_start_year % 400 == 0));
+    int days_in_start_year = leap ? 366 : 365;
+    days = (days_in_start_year - (int) this->gas_.quarter_start_day_of_year + 1) + (int) t.day_of_year;
+  }
+  return days < 1 ? 1 : days;
 }
 
 void GasStatisticsMJ::loop() {
@@ -286,6 +324,8 @@ void GasStatisticsMJ::loop() {
   if (is_first_run ||
       (this->is_quarter_start_month_(t.month) && t.day_of_month == this->get_quarter_reset_day_(t.year, t.month))) {
     this->gas_.start_quarter = total;
+    this->gas_.quarter_start_day_of_year = t.day_of_year;
+    this->gas_.quarter_start_year = t.year;
     if (!is_first_run) {
       ESP_LOGI(TAG, "Gas (MJ) quarter reset triggered: month=%d, day=%d, baseline=%f", t.month, t.day_of_month, total);
     }
