@@ -62,6 +62,16 @@ class GasStatisticsMJ : public Component {
    */
   void reset_quarter(float already_consumed = 0.0f);
 
+  /** Number of days elapsed since the current quarter started (the day the
+   * quarter started counts as day 1). Used by pricing lambdas to scale a
+   * per-day MJ threshold (e.g. "20.71 MJ/day") into a cumulative MJ figure
+   * for the quarter so far, since the gas retailer's tiers are themselves
+   * per-day rates multiplied out by the exact number of days in each bill.
+   * Returns 0 if the quarter start date hasn't been established yet (e.g.
+   * before the first quarter boundary/reset_quarter() call after flashing).
+   */
+  int days_into_quarter();
+
  protected:
   ESPPreferenceObject pref_;
   time::RealTimeClock *time_;
@@ -111,6 +121,10 @@ class GasStatisticsMJ : public Component {
     float start_month{NAN};
     float start_year{NAN};
     float start_quarter{NAN};
+    // Calendar date the current quarter baseline was established, used by
+    // days_into_quarter(). 0 means "not yet established".
+    uint16_t quarter_start_day_of_year{0};
+    uint16_t quarter_start_year{0};
   } gas_;
 
   // Store last published values for change detection
