@@ -2,16 +2,13 @@
 
 #include "esphome/core/component.h"
 #include "esphome/core/preferences.h"
-#include "esphome/core/string_ref.h"
 #include "esphome/components/sensor/sensor.h"
-#include "esphome/components/select/select.h"
 #include "esphome/components/time/real_time_clock.h"
 
 namespace esphome {
 namespace gas_statistics_mj {
 
 using sensor::Sensor;
-using select::Select;
 
 class GasStatisticsMJ : public Component {
  public:
@@ -24,19 +21,6 @@ class GasStatisticsMJ : public Component {
   void set_time(time::RealTimeClock *time) { this->time_ = time; }
   void set_total(Sensor *sensor) { this->total_ = sensor; }
 
-  // Optional select entity (e.g. a template select rendered as a dropdown
-  // on the web_server GUI) holding the day-of-month (options "1".."31") on
-  // which the quarter accumulator resets. Automatically clamped to the real
-  // length of the reset month (e.g. 31 falls back to the 28th/29th in
-  // February). Defaults to day 1 if unset or unparsable.
-  void set_quarter_reset_day(Select *select) { this->quarter_reset_day_ = select; }
-
-  // Optional select entity holding the "anchor" month (options "January"..
-  // "December") for the first quarter. The other three quarter-start months
-  // are anchor+3, anchor+6, anchor+9 (e.g. anchor=February => Feb/May/Aug/
-  // Nov). Defaults to January if unset or unparsable.
-  void set_quarter_start_month(Select *select) { this->quarter_start_month_ = select; }
-
   void set_gas_today(Sensor *sensor) { this->gas_today_ = sensor; }
   void set_gas_yesterday(Sensor *sensor) { this->gas_yesterday_ = sensor; }
   void set_gas_week(Sensor *sensor) { this->gas_week_ = sensor; }
@@ -44,14 +28,15 @@ class GasStatisticsMJ : public Component {
   void set_gas_year(Sensor *sensor) { this->gas_year_ = sensor; }
   void set_gas_quarter(Sensor *sensor) { this->gas_quarter_ = sensor; }
 
-  /** Manually (re)start the quarter accumulator, e.g. from a "Reset Quarter"
-   * button or a one-off setup action. If already_consumed is 0 (the
-   * default), this behaves like the automatic reset: the quarter baseline
-   * snaps to the current total, so Gas - Quarter (MJ) reads 0 going forward.
-   * If already_consumed is non-zero (e.g. computed from a last-bill-reading
-   * / current-meter-reading pair converted to MJ), the baseline is backdated
-   * so Gas - Quarter (MJ) immediately reflects that real consumption-so-far
-   * figure instead. Callable directly from a YAML lambda via
+  /** Manually (re)start the quarter accumulator - e.g. from the max-quarter-
+   * length fallback in gas.yaml. If already_consumed is 0 (the default), the
+   * quarter baseline snaps to the current total, so Gas - Quarter (MJ) reads
+   * 0 going forward. If already_consumed is non-zero (e.g. computed from a
+   * last-bill-reading / current-meter-reading pair converted to MJ), the
+   * baseline is backdated so Gas - Quarter (MJ) immediately reflects that
+   * real consumption-so-far figure instead. Also stamps "today" as the
+   * quarter start date (see reset_quarter_from_date() for backdating to a
+   * specific date instead). Callable directly from a YAML lambda via
    * id(component).reset_quarter(...).
    *
    * Note: unlike the m3 component, there is no calibrate_total() here - the
@@ -79,7 +64,7 @@ class GasStatisticsMJ : public Component {
    * for the quarter so far, since the gas retailer's tiers are themselves
    * per-day rates multiplied out by the exact number of days in each bill.
    * Returns 0 if the quarter start date hasn't been established yet (e.g.
-   * before the first quarter boundary/reset_quarter() call after flashing).
+   * before "Gas - Quarter Start Date" has ever been set after flashing).
    */
   int days_into_quarter();
 
@@ -96,8 +81,6 @@ class GasStatisticsMJ : public Component {
 
   // Input sensors
   Sensor *total_{nullptr};
-  Select *quarter_reset_day_{nullptr};
-  Select *quarter_start_month_{nullptr};
 
   // Exposed sensors
   Sensor *gas_today_{nullptr};
@@ -113,15 +96,6 @@ class GasStatisticsMJ : public Component {
   int gas_month_start_day_{1};
   // Start day of year configuration
   int gas_year_start_day_{1};
-  // Fallback reset day-of-month used when quarter_reset_day_ is not set
-  // or has not yet published a valid state. Range 1-31; automatically
-  // clamped to the number of days in the current reset month.
-  int gas_quarter_reset_day_default_{1};
-  // Fallback "anchor" month (1-12) for the first quarter-start month, used
-  // when quarter_start_month_ is not set or has not yet published a valid
-  // state. The other three quarter-start months are anchor+3, anchor+6,
-  // anchor+9.
-  int gas_quarter_start_month_default_{1};
 
   // Structure for storing gas statistics in megajoules
   struct gas_mj_data_t {
@@ -146,11 +120,6 @@ class GasStatisticsMJ : public Component {
   float last_year_{NAN};
   float last_quarter_{NAN};
 
-  int get_quarter_start_month_();
-  int get_quarter_reset_day_(int year, int month);
-  bool is_quarter_start_month_(int month);
-  static int days_in_month_(int year, int month);
-  static int month_name_to_number_(const StringRef &name);
   // Shared by reset_quarter() and reset_quarter_from_date(). start_day_of_year
   // / start_year of 0/0 means "use the RTC's current date" (the plain
   // reset_quarter() case); any other value backdates the quarter start to
