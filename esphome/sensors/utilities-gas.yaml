@@ -99,7 +99,7 @@ globals:
   - id: gas_daily_service_charge
     type: float
     restore_value: true
-    initial_value: "0.825"
+    initial_value: "0.891"
   - id: gas_step1_threshold_mj
     type: float
     restore_value: true
@@ -735,7 +735,7 @@ sensor:
       id: gas_m3_today
       web_server:
         sorting_group_id: group_consumption_gas_m3
-        sorting_weight: 1
+        sorting_weight: 2
 
 #    gas_yesterday:
 #      name: "Gas - Yesterday"
@@ -801,7 +801,7 @@ sensor:
       id: gas_used_today_mj
       web_server:
         sorting_group_id: group_consumption_gas_mj
-        sorting_weight: 1
+        sorting_weight: 2
 
 #    gas_yesterday:
 #      name: "Gas - Yesterday (MJ)"
@@ -905,7 +905,7 @@ sensor:
       return rates[selected_step];
     web_server:
       sorting_group_id: group_consumption_gas_mj
-      sorting_weight: 9
+      sorting_weight: 1
 
   - platform: template
     name: "Gas - Price (m³)"
@@ -925,7 +925,7 @@ sensor:
       return price_mj * pressure_factor * heating_value;
     web_server:
       sorting_group_id: group_consumption_gas_m3
-      sorting_weight: 9
+      sorting_weight: 1
 
   - platform: template
     name: "Gas - Quarter Cost"
