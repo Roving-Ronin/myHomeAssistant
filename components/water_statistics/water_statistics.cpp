@@ -136,25 +136,61 @@ void WaterStatistics::on_shutdown() {
            this->water_.start_month, this->water_.start_year, this->water_.start_quarter);
 }
 
+namespace {
+// Converts a calendar date to a day-of-year (1-366), for backdating a
+// quarter start to a specific date picked via a "Quarter Start Date"
+// datetime entity, rather than always stamping "now".
+uint16_t day_of_year_from_ymd(uint16_t year, uint8_t month, uint8_t day) {
+  static const uint16_t cumulative_days[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
+  if (month < 1 || month > 12) {
+    month = 1;
+  }
+  bool leap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+  uint16_t doy = cumulative_days[month - 1] + day;
+  if (leap && month > 2) {
+    doy += 1;
+  }
+  return doy;
+}
+}  // namespace
+
 void WaterStatistics::reset_quarter(float already_consumed) {
+  const auto t = this->time_->now();
+  if (t.is_valid()) {
+    this->set_quarter_baseline_(already_consumed, t.day_of_year, t.year);
+  } else {
+    // Time not synced yet - still move the usage baseline, but leave
+    // whatever quarter start date is already stored in place rather than
+    // writing a bogus one.
+    this->set_quarter_baseline_(already_consumed, 0, 0);
+  }
+}
+
+void WaterStatistics::reset_quarter_from_date(float already_consumed, uint16_t year, uint8_t month, uint8_t day) {
+  this->set_quarter_baseline_(already_consumed, day_of_year_from_ymd(year, month, day), year);
+}
+
+void WaterStatistics::set_quarter_baseline_(float already_consumed, uint16_t start_day_of_year, uint16_t start_year) {
   float current_total = this->total_->get_state();
   if (std::isnan(current_total)) {
-    ESP_LOGW(TAG, "Water reset_quarter called but total not yet available, ignoring");
+    ESP_LOGW(TAG, "Water quarter baseline set called but total not yet available, ignoring");
     return;
   }
   this->water_.start_quarter = current_total - already_consumed;
-  const auto t = this->time_->now();
-  if (t.is_valid()) {
-    this->water_.quarter_start_day_of_year = t.day_of_year;
-    this->water_.quarter_start_year = t.year;
+  if (start_day_of_year != 0 && start_year != 0) {
+    this->water_.quarter_start_day_of_year = start_day_of_year;
+    this->water_.quarter_start_year = start_year;
   }
   // Force process_() to republish even if the numeric value happens to
   // match what was last published (e.g. resetting to the same figure twice).
   this->last_quarter_ = NAN;
   this->pref_.save(&this->water_);
   this->process_(current_total);
-  ESP_LOGI(TAG, "Water quarter manually (re)started: total=%f, already_consumed=%f, baseline=%f", current_total,
-           already_consumed, this->water_.start_quarter);
+  ESP_LOGI(TAG,
+           "Water quarter (re)started: total=%f, already_consumed=%f, baseline=%f, start_day_of_year=%u, "
+           "start_year=%u",
+           current_total, already_consumed, this->water_.start_quarter,
+           (unsigned) this->water_.quarter_start_day_of_year, (unsigned) this->water_.quarter_start_year);
 }
 
 void WaterStatistics::calibrate_total(float new_total) {
