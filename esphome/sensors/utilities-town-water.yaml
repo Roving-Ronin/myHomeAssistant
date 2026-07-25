@@ -1,7 +1,7 @@
- #########################################################################
+#########################################################################
 #
 # Utility - Town Water Sensors
-# 
+#
 # Used to monitor town water supply, with a reed sensor connected to the
 # meter, that has a rotating dial with a magnet inside that can be monitored.
 #
@@ -12,10 +12,26 @@ substitutions:
   # Multiplier used in the flow rate calculation. Set to the number of litres 1 rotation of the meter equals.
   town_water_litres_per_pulse: "5.0"
 
-  
+
 ########################## End of Substitutions #########################
 #
-# Web_server v3 Sort Groups - These substitutes are applied to overwrite the default ones supplied by the 
+# Restore input values from the values stored by their respective globals
+#
+esphome:
+  on_boot:
+    priority: -10
+    then:
+      - lambda: |-
+          id(input_town_water_tariff1_rate).publish_state(id(town_water_tariff1_rate) * 100.0f);
+          id(input_town_water_tariff2_rate).publish_state(id(town_water_tariff2_rate) * 100.0f);
+          id(input_town_water_tariff1_daily_limit).publish_state(id(town_water_tariff1_daily_limit));
+          id(input_town_water_annual_fee).publish_state(id(town_water_annual_fee));
+          id(input_town_water_last_bill_reading).publish_state(id(town_water_last_bill_reading_kl));
+          id(input_town_water_current_meter_reading).publish_state(id(town_water_current_meter_reading_l));
+
+#########################################################################
+#
+# Web_server v3 Sort Groups - These substitutes are applied to overwrite the default ones supplied by the
 # sensor specific template file, in this case the /sensors/hc-sr04-ultrasonic.yaml file.
 #
 
@@ -25,7 +41,7 @@ web_server:
     - id: group_utility_water_meter_sensors
       name: "Town Water - Sensors"
       sorting_weight: -43.1
-      
+
     - id: group_consumption_town_water
       name: "Consumption - Town Water"
       sorting_weight: -39.1
@@ -55,11 +71,41 @@ globals:
     restore_value: no
     initial_value: '""'
 
-################################################################################
-#
-#  Sensors
-#
-
+  #
+  # Town Water pricing / cost tracking. Tariff 1 applies up to the daily
+  # limit (averaged over the whole billing period, since the meter is only
+  # read once a quarter); everything above that limit is Tariff 2. Rates are
+  # stored here in $/kL, but entered on the ¢/kL number inputs below
+  # (converted in each input's set_action). Update these each quarter/bill.
+  #
+  - id: town_water_tariff1_rate
+    type: float
+    restore_value: true
+    initial_value: "3.44"     # $/kL (344 ¢/kL)
+  - id: town_water_tariff2_rate
+    type: float
+    restore_value: true
+    initial_value: "4.66"     # $/kL (466 ¢/kL)
+  - id: town_water_tariff1_daily_limit
+    type: float
+    restore_value: true
+    initial_value: "0.80"     # kL/day
+  # Annual connection/service fee, converted to a daily rate (÷365) for the
+  # Daily/Quarter Connection Fee sensors below.
+  - id: town_water_annual_fee
+    type: float
+    restore_value: true
+    initial_value: "210.00"
+  # One-off setup values - used by the "Town Water - Apply Meter Readings"
+  # button to seed the quarter baseline and calibrate the lifetime L total.
+  - id: town_water_last_bill_reading_kl
+    type: float
+    restore_value: true
+    initial_value: "0"
+  - id: town_water_current_meter_reading_l
+    type: float
+    restore_value: true
+    initial_value: "0"
 
 ################################################################################
 #
@@ -147,6 +193,175 @@ text_sensor:
       sorting_group_id: group_utility_water_meter_sensors
       sorting_weight: 4
 
+#######################################################################################
+#
+# Number Inputs - Town Water tariffs, connection fee, and meter calibration.
+#
+number:
+  - platform: template
+    name: "Town Water - Tariff 1 Rate"
+    id: input_town_water_tariff1_rate
+    min_value: 100
+    max_value: 1000
+    step: 0.01
+    unit_of_measurement: "¢/kL"
+    optimistic: true
+    mode: box
+    icon: "mdi:currency-usd"
+    set_action:
+      then:
+        - globals.set:
+            id: town_water_tariff1_rate
+            value: !lambda "return x / 100.0f;"
+    web_server:
+      sorting_group_id: group_configuration_town_water_tariffs
+      sorting_weight: 1
+
+  - platform: template
+    name: "Town Water - Tariff 2 Rate"
+    id: input_town_water_tariff2_rate
+    min_value: 100
+    max_value: 1000
+    step: 0.01
+    unit_of_measurement: "¢/kL"
+    optimistic: true
+    mode: box
+    icon: "mdi:currency-usd"
+    set_action:
+      then:
+        - globals.set:
+            id: town_water_tariff2_rate
+            value: !lambda "return x / 100.0f;"
+    web_server:
+      sorting_group_id: group_configuration_town_water_tariffs
+      sorting_weight: 2
+
+  - platform: template
+    name: "Town Water - Tariff 1 Daily Limit"
+    id: input_town_water_tariff1_daily_limit
+    min_value: 0
+    max_value: 10
+    step: 0.01
+    unit_of_measurement: "kL/day"
+    optimistic: true
+    mode: box
+    icon: "mdi:stairs-up"
+    set_action:
+      then:
+        - globals.set:
+            id: town_water_tariff1_daily_limit
+            value: !lambda "return x;"
+    web_server:
+      sorting_group_id: group_configuration_town_water_tariffs
+      sorting_weight: 3
+
+  - platform: template
+    name: "Town Water - Annual Connection Fee"
+    id: input_town_water_annual_fee
+    min_value: 0
+    max_value: 2000
+    step: 0.01
+    unit_of_measurement: "$"
+    optimistic: true
+    mode: box
+    icon: "mdi:cash-minus"
+    set_action:
+      then:
+        - globals.set:
+            id: town_water_annual_fee
+            value: !lambda "return x;"
+    web_server:
+      sorting_group_id: group_configuration_town_water_tariffs
+      sorting_weight: 4
+
+  - platform: template
+    name: "Town Water - Meter Reading (Last Bill)"
+    id: input_town_water_last_bill_reading
+    min_value: 0
+    max_value: 99999
+    step: 1
+    unit_of_measurement: "kL"
+    optimistic: true
+    mode: box
+    icon: "mdi:counter"
+    set_action:
+      then:
+        - globals.set:
+            id: town_water_last_bill_reading_kl
+            value: !lambda "return x;"
+    web_server:
+      sorting_group_id: group_configuration_town_water_meter_calibration
+      sorting_weight: 1
+
+  - platform: template
+    name: "Town Water - Meter Reading (Current)"
+    id: input_town_water_current_meter_reading
+    min_value: 0
+    max_value: 99999999
+    step: 1
+    unit_of_measurement: "L"
+    optimistic: true
+    mode: box
+    icon: "mdi:counter"
+    set_action:
+      then:
+        - globals.set:
+            id: town_water_current_meter_reading_l
+            value: !lambda "return x;"
+    web_server:
+      sorting_group_id: group_configuration_town_water_meter_calibration
+      sorting_weight: 2
+
+#######################################################################################
+#
+# Buttons - Manual quarter reset (real bill/meter-read periods land on
+# irregular dates, so unlike gas there's no automatic day/month pattern to
+# reset from), and a one-off setup action for starting mid-quarter.
+#
+button:
+  - platform: template
+    name: "Town Water - Quarter Apply"
+    icon: "mdi:restart"
+    on_press:
+      then:
+        - lambda: |-
+            id(town_water_statistics_component).reset_quarter();
+    web_server:
+      sorting_group_id: group_configuration_town_water_meter_calibration
+      sorting_weight: 3
+
+  - platform: template
+    name: "Town Water - Meter Readings (Apply)"
+    icon: "mdi:calendar-refresh"
+    on_press:
+      then:
+        - lambda: |-
+            float current_reading_l = id(input_town_water_current_meter_reading).state;
+            float last_bill_kl = id(input_town_water_last_bill_reading).state;
+            float already_consumed_l = current_reading_l - (last_bill_kl * 1000.0f);
+            if (already_consumed_l < 0) {
+              already_consumed_l = 0;
+            }
+
+            // 1) Calibrate the lifetime L total to the physical reading.
+            //    Must run BEFORE the global is updated below, since it
+            //    reads the *old* total internally to work out how far
+            //    today/week/month/year need to shift to stay unaffected by
+            //    the jump.
+            id(town_water_statistics_component).calibrate_total(current_reading_l);
+
+            // 2) Actually move the lifetime total, and force "Town Water -
+            //    Total" to publish it immediately.
+            id(global_town_water_total) = current_reading_l;
+            id(town_water_total).update();
+
+            // 3) Seed the quarter baseline from the real consumption since
+            //    the last bill. Runs *after* step 2 so it reads the newly
+            //    calibrated total.
+            id(town_water_statistics_component).reset_quarter(already_consumed_l);
+    web_server:
+      sorting_group_id: group_configuration_town_water_meter_calibration
+      sorting_weight: 4
 
 sensor:
   ################################################################################
@@ -209,8 +424,8 @@ sensor:
       accuracy_decimals: 2
       filters:
         - multiply: ${town_water_litres_per_pulse}  # Each pulse equals 5 liters
-    #  Adds the calculation for 'Reading Total' 
-      on_value: 
+    #  Adds the calculation for 'Reading Total'
+      on_value:
         then:
           - lambda: |-
               static float previous_town_water_used_litres_value = 0.0;
@@ -237,7 +452,7 @@ sensor:
       web_server:
         sorting_group_id: group_consumption_town_water
         sorting_weight: 1
-    
+
 #    water_yesterday:
 #      name: "Town Water - Yesterday"
 #      id: town_water_yesterday
@@ -251,7 +466,7 @@ sensor:
       web_server:
         sorting_group_id: group_consumption_town_water
         sorting_weight: 3
-    
+
     water_month:
       name: "Town Water - Month"
       id: town_water_month
@@ -265,6 +480,13 @@ sensor:
       web_server:
         sorting_group_id: group_consumption_town_water
         sorting_weight: 5
+
+    water_quarter:
+      name: "Town Water - Quarter"
+      id: town_water_quarter
+      web_server:
+        sorting_group_id: group_consumption_town_water
+        sorting_weight: 5.5
 
 
   ################################################################################
@@ -286,6 +508,123 @@ sensor:
       sorting_group_id: group_consumption_town_water
       sorting_weight: 6
 
+  ################################################################################
+  #
+  #  Town Water pricing - bracketed 2-tier cost (Tariff 1 up to the daily
+  #  limit averaged over the quarter-to-date, Tariff 2 above it), plus the
+  #  separately-tracked annual connection fee pro-rated to a daily/quarter
+  #  figure. Usage cost and connection fee are kept as separate sensors,
+  #  matching how the two line items appear separately on the actual bill.
+  #
+  - platform: template
+    name: "Town Water - Quarter Cost"
+    id: town_water_quarter_cost
+    unit_of_measurement: "$"
+    device_class: monetary
+    accuracy_decimals: 2
+    icon: "mdi:cash-multiple"
+    update_interval: ${water_sensor_update_interval}
+    lambda: |-
+      // True bracketed total for quarter-to-date usage (Litres from
+      // Town Water - Quarter, converted to kL). Usage-only - excludes the
+      // annual connection fee, which is tracked separately below.
+      float quarter_kl = id(town_water_quarter).state / 1000.0f;
+      int days_elapsed = id(town_water_statistics_component).days_into_quarter();
+      if (days_elapsed < 1) days_elapsed = 1;
+
+      float tariff1_rate = id(town_water_tariff1_rate);
+      float tariff2_rate = id(town_water_tariff2_rate);
+      float daily_limit = id(town_water_tariff1_daily_limit);
+      float threshold_kl = daily_limit * days_elapsed;
+
+      float tariff1_kl = quarter_kl;
+      if (tariff1_kl > threshold_kl) tariff1_kl = threshold_kl;
+      if (tariff1_kl < 0) tariff1_kl = 0;
+      float tariff2_kl = quarter_kl - threshold_kl;
+      if (tariff2_kl < 0) tariff2_kl = 0;
+
+      return (tariff1_kl * tariff1_rate) + (tariff2_kl * tariff2_rate);
+    web_server:
+      sorting_group_id: group_utility_cost_sensors
+      sorting_weight: 3
+
+  - platform: template
+    name: "Town Water - Daily Cost"
+    id: town_water_daily_cost
+    unit_of_measurement: "$"
+    device_class: monetary
+    accuracy_decimals: 2
+    icon: "mdi:cash"
+    update_interval: ${water_sensor_update_interval}
+    lambda: |-
+      // Bracketed cost of just today's incremental usage - worked out as
+      // (bracketed cost of quarter-to-date usage including today) minus
+      // (bracketed cost of quarter-to-date usage as it stood at the start
+      // of today), so a tariff boundary crossed partway through today is
+      // still priced correctly on each side of the split. Usage-only -
+      // excludes the connection fee, tracked separately below.
+      float quarter_l_now = id(town_water_quarter).state;
+      float today_l = id(town_water_today).state;
+      float quarter_l_before_today = quarter_l_now - today_l;
+      if (quarter_l_before_today < 0) quarter_l_before_today = 0;
+
+      int days_now = id(town_water_statistics_component).days_into_quarter();
+      if (days_now < 1) days_now = 1;
+      int days_before_today = days_now - 1;
+
+      float tariff1_rate = id(town_water_tariff1_rate);
+      float tariff2_rate = id(town_water_tariff2_rate);
+      float daily_limit = id(town_water_tariff1_daily_limit);
+
+      auto bracket_cost = [&](float litres, int days) -> float {
+        float kl = litres / 1000.0f;
+        float threshold_kl = daily_limit * days;
+        float t1 = kl;
+        if (t1 > threshold_kl) t1 = threshold_kl;
+        if (t1 < 0) t1 = 0;
+        float t2 = kl - threshold_kl;
+        if (t2 < 0) t2 = 0;
+        return (t1 * tariff1_rate) + (t2 * tariff2_rate);
+      };
+
+      float cost_up_to_today = bracket_cost(quarter_l_now, days_now);
+      float cost_up_to_yesterday = bracket_cost(quarter_l_before_today, days_before_today);
+      float today_cost = cost_up_to_today - cost_up_to_yesterday;
+      if (today_cost < 0) today_cost = 0;
+      return today_cost;
+    web_server:
+      sorting_group_id: group_utility_cost_sensors
+      sorting_weight: 4
+
+  - platform: template
+    name: "Town Water - Daily Connection Fee"
+    id: town_water_daily_connection_fee
+    unit_of_measurement: "$"
+    device_class: monetary
+    accuracy_decimals: 4
+    icon: "mdi:cash-minus"
+    update_interval: ${water_sensor_update_interval}
+    lambda: |-
+      return id(town_water_annual_fee) / 365.0f;
+    web_server:
+      sorting_group_id: group_utility_cost_sensors
+      sorting_weight: 5
+
+  - platform: template
+    name: "Town Water - Quarter Connection Fee"
+    id: town_water_quarter_connection_fee
+    unit_of_measurement: "$"
+    device_class: monetary
+    accuracy_decimals: 2
+    icon: "mdi:cash-minus"
+    update_interval: ${water_sensor_update_interval}
+    lambda: |-
+      int days_elapsed = id(town_water_statistics_component).days_into_quarter();
+      if (days_elapsed < 1) days_elapsed = 1;
+      return (id(town_water_annual_fee) / 365.0f) * days_elapsed;
+    web_server:
+      sorting_group_id: group_utility_cost_sensors
+      sorting_weight: 6
 
   ################################################################################
   #
@@ -318,5 +657,5 @@ sensor:
         sorting_group_id: group_utility_water_meter_sensors
         sorting_weight: 5
       internal: true
-      
-  ################################################################################
+
+################################################################################
