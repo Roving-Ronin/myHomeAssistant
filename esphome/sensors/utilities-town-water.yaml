@@ -603,7 +603,7 @@ sensor:
   #  limit averaged over the quarter-to-date, Tariff 2 above it), plus the
   #  annual connection fee pro-rated and accrued day by day - a running
   #  best-estimate of the final quarterly bill. The connection fee is also
-  #  still tracked on its own in "Town Water - Quarter Service Fee",
+  #  still tracked on its own in "Town Water - Quarter Fee",
   #  matching how the two line items appear separately on the actual bill.
   #
   - platform: template
@@ -690,7 +690,7 @@ sensor:
       sorting_weight: 3
 
   - platform: template
-    name: "Town Water - Daily Service Fee"
+    name: "Town Water - Daily Fee"
     id: town_water_daily_connection_fee
     unit_of_measurement: "$"
     device_class: monetary
@@ -704,7 +704,7 @@ sensor:
       sorting_weight: 5
 
   - platform: template
-    name: "Town Water - Quarter Service Fee"
+    name: "Town Water - Quarter Fee"
     id: town_water_quarter_connection_fee
     unit_of_measurement: "$"
     device_class: monetary
