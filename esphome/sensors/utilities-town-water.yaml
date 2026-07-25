@@ -22,8 +22,8 @@ esphome:
     priority: -10
     then:
       - lambda: |-
-          id(input_town_water_tariff1_rate).publish_state(id(town_water_tariff1_rate) * 100.0f);
-          id(input_town_water_tariff2_rate).publish_state(id(town_water_tariff2_rate) * 100.0f);
+          id(input_town_water_tariff1_rate).publish_state(id(town_water_tariff1_rate));
+          id(input_town_water_tariff2_rate).publish_state(id(town_water_tariff2_rate));
           id(input_town_water_tariff1_daily_limit).publish_state(id(town_water_tariff1_daily_limit));
           id(input_town_water_annual_fee).publish_state(id(town_water_annual_fee));
           id(input_town_water_last_bill_reading).publish_state(id(town_water_last_bill_reading_kl));
@@ -201,10 +201,10 @@ number:
   - platform: template
     name: "Town Water - Tariff 1 Rate"
     id: input_town_water_tariff1_rate
-    min_value: 100
-    max_value: 1000
+    min_value: 1
+    max_value: 10
     step: 0.01
-    unit_of_measurement: "¢/kL"
+    unit_of_measurement: "$/kL"
     optimistic: true
     mode: box
     icon: "mdi:currency-usd"
@@ -212,7 +212,7 @@ number:
       then:
         - globals.set:
             id: town_water_tariff1_rate
-            value: !lambda "return x / 100.0f;"
+            value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
       sorting_weight: 1
@@ -220,10 +220,10 @@ number:
   - platform: template
     name: "Town Water - Tariff 2 Rate"
     id: input_town_water_tariff2_rate
-    min_value: 100
-    max_value: 1000
+    min_value: 1
+    max_value: 10
     step: 0.01
-    unit_of_measurement: "¢/kL"
+    unit_of_measurement: "$/kL"
     optimistic: true
     mode: box
     icon: "mdi:currency-usd"
@@ -231,7 +231,7 @@ number:
       then:
         - globals.set:
             id: town_water_tariff2_rate
-            value: !lambda "return x / 100.0f;"
+            value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
       sorting_weight: 2
@@ -297,7 +297,7 @@ number:
     name: "Town Water - Meter Reading (Current)"
     id: input_town_water_current_meter_reading
     min_value: 0
-    max_value: 99999999
+    max_value: 9999999
     step: 1
     unit_of_measurement: "L"
     optimistic: true
@@ -320,7 +320,7 @@ number:
 #
 button:
   - platform: template
-    name: "Town Water - Quarter Apply"
+    name: "Town Water - Quarter Reset"
     icon: "mdi:restart"
     on_press:
       then:
