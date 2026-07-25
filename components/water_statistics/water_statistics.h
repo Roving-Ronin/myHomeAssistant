@@ -50,6 +50,15 @@ class WaterStatistics : public Component {
    */
   void reset_quarter(float already_consumed = 0.0f);
 
+  /** Same as reset_quarter(), but backdates the quarter start to a specific
+   * calendar date instead of "now" - used when a "Quarter Start Date"
+   * datetime entity is set to the real billing period start date, which is
+   * often only known once the actual bill arrives, days or weeks into the
+   * new period. Callable directly from a YAML lambda via
+   * id(component).reset_quarter_from_date(...).
+   */
+  void reset_quarter_from_date(float already_consumed, uint16_t year, uint8_t month, uint8_t day);
+
   /** Calibrate the lifetime total to match a physical meter reading. Shifts
    * the today/yesterday/week/month/year baselines by the same delta as the
    * total, so those sensors keep reporting the consumption they'd already
@@ -121,6 +130,11 @@ class WaterStatistics : public Component {
   float last_year_{NAN};
   float last_quarter_{NAN};
 
+  // Shared by reset_quarter() and reset_quarter_from_date(). start_day_of_year
+  // / start_year of 0/0 means "use the RTC's current date" (the plain
+  // reset_quarter() case); any other value backdates the quarter start to
+  // that specific calendar date instead.
+  void set_quarter_baseline_(float already_consumed, uint16_t start_day_of_year, uint16_t start_year);
   void process_(float total, bool is_initial_restore = false);
   void retry_sntp_sync_();
 };
