@@ -1,4 +1,3 @@
-#include <cstdlib>
 #include "esphome/core/log.h"
 #include "esphome/core/hal.h"
 #include "gas_statistics_mj.h"
@@ -43,16 +42,7 @@ void GasStatisticsMJ::dump_config() {
   if (this->gas_quarter_) {
     LOG_SENSOR("  ", "Gas (MJ) Quarter", this->gas_quarter_);
   }
-  if (this->quarter_reset_day_) {
-    ESP_LOGCONFIG(TAG, "  Quarter reset day source: select entity (state read each day change)");
-  } else {
-    ESP_LOGCONFIG(TAG, "  Quarter reset day source: fixed default (day %d)", this->gas_quarter_reset_day_default_);
-  }
-  if (this->quarter_start_month_) {
-    ESP_LOGCONFIG(TAG, "  Quarter start month source: select entity (state read each day change)");
-  } else {
-    ESP_LOGCONFIG(TAG, "  Quarter start month source: fixed default (month %d)", this->gas_quarter_start_month_default_);
-  }
+  ESP_LOGCONFIG(TAG, "  Quarter start: manual only (datetime entity / max-length fallback)");
 }
 
 void GasStatisticsMJ::setup() {
@@ -135,72 +125,6 @@ void GasStatisticsMJ::on_shutdown() {
   ESP_LOGD(TAG, "Saved Gas (MJ) NVS on shutdown: today=%f, yesterday=%f, week=%f, month=%f, year=%f, quarter=%f",
            this->gas_.start_today, this->gas_.start_yesterday, this->gas_.start_week,
            this->gas_.start_month, this->gas_.start_year, this->gas_.start_quarter);
-}
-
-int GasStatisticsMJ::days_in_month_(int year, int month) {
-  static const int dim[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-  if (month < 1 || month > 12) {
-    return 31;
-  }
-  if (month == 2) {
-    bool leap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
-    return leap ? 29 : 28;
-  }
-  return dim[month - 1];
-}
-
-int GasStatisticsMJ::month_name_to_number_(const StringRef &name) {
-  static const char *const names[12] = {"January", "February", "March",     "April",   "May",      "June",
-                                         "July",    "August",   "September", "October", "November", "December"};
-  for (int i = 0; i < 12; i++) {
-    if (name == names[i]) {
-      return i + 1;
-    }
-  }
-  return 0;  // No match
-}
-
-int GasStatisticsMJ::get_quarter_start_month_() {
-  if (this->quarter_start_month_ != nullptr) {
-    // select::Select has no public .state - the current selection is read via
-    // current_option(), which returns a StringRef into a static (codegen'd)
-    // string literal, not a std::string.
-    StringRef current = this->quarter_start_month_->current_option();
-    if (!current.empty()) {
-      int parsed = GasStatisticsMJ::month_name_to_number_(current);
-      if (parsed >= 1 && parsed <= 12) {
-        return parsed;
-      }
-    }
-  }
-  return this->gas_quarter_start_month_default_;
-}
-
-int GasStatisticsMJ::get_quarter_reset_day_(int year, int month) {
-  int configured_day = this->gas_quarter_reset_day_default_;
-  if (this->quarter_reset_day_ != nullptr) {
-    StringRef current = this->quarter_reset_day_->current_option();
-    if (!current.empty()) {
-      int parsed = atoi(current.c_str());
-      if (parsed >= 1 && parsed <= 31) {
-        configured_day = parsed;
-      }
-    }
-  }
-  // Clamp to the actual number of days in this month, e.g. a configured
-  // reset day of 31 falls back to the 28th/29th when the quarter-start
-  // month is February.
-  int max_day = this->days_in_month_(year, month);
-  return configured_day > max_day ? max_day : configured_day;
-}
-
-bool GasStatisticsMJ::is_quarter_start_month_(int month) {
-  int anchor = this->get_quarter_start_month_();
-  int diff = month - anchor;
-  if (diff < 0) {
-    diff += 12;
-  }
-  return (diff % 3) == 0;
 }
 
 namespace {
