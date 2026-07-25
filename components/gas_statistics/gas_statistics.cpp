@@ -320,15 +320,14 @@ void GasStatistics::loop() {
   if (is_first_run || t.day_of_year == 1) {
     this->gas_.start_year = total;
   }
-  // At the configured reset day, within a quarter-start month (derived
-  // from the configurable start-month anchor), start a new quarter
-  // calculation
-  if (is_first_run ||
-      (this->is_quarter_start_month_(t.month) && t.day_of_month == this->get_quarter_reset_day_(t.year, t.month))) {
+  // Quarter start is now driven entirely manually - via the "Gas - Quarter
+  // Start Date" datetime entity's on_value handler (which calls
+  // reset_quarter() alongside the MJ component), or the max-quarter-length
+  // fallback in gas.yaml. There's no more automatic calendar day/month
+  // matching here - only the very first run after a fresh/reset baseline
+  // forces start_quarter to snap to the current total.
+  if (is_first_run) {
     this->gas_.start_quarter = total;
-    if (!is_first_run) {
-      ESP_LOGI(TAG, "Gas (m³) quarter reset triggered: month=%d, day=%d, baseline=%f", t.month, t.day_of_month, total);
-    }
   }
 
   // Defensive backfill: if any baseline is still NaN for some other reason
