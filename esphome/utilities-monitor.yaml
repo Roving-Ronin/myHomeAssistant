@@ -162,4 +162,8 @@ web_server:
       name: "Tank Water - Sensors"
       sorting_weight: -42.1
 
+    - id: group_utility_cost_sensors
+      name: "Cost Sensors"
+      sorting_weight: -46
+
 #########################################################################
