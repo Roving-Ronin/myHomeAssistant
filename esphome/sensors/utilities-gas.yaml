@@ -414,7 +414,7 @@ number:
       sorting_weight: 12
 
   - platform: template
-    name: "Gas - Meter (Last Bill)"
+    name: "Gas - Reading (Last Bill)"
     id: input_gas_last_bill_reading
     min_value: 0
     max_value: 99999
@@ -433,7 +433,7 @@ number:
       sorting_weight: 1
 
   - platform: template
-    name: "Gas - Meter (Current)"
+    name: "Gas - Reading (Current)"
     id: input_gas_current_meter_reading
     min_value: 0
     max_value: 100000
@@ -482,7 +482,7 @@ number:
 # Datetime Input - Pick the actual date your gas billing quarter started
 # (once you know it from the real bill, which often arrives a week or two
 # into the new quarter). Setting this date runs the full calibration in one
-# step: it reads "Gas - Meter (Last Bill)" / "Gas - Meter
+# step: it reads "Gas - Reading (Last Bill)" / "Gas - Reading
 # (Current)", calibrates the lifetime m³/MJ totals to the physical reading,
 # and backdates the quarter usage + day-count baseline to this date instead
 # of "today" - so day-scaled pricing thresholds are correct immediately,
