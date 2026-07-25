@@ -17,6 +17,7 @@ from .const import (
     ICON_WEEK,
     ICON_MONTH,
     ICON_YEAR,
+    ICON_QUARTER,
 )
 
 # Import your custom UNIT_LITRE from const.py
@@ -31,6 +32,12 @@ CONF_WATER_YESTERDAY = "water_yesterday"
 CONF_WATER_WEEK = "water_week"
 CONF_WATER_MONTH = "water_month"
 CONF_WATER_YEAR = "water_year"
+# New - only wire this up for instances that track a billing quarter (e.g.
+# Town Water). See WaterStatistics::reset_quarter() in water_statistics.h -
+# unlike gas, there's no automatic day/month reset pattern; the quarter only
+# ever advances via a manual reset_quarter() call (e.g. a "Reset Quarter"
+# button), since real water billing periods land on irregular dates.
+CONF_WATER_QUARTER = "water_quarter"
 CONF_SAVE_FREQUENCY = "save_frequency"
 
 water_statistics_ns = cg.esphome_ns.namespace("water_statistics")
@@ -77,6 +84,13 @@ CONFIG_SCHEMA = cv.Schema(
             device_class=DEVICE_CLASS_WATER,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
+        cv.Optional(CONF_WATER_QUARTER): sensor.sensor_schema(
+            unit_of_measurement=UNIT_LITRE,
+            icon=ICON_QUARTER,
+            accuracy_decimals=0,
+            device_class=DEVICE_CLASS_WATER,
+            state_class=STATE_CLASS_TOTAL_INCREASING,
+        ),
     }
 ).extend(cv.COMPONENT_SCHEMA)
 
@@ -116,3 +130,4 @@ async def to_code(config):
     await setup_sensor(config, CONF_WATER_WEEK, var.set_water_week)
     await setup_sensor(config, CONF_WATER_MONTH, var.set_water_month)
     await setup_sensor(config, CONF_WATER_YEAR, var.set_water_year)
+    await setup_sensor(config, CONF_WATER_QUARTER, var.set_water_quarter)
