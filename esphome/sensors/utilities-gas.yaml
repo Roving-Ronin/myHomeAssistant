@@ -980,11 +980,12 @@ sensor:
     icon: "mdi:cash-multiple"
     update_interval: ${gas_sensor_update_interval}
     lambda: |-
-      // True bracketed total for quarter-to-date MJ usage: each band's own
-      // MJ is charged at that band's own rate and summed, matching how the
-      // actual bill breaks Step1/Step2/Step3 usage into separate line items
-      // rather than pricing everything at whichever single tier is
-      // currently active. Usage-only - excludes the daily service charge.
+      // Running best-estimate of the final quarterly bill: true bracketed
+      // total for quarter-to-date MJ usage (each band's own MJ charged at
+      // that band's own rate and summed, matching how the actual bill
+      // breaks Step1/Step2/Step3 usage into separate line items rather than
+      // pricing everything at whichever single tier is currently active)
+      // plus the daily service charge accrued so far this quarter.
       float quarter_mj = id(gas_used_quarter_mj).state;
       int days_elapsed = id(gas_statistics_mj_component).days_into_quarter();
       if (days_elapsed < 1) days_elapsed = 1;
@@ -1024,6 +1025,9 @@ sensor:
       if (remaining > 0) {
         cost += remaining * rates[4];
       }
+
+      float daily_charge = id(input_gas_daily_service_charge).state;
+      cost += daily_charge * days_elapsed;
       return cost;
     web_server:
       sorting_group_id: group_utility_cost_sensors
