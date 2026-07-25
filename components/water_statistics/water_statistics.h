@@ -27,6 +27,48 @@ class WaterStatistics : public Component {
   void set_water_month(Sensor *sensor) { this->water_month_ = sensor; }
   void set_water_year(Sensor *sensor) { this->water_year_ = sensor; }
 
+  // Optional - only wire this up for instances that track a billing quarter
+  // (e.g. Town Water). Unlike gas, there's no automatic day/month reset
+  // pattern here: real water billing periods read once per quarter but on
+  // irregular dates (meter-reading-route dependent, not a fixed calendar
+  // day), so the quarter only ever advances via a manual reset_quarter()
+  // call (e.g. a "Reset Quarter" button pressed whenever a new bill/meter
+  // read arrives). If this isn't set, the quarter machinery is simply
+  // unused for that instance (e.g. Tank Water).
+  void set_water_quarter(Sensor *sensor) { this->water_quarter_ = sensor; }
+
+  /** Manually (re)start the quarter accumulator - e.g. from a "Reset
+   * Quarter" button, pressed whenever a new water bill/meter read period
+   * begins. If already_consumed is 0 (the default), the quarter baseline
+   * snaps to the current total, so the quarter sensor reads 0 going
+   * forward. If already_consumed is non-zero (e.g. computed from a
+   * last-bill-reading / current-meter-reading pair), the baseline is
+   * backdated so the quarter sensor immediately reflects that real
+   * consumption-so-far figure. Also records "now" as the quarter's start
+   * date, used by days_into_quarter(). Callable directly from a YAML lambda
+   * via id(component).reset_quarter(...).
+   */
+  void reset_quarter(float already_consumed = 0.0f);
+
+  /** Calibrate the lifetime total to match a physical meter reading. Shifts
+   * the today/yesterday/week/month/year baselines by the same delta as the
+   * total, so those sensors keep reporting the consumption they'd already
+   * tracked instead of showing the calibration jump as a spurious spike.
+   * start_quarter is intentionally left untouched - call reset_quarter()
+   * separately (typically right after this) if the quarter baseline also
+   * needs to move. The caller is still responsible for actually updating
+   * the total_ sensor itself (e.g. via a global + .update()).
+   */
+  void calibrate_total(float new_total);
+
+  /** Number of days elapsed since the current quarter started (the day
+   * reset_quarter() was called counts as day 1). Used by pricing lambdas to
+   * scale a per-day rate/limit (e.g. "0.80 kL/day") into a cumulative
+   * figure for the quarter so far. Returns 0 if reset_quarter() has never
+   * been called on this instance.
+   */
+  int days_into_quarter();
+
  protected:
   ESPPreferenceObject pref_;
   time::RealTimeClock *time_;
@@ -47,6 +89,7 @@ class WaterStatistics : public Component {
   Sensor *water_week_{nullptr};
   Sensor *water_month_{nullptr};
   Sensor *water_year_{nullptr};
+  Sensor *water_quarter_{nullptr};
 
   // Start day of week configuration
   int water_week_start_day_{2};
@@ -63,6 +106,11 @@ class WaterStatistics : public Component {
     float start_week{NAN};
     float start_month{NAN};
     float start_year{NAN};
+    float start_quarter{NAN};
+    // Calendar date the current quarter baseline was established (via
+    // reset_quarter()), used by days_into_quarter(). 0 means "never set".
+    uint16_t quarter_start_day_of_year{0};
+    uint16_t quarter_start_year{0};
   } water_;
 
   // Store last published values for change detection
@@ -71,6 +119,7 @@ class WaterStatistics : public Component {
   float last_week_{NAN};
   float last_month_{NAN};
   float last_year_{NAN};
+  float last_quarter_{NAN};
 
   void process_(float total, bool is_initial_restore = false);
   void retry_sntp_sync_();
