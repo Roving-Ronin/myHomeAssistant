@@ -928,8 +928,8 @@ sensor:
       float price_mj = id(gas_price_mj).state;
       return daily_charge + (today_mj * price_mj);
     web_server:
-      sorting_group_id: group_consumption_gas_mj
-      sorting_weight: 10
+      sorting_group_id: group_utility_cost_sensors
+      sorting_weight: 1
   ################################################################################
   #
   #  Uses the Usage_Tracker custom component to publish duration of last tap OPEN.
