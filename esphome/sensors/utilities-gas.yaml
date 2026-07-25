@@ -240,7 +240,7 @@ number:
     id: input_gas_step1_threshold
     min_value: 0
     max_value: 50
-    step: 0.01
+    step: 0.001
     unit_of_measurement: "MJ/day"
     optimistic: true
     mode: box
@@ -260,8 +260,8 @@ number:
     name: "Gas - Step 2 Width"
     id: input_gas_step2_threshold
     min_value: 0
-    max_value: 100
-    step: 0.01
+    max_value: 50
+    step: 0.001
     unit_of_measurement: "MJ/day"
     optimistic: true
     mode: box
@@ -282,8 +282,8 @@ number:
     name: "Gas - Step 3 Width"
     id: input_gas_step3_threshold
     min_value: 0
-    max_value: 200
-    step: 0.01
+    max_value: 100
+    step: 0.001
     unit_of_measurement: "MJ/day"
     optimistic: true
     mode: box
@@ -303,7 +303,7 @@ number:
     id: input_gas_step4_threshold
     min_value: 0
     max_value: 5000
-    step: 0.01
+    step: 0.001
     unit_of_measurement: "MJ/day"
     optimistic: true
     mode: box
@@ -414,7 +414,7 @@ number:
       sorting_weight: 12
 
   - platform: template
-    name: "Gas - Meter Reading (Last Bill)"
+    name: "Gas - Meter (Last Bill)"
     id: input_gas_last_bill_reading
     min_value: 0
     max_value: 99999
@@ -433,7 +433,7 @@ number:
       sorting_weight: 1
 
   - platform: template
-    name: "Gas - Meter Reading (Current)"
+    name: "Gas - Meter (Current)"
     id: input_gas_current_meter_reading
     min_value: 0
     max_value: 100000
@@ -462,10 +462,10 @@ number:
 # down. Real billing periods have run 85-97 days historically.
 #
   - platform: template
-    name: "Gas - Quarter Max Length (days)"
+    name: "Gas - Quarter Length (days)"
     id: input_gas_quarter_max_days
-    min_value: 30
-    max_value: 120
+    min_value: 85
+    max_value: 100
     step: 1
     unit_of_measurement: "days"
     optimistic: true
@@ -475,14 +475,14 @@ number:
     icon: "mdi:calendar-alert"
     web_server:
       sorting_group_id: group_configuration_gas_meter_calibration
-      sorting_weight: 4
+      sorting_weight: 3
 
 #######################################################################################
 #
 # Datetime Input - Pick the actual date your gas billing quarter started
 # (once you know it from the real bill, which often arrives a week or two
 # into the new quarter). Setting this date runs the full calibration in one
-# step: it reads "Gas - Meter Reading (Last Bill)" / "Gas - Meter Reading
+# step: it reads "Gas - Meter (Last Bill)" / "Gas - Meter
 # (Current)", calibrates the lifetime m³/MJ totals to the physical reading,
 # and backdates the quarter usage + day-count baseline to this date instead
 # of "today" - so day-scaled pricing thresholds are correct immediately,
@@ -552,12 +552,12 @@ datetime:
                 id(gas_quarter_start_date).day);
     web_server:
       sorting_group_id: group_configuration_gas_meter_calibration
-      sorting_weight: 3
+      sorting_weight: 4
 
 #######################################################################################
 #
 # Interval - Max-quarter-length fallback. Checked hourly; if either quarter
-# has run longer than "Gas - Quarter Max Length (days)" without a real
+# has run longer than "Gas - Quarter Length (days)" without a real
 # calibration, auto-resets both baselines to today so pricing thresholds
 # don't scale up indefinitely. This does NOT touch "Gas - Quarter Start
 # Date" itself (it stays showing whatever you last entered) - once your
