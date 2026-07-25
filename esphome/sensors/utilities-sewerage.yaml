@@ -71,8 +71,8 @@ sensor:
     lambda: |-
       return id(sewerage_annual_fee) / 365.0f;
     web_server:
-      sorting_group_id: group_utility_cost_sensors
-      sorting_weight: 7
+      sorting_group_id: group_configuration_town_water_tariffs
+      sorting_weight: 2
 
   - platform: template
     name: "Sewerage - Quarter Fee"
