@@ -121,6 +121,12 @@ packages:
 #    files: [esphome/sensors/utilities-tank-water.yaml]
 #    refresh: 1h
 
+  consumption-sewerage:
+    url: https://github.com/roving-ronin/myhomeassistant
+    ref: main
+    files: [esphome/sensors/utilities-sewerage.yaml]
+    refresh: 5s
+
 
 #  esp32-system-board:      !include boards/kincony-esp32-s3-core.yaml           # Model of ESP Board being used. This is Kincony S3 Core with JAComms add-on HAT board.
 #  base-config:             !include common/base-configuration.yaml              # Base configuration applied to all ESPHome devices
