@@ -105,12 +105,16 @@ globals:
   # 4's threshold) - rates are stored here in $/MJ, but entered on the
   # ¢/MJ number inputs below (converted in each input's set_action).
   #
-  # Thresholds are per-day MJ figures (e.g. "20.71 MJ/day"), matching how the
-  # retailer's bill actually works: with only one meter read per quarter,
-  # each tier's cumulative MJ boundary is the per-day rate multiplied by the
-  # exact number of days in the billing period. Gas - Price (MJ)/Quarter
-  # Cost scale these by days_into_quarter() rather than treating them as
-  # fixed absolute MJ numbers.
+  # Thresholds are per-day MJ WIDTHS - i.e. each one is the "Next X MJ/day"
+  # figure exactly as printed on the bill (Step 1 is "First X", which is the
+  # same thing since there's no prior band). This matches how the retailer
+  # actually quotes tariffs, so you can type the numbers straight off the
+  # bill without adding them up yourself. Gas - Price (MJ)/Quarter Cost/Daily
+  # Cost compute the cumulative boundary for each step (running sum of the
+  # widths) and scale that by days_into_quarter() internally - with only one
+  # meter read per quarter, each tier's cumulative MJ boundary is the
+  # per-day rate multiplied by the exact number of days in the billing
+  # period.
   #
   - id: gas_daily_service_charge
     type: float
@@ -119,19 +123,19 @@ globals:
   - id: gas_step1_threshold_mj
     type: float
     restore_value: true
-    initial_value: "20.71"     # MJ/day
+    initial_value: "20.712"    # MJ/day - "First 20.712 MJ/day" on the bill
   - id: gas_step2_threshold_mj
     type: float
     restore_value: true
-    initial_value: "41.1"      # MJ/day
+    initial_value: "20.384"    # MJ/day - "Next 20.384 MJ/day" on the bill
   - id: gas_step3_threshold_mj
     type: float
     restore_value: true
-    initial_value: "90.41"     # MJ/day
+    initial_value: "49.315"    # MJ/day - "Next 49.315 MJ/day" on the bill
   - id: gas_step4_threshold_mj
     type: float
     restore_value: true
-    initial_value: "2745.2"    # MJ/day
+    initial_value: "2654.794"  # MJ/day - "Next 2654.794 MJ/day" on the bill
   - id: gas_step1_rate_mj
     type: float
     restore_value: true
@@ -232,7 +236,7 @@ number:
       sorting_weight: 3
 
   - platform: template
-    name: "Gas - Step 1 Threshold"
+    name: "Gas - Step 1 Width"
     id: input_gas_step1_threshold
     min_value: 0
     max_value: 50
@@ -241,6 +245,8 @@ number:
     optimistic: true
     mode: box
     icon: "mdi:stairs-up"
+    # "First X MJ/day" on the bill - same as its own cumulative boundary,
+    # since there's no prior band.
     set_action:
       then:
         - globals.set:
@@ -251,7 +257,7 @@ number:
       sorting_weight: 4
 
   - platform: template
-    name: "Gas - Step 2 Threshold"
+    name: "Gas - Step 2 Width"
     id: input_gas_step2_threshold
     min_value: 0
     max_value: 100
@@ -260,6 +266,9 @@ number:
     optimistic: true
     mode: box
     icon: "mdi:stairs-up"
+    # "Next X MJ/day" on the bill - the incremental width of this band, not
+    # a cumulative total. No need to add Step 1's value in yourself; the
+    # pricing sensors do the running sum internally.
     set_action:
       then:
         - globals.set:
@@ -270,7 +279,7 @@ number:
       sorting_weight: 5
 
   - platform: template
-    name: "Gas - Step 3 Threshold"
+    name: "Gas - Step 3 Width"
     id: input_gas_step3_threshold
     min_value: 0
     max_value: 200
@@ -279,6 +288,7 @@ number:
     optimistic: true
     mode: box
     icon: "mdi:stairs-up"
+    # "Next X MJ/day" on the bill - incremental width, same as Step 2.
     set_action:
       then:
         - globals.set:
@@ -289,7 +299,7 @@ number:
       sorting_weight: 6
 
   - platform: template
-    name: "Gas - Step 4 Threshold"
+    name: "Gas - Step 4 Width"
     id: input_gas_step4_threshold
     min_value: 0
     max_value: 5000
@@ -298,6 +308,7 @@ number:
     optimistic: true
     mode: box
     icon: "mdi:stairs-up"
+    # "Next X MJ/day" on the bill - incremental width, same as Step 2/3.
     set_action:
       then:
         - globals.set:
@@ -862,9 +873,13 @@ sensor:
   ################################################################################
   #
   #  Gas pricing - stepped $/MJ lookup (based on quarter-to-date MJ usage,
-  #  always 4 thresholds / 5 rates - Step 5 is the catch-all above Step 4's
-  #  threshold). Thresholds are MJ/day figures scaled by the number of days
-  #  elapsed in the current quarter (gas_statistics_mj_component's
+  #  always 4 widths / 5 rates - Step 5 is the catch-all above Step 4's
+  #  cumulative boundary). The Step 1-4 inputs each hold an incremental
+  #  width ("Next X MJ/day" as printed on the bill, Step 1 being "First X")
+  #  rather than a running total, so you can type the numbers straight off
+  #  the bill without adding them up - each cumulative boundary is built as
+  #  a running sum of the widths, then scaled by the number of days elapsed
+  #  in the current quarter (gas_statistics_mj_component's
   #  days_into_quarter()), since the retailer bills MJ tiers as a per-day
   #  rate multiplied out by the exact length of each billing period - not a
   #  fixed absolute MJ number. "Gas - Price (MJ)" is informational (today's
@@ -884,11 +899,18 @@ sensor:
       int days_elapsed = id(gas_statistics_mj_component).days_into_quarter();
       if (days_elapsed < 1) days_elapsed = 1;
 
+      // Step inputs hold the incremental width of each band ("Next X
+      // MJ/day" on the bill) - build the cumulative per-day boundary for
+      // each step as a running sum before day-scaling.
+      float w1 = id(input_gas_step1_threshold).state;
+      float w2 = id(input_gas_step2_threshold).state;
+      float w3 = id(input_gas_step3_threshold).state;
+      float w4 = id(input_gas_step4_threshold).state;
       float thresholds[4] = {
-        id(input_gas_step1_threshold).state * days_elapsed,
-        id(input_gas_step2_threshold).state * days_elapsed,
-        id(input_gas_step3_threshold).state * days_elapsed,
-        id(input_gas_step4_threshold).state * days_elapsed,
+        w1 * days_elapsed,
+        (w1 + w2) * days_elapsed,
+        (w1 + w2 + w3) * days_elapsed,
+        (w1 + w2 + w3 + w4) * days_elapsed,
       };
       float rates[5] = {
         id(gas_step1_rate_mj),
@@ -967,11 +989,18 @@ sensor:
       int days_elapsed = id(gas_statistics_mj_component).days_into_quarter();
       if (days_elapsed < 1) days_elapsed = 1;
 
+      // Step inputs hold the incremental width of each band ("Next X
+      // MJ/day" on the bill) - build the cumulative per-day boundary for
+      // each step as a running sum before day-scaling.
+      float w1 = id(input_gas_step1_threshold).state;
+      float w2 = id(input_gas_step2_threshold).state;
+      float w3 = id(input_gas_step3_threshold).state;
+      float w4 = id(input_gas_step4_threshold).state;
       float thresholds[4] = {
-        id(input_gas_step1_threshold).state * days_elapsed,
-        id(input_gas_step2_threshold).state * days_elapsed,
-        id(input_gas_step3_threshold).state * days_elapsed,
-        id(input_gas_step4_threshold).state * days_elapsed,
+        w1 * days_elapsed,
+        (w1 + w2) * days_elapsed,
+        (w1 + w2 + w3) * days_elapsed,
+        (w1 + w2 + w3 + w4) * days_elapsed,
       };
       float rates[5] = {
         id(gas_step1_rate_mj),
@@ -1023,10 +1052,17 @@ sensor:
       if (days_now < 1) days_now = 1;
       int days_before_today = days_now - 1;
 
-      float t1 = id(input_gas_step1_threshold).state;
-      float t2 = id(input_gas_step2_threshold).state;
-      float t3 = id(input_gas_step3_threshold).state;
-      float t4 = id(input_gas_step4_threshold).state;
+      // Step inputs hold the incremental width of each band ("Next X
+      // MJ/day" on the bill) - build the cumulative per-day boundary for
+      // each step as a running sum; bracket_cost() below day-scales them.
+      float w1 = id(input_gas_step1_threshold).state;
+      float w2 = id(input_gas_step2_threshold).state;
+      float w3 = id(input_gas_step3_threshold).state;
+      float w4 = id(input_gas_step4_threshold).state;
+      float t1 = w1;
+      float t2 = w1 + w2;
+      float t3 = w1 + w2 + w3;
+      float t4 = w1 + w2 + w3 + w4;
       float rates[5] = {
         id(gas_step1_rate_mj),
         id(gas_step2_rate_mj),
