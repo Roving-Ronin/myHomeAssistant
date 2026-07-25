@@ -28,6 +28,14 @@ esphome:
           id(input_town_water_annual_fee).publish_state(id(town_water_annual_fee));
           id(input_town_water_last_bill_reading).publish_state(id(town_water_last_bill_reading_kl));
           id(input_town_water_current_meter_reading).publish_state(id(town_water_current_meter_reading_l));
+          // Flips true only after every component's setup() (and therefore
+          // every restore_value-triggered publish/on_value) has already run -
+          // on_boot triggers always fire after that point regardless of this
+          // trigger's own priority value. Used by "Town Water - Quarter
+          // Start Date"'s on_value guard below to tell a genuine
+          // user-initiated date change apart from the boot-time restore
+          // firing on_value on its own.
+          id(town_water_quarter_date_boot_restored) = true;
 
 #########################################################################
 #
@@ -58,6 +66,16 @@ web_server:
 #######################################################################################
 
 globals:
+
+  # Boot guard for "Town Water - Quarter Start Date"'s on_value handler -
+  # starts false on every boot (never restored), flips true once on_boot has
+  # run (i.e. once every entity's own restore_value republish has already
+  # happened), so the handler can tell a real user-initiated date change
+  # apart from the boot-time restore firing on_value on its own.
+  - id: town_water_quarter_date_boot_restored
+    type: bool
+    restore_value: false
+    initial_value: "false"
 
   #  Globals for use with pulse meter, to allow storing and setting a base reading for water meter
   - id: global_town_water_total
@@ -96,8 +114,9 @@ globals:
     type: float
     restore_value: true
     initial_value: "210.00"
-  # One-off setup values - used by the "Town Water - Apply Meter Readings"
-  # button to seed the quarter baseline and calibrate the lifetime L total.
+  # One-off setup values - used by "Town Water - Quarter Start Date"'s
+  # on_value calibration to seed the quarter baseline and calibrate the
+  # lifetime L total.
   - id: town_water_last_bill_reading_kl
     type: float
     restore_value: true
@@ -215,7 +234,7 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 3
+      sorting_weight: 1
 
   - platform: template
     name: "Town Water - Tariff 2 Rate"
@@ -234,7 +253,7 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 5
+      sorting_weight: 2
 
   - platform: template
     name: "Town Water - Tariff 1 Daily Limit"
@@ -253,10 +272,10 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 4
+      sorting_weight: 3
 
   - platform: template
-    name: "Town Water - Annual Fee"
+    name: "Town Water - Annual Connection Fee"
     id: input_town_water_annual_fee
     min_value: 0
     max_value: 2000
@@ -272,7 +291,7 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 2
+      sorting_weight: 4
 
   - platform: template
     name: "Town Water - Meter Reading (Last Bill)"
@@ -312,30 +331,54 @@ number:
       sorting_group_id: group_configuration_town_water_meter_calibration
       sorting_weight: 2
 
-#######################################################################################
-#
-# Buttons - Manual quarter reset (real bill/meter-read periods land on
-# irregular dates, so unlike gas there's no automatic day/month pattern to
-# reset from), and a one-off setup action for starting mid-quarter.
-#
-button:
   - platform: template
-    name: "Town Water - Quarter Reset"
-    icon: "mdi:restart"
-    on_press:
-      then:
-        - lambda: |-
-            id(town_water_statistics_component).reset_quarter();
+    name: "Town Water - Quarter Max Length (days)"
+    id: input_town_water_quarter_max_days
+    min_value: 30
+    max_value: 120
+    step: 1
+    unit_of_measurement: "days"
+    optimistic: true
+    restore_value: true
+    initial_value: 94
+    mode: box
+    icon: "mdi:calendar-alert"
     web_server:
       sorting_group_id: group_configuration_town_water_meter_calibration
       sorting_weight: 3
 
+#######################################################################################
+#
+# Datetime Input - Pick the actual date your Town Water billing quarter
+# started (once you know it from the real bill/meter read - often only
+# known a week or two after the fact, since periods land on irregular
+# dates). Setting this date runs the full calibration in one step: it reads
+# "Town Water - Meter Reading (Last Bill)" / "Town Water - Meter Reading
+# (Current)", calibrates the lifetime L total to the physical reading, and
+# backdates the quarter usage + day-count baseline to this date instead of
+# "today" - so day-scaled pricing (and Sewerage's shared quarter, which
+# borrows this same day count) is correct immediately.
+#
+datetime:
   - platform: template
-    name: "Town Water - Meter Readings (Apply)"
-    icon: "mdi:calendar-refresh"
-    on_press:
+    name: "Town Water - Quarter Start Date"
+    id: town_water_quarter_start_date
+    type: date
+    optimistic: true
+    restore_value: true
+    icon: "mdi:calendar-start"
+    on_value:
       then:
         - lambda: |-
+            // Skip this on boot, when ESPHome restores the saved date and
+            // republishes it - only act on a real, user-initiated change.
+            // Without this guard, every reboot would silently re-run the
+            // whole calibration using whatever the meter-reading inputs
+            // happen to hold at the time.
+            if (!id(town_water_quarter_date_boot_restored)) {
+              return;
+            }
+
             float current_reading_l = id(input_town_water_current_meter_reading).state;
             float last_bill_kl = id(input_town_water_last_bill_reading).state;
             float already_consumed_l = current_reading_l - (last_bill_kl * 1000.0f);
@@ -356,12 +399,41 @@ button:
             id(town_water_total).update();
 
             // 3) Seed the quarter baseline from the real consumption since
-            //    the last bill. Runs *after* step 2 so it reads the newly
-            //    calibrated total.
-            id(town_water_statistics_component).reset_quarter(already_consumed_l);
+            //    the last bill, backdated to the picked date. Runs *after*
+            //    step 2 so it reads the newly calibrated total.
+            id(town_water_statistics_component).reset_quarter_from_date(
+                already_consumed_l,
+                id(town_water_quarter_start_date).year,
+                id(town_water_quarter_start_date).month,
+                id(town_water_quarter_start_date).day);
     web_server:
       sorting_group_id: group_configuration_town_water_meter_calibration
       sorting_weight: 4
+
+#######################################################################################
+#
+# Interval - Max-quarter-length fallback. Checked hourly; if the quarter has
+# run longer than "Town Water - Quarter Max Length (days)" without a real
+# calibration, auto-resets the baseline to today so pricing thresholds (and
+# Sewerage's shared quarter fee) don't scale up indefinitely. This does NOT
+# touch "Town Water - Quarter Start Date" itself (it stays showing whatever
+# you last entered) - once your real bill arrives, still go back and enter
+# the true date + meter readings so usage/cost figures are accurate, not
+# just estimated.
+#
+interval:
+  - interval: 1h
+    then:
+      - lambda: |-
+          int days = id(town_water_statistics_component).days_into_quarter();
+          int max_days = (int) id(input_town_water_quarter_max_days).state;
+          if (days > 0 && days > max_days) {
+            ESP_LOGW("town_water_quarter_fallback",
+                     "Town Water quarter exceeded max length (%d > %d days) with no calibration - auto-resetting "
+                     "baseline. Update 'Town Water - Quarter Start Date' with the real bill once it arrives.",
+                     days, max_days);
+            id(town_water_statistics_component).reset_quarter();
+          }
 
 sensor:
   ################################################################################
@@ -507,6 +579,23 @@ sensor:
     web_server:
       sorting_group_id: group_consumption_town_water
       sorting_weight: 6
+
+  - platform: template
+    name: "Town Water - Quarter Days Elapsed"
+    id: town_water_quarter_days_elapsed
+    unit_of_measurement: "days"
+    accuracy_decimals: 0
+    icon: "mdi:calendar-clock"
+    update_interval: ${water_sensor_update_interval}
+    lambda: |-
+      // Diagnostic - the raw day count days_into_quarter() is scaling the
+      // pricing thresholds (and Sewerage's shared quarter fee) by. 0 means
+      // the quarter start date hasn't been established yet (e.g. before
+      // "Town Water - Quarter Start Date" has ever been set).
+      return id(town_water_statistics_component).days_into_quarter();
+    web_server:
+      sorting_group_id: group_consumption_town_water
+      sorting_weight: 7
 
   ################################################################################
   #
