@@ -234,7 +234,7 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 5
+      sorting_weight: 7
 
   - platform: template
     name: "Town Water - Tariff 2 Rate"
@@ -253,7 +253,7 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 7
+      sorting_weight: 9
 
   - platform: template
     name: "Town Water - Tariff 1 Daily Limit"
@@ -272,7 +272,7 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 6
+      sorting_weight: 8
 
   - platform: template
     name: "Town Water - Annual Fee"
@@ -291,7 +291,7 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 3
+      sorting_weight: 4
 
   - platform: template
     name: "Town Water - Meter (Last Bill)"
@@ -603,7 +603,7 @@ sensor:
   #  limit averaged over the quarter-to-date, Tariff 2 above it), plus the
   #  annual connection fee pro-rated and accrued day by day - a running
   #  best-estimate of the final quarterly bill. The connection fee is also
-  #  still tracked on its own in "Town Water - Quarter Connection Fee" below,
+  #  still tracked on its own in "Town Water - Quarter Service Fee",
   #  matching how the two line items appear separately on the actual bill.
   #
   - platform: template
@@ -649,12 +649,11 @@ sensor:
     icon: "mdi:cash"
     update_interval: ${water_sensor_update_interval}
     lambda: |-
-      // Bracketed cost of just today's incremental usage - worked out as
-      // (bracketed cost of quarter-to-date usage including today) minus
-      // (bracketed cost of quarter-to-date usage as it stood at the start
-      // of today), so a tariff boundary crossed partway through today is
-      // still priced correctly on each side of the split. Usage-only -
-      // excludes the connection fee, tracked separately below.
+      // Today's incremental usage cost plus one day's connection fee -
+      // worked out as (bracketed cost of quarter-to-date usage including
+      // today) minus (bracketed cost of quarter-to-date usage as it stood
+      // at the start of today), so a tariff boundary crossed partway
+      // through today is still priced correctly on each side of the split.
       float quarter_l_now = id(town_water_quarter).state;
       float today_l = id(town_water_today).state;
       float quarter_l_before_today = quarter_l_now - today_l;
@@ -683,13 +682,15 @@ sensor:
       float cost_up_to_yesterday = bracket_cost(quarter_l_before_today, days_before_today);
       float today_cost = cost_up_to_today - cost_up_to_yesterday;
       if (today_cost < 0) today_cost = 0;
-      return today_cost;
+
+      float connection_fee = id(town_water_annual_fee) / 365.0f;
+      return today_cost + connection_fee;
     web_server:
       sorting_group_id: group_utility_cost_sensors
       sorting_weight: 3
 
   - platform: template
-    name: "Town Water - Daily Connection Fee"
+    name: "Town Water - Daily Service Fee"
     id: town_water_daily_connection_fee
     unit_of_measurement: "$"
     device_class: monetary
@@ -700,10 +701,10 @@ sensor:
       return id(town_water_annual_fee) / 365.0f;
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 4
+      sorting_weight: 5
 
   - platform: template
-    name: "Town Water - Quarter Connection Fee"
+    name: "Town Water - Quarter Service Fee"
     id: town_water_quarter_connection_fee
     unit_of_measurement: "$"
     device_class: monetary
@@ -715,7 +716,7 @@ sensor:
       if (days_elapsed < 1) days_elapsed = 1;
       return (id(town_water_annual_fee) / 365.0f) * days_elapsed;
     web_server:
-      sorting_group_id: group_utility_cost_sensors
+      sorting_group_id: group_configuration_town_water_tariffs
       sorting_weight: 6
 
   ################################################################################
