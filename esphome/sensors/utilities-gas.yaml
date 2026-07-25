@@ -50,7 +50,7 @@ web_server:
     - id: group_consumption_gas_mj
       name: "Consumption - Gas (MJ)"
       sorting_weight: -40.1
-      
+
     - id: group_configuration_gas_tariffs
       name: "Configuration - Gas Tariffs"
       sorting_weight: -37.1
@@ -58,7 +58,7 @@ web_server:
     - id: group_configuration_gas_meter_calibration
       name: "Configuration - Gas Meter Calibration"
       sorting_weight: -36.1
-      
+
 #######################################################################################
 globals:
   - id: gas_pressure_factor
@@ -89,48 +89,55 @@ globals:
   # 4's threshold) - rates are stored here in $/MJ, but entered on the
   # ¢/MJ number inputs below (converted in each input's set_action).
   #
+  # Thresholds are per-day MJ figures (e.g. "20.71 MJ/day"), matching how the
+  # retailer's bill actually works: with only one meter read per quarter,
+  # each tier's cumulative MJ boundary is the per-day rate multiplied by the
+  # exact number of days in the billing period. Gas - Price (MJ)/Quarter
+  # Cost scale these by days_into_quarter() rather than treating them as
+  # fixed absolute MJ numbers.
+  #
   - id: gas_daily_service_charge
     type: float
     restore_value: true
-    initial_value: "0.825"
+    initial_value: "0.891"
   - id: gas_step1_threshold_mj
     type: float
     restore_value: true
-    initial_value: "1890"
+    initial_value: "20.71"     # MJ/day
   - id: gas_step2_threshold_mj
     type: float
     restore_value: true
-    initial_value: "3750"
+    initial_value: "41.1"      # MJ/day
   - id: gas_step3_threshold_mj
     type: float
     restore_value: true
-    initial_value: "8250"
+    initial_value: "90.41"     # MJ/day
   - id: gas_step4_threshold_mj
     type: float
     restore_value: true
-    initial_value: "250500"
+    initial_value: "2745.2"    # MJ/day
   - id: gas_step1_rate_mj
     type: float
     restore_value: true
-    initial_value: "0.03938"    # 3.938 ¢/MJ
+    initial_value: "0.0495"    # 4.95 ¢/MJ
   - id: gas_step2_rate_mj
     type: float
     restore_value: true
-    initial_value: "0.03278"    # 3.278 ¢/MJ
+    initial_value: "0.0363"    # 3.63 ¢/MJ
   - id: gas_step3_rate_mj
     type: float
     restore_value: true
-    initial_value: "0.03102"    # 3.102 ¢/MJ
+    initial_value: "0.0330"    # 3.30 ¢/MJ
   - id: gas_step4_rate_mj
     type: float
     restore_value: true
-    initial_value: "0.02838"    # 2.838 ¢/MJ
+    initial_value: "0.0308"    # 3.08 ¢/MJ
   - id: gas_step5_rate_mj
     type: float
     restore_value: true
-    initial_value: "0.02838"    # 2.838 ¢/MJ
-  # One-off setup values - used by the "Gas - Apply Meter Readings" button to
-  # seed the quarter baseline and calibrate the lifetime m³ total.
+    initial_value: "0.0297"    # 2.97 ¢/MJ
+  # One-off setup values - used by the "Gas - Meter Readings (Apply)" button
+  # to seed the quarter baseline and calibrate the lifetime m³ total.
   - id: gas_last_bill_reading_m3
     type: float
     restore_value: true
@@ -184,7 +191,7 @@ number:
       sorting_weight: 2
   #
   # Gas pricing inputs - update these each quarter from the retailer's bill.
-  # Step thresholds are entered in MJ; Step rates are entered in ¢/MJ and
+  # Step thresholds are entered in MJ/day; Step rates are entered in ¢/MJ and
   # converted to $/MJ (÷100) before being stored, since the pricing sensors'
   # math expects $/MJ.
   #
@@ -211,9 +218,9 @@ number:
     name: "Gas - Step 1 Threshold"
     id: input_gas_step1_threshold
     min_value: 0
-    max_value: 2000
-    step: 1
-    unit_of_measurement: "MJ"
+    max_value: 50
+    step: 0.01
+    unit_of_measurement: "MJ/day"
     optimistic: true
     mode: box
     icon: "mdi:stairs-up"
@@ -230,9 +237,9 @@ number:
     name: "Gas - Step 2 Threshold"
     id: input_gas_step2_threshold
     min_value: 0
-    max_value: 5000
-    step: 1
-    unit_of_measurement: "MJ"
+    max_value: 100
+    step: 0.01
+    unit_of_measurement: "MJ/day"
     optimistic: true
     mode: box
     icon: "mdi:stairs-up"
@@ -249,9 +256,9 @@ number:
     name: "Gas - Step 3 Threshold"
     id: input_gas_step3_threshold
     min_value: 0
-    max_value: 10000
-    step: 1
-    unit_of_measurement: "MJ"
+    max_value: 200
+    step: 0.01
+    unit_of_measurement: "MJ/day"
     optimistic: true
     mode: box
     icon: "mdi:stairs-up"
@@ -268,9 +275,9 @@ number:
     name: "Gas - Step 4 Threshold"
     id: input_gas_step4_threshold
     min_value: 0
-    max_value: 300000
-    step: 1
-    unit_of_measurement: "MJ"
+    max_value: 5000
+    step: 0.01
+    unit_of_measurement: "MJ/day"
     optimistic: true
     mode: box
     icon: "mdi:stairs-up"
@@ -401,7 +408,7 @@ number:
     name: "Gas - Meter Reading (Current)"
     id: input_gas_current_meter_reading
     min_value: 0
-    max_value: 99999.999
+    max_value: 100000
     step: 0.001
     unit_of_measurement: "m³"
     optimistic: true
@@ -415,7 +422,7 @@ number:
     web_server:
       sorting_group_id: group_configuration_gas_meter_calibration
       sorting_weight: 5
-      
+
 #######################################################################################
 #
 # Select Inputs - Used to configure Gas day and month of the quarter reset day.
@@ -487,7 +494,7 @@ select:
     web_server:
       sorting_group_id: group_configuration_gas_meter_calibration
       sorting_weight: 2
-      
+
 #######################################################################################
 #
 # Buttons - Manual quarter reset safety net, and one-off setup action for
@@ -573,7 +580,7 @@ binary_sensor:
             id: gas_valve_state
             state: "CLOSED"
     internal: true
-    
+
 ################################################################################
 #
 #  Text Sensor - Used to publish if the tap is On
@@ -728,7 +735,7 @@ sensor:
       id: gas_m3_today
       web_server:
         sorting_group_id: group_consumption_gas_m3
-        sorting_weight: 1
+        sorting_weight: 2
 
 #    gas_yesterday:
 #      name: "Gas - Yesterday"
@@ -761,7 +768,7 @@ sensor:
       web_server:
         sorting_group_id: group_consumption_gas_m3
         sorting_weight: 6
-        
+
   ################################################################################
   #  Adds the 'Reading Since Reset' that tracks the LIFETIME total of m3
   #  Hidden from HA/web_server (internal: true) - still required internally as
@@ -794,7 +801,7 @@ sensor:
       id: gas_used_today_mj
       web_server:
         sorting_group_id: group_consumption_gas_mj
-        sorting_weight: 1
+        sorting_weight: 2
 
 #    gas_yesterday:
 #      name: "Gas - Yesterday (MJ)"
@@ -851,9 +858,13 @@ sensor:
   #
   #  Gas pricing - stepped $/MJ lookup (based on quarter-to-date MJ usage,
   #  always 4 thresholds / 5 rates - Step 5 is the catch-all above Step 4's
-  #  threshold), the equivalent $/m³ rate derived from it, and today's
-  #  running cost (service charge + consumption). Recalculated continuously
-  #  since the active step depends on quarter-to-date usage.
+  #  threshold). Thresholds are MJ/day figures scaled by the number of days
+  #  elapsed in the current quarter (gas_statistics_mj_component's
+  #  days_into_quarter()), since the retailer bills MJ tiers as a per-day
+  #  rate multiplied out by the exact length of each billing period - not a
+  #  fixed absolute MJ number. "Gas - Price (MJ)" is informational (today's
+  #  marginal rate); the actual cost total is "Gas - Quarter Cost" below,
+  #  which is a true bracketed sum, not this single rate multiplied by usage.
   #
   - platform: template
     name: "Gas - Price (MJ)"
@@ -865,12 +876,14 @@ sensor:
     update_interval: ${gas_sensor_update_interval}
     lambda: |-
       float quarter_mj = id(gas_used_quarter_mj).state;
+      int days_elapsed = id(gas_statistics_mj_component).days_into_quarter();
+      if (days_elapsed < 1) days_elapsed = 1;
 
       float thresholds[4] = {
-        id(input_gas_step1_threshold).state,
-        id(input_gas_step2_threshold).state,
-        id(input_gas_step3_threshold).state,
-        id(input_gas_step4_threshold).state,
+        id(input_gas_step1_threshold).state * days_elapsed,
+        id(input_gas_step2_threshold).state * days_elapsed,
+        id(input_gas_step3_threshold).state * days_elapsed,
+        id(input_gas_step4_threshold).state * days_elapsed,
       };
       float rates[5] = {
         id(gas_step1_rate_mj),
@@ -892,7 +905,7 @@ sensor:
       return rates[selected_step];
     web_server:
       sorting_group_id: group_consumption_gas_mj
-      sorting_weight: 9
+      sorting_weight: 1
 
   - platform: template
     name: "Gas - Price (m³)"
@@ -912,7 +925,58 @@ sensor:
       return price_mj * pressure_factor * heating_value;
     web_server:
       sorting_group_id: group_consumption_gas_m3
-      sorting_weight: 9
+      sorting_weight: 1
+
+  - platform: template
+    name: "Gas - Quarter Cost"
+    id: gas_quarter_cost
+    unit_of_measurement: "$"
+    device_class: monetary
+    accuracy_decimals: 2
+    icon: "mdi:cash-multiple"
+    update_interval: ${gas_sensor_update_interval}
+    lambda: |-
+      // True bracketed total for quarter-to-date MJ usage: each band's own
+      // MJ is charged at that band's own rate and summed, matching how the
+      // actual bill breaks Step1/Step2/Step3 usage into separate line items
+      // rather than pricing everything at whichever single tier is
+      // currently active. Usage-only - excludes the daily service charge.
+      float quarter_mj = id(gas_used_quarter_mj).state;
+      int days_elapsed = id(gas_statistics_mj_component).days_into_quarter();
+      if (days_elapsed < 1) days_elapsed = 1;
+
+      float thresholds[4] = {
+        id(input_gas_step1_threshold).state * days_elapsed,
+        id(input_gas_step2_threshold).state * days_elapsed,
+        id(input_gas_step3_threshold).state * days_elapsed,
+        id(input_gas_step4_threshold).state * days_elapsed,
+      };
+      float rates[5] = {
+        id(gas_step1_rate_mj),
+        id(gas_step2_rate_mj),
+        id(gas_step3_rate_mj),
+        id(gas_step4_rate_mj),
+        id(gas_step5_rate_mj),
+      };
+
+      float cost = 0.0f;
+      float lower = 0.0f;
+      for (int i = 0; i < 4; i++) {
+        float upper = thresholds[i];
+        float used = quarter_mj - lower;
+        if (used < 0) used = 0;
+        if (used > (upper - lower)) used = (upper - lower);
+        cost += used * rates[i];
+        lower = upper;
+      }
+      float remaining = quarter_mj - lower;
+      if (remaining > 0) {
+        cost += remaining * rates[4];
+      }
+      return cost;
+    web_server:
+      sorting_group_id: group_utility_cost_sensors
+      sorting_weight: 2
 
   - platform: template
     name: "Gas - Daily Cost"
@@ -923,10 +987,58 @@ sensor:
     icon: "mdi:cash"
     update_interval: ${gas_sensor_update_interval}
     lambda: |-
-      float daily_charge = id(input_gas_daily_service_charge).state;
+      // Service charge + the bracketed cost of just today's incremental MJ
+      // usage - worked out as (bracketed cost of quarter-to-date usage
+      // including today) minus (bracketed cost of quarter-to-date usage as
+      // it stood at the start of today), so a tier boundary crossed partway
+      // through today is still priced correctly on each side of the split.
+      float quarter_mj_now = id(gas_used_quarter_mj).state;
       float today_mj = id(gas_used_today_mj).state;
-      float price_mj = id(gas_price_mj).state;
-      return daily_charge + (today_mj * price_mj);
+      float quarter_mj_before_today = quarter_mj_now - today_mj;
+      if (quarter_mj_before_today < 0) quarter_mj_before_today = 0;
+
+      int days_now = id(gas_statistics_mj_component).days_into_quarter();
+      if (days_now < 1) days_now = 1;
+      int days_before_today = days_now - 1;
+
+      float t1 = id(input_gas_step1_threshold).state;
+      float t2 = id(input_gas_step2_threshold).state;
+      float t3 = id(input_gas_step3_threshold).state;
+      float t4 = id(input_gas_step4_threshold).state;
+      float rates[5] = {
+        id(gas_step1_rate_mj),
+        id(gas_step2_rate_mj),
+        id(gas_step3_rate_mj),
+        id(gas_step4_rate_mj),
+        id(gas_step5_rate_mj),
+      };
+
+      auto bracket_cost = [&](float mj, int days) -> float {
+        float thresholds[4] = {t1 * days, t2 * days, t3 * days, t4 * days};
+        float cost = 0.0f;
+        float lower = 0.0f;
+        for (int i = 0; i < 4; i++) {
+          float upper = thresholds[i];
+          float used = mj - lower;
+          if (used < 0) used = 0;
+          if (used > (upper - lower)) used = (upper - lower);
+          cost += used * rates[i];
+          lower = upper;
+        }
+        float remaining = mj - lower;
+        if (remaining > 0) {
+          cost += remaining * rates[4];
+        }
+        return cost;
+      };
+
+      float cost_up_to_today = bracket_cost(quarter_mj_now, days_now);
+      float cost_up_to_yesterday = bracket_cost(quarter_mj_before_today, days_before_today);
+      float today_usage_cost = cost_up_to_today - cost_up_to_yesterday;
+      if (today_usage_cost < 0) today_usage_cost = 0;
+
+      float daily_charge = id(input_gas_daily_service_charge).state;
+      return daily_charge + today_usage_cost;
     web_server:
       sorting_group_id: group_utility_cost_sensors
       sorting_weight: 1
