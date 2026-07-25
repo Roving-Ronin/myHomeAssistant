@@ -1,0 +1,96 @@
+#########################################################################
+#
+# Utility - Sewerage
+#
+# Sewerage is a fixed annual connection fee only - no usage/consumption
+# component (unlike Town Water). Pro-rated to a daily rate, then tracked
+# for the current quarter using the SAME shared quarter reset as Town
+# Water (they're billed on the same dates), so this file has no reset
+# button or component of its own - it just reads
+# town_water_statistics_component's days_into_quarter().
+#
+# Requires utilities-town-water.yaml to be loaded (for
+# town_water_statistics_component and group_configuration_town_water_tariffs
+# / group_utility_cost_sensors).
+#
+
+########################## Restore input values from globals ###########
+esphome:
+  on_boot:
+    priority: -10
+    then:
+      - lambda: |-
+          id(input_sewerage_annual_fee).publish_state(id(sewerage_annual_fee));
+
+#######################################################################################
+
+globals:
+  - id: sewerage_annual_fee
+    type: float
+    restore_value: true
+    initial_value: "855.00"
+
+#######################################################################################
+#
+# Number Input - Sewerage annual connection fee. Update whenever the council
+# changes it.
+#
+number:
+  - platform: template
+    name: "Sewerage - Annual Fee"
+    id: input_sewerage_annual_fee
+    min_value: 0
+    max_value: 2000
+    step: 0.01
+    unit_of_measurement: "$"
+    optimistic: true
+    mode: box
+    icon: "mdi:cash-minus"
+    set_action:
+      then:
+        - globals.set:
+            id: sewerage_annual_fee
+            value: !lambda "return x;"
+    web_server:
+      sorting_group_id: group_configuration_town_water_tariffs
+      sorting_weight: 5
+
+#######################################################################################
+#
+# Sensors - Daily and quarter-to-date pro-rated fee. No usage charges at all.
+#
+sensor:
+  - platform: template
+    name: "Sewerage - Daily Fee"
+    id: sewerage_daily_fee
+    unit_of_measurement: "$"
+    device_class: monetary
+    accuracy_decimals: 4
+    icon: "mdi:cash-minus"
+    update_interval: ${water_sensor_update_interval}
+    lambda: |-
+      return id(sewerage_annual_fee) / 365.0f;
+    web_server:
+      sorting_group_id: group_utility_cost_sensors
+      sorting_weight: 7
+
+  - platform: template
+    name: "Sewerage - Quarter Fee"
+    id: sewerage_quarter_fee
+    unit_of_measurement: "$"
+    device_class: monetary
+    accuracy_decimals: 2
+    icon: "mdi:cash-minus"
+    update_interval: ${water_sensor_update_interval}
+    lambda: |-
+      // Shared reset date with Town Water - sewerage and town water are
+      // billed on the same dates, so this borrows Town Water's day count
+      // rather than tracking its own quarter/reset separately.
+      int days_elapsed = id(town_water_statistics_component).days_into_quarter();
+      if (days_elapsed < 1) days_elapsed = 1;
+      return (id(sewerage_annual_fee) / 365.0f) * days_elapsed;
+    web_server:
+      sorting_group_id: group_utility_cost_sensors
+      sorting_weight: 8
+
+################################################################################
