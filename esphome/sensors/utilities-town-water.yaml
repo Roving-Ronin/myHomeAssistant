@@ -215,7 +215,7 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 1
+      sorting_weight: 3
 
   - platform: template
     name: "Town Water - Tariff 2 Rate"
@@ -234,7 +234,7 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 2
+      sorting_weight: 5
 
   - platform: template
     name: "Town Water - Tariff 1 Daily Limit"
@@ -253,7 +253,7 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 3
+      sorting_weight: 4
 
   - platform: template
     name: "Town Water - Annual Fee"
@@ -272,7 +272,7 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 4
+      sorting_weight: 2
 
   - platform: template
     name: "Town Water - Meter Reading (Last Bill)"
