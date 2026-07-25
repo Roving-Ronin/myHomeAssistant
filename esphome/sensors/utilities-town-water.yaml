@@ -234,7 +234,7 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 3
+      sorting_weight: 5
 
   - platform: template
     name: "Town Water - Tariff 2 Rate"
@@ -253,7 +253,7 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 5
+      sorting_weight: 7
 
   - platform: template
     name: "Town Water - Tariff 1 Daily Limit"
@@ -272,7 +272,7 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 4
+      sorting_weight: 6
 
   - platform: template
     name: "Town Water - Annual Fee"
@@ -291,7 +291,7 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_town_water_tariffs
-      sorting_weight: 2
+      sorting_weight: 3
 
   - platform: template
     name: "Town Water - Meter (Last Bill)"
@@ -601,8 +601,9 @@ sensor:
   #
   #  Town Water pricing - bracketed 2-tier cost (Tariff 1 up to the daily
   #  limit averaged over the quarter-to-date, Tariff 2 above it), plus the
-  #  separately-tracked annual connection fee pro-rated to a daily/quarter
-  #  figure. Usage cost and connection fee are kept as separate sensors,
+  #  annual connection fee pro-rated and accrued day by day - a running
+  #  best-estimate of the final quarterly bill. The connection fee is also
+  #  still tracked on its own in "Town Water - Quarter Connection Fee" below,
   #  matching how the two line items appear separately on the actual bill.
   #
   - platform: template
@@ -615,8 +616,8 @@ sensor:
     update_interval: ${water_sensor_update_interval}
     lambda: |-
       // True bracketed total for quarter-to-date usage (Litres from
-      // Town Water - Quarter, converted to kL). Usage-only - excludes the
-      // annual connection fee, which is tracked separately below.
+      // Town Water - Quarter, converted to kL), plus the annual connection
+      // fee pro-rated and accrued for the days elapsed so far this quarter.
       float quarter_kl = id(town_water_quarter).state / 1000.0f;
       int days_elapsed = id(town_water_statistics_component).days_into_quarter();
       if (days_elapsed < 1) days_elapsed = 1;
@@ -632,10 +633,12 @@ sensor:
       float tariff2_kl = quarter_kl - threshold_kl;
       if (tariff2_kl < 0) tariff2_kl = 0;
 
-      return (tariff1_kl * tariff1_rate) + (tariff2_kl * tariff2_rate);
+      float usage_cost = (tariff1_kl * tariff1_rate) + (tariff2_kl * tariff2_rate);
+      float connection_fee = (id(town_water_annual_fee) / 365.0f) * days_elapsed;
+      return usage_cost + connection_fee;
     web_server:
       sorting_group_id: group_utility_cost_sensors
-      sorting_weight: 3
+      sorting_weight: 4
 
   - platform: template
     name: "Town Water - Daily Cost"
@@ -683,7 +686,7 @@ sensor:
       return today_cost;
     web_server:
       sorting_group_id: group_utility_cost_sensors
-      sorting_weight: 4
+      sorting_weight: 3
 
   - platform: template
     name: "Town Water - Daily Connection Fee"
@@ -696,8 +699,8 @@ sensor:
     lambda: |-
       return id(town_water_annual_fee) / 365.0f;
     web_server:
-      sorting_group_id: group_utility_cost_sensors
-      sorting_weight: 5
+      sorting_group_id: group_configuration_town_water_tariffs
+      sorting_weight: 4
 
   - platform: template
     name: "Town Water - Quarter Connection Fee"
