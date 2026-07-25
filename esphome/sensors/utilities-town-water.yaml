@@ -275,7 +275,7 @@ number:
       sorting_weight: 3
 
   - platform: template
-    name: "Town Water - Annual Connection Fee"
+    name: "Town Water - Annual Fee"
     id: input_town_water_annual_fee
     min_value: 0
     max_value: 2000
