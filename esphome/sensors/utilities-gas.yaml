@@ -136,8 +136,9 @@ globals:
     type: float
     restore_value: true
     initial_value: "0.0297"    # 2.97 ¢/MJ
-  # One-off setup values - used by the "Gas - Meter Readings (Apply)" button
-  # to seed the quarter baseline and calibrate the lifetime m³ total.
+  # One-off setup values - used by "Gas - Quarter Start Date"'s on_value
+  # calibration to seed the quarter baseline and calibrate the lifetime m³
+  # total.
   - id: gas_last_bill_reading_m3
     type: float
     restore_value: true
@@ -402,7 +403,7 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_gas_meter_calibration
-      sorting_weight: 4
+      sorting_weight: 1
 
   - platform: template
     name: "Gas - Meter Reading (Current)"
@@ -421,105 +422,66 @@ number:
             value: !lambda "return x;"
     web_server:
       sorting_group_id: group_configuration_gas_meter_calibration
-      sorting_weight: 5
-
-#######################################################################################
-#
-# Select Inputs - Used to configure Gas day and month of the quarter reset day.
-#
-select:
-  - platform: template
-    name: "Gas - Quarter Reset Day"
-    id: input_gas_quarter_reset_day
-    optimistic: true
-    restore_value: true
-    icon: "mdi:calendar-refresh"
-    options:
-      - "1"
-      - "2"
-      - "3"
-      - "4"
-      - "5"
-      - "6"
-      - "7"
-      - "8"
-      - "9"
-      - "10"
-      - "11"
-      - "12"
-      - "13"
-      - "14"
-      - "15"
-      - "16"
-      - "17"
-      - "18"
-      - "19"
-      - "20"
-      - "21"
-      - "22"
-      - "23"
-      - "24"
-      - "25"
-      - "26"
-      - "27"
-      - "28"
-      - "29"
-      - "30"
-      - "31"
-    initial_option: "1"
-    web_server:
-      sorting_group_id: group_configuration_gas_meter_calibration
-      sorting_weight: 1
-
-  - platform: template
-    name: "Gas - Quarter Start Month"
-    id: input_gas_quarter_start_month
-    optimistic: true
-    restore_value: true
-    icon: "mdi:calendar-start"
-    options:
-      - "January"
-      - "February"
-      - "March"
-      - "April"
-      - "May"
-      - "June"
-      - "July"
-      - "August"
-      - "September"
-      - "October"
-      - "November"
-      - "December"
-    initial_option: "January"
-    web_server:
-      sorting_group_id: group_configuration_gas_meter_calibration
       sorting_weight: 2
 
 #######################################################################################
 #
-# Buttons - Manual quarter reset safety net, and one-off setup action for
-# starting mid-quarter (seeds the quarter baseline + calibrates the lifetime
-# m³ total from a last-bill-reading / current-meter-reading pair).
+# Number Input - Fallback safety net. If "Gas - Quarter Start Date" below
+# hasn't been updated in this many days (e.g. you're waiting on the real
+# bill to arrive before you know the exact start date), the quarter
+# baseline auto-resets to today so day-scaled pricing thresholds don't
+# silently grow unbounded. This is only an estimate for the gap until you
+# enter the real date/meter readings - see the interval: block further
+# down. Real billing periods have run 85-97 days historically.
 #
-button:
   - platform: template
-    name: "Gas - Quarter Apply"
-    icon: "mdi:restart"
-    on_press:
-      then:
-        - lambda: |-
-            id(gas_statistics_component).reset_quarter();
-            id(gas_statistics_mj_component).reset_quarter();
+    name: "Gas - Quarter Max Length (days)"
+    id: input_gas_quarter_max_days
+    min_value: 30
+    max_value: 120
+    step: 1
+    unit_of_measurement: "days"
+    optimistic: true
+    restore_value: true
+    initial_value: 94
+    mode: box
+    icon: "mdi:calendar-alert"
     web_server:
       sorting_group_id: group_configuration_gas_meter_calibration
-      sorting_weight: 3
+      sorting_weight: 4
 
+#######################################################################################
+#
+# Datetime Input - Pick the actual date your gas billing quarter started
+# (once you know it from the real bill, which often arrives a week or two
+# into the new quarter). Setting this date runs the full calibration in one
+# step: it reads "Gas - Meter Reading (Last Bill)" / "Gas - Meter Reading
+# (Current)", calibrates the lifetime m³/MJ totals to the physical reading,
+# and backdates the quarter usage + day-count baseline to this date instead
+# of "today" - so day-scaled pricing thresholds are correct immediately,
+# even though you're calibrating after the quarter has already been running
+# a while.
+#
+datetime:
   - platform: template
-    name: "Gas - Meter Readings (Apply)"
-    icon: "mdi:calendar-refresh"
-    on_press:
+    name: "Gas - Quarter Start Date"
+    id: gas_quarter_start_date
+    type: date
+    optimistic: true
+    restore_value: true
+    icon: "mdi:calendar-start"
+    on_value:
       then:
         - lambda: |-
+            // Skip this on boot, when ESPHome restores the saved date and
+            // republishes it - only act on a real, user-initiated change.
+            // Without this guard, every reboot would silently re-run the
+            // whole calibration using whatever the meter-reading inputs
+            // happen to hold at the time.
+            if (!App.is_fully_setup()) {
+              return;
+            }
+
             float current_reading = id(input_gas_current_meter_reading).state;
             float last_bill = id(input_gas_last_bill_reading).state;
             float already_consumed_m3 = current_reading - last_bill;
@@ -528,8 +490,8 @@ button:
             }
 
             // 1) Calibrate the lifetime m³ total to the physical reading.
-            //    This must run BEFORE the global is updated below, since it
-            //    reads the *old* total internally to work out how far
+            //    Must run BEFORE the global is updated below, since it reads
+            //    the *old* total internally to work out how far
             //    today/week/month/year need to shift to stay unaffected by
             //    the jump.
             id(gas_statistics_component).calibrate_total(current_reading);
@@ -541,8 +503,10 @@ button:
             id(gas_total_m3).update();
 
             // 3) Seed the m³ quarter baseline from the real consumption
-            //    since the last bill. This runs *after* step 2 so it reads
-            //    the newly calibrated total.
+            //    since the last bill. The m³ "Gas - Quarter" sensor has no
+            //    day-scaled pricing riding on it (only the MJ side below
+            //    does), so the plain reset_quarter() is enough here - it
+            //    doesn't track a quarter start date at all.
             id(gas_statistics_component).reset_quarter(already_consumed_m3);
 
             // 4) Seed the MJ quarter baseline the same way, converting via
@@ -554,10 +518,39 @@ button:
             float pressure_factor = id(input_gas_pressure_factor).state;
             float heating_value = id(input_gas_heating_value).state;
             float already_consumed_mj = already_consumed_m3 * pressure_factor * heating_value;
-            id(gas_statistics_mj_component).reset_quarter(already_consumed_mj);
+            id(gas_statistics_mj_component).reset_quarter_from_date(
+                already_consumed_mj,
+                id(gas_quarter_start_date).year,
+                id(gas_quarter_start_date).month,
+                id(gas_quarter_start_date).day);
     web_server:
       sorting_group_id: group_configuration_gas_meter_calibration
-      sorting_weight: 6
+      sorting_weight: 3
+
+#######################################################################################
+#
+# Interval - Max-quarter-length fallback. Checked hourly; if either quarter
+# has run longer than "Gas - Quarter Max Length (days)" without a real
+# calibration, auto-resets both baselines to today so pricing thresholds
+# don't scale up indefinitely. This does NOT touch "Gas - Quarter Start
+# Date" itself (it stays showing whatever you last entered) - once your
+# real bill arrives, still go back and enter the true date + meter readings
+# so the quarter's usage/cost figures are accurate, not just estimated.
+#
+interval:
+  - interval: 1h
+    then:
+      - lambda: |-
+          int days = id(gas_statistics_mj_component).days_into_quarter();
+          int max_days = (int) id(input_gas_quarter_max_days).state;
+          if (days > 0 && days > max_days) {
+            ESP_LOGW("gas_quarter_fallback",
+                     "Gas quarter exceeded max length (%d > %d days) with no calibration - auto-resetting baseline. "
+                     "Update 'Gas - Quarter Start Date' with the real bill once it arrives.",
+                     days, max_days);
+            id(gas_statistics_component).reset_quarter();
+            id(gas_statistics_mj_component).reset_quarter();
+          }
 
 ################################################################################
 #
@@ -727,8 +720,6 @@ sensor:
   - platform: "gas_statistics"
     id: gas_statistics_component
     total: gas_total_m3
-    quarter_reset_day: input_gas_quarter_reset_day
-    quarter_start_month: input_gas_quarter_start_month
 
     gas_today:
       name: "Gas - Today"
@@ -794,8 +785,6 @@ sensor:
   - platform: "gas_statistics_mj"
     id: gas_statistics_mj_component
     total: gas_total_mj
-    quarter_reset_day: input_gas_quarter_reset_day
-    quarter_start_month: input_gas_quarter_start_month
     gas_today:
       name: "Gas - Today (MJ)"
       id: gas_used_today_mj
@@ -926,6 +915,23 @@ sensor:
     web_server:
       sorting_group_id: group_consumption_gas_m3
       sorting_weight: 1
+
+  - platform: template
+    name: "Gas - Quarter Days Elapsed"
+    id: gas_quarter_days_elapsed
+    unit_of_measurement: "days"
+    accuracy_decimals: 0
+    icon: "mdi:calendar-clock"
+    update_interval: ${gas_sensor_update_interval}
+    lambda: |-
+      // Diagnostic - the raw day count days_into_quarter() is scaling the
+      // pricing thresholds by. 0 means the quarter start date hasn't been
+      // established yet (e.g. before "Gas - Quarter Start Date" has ever
+      // been set on a fresh device).
+      return id(gas_statistics_mj_component).days_into_quarter();
+    web_server:
+      sorting_group_id: group_consumption_gas_mj
+      sorting_weight: 7
 
   - platform: template
     name: "Gas - Quarter Cost"
