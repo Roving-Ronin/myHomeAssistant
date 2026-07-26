@@ -97,6 +97,17 @@ globals:
     type: std::string
     restore_value: no
     initial_value: '""'
+  # Permanent running total of every already-completed quarter's true
+  # bracketed cost (usage + service charge accrued) - folded in right before
+  # each quarter reset (see "Gas - Quarter Start Date" on_value and the
+  # max-length fallback interval below), so "Gas - Lifetime Cost" can keep
+  # counting up smoothly forever, unlike "Gas - Quarter Cost" which resets
+  # every quarter. Never decremented - safe for HA's Energy Dashboard
+  # "entity tracking total costs" option.
+  - id: gas_lifetime_cost_completed
+    type: float
+    restore_value: true
+    initial_value: "0.0"
   #
   # Gas pricing / cost tracking - mirrors the stepped MJ pricing + daily
   # service charge from the gas retailer's bill. Update the step
@@ -536,7 +547,15 @@ datetime:
             //    doesn't track a quarter start date at all.
             id(gas_statistics_component).reset_quarter(already_consumed_m3);
 
-            // 4) Seed the MJ quarter baseline the same way, converting via
+            // 4) Fold the just-finished quarter's true bracketed cost
+            //    (usage + service charge accrued) into the permanent
+            //    lifetime-cost accumulator, before the reset below zeroes
+            //    "Gas - Quarter Cost" back out - so "Gas - Lifetime Cost"
+            //    keeps counting up smoothly across the reset instead of
+            //    losing the quarter that just ended.
+            id(gas_lifetime_cost_completed) += id(gas_quarter_cost).state;
+
+            // 5) Seed the MJ quarter baseline the same way, converting via
             //    the current Pressure Factor / Heating Value (valid here
             //    since it's scoped to just this quarter). The MJ lifetime
             //    total itself is never recalibrated - it keeps accumulating
@@ -575,6 +594,10 @@ interval:
                      "Gas quarter exceeded max length (%d > %d days) with no calibration - auto-resetting baseline. "
                      "Update 'Gas - Quarter Start Date' with the real bill once it arrives.",
                      days, max_days);
+            // Fold the just-finished quarter's cost into the lifetime
+            // accumulator before resetting, same as the real calibration
+            // path above - keeps "Gas - Lifetime Cost" continuous.
+            id(gas_lifetime_cost_completed) += id(gas_quarter_cost).state;
             id(gas_statistics_component).reset_quarter();
             id(gas_statistics_mj_component).reset_quarter();
           }
@@ -1032,6 +1055,29 @@ sensor:
     web_server:
       sorting_group_id: group_utility_cost_sensors
       sorting_weight: 2
+
+  - platform: template
+    name: "Gas - Lifetime Cost"
+    id: gas_lifetime_cost
+    unit_of_measurement: "$"
+    device_class: monetary
+    state_class: total_increasing
+    accuracy_decimals: 2
+    icon: "mdi:cash-multiple"
+    update_interval: ${gas_sensor_update_interval}
+    lambda: |-
+      // Ever-increasing running total - safe for Home Assistant's Energy
+      // Dashboard "entity tracking total costs" option, unlike "Gas -
+      // Quarter Cost" (which resets every quarter and produces negative
+      // deltas there). Sum of every already-completed quarter's true
+      // bracketed cost (folded into gas_lifetime_cost_completed right
+      // before each reset - see "Gas - Quarter Start Date" on_value and the
+      // max-length fallback interval) plus the current quarter's own live
+      // running Quarter Cost.
+      return id(gas_lifetime_cost_completed) + id(gas_quarter_cost).state;
+    web_server:
+      sorting_group_id: group_utility_cost_sensors
+      sorting_weight: 6
 
   - platform: template
     name: "Gas - Daily Cost"
