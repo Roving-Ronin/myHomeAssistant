@@ -111,6 +111,6 @@ sensor:
       return id(town_water_quarter_cost).state + id(sewerage_quarter_fee).state;
     web_server:
       sorting_group_id: group_utility_cost_sensors
-      sorting_weight: 5
+      sorting_weight: 7
 
 ################################################################################
