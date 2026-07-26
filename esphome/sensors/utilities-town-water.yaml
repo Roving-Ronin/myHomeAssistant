@@ -89,6 +89,18 @@ globals:
     restore_value: no
     initial_value: '""'
 
+  # Permanent running total of every already-completed quarter's true
+  # bracketed cost (usage + connection fee accrued) - folded in right before
+  # each quarter reset (see "Town Water - Quarter Start Date" on_value and
+  # the max-length fallback interval below), so "Town Water - Lifetime Cost"
+  # can keep counting up smoothly forever, unlike "Town Water - Quarter
+  # Cost" which resets every quarter. Never decremented - safe for HA's
+  # Energy Dashboard "entity tracking total costs" option.
+  - id: town_water_lifetime_cost_completed
+    type: float
+    restore_value: true
+    initial_value: "0.0"
+
   #
   # Town Water pricing / cost tracking. Tariff 1 applies up to the daily
   # limit (averaged over the whole billing period, since the meter is only
@@ -294,7 +306,7 @@ number:
       sorting_weight: 4
 
   - platform: template
-    name: "Town Water - Meter (Last Bill)"
+    name: "Town Water - Reading (Last Bill)"
     id: input_town_water_last_bill_reading
     min_value: 0
     max_value: 99999
@@ -313,7 +325,7 @@ number:
       sorting_weight: 1
 
   - platform: template
-    name: "Town Water - Meter (Current)"
+    name: "Town Water - Reading (Current)"
     id: input_town_water_current_meter_reading
     min_value: 0
     max_value: 9999999
@@ -353,7 +365,7 @@ number:
 # started (once you know it from the real bill/meter read - often only
 # known a week or two after the fact, since periods land on irregular
 # dates). Setting this date runs the full calibration in one step: it reads
-# "Town Water - Meter (Last Bill)" / "Town Water - Meter
+# "Town Water - Reading (Last Bill)" / "Town Water - Reading
 # (Current)", calibrates the lifetime L total to the physical reading, and
 # backdates the quarter usage + day-count baseline to this date instead of
 # "today" - so day-scaled pricing (and Sewerage's shared quarter, which
@@ -398,7 +410,15 @@ datetime:
             id(global_town_water_total) = current_reading_l;
             id(town_water_total).update();
 
-            // 3) Seed the quarter baseline from the real consumption since
+            // 3) Fold the just-finished quarter's true bracketed cost
+            //    (usage + connection fee accrued) into the permanent
+            //    lifetime-cost accumulator, before the reset below zeroes
+            //    "Town Water - Quarter Cost" back out - so "Town Water -
+            //    Lifetime Cost" keeps counting up smoothly across the
+            //    reset instead of losing the quarter that just ended.
+            id(town_water_lifetime_cost_completed) += id(town_water_quarter_cost).state;
+
+            // 4) Seed the quarter baseline from the real consumption since
             //    the last bill, backdated to the picked date. Runs *after*
             //    step 2 so it reads the newly calibrated total.
             id(town_water_statistics_component).reset_quarter_from_date(
@@ -432,6 +452,10 @@ interval:
                      "Town Water quarter exceeded max length (%d > %d days) with no calibration - auto-resetting "
                      "baseline. Update 'Town Water - Quarter Start Date' with the real bill once it arrives.",
                      days, max_days);
+            // Fold the just-finished quarter's cost into the lifetime
+            // accumulator before resetting, same as the real calibration
+            // path above - keeps "Town Water - Lifetime Cost" continuous.
+            id(town_water_lifetime_cost_completed) += id(town_water_quarter_cost).state;
             id(town_water_statistics_component).reset_quarter();
           }
 
@@ -673,6 +697,29 @@ sensor:
     web_server:
       sorting_group_id: group_utility_cost_sensors
       sorting_weight: 4
+
+  - platform: template
+    name: "Town Water - Lifetime Cost"
+    id: town_water_lifetime_cost
+    unit_of_measurement: "$"
+    device_class: monetary
+    state_class: total_increasing
+    accuracy_decimals: 2
+    icon: "mdi:cash-multiple"
+    update_interval: ${water_sensor_update_interval}
+    lambda: |-
+      // Ever-increasing running total - safe for Home Assistant's Energy
+      // Dashboard "entity tracking total costs" option, unlike "Town Water
+      // - Quarter Cost" (which resets every quarter and produces negative
+      // deltas there). Sum of every already-completed quarter's true
+      // bracketed cost (folded into town_water_lifetime_cost_completed
+      // right before each reset - see "Town Water - Quarter Start Date"
+      // on_value and the max-length fallback interval) plus the current
+      // quarter's own live running Quarter Cost.
+      return id(town_water_lifetime_cost_completed) + id(town_water_quarter_cost).state;
+    web_server:
+      sorting_group_id: group_utility_cost_sensors
+      sorting_weight: 7
 
   - platform: template
     name: "Town Water - Daily Cost"
