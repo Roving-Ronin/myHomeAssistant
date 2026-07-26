@@ -576,11 +576,9 @@ sensor:
     update_interval: ${water_sensor_update_interval}  # Set interval that updates are sent to HA instance
     lambda: |-
           return id(global_town_water_total);
-    internal: true
-#    web_server:
-#      sorting_group_id: group_consumption_town_water
-#      sorting_weight: 6
-
+    web_server:
+      sorting_group_id: group_consumption_town_water
+      sorting_weight: 6
 
   - platform: template
     name: "Town Water - Quarter Days Elapsed"
@@ -598,6 +596,40 @@ sensor:
     web_server:
       sorting_group_id: group_consumption_town_water
       sorting_weight: 7
+
+  ################################################################################
+  #
+  #  Marginal per-Litre rate for whichever tariff tier quarter-to-date usage
+  #  currently sits in - informational only (mirrors "Gas - Price (MJ)").
+  #  The true cost total is "Town Water - Quarter Cost" below, which is a
+  #  bracketed sum, not this single rate multiplied by usage.
+  #
+  - platform: template
+    name: "Town Water - Price (L)"
+    id: town_water_price_l
+    unit_of_measurement: "$/L"
+    device_class: monetary
+    accuracy_decimals: 5
+    icon: "mdi:currency-usd"
+    update_interval: ${water_sensor_update_interval}
+    lambda: |-
+      float quarter_kl = id(town_water_quarter).state / 1000.0f;
+      int days_elapsed = id(town_water_statistics_component).days_into_quarter();
+      if (days_elapsed < 1) days_elapsed = 1;
+
+      float daily_limit = id(town_water_tariff1_daily_limit);
+      float threshold_kl = daily_limit * days_elapsed;
+
+      float tariff1_rate = id(town_water_tariff1_rate);
+      float tariff2_rate = id(town_water_tariff2_rate);
+
+      // Tariffs are entered in $/kL to match the bill - convert to $/L to
+      // match the Litre-denominated consumption sensors.
+      float rate_per_kl = (quarter_kl <= threshold_kl) ? tariff1_rate : tariff2_rate;
+      return rate_per_kl / 1000.0f;
+    web_server:
+      sorting_group_id: group_consumption_town_water
+      sorting_weight: 0
 
   ################################################################################
   #
