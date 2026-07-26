@@ -1077,7 +1077,7 @@ sensor:
       return id(gas_lifetime_cost_completed) + id(gas_quarter_cost).state;
     web_server:
       sorting_group_id: group_utility_cost_sensors
-      sorting_weight: 6
+      sorting_weight: 3
 
   - platform: template
     name: "Gas - Daily Cost"
