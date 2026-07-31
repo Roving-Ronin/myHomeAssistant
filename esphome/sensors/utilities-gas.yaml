@@ -1061,7 +1061,7 @@ sensor:
     id: gas_lifetime_cost
     unit_of_measurement: "$"
     device_class: monetary
-    state_class: total_increasing
+    state_class: total
     accuracy_decimals: 2
     icon: "mdi:cash-multiple"
     update_interval: ${gas_sensor_update_interval}
