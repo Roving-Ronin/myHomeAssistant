@@ -8,3 +8,4 @@ The files are what I have developed, with assistance of various forum users and 
 Files are located in folders that denote them being esphome configurations and template files, and package files that are Home Assistant yaml to add functionality such as new sensors or the ability to track and cost gas, water or electricity consumption.
 
 
+![myHome](./images/home-live-data.gif)
