@@ -39,7 +39,9 @@ substitutions:
   backlight1_assignment: "Backlight 1"
   backlight2_assignment: "Backlight 2"
 
-  
+  # Areas names, assigned to devices vs 'Area' for overall switch
+  device_id1: "backyard_lights"
+  device_id2: "patio_light"
 
 ########################## End of Substitutions #########################
 #
