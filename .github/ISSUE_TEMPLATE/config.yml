@@ -1,0 +1,12 @@
+---
+blank_issues_enabled: false
+contact_links:
+  - name: Repository README
+    url: https://github.com/Roving-Ronin/myHomeAssistant/blob/main/README.md
+    about: Overview of the ESPHome configurations, components and Home Assistant packages in this repository.
+  - name: ESPHome documentation
+    url: https://esphome.io/
+    about: General ESPHome questions not specific to these configurations.
+  - name: Home Assistant Community forum
+    url: https://community.home-assistant.io/
+    about: General Home Assistant questions not specific to these configurations.

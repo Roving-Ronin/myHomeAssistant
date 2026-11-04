@@ -1,0 +1,104 @@
+name: Bug report
+description: Report a problem with an ESPHome configuration, component or Home Assistant package
+labels: ['type/bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **NOTE:** Before you start, please check the following.
+
+        - Read the [README](https://github.com/Roving-Ronin/myHomeAssistant/blob/main/README.md) and any comments at the top of the file you are using.
+        - Make sure no [similar issues (including closed ones)](https://github.com/Roving-Ronin/myHomeAssistant/issues?q=is%3Aissue+label%3Atype%2Fbug) exist.
+        - Make sure you are using the latest version of the file from the `main` branch.
+
+        These are personal configurations shared as-is, with no warranty. Thanks for taking the time to help improve them!
+  - type: checkboxes
+    attributes:
+      label: Is there an existing issue for this?
+      description: Please search to see if an issue already exists for the bug you encountered.
+      options:
+        - label: I have searched the existing issues
+          required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which area?
+      description: Which part of the repository is affected?
+      options:
+        - ESPHome device configuration (esphome/)
+        - ESPHome external component (components/)
+        - Home Assistant package (packages/)
+        - Other / Not sure
+    validations:
+      required: true
+  - type: input
+    id: file
+    attributes:
+      label: File(s)
+      description: Path of the file(s) involved.
+      placeholder: e.g. esphome/athom-smart-plug-v3.yaml or components/energy_statistics
+    validations:
+      required: true
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: Current Behaviour
+      description: A concise description of what you're experiencing. Screenshots are very helpful.
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps To Reproduce
+      description: Steps to reproduce the behaviour.
+      placeholder: |
+        1. Compile / install this configuration...
+        2. Do this on the device / in Home Assistant...
+        3. See error...
+    validations:
+      required: false
+  - type: textarea
+    id: expected-behaviour
+    attributes:
+      label: Expected Behaviour
+      description: A concise description of what you expected to happen.
+      placeholder: Tell us what you should see!
+    validations:
+      required: true
+  - type: input
+    id: hardware
+    attributes:
+      label: Device / Board
+      description: For ESPHome issues, the device and chip (e.g. Athom Smart Plug V3, ESP32-C3, KinCony KC868-A16).
+    validations:
+      required: false
+  - type: input
+    id: esphome-version
+    attributes:
+      label: ESPHome Version
+      description: For ESPHome issues (shown in the ESPHome dashboard or the compile log).
+    validations:
+      required: false
+  - type: input
+    id: ha-version
+    attributes:
+      label: Home Assistant Version
+      description: The version of Home Assistant you have installed (Settings → About).
+    validations:
+      required: true
+  - type: textarea
+    id: config
+    attributes:
+      label: Configuration
+      description: Paste the relevant YAML, with passwords, keys and other secrets removed. This will be automatically formatted into code, so no need for backticks.
+      render: yaml
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Relevant ESPHome compile or device logs, or Home Assistant logs (Settings → System → Logs). This will be automatically formatted into code, so no need for backticks.
+      render: shell
+    validations:
+      required: false

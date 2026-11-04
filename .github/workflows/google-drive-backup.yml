@@ -1,0 +1,148 @@
+name: Backup to Google Drive
+
+# Uploads a zip (full git bundle of all branches, tags and history, plus a
+# browsable snapshot of the files on main) to Google Drive
+# with rclone, then applies retention: always keep the newest 10 backups, and
+# trash any older ones that are more than 90 days old.
+#
+# Requires three repository secrets (from your own Google Cloud OAuth client,
+# published "In production", scope drive.file):
+#   GDRIVE_CLIENT_ID      OAuth client ID
+#   GDRIVE_CLIENT_SECRET  OAuth client secret
+#   GDRIVE_REFRESH_TOKEN  refresh token from the OAuth Playground
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gdrive-backup
+  cancel-in-progress: false
+
+env:
+  REMOTE_DIR: "gdrive:GitHub-Backups/${{ github.event.repository.name }}"
+  PREFIX: "Github-${{ github.event.repository.name }}-"
+  KEEP_MIN: 10
+  KEEP_DAYS: 90
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Check the secrets are set
+        env:
+          GDRIVE_CLIENT_ID: ${{ secrets.GDRIVE_CLIENT_ID }}
+          GDRIVE_CLIENT_SECRET: ${{ secrets.GDRIVE_CLIENT_SECRET }}
+          GDRIVE_REFRESH_TOKEN: ${{ secrets.GDRIVE_REFRESH_TOKEN }}
+        run: |
+          fail=0
+          for s in GDRIVE_CLIENT_ID GDRIVE_CLIENT_SECRET GDRIVE_REFRESH_TOKEN; do
+            if [ -z "${!s}" ]; then
+              echo "::error::$s secret is missing or empty."
+              fail=1
+            fi
+          done
+          exit $fail
+
+      - name: Install rclone
+        run: |
+          curl -fsSL https://rclone.org/install.sh | sudo bash
+          rclone version
+
+      - name: Write rclone config
+        env:
+          GDRIVE_CLIENT_ID: ${{ secrets.GDRIVE_CLIENT_ID }}
+          GDRIVE_CLIENT_SECRET: ${{ secrets.GDRIVE_CLIENT_SECRET }}
+          GDRIVE_REFRESH_TOKEN: ${{ secrets.GDRIVE_REFRESH_TOKEN }}
+        run: |
+          mkdir -p ~/.config/rclone
+          # Expired placeholder access token: rclone refreshes it from the refresh token.
+          # It must be non-empty — rclone ignores a token with an empty access_token.
+          TOKEN=$(jq -cn --arg rt "$GDRIVE_REFRESH_TOKEN" \
+            '{access_token:"placeholder", token_type:"Bearer", refresh_token:$rt, expiry:"2000-01-01T00:00:00Z"}')
+          cat > ~/.config/rclone/rclone.conf <<EOF
+          [gdrive]
+          type = drive
+          client_id = ${GDRIVE_CLIENT_ID}
+          client_secret = ${GDRIVE_CLIENT_SECRET}
+          scope = drive.file
+          token = ${TOKEN}
+          EOF
+          chmod 600 ~/.config/rclone/rclone.conf
+          # Fail early, with a clear message, if Google rejects the credentials
+          # (also creates the backup folder on the first run)
+          rclone mkdir "$REMOTE_DIR" || {
+            echo "::error::Google Drive sign-in failed. Check the 3 secrets, and that the OAuth app is 'In production'."
+            exit 1
+          }
+
+      - name: Create zip (git bundle + source snapshot)
+        run: |
+          REPO="${{ github.event.repository.name }}"
+          BASE="${PREFIX}$(TZ=Australia/Sydney date +'%Y-%m-%d_%H%M%S')"
+          STAGE="$RUNNER_TEMP/$BASE"
+          mkdir -p "$STAGE/source"
+
+          # Make every remote branch a local branch so the bundle restores cleanly
+          for b in $(git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin | grep -v '^HEAD$'); do
+            git show-ref --verify --quiet "refs/heads/$b" || git branch --quiet "$b" "origin/$b"
+          done
+
+          # 1. Full history: all branches and tags
+          git bundle create "$STAGE/$REPO.bundle" HEAD --branches --tags
+          git bundle verify "$STAGE/$REPO.bundle"
+
+          # 2. Browsable copy of the files on main, as they are now
+          git archive HEAD | tar -x -C "$STAGE/source"
+
+          cat > "$STAGE/RESTORE.txt" <<EOF
+          Backup of github.com/${{ github.repository }}
+          Created: $(TZ=Australia/Sydney date +'%Y-%m-%d %H:%M:%S %Z')
+          Commit:  $(git rev-parse HEAD) (main)
+
+          source/       Files on main at the time of the backup (no git history).
+          $REPO.bundle  Full git repository: every branch, tag and commit.
+
+          To restore the full repository:
+            git clone $REPO.bundle $REPO
+          EOF
+
+          (cd "$STAGE" && zip -q -r -9 "$GITHUB_WORKSPACE/$BASE.zip" .)
+          unzip -tq "$BASE.zip"
+          ls -lh "$BASE.zip"
+          echo "ARCHIVE=$BASE.zip" >> "$GITHUB_ENV"
+
+      - name: Upload to Google Drive
+        run: |
+          rclone copyto "$ARCHIVE" "$REMOTE_DIR/$ARCHIVE" --progress=false --stats-one-line -v
+
+      - name: Apply retention (keep newest 10, trash others older than 90 days)
+        run: |
+          CUTOFF=$(date -u -d "-${KEEP_DAYS} days" +%s)
+          rclone lsjson "$REMOTE_DIR" --files-only > listing.json
+          echo "Backups in Drive: $(jq --arg p "$PREFIX" '[.[] | select(.Name | startswith($p))] | length' listing.json)"
+
+          jq -r --arg p "$PREFIX" --argjson keep "$KEEP_MIN" --argjson cutoff "$CUTOFF" '
+            [ .[] | select((.Name | startswith($p)) and (.Name | endswith(".zip"))) ]
+            | sort_by(.ModTime) | reverse
+            | .[$keep:]
+            | .[] | select((.ModTime | sub("\\.[0-9]+"; "") | fromdateiso8601) < $cutoff)
+            | .Name' listing.json > to-delete.txt
+
+          if [ ! -s to-delete.txt ]; then
+            echo "Nothing to remove."
+            exit 0
+          fi
+          while IFS= read -r f; do
+            echo "Trashing $f"
+            rclone deletefile "$REMOTE_DIR/$f"   # Drive moves it to Trash by default
+          done < to-delete.txt
