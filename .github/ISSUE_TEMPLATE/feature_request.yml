@@ -1,0 +1,64 @@
+name: Feature request
+description: Suggest an idea for an ESPHome configuration, component or Home Assistant package
+labels: ['type/feature']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to help improve this project!
+  - type: checkboxes
+    attributes:
+      label: Is there an existing issue for this?
+      description: Please search to see if an issue already exists for the feature you are requesting.
+      options:
+        - label: I have searched the existing issues
+          required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which area?
+      description: Which part of the repository should this apply to?
+      options:
+        - ESPHome device configuration (esphome/)
+        - ESPHome external component (components/)
+        - Home Assistant package (packages/)
+        - New device or package
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: file
+    attributes:
+      label: File(s)
+      description: Path of the existing file(s) this relates to, if any.
+      placeholder: e.g. packages/solar_analytics.yaml
+    validations:
+      required: false
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: Current Behaviour
+      description: A concise description of what it does now (or what is missing).
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behaviour
+    attributes:
+      label: Desired Behaviour
+      description: A concise description of what you would like it to do.
+      placeholder: Tell us what you would like to see!
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Possible Solutions
+      description: If you have an idea on how to implement this, e.g. which sensor, entity or ESPHome component could be used, please let us know.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Context / Reason
+      description: Providing context helps us come up with a solution that is most useful in the real world.
+    validations:
+      required: true
